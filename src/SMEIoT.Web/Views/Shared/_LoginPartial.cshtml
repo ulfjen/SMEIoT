@@ -1,0 +1,12 @@
+@using Microsoft.AspNetCore.Identity
+@using SMEIoT.Core.Entities
+
+@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
+
+@if (SignInManager.IsSignedIn(User))
+{
+}
+else
+{
+}

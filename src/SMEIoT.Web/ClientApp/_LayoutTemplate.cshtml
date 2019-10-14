@@ -1,0 +1,35 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>@ViewData["Title"]</title>
+
+  <% for (var chunk in htmlWebpackPlugin.files.chunks) { %>
+  <link href="<%= htmlWebpackPlugin.files.chunks[chunk].css %>" rel="stylesheet"/>
+  <% } %>
+
+</head>
+
+<body data-controller="@ViewContext.RouteData.Values["Controller"]" data-action="@System.IO.Path.GetFileNameWithoutExtension(ViewContext.View.Path)">
+<partial name="_CookieConsentPartial"/>
+
+<div id="react-main"></div>
+@RenderBody()
+
+@if (IsSectionDefined("BeforeBundle"))
+{
+  @RenderSection("BeforeBundle")
+}
+
+<% for (var chunk in htmlWebpackPlugin.files.chunks) { %>
+<script src="<%= htmlWebpackPlugin.files.chunks[chunk].entry %>" asp-append-version="true"></script>
+<% } %>
+
+@if (IsSectionDefined("AfterBundle"))
+{
+  @RenderSection("AfterBundle")
+}
+
+</body>
+</html>

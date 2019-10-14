@@ -1,0 +1,15 @@
+﻿@using SMEIoT.Views.Helpers
+@model SMEIoT.Web.ApiModels.AdminUserApiModel
+
+@{
+    Layout = "_Layout";
+}
+
+@section BeforeBundle {
+  @{ await Html.RenderPartialAsync("_CsrfToken"); }
+  @{
+    var rendered = new Dictionary<string, object>();
+    rendered["user"] = @Model;
+  }
+  <dom-json objects="rendered"></dom-json>
+}

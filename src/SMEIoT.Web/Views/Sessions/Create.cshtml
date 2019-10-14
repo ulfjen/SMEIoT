@@ -1,0 +1,11 @@
+@using SMEIoT.Views.Helpers
+
+@section BeforeBundle {
+  @{ await Html.RenderPartialAsync("_CsrfToken"); }
+  @{
+    var rendered = new Dictionary<string, object>();
+    rendered["validation_errors"] = ViewData.ModelState.JsonValidation();
+    rendered["model"] = new {username = @Model.Username};
+  }
+  <dom-json objects="rendered"></dom-json>
+}
