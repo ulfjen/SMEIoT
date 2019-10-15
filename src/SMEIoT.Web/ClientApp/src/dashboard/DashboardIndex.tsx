@@ -1,6 +1,8 @@
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
+import Link from '@material-ui/core/Link';
 import * as React from "react";
 import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
@@ -13,7 +15,7 @@ import { BasicUserApiModel } from 'smeiot-client/src';
 import moment from 'moment';
 
 
-const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Theme) => createStyles({
+const styles = ({ palette, spacing, transitions, zIndex, mixins, breakpoints }: Theme) => createStyles({
   container: {
     paddingTop: spacing(4),
     paddingBottom: spacing(4),
@@ -27,6 +29,9 @@ const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Th
   fixedHeight: {
     height: 240,
   },
+  context: {
+    flex: 1,
+  },
 });
 
 export interface IDashboardIndexProps extends WithStyles<typeof styles> {
@@ -35,7 +40,7 @@ export interface IDashboardIndexProps extends WithStyles<typeof styles> {
 
 const _DashboardIndex: React.FunctionComponent<IDashboardIndexProps & WithStyles<typeof styles>> = ({ classes }) => {
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
-  let user: BasicUserApiModel = {
+  let currentUser: BasicUserApiModel = {
     createdAt: moment.utc().toISOString(),
     roles: [],
     username: ""
@@ -44,27 +49,51 @@ const _DashboardIndex: React.FunctionComponent<IDashboardIndexProps & WithStyles
   // @ts-ignore
   if (window.SMEIoTPreRendered) {
     // @ts-ignore
-    user = window.SMEIoTPreRendered["currentUser"];
+    currentUser = window.SMEIoTPreRendered["currentUser"];
   }
 
-  const toolbarRight = <UserAvatarMenu user={user}/>;
-  return <Frame title="Dashboard" direction="ltr" toolbarRight={toolbarRight} 
+  const toolbarRight = <UserAvatarMenu user={currentUser} />;
+  return <Frame title="Dashboard" direction="ltr" toolbarRight={toolbarRight}
     content={
       <Container maxWidth="lg" className={classes.container}>
         <Grid container spacing={3}>
-          {/* Chart */}
+          {/* Sensor stats */}
           <Grid item xs={12} md={8} lg={9}>
             <Paper className={fixedHeightPaper}>
-              <p>placeholder</p>
+              <Typography component="h2" variant="h6" color="primary" gutterBottom>
+                Sensors
+            </Typography>
+              <Typography component="p" variant="h4">
+                1
+            </Typography>
+              <Typography color="textSecondary" className={classes.context}>
+              </Typography>
+              <div>
+                <Link color="primary" href="/dashboard/sensors">
+                  View sensors
+              </Link>
+              </div>
             </Paper>
           </Grid>
-          {/* Recent Deposits */}
+          {/* User stats */}
           <Grid item xs={12} md={4} lg={3}>
             <Paper className={fixedHeightPaper}>
-              <p>placeholder</p>
+              <Typography component="h2" variant="h6" color="primary" gutterBottom>
+                Users
+              </Typography>
+              <Typography component="p" variant="h4">
+                1
+              </Typography>
+              <Typography color="textSecondary" className={classes.context}>
+              </Typography>
+              <div>
+                <Link color="primary" href="/dashboard/users">
+                  View users
+                </Link>
+              </div>
             </Paper>
           </Grid>
-          {/* Recent Orders */}
+          {/* System stats */}
           <Grid item xs={12}>
             <Paper className={classes.paper}>
               <p>placeholder</p>
