@@ -1,6 +1,8 @@
 import Container from '@material-ui/core/Container';
 import * as React from "react";
-import {createStyles, Theme, WithStyles} from "@material-ui/core";
+import { WithStyles } from "@material-ui/styles/withStyles";
+import createStyles from "@material-ui/styles/createStyles";
+import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Frame from "./Frame";
 import List from "@material-ui/core/List";
@@ -11,7 +13,7 @@ import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import Skeleton from "@material-ui/lab/Skeleton";
 import {GetDefaultApiConfig} from "../index";
-import {AdminUserApiModel, AdminUsersApi} from "smeiot-client/src";
+import {AdminUserApiModel, AdminUsersApi, BasicUserApiModel} from "smeiot-client/src";
 import Card from "@material-ui/core/Card";
 import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -19,6 +21,9 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogActions from "@material-ui/core/DialogActions";
 import Button from "@material-ui/core/Button";
 import DialogTitle from "@material-ui/core/DialogTitle";
+import Paper from '@material-ui/core/Paper';
+import UserAvatarMenu from '../components/UserAvatarMenu';
+import moment from 'moment';
 
 const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Theme) => createStyles({
   container: {
@@ -94,7 +99,22 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps & WithStyles
     setLoaded(true);
     setUsers((result.users as ((prevState: (Array<AdminUserApiModel> | null)) => (Array<AdminUserApiModel> | null)) | Array<AdminUserApiModel> | null));
   };
-  
+
+  let currentUser: BasicUserApiModel = {
+    createdAt: moment.utc().toISOString(),
+    roles: [],
+    username: ""
+  };
+
+  // @ts-ignore
+  if (window.SMEIoTPreRendered) {
+    // @ts-ignore
+    currentUser = window.SMEIoTPreRendered["currentUser"];
+  }
+
+  const toolbarRight = <UserAvatarMenu user={currentUser} />;
+
+
   const renderUserLists = () => {
     if (users == null) { return null; }
 
@@ -102,13 +122,13 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps & WithStyles
   };
 
   requestUsers();
-  return <Frame title="Users" direction="ltr" toolbarRight={null}
+  return <Frame title="Users" direction="ltr" toolbarRight={toolbarRight}
                 content={
     <Container maxWidth="lg" className={classes.container}>
-      <Card className={classes.filterBar}>
-        <Typography>Show:</Typography> <Chip label="Basic"/>
-        <Chip label="Disabled"/>
-      </Card>
+      <Paper className={classes.filterBar}>
+        <Typography>Show:</Typography>
+        <Chip label="Admin"/>
+      </Paper>
       <Card>
       <List className={classes.list}>
         {loaded ? (

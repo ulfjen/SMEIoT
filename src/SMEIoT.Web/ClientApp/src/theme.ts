@@ -1,4 +1,4 @@
-import { createMuiTheme } from '@material-ui/core/styles';
+import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
 import red from '@material-ui/core/colors/red';
 
 // https://material.io/resources/color/#!/?view.left=1&view.right=0&secondary.color=F3E5F5&primary.color=42A5F5&secondary.text.color=424242

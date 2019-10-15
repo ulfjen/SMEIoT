@@ -1,4 +1,5 @@
 import NewUser from "./NewUser";
+import EditUser from "./EditUser";
 import SensorDetails from "./SensorDetails";
 import Main from "./Main";
 import * as React from "react";
@@ -51,6 +52,11 @@ export const Routes: IController = {
     New() {
       return <NewUser csrfToken={GetXsrfTokenFromDom()}/>;
     },
+
+    EditUser() {
+      return <EditUser csrfToken={GetXsrfTokenFromDom()} />;
+    },
+
   },
 
   Sensors: {

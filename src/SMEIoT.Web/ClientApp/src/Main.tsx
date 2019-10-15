@@ -1,5 +1,5 @@
 import * as React from "react";
-import {ThemeProvider} from "@material-ui/styles";
+import ThemeProvider from "@material-ui/styles/ThemeProvider";
 import theme from "./theme";
 import {Router} from "./routes";
 

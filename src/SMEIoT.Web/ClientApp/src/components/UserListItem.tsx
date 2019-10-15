@@ -1,7 +1,9 @@
-﻿import ListItemText from "@material-ui/core/ListItemText";
+import ListItemText from "@material-ui/core/ListItemText";
 import ListItem from "@material-ui/core/ListItem";
 import * as React from "react";
-import {createStyles, Theme, WithStyles} from "@material-ui/core";
+import { WithStyles } from "@material-ui/styles/withStyles";
+import createStyles from "@material-ui/styles/createStyles";
+import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
@@ -46,7 +48,7 @@ const _UserListItem: React.FunctionComponent<IUserListItemProps & WithStyles<typ
       </Avatar>
     </ListItemAvatar>
 
-    <ListItemText primary={username} secondary={lastSeenAt}/>
+    <ListItemText primary={username} secondary={`Last seen at ${lastSeenAt}`}/>
     <ListItemSecondaryAction>
       <IconButton edge="end" aria-label="delete" onClick={onClick}>
         <MoreVertIcon/>

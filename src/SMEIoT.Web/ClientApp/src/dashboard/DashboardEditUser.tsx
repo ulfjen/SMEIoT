@@ -1,6 +1,8 @@
 import Container from '@material-ui/core/Container';
 import * as React from "react";
-import {createStyles, Theme, WithStyles} from "@material-ui/core";
+import { WithStyles } from "@material-ui/styles/withStyles";
+import createStyles from "@material-ui/styles/createStyles";
+import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Frame from "./Frame";
 import List from "@material-ui/core/List";

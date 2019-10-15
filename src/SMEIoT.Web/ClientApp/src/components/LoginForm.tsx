@@ -1,6 +1,8 @@
-﻿import * as React from "react";
+import * as React from "react";
 import TextField from '@material-ui/core/TextField';
-import {createStyles, Theme, WithStyles} from '@material-ui/core/styles';
+import { WithStyles } from "@material-ui/styles/withStyles";
+import createStyles from "@material-ui/styles/createStyles";
+import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import {FunctionComponent, useContext, useState} from "react";
 import InputAdornment from "@material-ui/core/InputAdornment";

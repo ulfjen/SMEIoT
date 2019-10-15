@@ -44,11 +44,11 @@ const styles = ({palette, spacing}: Theme) => createStyles({
   },
 });
 
-export interface INewUserProps extends WithStyles<typeof styles> {
+export interface IEditUserProps extends WithStyles<typeof styles> {
   csrfToken: string
 }
 
-const _NewUser: React.FunctionComponent<INewUserProps & WithStyles<typeof styles>> = ({csrfToken, classes}) => {
+const _EditUser: React.FunctionComponent<IEditUserProps & WithStyles<typeof styles>> = ({csrfToken, classes}) => {
   const {
     username, setUsername,
     password, setPassword,
@@ -124,6 +124,6 @@ const _NewUser: React.FunctionComponent<INewUserProps & WithStyles<typeof styles
     </Container>;
 };
 
-const NewUser = withStyles(styles)(_NewUser);
+const EditUser = withStyles(styles)(_EditUser);
 
-export default NewUser;
+export default EditUser;
