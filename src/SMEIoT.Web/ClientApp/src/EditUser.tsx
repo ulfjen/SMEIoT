@@ -11,13 +11,22 @@ import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Container from '@material-ui/core/Container';
-import UserPasswordForm from "./components/UserPasswordForm";
-import useUserCredentials from "./components/useUserCredentials";
+import Card from '@material-ui/core/Card';
+import CardActions from '@material-ui/core/CardActions';
+import CardContent from '@material-ui/core/CardContent';
+import TextField from '@material-ui/core/TextField';
+import InputAdornment from "@material-ui/core/InputAdornment";
+import IconButton from "@material-ui/core/IconButton";
+import { Visibility, VisibilityOff } from "@material-ui/icons";
+
 import {
   Configuration, SessionsApi,
   UsersApi,
+  BasicUserApiModel,
 } from "smeiot-client/src";
 import {GetDefaultApiConfig} from "./index";
+import moment from "moment";
+import useUserCredentials from "./components/useUserCredentials";
 
 const styles = ({palette, spacing}: Theme) => createStyles({
   '@global': {
@@ -25,6 +34,7 @@ const styles = ({palette, spacing}: Theme) => createStyles({
       backgroundColor: palette.common.white,
     },
   },
+  container: {},
   paper: {
     marginTop: spacing(8),
     display: 'flex',
@@ -56,6 +66,18 @@ const _EditUser: React.FunctionComponent<IEditUserProps & WithStyles<typeof styl
     passwordErrors, setPasswordErrors
   } = useUserCredentials();
 
+  let currentUser: BasicUserApiModel = {
+    createdAt: moment.utc().toISOString(),
+    roles: [],
+    username: ""
+  };
+
+  // @ts-ignore
+  if (window.SMEIoTPreRendered) {
+    // @ts-ignore
+    currentUser = window.SMEIoTPreRendered["currentUser"];
+  }
+
   const handleSubmit = async (event: React.MouseEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (event.target === undefined) {
@@ -86,42 +108,58 @@ const _EditUser: React.FunctionComponent<IEditUserProps & WithStyles<typeof styl
       }
     }
   };
+  const [showPassword, setShowPassword] = React.useState<boolean>(false);
 
-    return <Container component="main" maxWidth="xs">
+    return <Container component="main" maxWidth="lg">
       <CssBaseline/>
-      <div className={classes.paper}>
-        <Avatar className={classes.avatar}>
-          <LockOutlinedIcon/>
-        </Avatar>
-        <Typography component="h1" variant="h5">
-          Sign up
+        <Card>
+          <CardContent>
+            <Typography variant="h5" component="h2">{username}
         </Typography>
-        <UserPasswordForm csrfToken={csrfToken}
-                          url={undefined}
-                          handleSubmit={handleSubmit}
-                          username={username} setUsername={setUsername}
-                          password={password} setPassword={setPassword}
-                          usernameErrors={usernameErrors} setUsernameErrors={setUsernameErrors}
-                          passwordErrors={passwordErrors} setPasswordErrors={setPasswordErrors}>
-          <Button
-            type="submit"
+            <Typography color="textSecondary">{currentUser.roles}</Typography>
+          <Typography>Created at: {currentUser.createdAt}</Typography>
+
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
             fullWidth
-            variant="contained"
-            color="primary"
-            className={classes.submit}
-          >
-            Sign Up
-          </Button>
-          <Grid container justify="flex-end">
-            <Grid item>
-              <Link href="/login" variant="body2">
-                Already have an account? Sign in
-              </Link>
-            </Grid>
-          </Grid>
-        </UserPasswordForm>
-      </div>
-    </Container>;
+            name="password"
+            label="Password"
+            type={showPassword ? "text" : "password"}
+            id="password"
+            autoComplete="current-password"
+            onChange={(event) => {
+              setPassword(event.target.value);
+              if (passwordErrors.length > 0) {
+                setPasswordErrors("");
+              }
+            }}
+            error={passwordErrors.length > 0}
+            helperText={passwordErrors}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    edge="end"
+                    aria-label="toggle password visibility"
+                    onClick={() => {
+                      setShowPassword(!showPassword)
+                    }}
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+
+          </CardContent>
+          <CardActions>
+            <Button onClick={() => { window.location.href = "/dashboard"; }}>Cancel</Button>
+            <Button color="primary">Edit</Button>
+          </CardActions>
+        </Card>    </Container>;
 };
 
 const EditUser = withStyles(styles)(_EditUser);

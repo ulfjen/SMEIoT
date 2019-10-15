@@ -158,6 +158,7 @@ namespace SMEIoT.Web
         endpoints.MapControllerRoute("create_login", "/login", new {controller = "Sessions", action = "Create"},
           new {httpMethod = new HttpMethodRouteConstraint(nameof(HttpMethod.Post))});
         endpoints.MapControllerRoute("signup", "/signup", new {controller = "Users", action = "New"});
+        endpoints.MapControllerRoute("edit_user", "/account", new { controller = "Users", action = "Edit" });
         endpoints.MapControllerRoute(
           name: "default",
           pattern: "{controller:slugify=Home}/{action:slugify=Index}/{id?}");

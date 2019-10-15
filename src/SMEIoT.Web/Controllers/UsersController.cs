@@ -30,22 +30,11 @@ namespace SMEIoT.Web.Controllers
       return View();
     }
 
-    #region Helpers
-
-    private void AddErrors(IdentityResult result)
+    [HttpGet]
+    public IActionResult Edit()
     {
-      foreach (var error in result.Errors)
-      {
-        ModelState.AddModelError(string.Empty, error.Description);
-      }
+      return View();
     }
-
-    private Task<User> GetCurrentUserAsync()
-    {
-      return _userManager.GetUserAsync(HttpContext.User);
-    }
-
-    #endregion
   }
 
 }

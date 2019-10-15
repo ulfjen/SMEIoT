@@ -53,7 +53,7 @@ export const Routes: IController = {
       return <NewUser csrfToken={GetXsrfTokenFromDom()}/>;
     },
 
-    EditUser() {
+    Edit() {
       return <EditUser csrfToken={GetXsrfTokenFromDom()} />;
     },
 
