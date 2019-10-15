@@ -12,6 +12,7 @@ import UserAvatarMenu from '../components/UserAvatarMenu';
 import { BasicUserApiModel, SensorDetailsApiModel } from 'smeiot-client/src';
 import moment from 'moment';
 import SensorCard from '../components/SensorCard';
+import { RouteComponentProps } from '@reach/router';
 
 const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Theme) => createStyles({
   container: {
@@ -29,11 +30,11 @@ const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Th
   },
 });
 
-export interface IDashboardSensors extends WithStyles<typeof styles> {
+export interface IDashboardSensors extends RouteComponentProps, WithStyles<typeof styles> {
 }
 
 
-const _DashboardSensors: React.FunctionComponent<IDashboardSensors & WithStyles<typeof styles>> = ({ classes }) => {
+const _DashboardSensors: React.FunctionComponent<IDashboardSensors> = ({ classes }) => {
   const [sensors, setSensors] = React.useState<null | Array<SensorDetailsApiModel>>(null);
 
   let user: BasicUserApiModel = {

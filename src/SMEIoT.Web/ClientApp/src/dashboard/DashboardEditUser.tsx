@@ -20,13 +20,15 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogActions from "@material-ui/core/DialogActions";
 import Button from "@material-ui/core/Button";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import {AdminUserApiModel} from "smeiot-client/src";
+import {AdminUserApiModel, UsersApi} from "smeiot-client/src";
 import moment from "moment";
 import CardContent from "@material-ui/core/CardContent";
 import CardActions from "@material-ui/core/CardActions";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/core/SvgIcon/SvgIcon";
 import Toolbar from "@material-ui/core/Toolbar";
+import { RouteComponentProps } from '@reach/router';
+import { AdminUsersApi } from 'smeiot-client';
 
 const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Theme) => createStyles({
   container: {
@@ -60,11 +62,16 @@ const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Th
   }
 });
 
-export interface IDashboardEditUserProps extends WithStyles<typeof styles> {
+export interface IDashboardEditUserRouteParams {
+  username: string;
+}
+
+export interface IDashboardEditUserProps extends RouteComponentProps<IDashboardEditUserRouteParams>, WithStyles<typeof styles> {
+  
 }
 
 
-const _DashboardEditUser: React.FunctionComponent<IDashboardEditUserProps & WithStyles<typeof styles>> = ({classes}) => {
+const _DashboardEditUser: React.FunctionComponent<IDashboardEditUserProps> = ({classes, username}) => {
   let user: AdminUserApiModel = {
     createdAt: moment.utc().toISOString(),
     id: 0,
@@ -72,12 +79,22 @@ const _DashboardEditUser: React.FunctionComponent<IDashboardEditUserProps & With
     roles: [],
     username: ""
   };
+
+  const requestUser = async () => {
+    if (username === undefined || username === null) { return; }
+    user = await new UsersApi(GetDefaultApiConfig()).apiUsersUsernameGet({
+      username
+    });
+  };
+
+
   // @ts-ignore
   if (window.SMEIoTPreRendered) {
     // @ts-ignore
     user = window.SMEIoTPreRendered["user"];
+  } else {
+    requestUser();
   }
-  const username = user.username;
   let roles = user.roles != null ? user.roles.join(", ") : "";
   const onClosedUrl = "/dashboard/users";
 

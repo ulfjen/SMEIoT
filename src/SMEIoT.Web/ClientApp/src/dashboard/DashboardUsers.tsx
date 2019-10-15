@@ -24,6 +24,8 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import Paper from '@material-ui/core/Paper';
 import UserAvatarMenu from '../components/UserAvatarMenu';
 import moment from 'moment';
+import { RouteComponentProps } from '@reach/router';
+
 
 const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Theme) => createStyles({
   container: {
@@ -58,11 +60,11 @@ const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Th
   }
 });
 
-export interface IDashboardUsersProps extends WithStyles<typeof styles> {
+export interface IDashboardUsersProps extends RouteComponentProps, WithStyles<typeof styles> {
 }
 
 
-const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps & WithStyles<typeof styles>> = ({classes}) => {
+const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({classes}) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [loaded, setLoaded] = React.useState<boolean>(false);
   const [users, setUsers] = React.useState<null | Array<AdminUserApiModel>>(null);
@@ -121,7 +123,9 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps & WithStyles
     return users.map(user => <UserListItem user={user} setFocusedUsername={setFocusedUsername} setAnchorEl={setAnchorEl} key={user.id}/>);
   };
 
-  requestUsers();
+  React.useEffect(() => {
+    requestUsers();
+  });
   return <Frame title="Users" direction="ltr" toolbarRight={toolbarRight}
                 content={
     <Container maxWidth="lg" className={classes.container}>

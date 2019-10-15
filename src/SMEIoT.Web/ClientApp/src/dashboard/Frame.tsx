@@ -73,7 +73,7 @@ export interface IFrameProps extends WithStyles<typeof styles> {
   toolbarRight: null | React.ReactNode;
 }
 
-const _Frame: React.FunctionComponent<IFrameProps & WithStyles<typeof styles>> = ({classes, title, direction, content, toolbarRight}) => {
+const _Frame: React.FunctionComponent<IFrameProps> = ({classes, title, direction, content, toolbarRight}) => {
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
   const handleDrawerToggle = () => {

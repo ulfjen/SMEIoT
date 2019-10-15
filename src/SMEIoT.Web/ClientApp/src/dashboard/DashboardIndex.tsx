@@ -13,7 +13,7 @@ import clsx from 'clsx';
 import UserAvatarMenu from "../components/UserAvatarMenu";
 import { BasicUserApiModel } from 'smeiot-client/src';
 import moment from 'moment';
-
+import { Link as ReachLink, LinkProps as ReachLinkProps, RouteComponentProps } from '@reach/router';
 
 const styles = ({ palette, spacing, transitions, zIndex, mixins, breakpoints }: Theme) => createStyles({
   container: {
@@ -34,11 +34,10 @@ const styles = ({ palette, spacing, transitions, zIndex, mixins, breakpoints }: 
   },
 });
 
-export interface IDashboardIndexProps extends WithStyles<typeof styles> {
+export interface IDashboardIndexProps extends RouteComponentProps, WithStyles<typeof styles> {
 }
 
-
-const _DashboardIndex: React.FunctionComponent<IDashboardIndexProps & WithStyles<typeof styles>> = ({ classes }) => {
+const _DashboardIndex: React.FunctionComponent<IDashboardIndexProps> = ({ classes }) => {
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
   let currentUser: BasicUserApiModel = {
     createdAt: moment.utc().toISOString(),
@@ -69,9 +68,9 @@ const _DashboardIndex: React.FunctionComponent<IDashboardIndexProps & WithStyles
               <Typography color="textSecondary" className={classes.context}>
               </Typography>
               <div>
-                <Link color="primary" href="/dashboard/sensors">
+                <Link color="primary" to="/dashboard/sensors" component={ReachLink}>
                   View sensors
-              </Link>
+                </Link>
               </div>
             </Paper>
           </Grid>
@@ -87,7 +86,7 @@ const _DashboardIndex: React.FunctionComponent<IDashboardIndexProps & WithStyles
               <Typography color="textSecondary" className={classes.context}>
               </Typography>
               <div>
-                <Link color="primary" href="/dashboard/users">
+                <Link color="primary" to="/dashboard/sensors" component={ReachLink}>
                   View users
                 </Link>
               </div>

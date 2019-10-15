@@ -1,7 +1,6 @@
 import NewUser from "./NewUser";
 import EditUser from "./EditUser";
 import SensorDetails from "./SensorDetails";
-import Main from "./Main";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import NewSession from "./NewSession";
@@ -9,6 +8,9 @@ import DashboardUsers from "./dashboard/DashboardUsers";
 import DashboardSensors from "./dashboard/DashboardSensors";
 import DashboardEditUser from "./dashboard/DashboardEditUser";
 import DashboardIndex from "./dashboard/DashboardIndex";
+import theme from "./theme";
+import ThemeProvider from "@material-ui/styles/ThemeProvider";
+import { Router, Link } from "@reach/router";
 
 interface IAction {
   [action: string]: () => JSX.Element;
@@ -63,48 +65,51 @@ export const Routes: IController = {
     Show() {
       return <SensorDetails/>;
     }
-  },
-
-  Dashboard: {
-    Index() {
-      return <DashboardIndex/>;
-    },
-    
-    Sensors() {
-      return <DashboardSensors/>;
-    },
-    
-    Users() {
-      return <DashboardUsers/>;
-    },
-  },
-  
-  DashboardUsers: {
-    EditUser() {
-      return <DashboardEditUser/>;
-    }
   }
 };
 
-class Router {
-  public static bind(controller: string, action: string) {
-    action = action === undefined ? "init" : action;
 
-    if (controller !== undefined && controller !== "" && Routes[controller] && Routes[controller][action] !== undefined) {
-      return Routes[controller][action]();
+export namespace SMEIoT {
+
+  export class BodyRouter {
+    public static bind(controller: string, action: string) {
+      action = action === undefined ? "init" : action;
+
+      if (controller !== undefined && controller !== "" && Routes[controller] && Routes[controller][action] !== undefined) {
+        return Routes[controller][action]();
+      }
     }
-  }
-  
-  public static init() {
-    let body = document.body;
-    let controller = body.getAttribute("data-controller");
-    let action = body.getAttribute("data-action");
 
-    if (controller != null && action != null) {
-      ReactDOM.render(<Main controller={controller} action={action} />, document.getElementById("react-main"));
+    public static init() {
+      let body = document.body;
+      let controller = body.getAttribute("data-controller");
+      let action = body.getAttribute("data-action");
+
+      if (controller === "Dashboard") {
+        ReactDOM.render(
+          <ThemeProvider theme={theme}>
+            <Router>
+              <DashboardIndex path="/dashboard"/>
+              <DashboardSensors path="/dashboard/sensors"/>
+              <DashboardUsers path="/dashboard/users"/>
+              <DashboardEditUser path="/dashboard/users/:username"/>
+            </Router>
+          </ThemeProvider>,
+          document.getElementById("react-main")
+        );
+        return;
+      }
+
+      if (controller !== null && action !== null) {
+        ReactDOM.render(
+          <ThemeProvider theme={theme}>
+            {BodyRouter.bind(controller, action)}
+          </ThemeProvider>,
+          document.getElementById("react-main")
+        );
+      }
     }
   }
 }
 
-export { Router };
 
