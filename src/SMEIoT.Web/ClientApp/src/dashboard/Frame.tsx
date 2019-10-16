@@ -17,6 +17,9 @@ import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Hidden from "@material-ui/core/Hidden";
 import CloseIcon from '@material-ui/icons/Close';
+import UserAvatarMenu from "../components/UserAvatarMenu";
+import { BasicUserApiModel } from 'smeiot-client/src';
+import moment from 'moment';
 
 const drawerWidth = 240;
 
@@ -75,10 +78,25 @@ export interface IFrameProps extends WithStyles<typeof styles> {
 
 const _Frame: React.FunctionComponent<IFrameProps> = ({classes, title, direction, content, toolbarRight}) => {
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  let currentUser: BasicUserApiModel = {
+    createdAt: moment().utc().toISOString(),
+    roles: [],
+    username: ""
+  };
+
+  // @ts-ignore
+  if (window.SMEIoTPreRendered) {
+    // @ts-ignore
+    currentUser = window.SMEIoTPreRendered["currentUser"];
+  }
+  if (toolbarRight === null) {
+    toolbarRight = <UserAvatarMenu user={currentUser} />;
+  }
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
+
 
   const drawer = <div>
     <div className={classes.toolbarIcon}>

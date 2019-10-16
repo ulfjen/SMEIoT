@@ -24,7 +24,7 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import Paper from '@material-ui/core/Paper';
 import UserAvatarMenu from '../components/UserAvatarMenu';
 import moment from 'moment';
-import { RouteComponentProps } from '@reach/router';
+import { Link, RouteComponentProps } from '@reach/router';
 
 
 const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Theme) => createStyles({
@@ -102,31 +102,16 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({classes
     setUsers((result.users as ((prevState: (Array<AdminUserApiModel> | null)) => (Array<AdminUserApiModel> | null)) | Array<AdminUserApiModel> | null));
   };
 
-  let currentUser: BasicUserApiModel = {
-    createdAt: moment.utc().toISOString(),
-    roles: [],
-    username: ""
-  };
-
-  // @ts-ignore
-  if (window.SMEIoTPreRendered) {
-    // @ts-ignore
-    currentUser = window.SMEIoTPreRendered["currentUser"];
-  }
-
-  const toolbarRight = <UserAvatarMenu user={currentUser} />;
-
-
   const renderUserLists = () => {
     if (users == null) { return null; }
 
-    return users.map(user => <UserListItem user={user} setFocusedUsername={setFocusedUsername} setAnchorEl={setAnchorEl} key={user.id}/>);
+    return users.map(user => user ? <UserListItem user={user} setFocusedUsername={setFocusedUsername} setAnchorEl={setAnchorEl} key={user.id}/> : null);
   };
 
   React.useEffect(() => {
     requestUsers();
   });
-  return <Frame title="Users" direction="ltr" toolbarRight={toolbarRight}
+  return <Frame title="Users" direction="ltr" toolbarRight={null}
                 content={
     <Container maxWidth="lg" className={classes.container}>
       <Paper className={classes.filterBar}>
@@ -150,7 +135,7 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({classes
         className={classes.usersMenu}
         onClose={handleClose}
       >
-        <MenuItem onClick={handleEdit}>Edit</MenuItem>
+        <MenuItem onClick={handleClose} to={`/dashboard/users/${focusedUsername}`} component={Link}>Edit</MenuItem>
         <MenuItem className={classes.usersMenuDeleteItem} onClick={handleDelete}>Delete</MenuItem>
       </Menu>
       <Dialog

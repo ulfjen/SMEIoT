@@ -85,7 +85,7 @@ export namespace SMEIoT {
       let controller = body.getAttribute("data-controller");
       let action = body.getAttribute("data-action");
 
-      if (controller === "Dashboard") {
+      if (controller !== null && controller.startsWith("Dashboard")) {
         ReactDOM.render(
           <ThemeProvider theme={theme}>
             <Router>

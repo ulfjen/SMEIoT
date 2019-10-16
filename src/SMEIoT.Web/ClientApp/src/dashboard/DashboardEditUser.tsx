@@ -25,9 +25,9 @@ import moment from "moment";
 import CardContent from "@material-ui/core/CardContent";
 import CardActions from "@material-ui/core/CardActions";
 import IconButton from "@material-ui/core/IconButton";
-import CloseIcon from "@material-ui/core/SvgIcon/SvgIcon";
+import CloseIcon from '@material-ui/icons/Close';
 import Toolbar from "@material-ui/core/Toolbar";
-import { RouteComponentProps } from '@reach/router';
+import { Link, RouteComponentProps } from '@reach/router';
 import { AdminUsersApi } from 'smeiot-client';
 
 const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Theme) => createStyles({
@@ -89,13 +89,12 @@ const _DashboardEditUser: React.FunctionComponent<IDashboardEditUserProps> = ({c
 
 
   // @ts-ignore
-  if (window.SMEIoTPreRendered) {
+  if (window.SMEIoTPreRendered && window.SMEIoTPreRendered["user"]) {
     // @ts-ignore
     user = window.SMEIoTPreRendered["user"];
   } else {
     requestUser();
   }
-  let roles = user.roles != null ? user.roles.join(", ") : "";
   const onClosedUrl = "/dashboard/users";
 
   return <Frame title={`Edit ${username}`} direction="ltr" toolbarRight={
@@ -103,7 +102,8 @@ const _DashboardEditUser: React.FunctionComponent<IDashboardEditUserProps> = ({c
       edge="end"
       color="inherit"
       aria-label="close this action"
-      onClick={() => { window.location.href = onClosedUrl; }}
+      to={onClosedUrl}
+      component={Link}
     >
       <CloseIcon/>
     </IconButton>
@@ -115,12 +115,12 @@ const _DashboardEditUser: React.FunctionComponent<IDashboardEditUserProps> = ({c
           <Typography variant="h5" component="h2">{username} <span color="textSecondary">
           ({user.id})
         </span></Typography>
-          <Typography color="textSecondary">{roles}</Typography>
+          <Typography color="textSecondary">{user && user.roles ? user.roles.join(", ") : ""}</Typography>
           <Typography>Created at: {user.createdAt}</Typography>
           <Typography>Last seen at: {user.lastSeenAt}</Typography>
         </CardContent>
         <CardActions>
-          <Button onClick={() => { window.location.href = onClosedUrl;}}>Cancel</Button>
+          <Button to={onClosedUrl} component={Link}>Cancel</Button>
           <Button color="primary">Edit</Button>
         </CardActions>
       </Card>

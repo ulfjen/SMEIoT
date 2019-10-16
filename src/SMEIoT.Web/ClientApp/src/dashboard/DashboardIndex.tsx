@@ -10,9 +10,6 @@ import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Frame from "./Frame";
 import clsx from 'clsx';
-import UserAvatarMenu from "../components/UserAvatarMenu";
-import { BasicUserApiModel } from 'smeiot-client/src';
-import moment from 'moment';
 import { Link as ReachLink, LinkProps as ReachLinkProps, RouteComponentProps } from '@reach/router';
 
 const styles = ({ palette, spacing, transitions, zIndex, mixins, breakpoints }: Theme) => createStyles({
@@ -39,20 +36,8 @@ export interface IDashboardIndexProps extends RouteComponentProps, WithStyles<ty
 
 const _DashboardIndex: React.FunctionComponent<IDashboardIndexProps> = ({ classes }) => {
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
-  let currentUser: BasicUserApiModel = {
-    createdAt: moment.utc().toISOString(),
-    roles: [],
-    username: ""
-  };
 
-  // @ts-ignore
-  if (window.SMEIoTPreRendered) {
-    // @ts-ignore
-    currentUser = window.SMEIoTPreRendered["currentUser"];
-  }
-
-  const toolbarRight = <UserAvatarMenu user={currentUser} />;
-  return <Frame title="Dashboard" direction="ltr" toolbarRight={toolbarRight}
+    return <Frame title="Dashboard" direction="ltr" toolbarRight={null}
     content={
       <Container maxWidth="lg" className={classes.container}>
         <Grid container spacing={3}>

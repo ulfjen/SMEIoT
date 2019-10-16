@@ -37,28 +37,15 @@ export interface IDashboardSensors extends RouteComponentProps, WithStyles<typeo
 const _DashboardSensors: React.FunctionComponent<IDashboardSensors> = ({ classes }) => {
   const [sensors, setSensors] = React.useState<null | Array<SensorDetailsApiModel>>(null);
 
-  let user: BasicUserApiModel = {
-    createdAt: moment.utc().toISOString(),
-    roles: [],
-    username: ""
-  };
-
-  // @ts-ignore
-  if (window.SMEIoTPreRendered) {
-    // @ts-ignore
-    user = window.SMEIoTPreRendered["currentUser"];
-  }
-
   const renderSensors = () => {
     if (sensors == null) { return null; }
 
     return sensors.map(sensor => <SensorCard sensor={sensor} key={sensor.sensorName || ""} />);
   };
 
-  const toolbarRight = <UserAvatarMenu user={user} />;
 
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
-  return <Frame title="Sensors" direction="ltr" toolbarRight={toolbarRight}
+  return <Frame title="Sensors" direction="ltr" toolbarRight={null}
     content={
       <Container maxWidth="lg" className={classes.container}>
         <Grid container spacing={3}>
