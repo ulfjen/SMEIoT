@@ -23,6 +23,7 @@ using NodaTime.Serialization.SystemText;
 using SMEIoT.Core.Interfaces;
 using SMEIoT.Core.Services;
 using SMEIoT.Web.Api.Filters;
+using Hangfire;
 
 namespace SMEIoT.Web
 {
@@ -41,6 +42,9 @@ namespace SMEIoT.Web
       services.AddDbContext(Configuration);
 
       services.AddInfrastructure();
+      services.AddHangfire(Configuration);
+      services.AddHangfireServer();
+
       services.AddScoped<ISensorAssignmentService, SensorAssignmentService>();
       services.AddScoped<ISensorService, SensorService>();
       services.AddScoped<IUserManagementService, UserManagementService>();
