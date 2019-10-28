@@ -5,7 +5,7 @@ using NodaTime;
 using SMEIoT.Core.Interfaces;
 using SMEIoT.Infrastructure.Data;
 using Hangfire;
-using Hangfire.PostgreSql;
+using StackExchange.Redis;
 
 namespace SMEIoT.Infrastructure
 {
@@ -15,12 +15,18 @@ namespace SMEIoT.Infrastructure
       services.AddDbContext<ApplicationDbContext>(options =>
         options.UseNpgsql(configuration.BuildConnectionString(), opts => opts.UseNodaTime()));
 
-    public static void AddHangfire(this IServiceCollection services, IConfiguration configuration) =>
+    public static ConnectionMultiplexer? Redis;
+
+    public static void ConfigureRedis(this IServiceCollection services, IConfiguration configuration) =>
+      Redis = ConnectionMultiplexer.Connect(configuration.GetConnectionString("Redis"));
+
+    public static void ConfigureHangfire(this IServiceCollection services, IConfiguration configuration) =>
       Hangfire.GlobalConfiguration.Configuration
         .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
         .UseSimpleAssemblyNameTypeSerializer()
         .UseRecommendedSerializerSettings()
-        .UsePostgreSqlStorage(configuration.BuildConnectionString());
+        // .UsePostgreSqlStorage(configuration.BuildConnectionString());
+        .UseRedisStorage(Redis);
 
     public static void AddInfrastructure(this IServiceCollection services)
     {

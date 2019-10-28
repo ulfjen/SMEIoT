@@ -28,7 +28,6 @@ import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from '@material-ui/icons/Close';
 import Toolbar from "@material-ui/core/Toolbar";
 import { Link, RouteComponentProps } from '@reach/router';
-import { AdminUsersApi } from 'smeiot-client';
 
 const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Theme) => createStyles({
   container: {

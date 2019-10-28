@@ -24,6 +24,7 @@ using SMEIoT.Core.Interfaces;
 using SMEIoT.Core.Services;
 using SMEIoT.Web.Api.Filters;
 using Hangfire;
+using Microsoft.Extensions.Logging;
 
 namespace SMEIoT.Web
 {
@@ -42,7 +43,10 @@ namespace SMEIoT.Web
       services.AddDbContext(Configuration);
 
       services.AddInfrastructure();
-      services.AddHangfire(Configuration);
+      services.ConfigureRedis(Configuration);
+      services.ConfigureHangfire(Configuration);
+      services.AddHangfire(globalConfig => { });
+      
       services.AddHangfireServer();
 
       services.AddScoped<ISensorAssignmentService, SensorAssignmentService>();
@@ -59,7 +63,7 @@ namespace SMEIoT.Web
         })
         .AddDefaultTokenProviders()
         .AddEntityFrameworkStores<ApplicationDbContext>();
-      
+
       services.Configure<CookiePolicyOptions>(options =>
       {
         // This lambda determines whether user consent for non-essential 
@@ -78,6 +82,7 @@ namespace SMEIoT.Web
         options.AccessDeniedPath = "/login";
         options.SlidingExpiration = true;
       });
+      services.AddScoped<IUserProfileService, UserProfileService>();
 
       services.AddApiVersioning(options =>
       {
@@ -88,8 +93,11 @@ namespace SMEIoT.Web
         options.DefaultApiVersion = new ApiVersion(new DateTime(2019, 09, 27), 1, 0);
         options.Conventions.Add(new VersionByNamespaceConvention());
       });
-      services.AddControllersWithViews(options =>
-          options.Filters.Add(new EntityNotFoundFilter()))
+      services.AddScoped<LastSeenFilter>();
+      services.AddControllersWithViews(options => {
+        options.Filters.Add(new EntityNotFoundFilter());
+        options.Filters.Add(typeof(LastSeenFilter));
+        })
         .AddJsonOptions(options =>
         {
           options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
@@ -100,17 +108,18 @@ namespace SMEIoT.Web
         options.LowercaseUrls = true;
         options.ConstraintMap["slugify"] = typeof(SlugifyParameterTransformer);
       });
-      
+
       services.AddSwaggerGen(c =>
       {
         c.OperationFilter<SwaggerDefaultValues>();
-        c.SwaggerDoc("v1", new OpenApiInfo {Title = "SMEIoT API", Version = "v1"});
+        c.SwaggerDoc("v1", new OpenApiInfo { Title = "SMEIoT API", Version = "v1" });
       });
       services.AddRazorPages();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory,
+    IServiceProvider serviceProvider)
     {
       if (env.IsDevelopment())
       {
@@ -118,7 +127,8 @@ namespace SMEIoT.Web
         app.UseDatabaseErrorPage();
         app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
         {
-          HotModuleReplacement = true, ProjectPath = Path.Join(env.ContentRootPath, @"ClientApp")
+          HotModuleReplacement = true,
+          ProjectPath = Path.Join(env.ContentRootPath, @"ClientApp")
         });
       }
       else
@@ -128,6 +138,8 @@ namespace SMEIoT.Web
         app.UseHsts();
       }
 
+      Hangfire.GlobalConfiguration.Configuration
+        .UseActivator(new HangfireActivator(serviceProvider));
       app.UseHttpsRedirection();
 
       app.UseStaticFiles(new StaticFileOptions
@@ -157,11 +169,11 @@ namespace SMEIoT.Web
       app.UseEndpoints(endpoints =>
       {
         endpoints.MapControllers();
-        endpoints.MapControllerRoute("new_login", "/login", new {controller = "Sessions", action = "New"},
-          new {httpMethod = new HttpMethodRouteConstraint(nameof(HttpMethod.Get))});
-        endpoints.MapControllerRoute("create_login", "/login", new {controller = "Sessions", action = "Create"},
-          new {httpMethod = new HttpMethodRouteConstraint(nameof(HttpMethod.Post))});
-        endpoints.MapControllerRoute("signup", "/signup", new {controller = "Users", action = "New"});
+        endpoints.MapControllerRoute("new_login", "/login", new { controller = "Sessions", action = "New" },
+          new { httpMethod = new HttpMethodRouteConstraint(nameof(HttpMethod.Get)) });
+        endpoints.MapControllerRoute("create_login", "/login", new { controller = "Sessions", action = "Create" },
+          new { httpMethod = new HttpMethodRouteConstraint(nameof(HttpMethod.Post)) });
+        endpoints.MapControllerRoute("signup", "/signup", new { controller = "Users", action = "New" });
         endpoints.MapControllerRoute("edit_user", "/account", new { controller = "Users", action = "Edit" });
         endpoints.MapControllerRoute(
           name: "default",
