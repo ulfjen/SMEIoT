@@ -46,8 +46,13 @@ namespace SMEIoT.Web
       services.ConfigureRedis(Configuration);
       services.ConfigureHangfire(Configuration);
       services.AddHangfire(globalConfig => { });
+
+      services.ConfigureMqttClient(Configuration);
       
-      services.AddHangfireServer();
+      services.AddHangfireServer(options =>
+      {
+        options.Queues = new[] { "critical", "default" };
+      });
 
       services.AddScoped<ISensorAssignmentService, SensorAssignmentService>();
       services.AddScoped<ISensorService, SensorService>();
