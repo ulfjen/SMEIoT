@@ -13,7 +13,7 @@ import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import Skeleton from "@material-ui/lab/Skeleton";
 import {GetDefaultApiConfig} from "../index";
-import {AdminUserApiModel, AdminUsersApi, BasicUserApiModel} from "smeiot-client/src";
+import {AdminUserApiModel, AdminUsersApi, BasicUserApiModel} from "smeiot-client";
 import Card from "@material-ui/core/Card";
 import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -110,7 +110,7 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({classes
 
   React.useEffect(() => {
     requestUsers();
-  });
+  }, []);
   return <Frame title="Users" direction="ltr" toolbarRight={null}
                 content={
     <Container maxWidth="lg" className={classes.container}>

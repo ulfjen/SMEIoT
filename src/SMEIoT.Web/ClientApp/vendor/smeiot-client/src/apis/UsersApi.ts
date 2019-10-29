@@ -27,9 +27,6 @@ import {
     UserCredentialsUpdateApiModel,
     UserCredentialsUpdateApiModelFromJSON,
     UserCredentialsUpdateApiModelToJSON,
-    UserRolesBindingModel,
-    UserRolesBindingModelFromJSON,
-    UserRolesBindingModelToJSON,
     ValidatedUserCredentialsBindingModel,
     ValidatedUserCredentialsBindingModelFromJSON,
     ValidatedUserCredentialsBindingModelToJSON,
@@ -46,11 +43,6 @@ export interface UsersApiApiUsersUsernameGetRequest {
 export interface UsersApiApiUsersUsernamePasswordPutRequest {
     username: string;
     confirmedUserCredentialsUpdateBindingModel?: ConfirmedUserCredentialsUpdateBindingModel;
-}
-
-export interface UsersApiApiUsersUsernameRolesPutRequest {
-    username: string;
-    userRolesBindingModel?: UserRolesBindingModel;
 }
 
 /**
@@ -141,37 +133,6 @@ export class UsersApi extends runtime.BaseAPI {
      */
     async apiUsersUsernamePasswordPut(requestParameters: UsersApiApiUsersUsernamePasswordPutRequest): Promise<UserCredentialsUpdateApiModel> {
         const response = await this.apiUsersUsernamePasswordPutRaw(requestParameters);
-        return await response.value();
-    }
-
-    /**
-     */
-    async apiUsersUsernameRolesPutRaw(requestParameters: UsersApiApiUsersUsernameRolesPutRequest): Promise<runtime.ApiResponse<UserCredentialsUpdateApiModel>> {
-        if (requestParameters.username === null || requestParameters.username === undefined) {
-            throw new runtime.RequiredError('username','Required parameter requestParameters.username was null or undefined when calling apiUsersUsernameRolesPut.');
-        }
-
-        const queryParameters: runtime.HTTPQuery = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json; v=1.0';
-
-        const response = await this.request({
-            path: `/api/users/{username}/roles`.replace(`{${"username"}}`, encodeURIComponent(String(requestParameters.username))),
-            method: 'PUT',
-            headers: headerParameters,
-            query: queryParameters,
-            body: UserRolesBindingModelToJSON(requestParameters.userRolesBindingModel),
-        });
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => UserCredentialsUpdateApiModelFromJSON(jsonValue));
-    }
-
-    /**
-     */
-    async apiUsersUsernameRolesPut(requestParameters: UsersApiApiUsersUsernameRolesPutRequest): Promise<UserCredentialsUpdateApiModel> {
-        const response = await this.apiUsersUsernameRolesPutRaw(requestParameters);
         return await response.value();
     }
 

@@ -27,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="ClientApp\src\avatars.tsx" />
     <None Remove="ClientApp\src\components\ListItemRoutedLink.tsx" />
     <None Remove="ClientApp\src\components\SensorCard.tsx" />
   </ItemGroup>
@@ -55,6 +56,7 @@
     <TypeScriptCompile Include="ClientApp\src\dashboard\DashboardSensors.tsx" />
     <TypeScriptCompile Include="ClientApp\src\dashboard\DashboardUsers.tsx" />
     <TypeScriptCompile Include="ClientApp\src\index.tsx" />
+    <TypeScriptCompile Include="ClientApp\src\avatars.tsx" />
     <TypeScriptCompile Include="ClientApp\src\routes.tsx" />
     <TypeScriptCompile Include="ClientApp\src\SensorDetails.tsx" />
     <TypeScriptCompile Include="ClientApp\src\theme.ts" />

@@ -47,17 +47,6 @@ namespace SMEIoT.Web.Api.V1
       return Ok(res);
     }
     
-    [HttpPut("{username}/roles")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<UserCredentialsUpdateApiModel>> EditRoles(
-      UserRolesBindingModel binding, string username)
-    {
-      await _userService.UpdateUserRoles(username, binding.Roles);
-      return Ok(await GetBasicUserResultAsync(username));
-    }
-
     [HttpGet("{username}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

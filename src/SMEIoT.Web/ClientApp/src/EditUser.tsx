@@ -23,7 +23,7 @@ import {
   Configuration, SessionsApi,
   UsersApi,
   BasicUserApiModel,
-} from "smeiot-client/src";
+} from "smeiot-client";
 import {GetDefaultApiConfig} from "./index";
 import moment from "moment";
 import useUserCredentials from "./components/useUserCredentials";

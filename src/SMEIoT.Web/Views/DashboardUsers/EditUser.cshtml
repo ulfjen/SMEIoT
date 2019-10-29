@@ -1,8 +1,13 @@
 ﻿@using SMEIoT.Views.Helpers
+@using Microsoft.AspNetCore.Identity
+@using SMEIoT.Core.Entities
 @model SMEIoT.Web.ApiModels.AdminUserApiModel
+@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
+@using SMEIoT.Web.ApiModels
 
 @{
-    Layout = "_Layout";
+  Layout = "_Layout";
 }
 
 @section BeforeBundle {
@@ -10,6 +15,15 @@
   @{
     var rendered = new Dictionary<string, object>();
     rendered["user"] = @Model;
+    if (SignInManager.IsSignedIn(User))
+    {
+      var user = await UserManager.GetUserAsync(User);
+      rendered["currentUser"] = new BasicUserApiModel(user, await UserManager.GetRolesAsync(user));
+    }
+    else
+    {
+      rendered["currentUser"] = new { };
+    }
   }
   <dom-json objects="rendered"></dom-json>
 }

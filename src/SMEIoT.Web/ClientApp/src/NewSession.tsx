@@ -13,7 +13,7 @@ import withStyles from "@material-ui/core/styles/withStyles";
 import Container from '@material-ui/core/Container';
 import UserPasswordForm from "./components/UserPasswordForm";
 import useUserCredentials from "./components/useUserCredentials";
-import {SessionsApi} from "smeiot-client/src";
+import {SessionsApi} from "smeiot-client";
 import {GetDefaultApiConfig} from "./index";
 
 const styles = ({palette, spacing}: Theme) => createStyles({

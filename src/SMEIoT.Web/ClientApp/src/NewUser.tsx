@@ -16,7 +16,7 @@ import useUserCredentials from "./components/useUserCredentials";
 import {
   Configuration, SessionsApi,
   UsersApi,
-} from "smeiot-client/src";
+} from "smeiot-client";
 import {GetDefaultApiConfig} from "./index";
 
 const styles = ({palette, spacing}: Theme) => createStyles({

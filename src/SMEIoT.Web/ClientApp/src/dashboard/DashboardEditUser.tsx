@@ -5,29 +5,22 @@ import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Frame from "./Frame";
-import List from "@material-ui/core/List";
-import UserListItem from "../components/UserListItem";
 import Typography from "@material-ui/core/Typography";
-import Chip from "@material-ui/core/Chip";
-import Menu from "@material-ui/core/Menu";
-import MenuItem from "@material-ui/core/MenuItem";
 import Skeleton from "@material-ui/lab/Skeleton";
 import {GetDefaultApiConfig} from "../index";
 import Card from "@material-ui/core/Card";
-import Dialog from "@material-ui/core/Dialog";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
-import DialogActions from "@material-ui/core/DialogActions";
-import Button from "@material-ui/core/Button";
-import DialogTitle from "@material-ui/core/DialogTitle";
 import {AdminUserApiModel, UsersApi} from "smeiot-client/src";
 import moment from "moment";
+import Avatar from "@material-ui/core/Avatar";
+import CardHeader from "@material-ui/core/CardHeader";
 import CardContent from "@material-ui/core/CardContent";
-import CardActions from "@material-ui/core/CardActions";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from '@material-ui/icons/Close';
-import Toolbar from "@material-ui/core/Toolbar";
 import { Link, RouteComponentProps } from '@reach/router';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Switch from '@material-ui/core/Switch';
+import { AdminUsersApi } from 'smeiot-client';
+import { SMEIoT } from "../avatars";
 
 const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Theme) => createStyles({
   container: {
@@ -58,7 +51,9 @@ const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Th
   usersMenu: {},
   usersMenuDeleteItem: {
     color: palette.error.main
-  }
+  },
+  avatar: {},
+  cardContent: {}
 });
 
 export interface IDashboardEditUserRouteParams {
@@ -70,38 +65,71 @@ export interface IDashboardEditUserProps extends RouteComponentProps<IDashboardE
 }
 
 
-const _DashboardEditUser: React.FunctionComponent<IDashboardEditUserProps> = ({classes, username}) => {
-  let user: AdminUserApiModel = {
+const _DashboardEditUser: React.FunctionComponent<IDashboardEditUserProps> = ({ classes, username }) => {
+  const [user, setUser] = React.useState<AdminUserApiModel>({
     createdAt: moment.utc().toISOString(),
     id: 0,
     lastSeenAt: moment.utc().toISOString(),
     roles: [],
     username: ""
-  };
+  });
+  const [admin, setAdmin] = React.useState<boolean>(false);  const [avatar, setAvatar] = React.useState<string>("");
+  
+  const saveUser = (user: AdminUserApiModel) => {
+    setUser(user);
+    setAvatar(SMEIoT.Avatars.create(user.username || ""));
+
+    if (user && user.roles && user.roles.indexOf("Admin") !== -1) {
+      setAdmin(true);
+    }
+  }
 
   const requestUser = async () => {
     if (username === undefined || username === null) { return; }
-    user = await new UsersApi(GetDefaultApiConfig()).apiUsersUsernameGet({
+    saveUser(await new AdminUsersApi(GetDefaultApiConfig()).apiAdminUsersUsernameGet({
       username
-    });
+    }));
   };
 
+  const handleRoleChange = async (event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
+    let username = user.username || "";
+    let roles = user.roles || [];
 
-  // @ts-ignore
-  if (window.SMEIoTPreRendered && window.SMEIoTPreRendered["user"]) {
+    if (checked) {
+      if (roles.indexOf("Admin")) {
+        roles.push("Admin");
+      }
+    } else {
+      roles = roles.filter(cur => cur !== "Admin");
+    }
+
+    var credentials = await new AdminUsersApi(GetDefaultApiConfig()).apiAdminUsersUsernameRolesPut({
+      username,
+      userRolesBindingModel: {
+        roles
+      }
+    });
+    user.roles = credentials.roles;
+    setUser(user);
+
+    setAdmin(checked);
+  };
+
+  React.useEffect(() => {
     // @ts-ignore
-    user = window.SMEIoTPreRendered["user"];
-  } else {
-    requestUser();
-  }
-  const onClosedUrl = "/dashboard/users";
-
+    if (window.SMEIoTPreRendered && window.SMEIoTPreRendered["user"]) {
+      // @ts-ignore
+      saveUser(window.SMEIoTPreRendered["user"]);
+    } else {
+      requestUser();
+    }
+  }, []);
   return <Frame title={`Edit ${username}`} direction="ltr" toolbarRight={
     <IconButton
       edge="end"
       color="inherit"
       aria-label="close this action"
-      to={onClosedUrl}
+      to={"/dashboard/users"}
       component={Link}
     >
       <CloseIcon/>
@@ -110,18 +138,27 @@ const _DashboardEditUser: React.FunctionComponent<IDashboardEditUserProps> = ({c
   content={
     <Container maxWidth="lg" className={classes.container}>
       <Card>
-        <CardContent>
-          <Typography variant="h5" component="h2">{username} <span color="textSecondary">
-          ({user.id})
-        </span></Typography>
-          <Typography color="textSecondary">{user && user.roles ? user.roles.join(", ") : ""}</Typography>
-          <Typography>Created at: {user.createdAt}</Typography>
-          <Typography>Last seen at: {user.lastSeenAt}</Typography>
+        <CardHeader
+          avatar={
+            <Avatar className={classes.avatar}>
+              <svg dangerouslySetInnerHTML={{ __html: avatar }} />
+            </Avatar>
+          }
+          action={
+            <IconButton aria-label="settings">
+            </IconButton>
+          }
+          title={username}
+          subheader={user.id}
+        />
+        <CardContent className={classes.cardContent}>
+          <FormControlLabel
+            control={<Switch checked={admin} onChange={handleRoleChange} value="Admin" />}
+            label="Admin"
+          />
+          <Typography>Created at: {moment(user.createdAt).format("LLLL")}</Typography>
+          <Typography>Last seen at: {moment(user.lastSeenAt).format("LLLL")}</Typography>
         </CardContent>
-        <CardActions>
-          <Button to={onClosedUrl} component={Link}>Cancel</Button>
-          <Button color="primary">Edit</Button>
-        </CardActions>
       </Card>
     </Container>
   } />;
