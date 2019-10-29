@@ -53,7 +53,7 @@ namespace SMEIoT.Web.Api.V1
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<UserCredentialsUpdateApiModel>> EditRoles(
-      UserRolesBindingModel binding, string username)
+      [FromBody] UserRolesBindingModel binding, [FromRoute] string username)
     {
       await _userService.UpdateUserRoles(username, binding.Roles);
       return Ok(await GetAdminUserResultAsync(username));

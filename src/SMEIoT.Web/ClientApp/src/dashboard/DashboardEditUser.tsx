@@ -9,7 +9,7 @@ import Typography from "@material-ui/core/Typography";
 import Skeleton from "@material-ui/lab/Skeleton";
 import {GetDefaultApiConfig} from "../index";
 import Card from "@material-ui/core/Card";
-import {AdminUserApiModel, UsersApi} from "smeiot-client/src";
+import { AdminUserApiModel, AdminUsersApi, UsersApi} from "smeiot-client";
 import moment from "moment";
 import Avatar from "@material-ui/core/Avatar";
 import CardHeader from "@material-ui/core/CardHeader";
@@ -19,7 +19,6 @@ import CloseIcon from '@material-ui/icons/Close';
 import { Link, RouteComponentProps } from '@reach/router';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
-import { AdminUsersApi } from 'smeiot-client';
 import { SMEIoT } from "../avatars";
 
 const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Theme) => createStyles({
@@ -103,13 +102,13 @@ const _DashboardEditUser: React.FunctionComponent<IDashboardEditUserProps> = ({ 
       roles = roles.filter(cur => cur !== "Admin");
     }
 
-    var credentials = await new AdminUsersApi(GetDefaultApiConfig()).apiAdminUsersUsernameRolesPut({
-      username,
-      userRolesBindingModel: {
-        roles
-      }
-    });
-    user.roles = credentials.roles;
+     var credentials = await new AdminUsersApi(GetDefaultApiConfig()).apiAdminUsersUsernameRolesPut({
+       username,
+       userRolesBindingModel: {
+         roles: roles || null
+       }
+     });
+     user.roles = credentials.roles;
     setUser(user);
 
     setAdmin(checked);

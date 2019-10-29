@@ -6,6 +6,6 @@ namespace SMEIoT.Web.BindingModels
   public class UserRolesBindingModel
   {
     [Required]
-    public IEnumerable<string> Roles;
+    public IEnumerable<string> Roles { get; set; }
   }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -94,7 +94,7 @@ namespace SMEIoT.Core.Services
         throw new EntityNotFoundException($"cannot find the user {username}.", "userName");
       }
 
-      if (roles == null || !roles.Any())
+      if (roles == null)
       {
         throw new EntityNotFoundException($"cannot find the roles.", "roles");
       }

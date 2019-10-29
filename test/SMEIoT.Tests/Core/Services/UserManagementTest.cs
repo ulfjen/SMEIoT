@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -136,7 +136,25 @@ namespace SMEIoT.Tests.Core.Services
         Assert.True(await userManager.IsInRoleAsync(user, role));
       }
     }
-    
+
+    [Fact]
+    public async Task UpdateUserRoles_ClearRoles()
+    {
+      var (service, dbContext, userManager) = BuildService();
+      const string username = "normal-username-1";
+      const string password = "a-normal-password";
+      await userManager.CreateAsync(new User { UserName = username, ConcurrencyStamp = Guid.NewGuid().ToString() },
+        password);
+      var user = await userManager.FindByNameAsync(username);
+      await userManager.AddToRolesAsync(user, new[] { "Admin" });
+
+      var res = await service.UpdateUserRoles(username, Array.Empty<string>());
+
+      Assert.True(res);
+      Assert.False(await userManager.IsInRoleAsync(user, "Admin"));
+    }
+
+
     [Fact]
     public async Task ListBasicUserResultAsync_ReturnsUserAndRole()
     {

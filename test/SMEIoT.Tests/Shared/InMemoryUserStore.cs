@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -146,7 +146,13 @@ namespace SMEIoT.Tests.Shared
 
     public Task RemoveFromRoleAsync(User user, string roleName, CancellationToken cancellationToken)
     {
-      throw new NotImplementedException();
+      if (!_roles.ContainsKey(user.NormalizedUserName))
+      {
+        _roles[user.NormalizedUserName] = new List<string>();
+      }
+
+      _roles[user.NormalizedUserName].Remove(roleName);
+      return Task.FromResult(IdentityResult.Success);
     }
 
     public Task ReplaceClaimAsync(User user, Claim claim, Claim newClaim, CancellationToken cancellationToken)
