@@ -100,7 +100,7 @@ namespace SMEIoT.Web
       });
       services.AddScoped<LastSeenFilter>();
       services.AddControllersWithViews(options => {
-        options.Filters.Add(new EntityNotFoundFilter());
+        options.Filters.Add(new ActionExceptionFilter());
         options.Filters.Add(typeof(LastSeenFilter));
         })
         .AddJsonOptions(options =>

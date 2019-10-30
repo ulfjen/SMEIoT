@@ -80,7 +80,11 @@ namespace SMEIoT.Core.Services
       var result = await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);
       if (!result.Succeeded)
       {
-        throw new Exception();
+        if (result.Errors.Any(e => e.Code == "PasswordMismatch"))
+        {
+          throw new InvalidArgumentException("Password is not correct.", "currentPassword");
+        }
+        throw new InvalidArgumentException(string.Join(',', result.Errors.ToList().Select(e => e.Description.ToString())), "errors");
       }
 
       return true;

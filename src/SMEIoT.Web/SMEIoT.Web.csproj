@@ -29,6 +29,7 @@
   <ItemGroup>
     <None Remove="ClientApp\src\avatars.tsx" />
     <None Remove="ClientApp\src\components\ListItemRoutedLink.tsx" />
+    <None Remove="ClientApp\src\components\PasswordField.tsx" />
     <None Remove="ClientApp\src\components\SensorCard.tsx" />
   </ItemGroup>
 
@@ -47,6 +48,7 @@
     <TypeScriptCompile Include="ClientApp\src\components\ListItemRoutedLink.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\ListItemLink.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\LoginForm.tsx" />
+    <TypeScriptCompile Include="ClientApp\src\components\PasswordField.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\SensorCard.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\UserListItem.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\UserPasswordForm.tsx" />

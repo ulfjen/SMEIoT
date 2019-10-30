@@ -1,10 +1,6 @@
 import * as React from "react";
-import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import Link from '@material-ui/core/Link';
-import Grid from '@material-ui/core/Grid';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
@@ -14,13 +10,9 @@ import Container from '@material-ui/core/Container';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
-import TextField from '@material-ui/core/TextField';
 import CardHeader from '@material-ui/core/CardHeader';
-import InputAdornment from "@material-ui/core/InputAdornment";
-import IconButton from "@material-ui/core/IconButton";
 import BuildIcon from '@material-ui/icons/Build';
-import Visibility from "@material-ui/icons/Visibility";
-import VisibilityOff from "@material-ui/icons/VisibilityOff";
+import PasswordField from "./components/PasswordField";
 
 import {
   Configuration, SessionsApi,
@@ -72,6 +64,10 @@ const _EditUser: React.FunctionComponent<IEditUserProps & WithStyles<typeof styl
     passwordErrors, setPasswordErrors
   } = useUserCredentials();
 
+  const [newPassword, setNewPassword] = React.useState<string>("");
+  const [newPasswordErrors, setNewPasswordErrors] = React.useState<string>("");
+
+
   let currentUser: BasicUserApiModel = {
     createdAt: moment.utc().toISOString(),
     roles: [],
@@ -84,37 +80,31 @@ const _EditUser: React.FunctionComponent<IEditUserProps & WithStyles<typeof styl
     currentUser = window.SMEIoTPreRendered["currentUser"];
   }
 
-  const handleSubmit = async (event: React.MouseEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (event.target === undefined) {
-      return;
-    }
-
+  const handleEdit = async () => {
     try {
-      const result = await new UsersApi(GetDefaultApiConfig()).apiUsersPost({
-        validatedUserCredentialsBindingModel: {
-          username, password
+      const result = await new UsersApi(GetDefaultApiConfig()).apiUsersUsernamePasswordPut({
+        username: currentUser.username || "",
+        confirmedUserCredentialsUpdateBindingModel: {
+          currentPassword: password,
+          newPassword: newPassword
         }
       });
 
-      const login = await new SessionsApi(GetDefaultApiConfig()).apiSessionsPost({
-        loginBindingModel: {
-          username, password
-        }
-      });
-
-      window.location.replace(login.returnUrl || "/");
+      window.location.replace("/dashboard");
     } catch (response) {
       const { status, errors } = await response.json();
       if (errors.hasOwnProperty("Username")) {
         setUsernameErrors(errors["Username"].join("\n"));
       }
-      if (errors.hasOwnProperty("Password")) {
-        setPasswordErrors(errors["Password"].join("\n"));
+      if (errors.hasOwnProperty("CurrentPassword")) {
+        setPasswordErrors(errors["CurrentPassword"].join("\n"));
       }
+      if (errors.hasOwnProperty("NewPassword")) {
+        setNewPasswordErrors(errors["NewPassword"].join("\n"));
+      }
+
     }
   };
-  const [showPassword, setShowPassword] = React.useState<boolean>(false);
 
   var roles = (currentUser.roles || []).join(", ");
 
@@ -134,45 +124,20 @@ const _EditUser: React.FunctionComponent<IEditUserProps & WithStyles<typeof styl
         <Typography color="textSecondary">{roles}</Typography>
         <Typography>Created at: {moment(currentUser.createdAt).format("LLLL")}</Typography>
 
-        <TextField
-          variant="outlined"
-          margin="normal"
-          required
-          fullWidth
-          name="password"
-          label="Password"
-          type={showPassword ? "text" : "password"}
-          id="password"
-          autoComplete="current-password"
-          onChange={(event) => {
-            setPassword(event.target.value);
-            if (passwordErrors.length > 0) {
-              setPasswordErrors("");
-            }
-          }}
-          error={passwordErrors.length > 0}
-          helperText={passwordErrors}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton
-                  edge="end"
-                  aria-label="toggle password visibility"
-                  onClick={() => {
-                    setShowPassword(!showPassword)
-                  }}
-                >
-                  {showPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-        />
-
+        <PasswordField
+          label="Current Password"
+          setPassword={setPassword}
+          errors={passwordErrors}
+          setErrors={setPasswordErrors} />
+        <PasswordField
+          label="New Password"
+          setPassword={setNewPassword}
+          errors={newPasswordErrors}
+          setErrors={setNewPasswordErrors} />
       </CardContent>
       <CardActions>
         <Button onClick={() => { window.location.href = "/dashboard"; }}>Cancel</Button>
-        <Button color="primary">Edit</Button>
+        <Button color="primary" onClick={handleEdit}>Edit</Button>
       </CardActions>
     </Card>
   </Container>;
