@@ -15,20 +15,23 @@ import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import TextField from '@material-ui/core/TextField';
+import CardHeader from '@material-ui/core/CardHeader';
 import InputAdornment from "@material-ui/core/InputAdornment";
 import IconButton from "@material-ui/core/IconButton";
-import { Visibility, VisibilityOff } from "@material-ui/icons";
+import BuildIcon from '@material-ui/icons/Build';
+import Visibility from "@material-ui/icons/Visibility";
+import VisibilityOff from "@material-ui/icons/VisibilityOff";
 
 import {
   Configuration, SessionsApi,
   UsersApi,
   BasicUserApiModel,
 } from "smeiot-client";
-import {GetDefaultApiConfig} from "./index";
+import { GetDefaultApiConfig } from "./index";
 import moment from "moment";
 import useUserCredentials from "./components/useUserCredentials";
 
-const styles = ({palette, spacing}: Theme) => createStyles({
+const styles = ({ palette, spacing }: Theme) => createStyles({
   '@global': {
     body: {
       backgroundColor: palette.common.white,
@@ -52,13 +55,16 @@ const styles = ({palette, spacing}: Theme) => createStyles({
   submit: {
     margin: spacing(3, 0, 2),
   },
+  page: {
+    marginTop: spacing(3)
+  }
 });
 
 export interface IEditUserProps extends WithStyles<typeof styles> {
   csrfToken: string
 }
 
-const _EditUser: React.FunctionComponent<IEditUserProps & WithStyles<typeof styles>> = ({csrfToken, classes}) => {
+const _EditUser: React.FunctionComponent<IEditUserProps & WithStyles<typeof styles>> = ({ csrfToken, classes }) => {
   const {
     username, setUsername,
     password, setPassword,
@@ -99,7 +105,7 @@ const _EditUser: React.FunctionComponent<IEditUserProps & WithStyles<typeof styl
 
       window.location.replace(login.returnUrl || "/");
     } catch (response) {
-      const {status, errors} = await response.json();
+      const { status, errors } = await response.json();
       if (errors.hasOwnProperty("Username")) {
         setUsernameErrors(errors["Username"].join("\n"));
       }
@@ -110,56 +116,66 @@ const _EditUser: React.FunctionComponent<IEditUserProps & WithStyles<typeof styl
   };
   const [showPassword, setShowPassword] = React.useState<boolean>(false);
 
-    return <Container component="main" maxWidth="lg">
-      <CssBaseline/>
-        <Card>
-          <CardContent>
-            <Typography variant="h5" component="h2">{username}
+  var roles = (currentUser.roles || []).join(", ");
+
+  return <Container component="main" maxWidth="lg" className={classes.page}>
+    <CssBaseline />
+    <Card>
+      <CardHeader
+        avatar={
+          <BuildIcon />
+        }
+        title={"Edit profile"}
+      />
+      <CardContent>
+        <Typography variant="h5">
+          {currentUser.username}
         </Typography>
-            <Typography color="textSecondary">{currentUser.roles}</Typography>
-          <Typography>Created at: {currentUser.createdAt}</Typography>
+        <Typography color="textSecondary">{roles}</Typography>
+        <Typography>Created at: {moment(currentUser.createdAt).format("LLLL")}</Typography>
 
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Password"
-            type={showPassword ? "text" : "password"}
-            id="password"
-            autoComplete="current-password"
-            onChange={(event) => {
-              setPassword(event.target.value);
-              if (passwordErrors.length > 0) {
-                setPasswordErrors("");
-              }
-            }}
-            error={passwordErrors.length > 0}
-            helperText={passwordErrors}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    edge="end"
-                    aria-label="toggle password visibility"
-                    onClick={() => {
-                      setShowPassword(!showPassword)
-                    }}
-                  >
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
+        <TextField
+          variant="outlined"
+          margin="normal"
+          required
+          fullWidth
+          name="password"
+          label="Password"
+          type={showPassword ? "text" : "password"}
+          id="password"
+          autoComplete="current-password"
+          onChange={(event) => {
+            setPassword(event.target.value);
+            if (passwordErrors.length > 0) {
+              setPasswordErrors("");
+            }
+          }}
+          error={passwordErrors.length > 0}
+          helperText={passwordErrors}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  edge="end"
+                  aria-label="toggle password visibility"
+                  onClick={() => {
+                    setShowPassword(!showPassword)
+                  }}
+                >
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+        />
 
-          </CardContent>
-          <CardActions>
-            <Button onClick={() => { window.location.href = "/dashboard"; }}>Cancel</Button>
-            <Button color="primary">Edit</Button>
-          </CardActions>
-        </Card>    </Container>;
+      </CardContent>
+      <CardActions>
+        <Button onClick={() => { window.location.href = "/dashboard"; }}>Cancel</Button>
+        <Button color="primary">Edit</Button>
+      </CardActions>
+    </Card>
+  </Container>;
 };
 
 const EditUser = withStyles(styles)(_EditUser);

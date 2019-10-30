@@ -27,46 +27,54 @@ namespace SMEIoT.Web.Controllers
       ViewData["ReturnUrl"] = returnUrl;
       return View();
     }
-//
-//    [AllowAnonymous]
-//    [ValidateAntiForgeryToken]
-//    public async Task<IActionResult> Create(LoginViewModel model)
-//    {
-//      ViewData["ReturnUrl"] = model.ReturnUrl;
-//      if (!ModelState.IsValid)
-//      {
-//        return View(model);
-//      }
-//
-//      return NotFound();
-//
-//      var result =
-//        await _signInManager.PasswordSignInAsync(model.Username, model.Password, isPersistent: true,
-//          lockoutOnFailure: false);
-//      if (result.Succeeded)
-//      {
-//        _logger.LogInformation(1, "User logged in.");
-//        return !string.IsNullOrEmpty(model.ReturnUrl) ? RedirectToLocal(model.ReturnUrl) : RedirectToAction("Index", "Dashboard");
-//      }
-//
-//#if false
-//        if (result.RequiresTwoFactor)
-//        {
-//          return RedirectToAction(nameof(SendCode), new {ReturnUrl = returnUrl, RememberMe = model.RememberMe});
-//        }
-//#endif
-//
-//      if (result.IsLockedOut)
-//      {
-//        _logger.LogWarning(2, "User account locked out.");
-//        return View("Lockout");
-//      }
-//      else
-//      {
-//        ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-//        return View(model);
-//      }
-//    }
+
+    public IActionResult Destroy(string? returnUrl = null)
+    {
+      _signInManager.SignOutAsync();
+
+      return returnUrl != null ? RedirectToLocal(returnUrl) : RedirectToLocal("/");
+    }
+
+    //
+    //    [AllowAnonymous]
+    //    [ValidateAntiForgeryToken]
+    //    public async Task<IActionResult> Create(LoginViewModel model)
+    //    {
+    //      ViewData["ReturnUrl"] = model.ReturnUrl;
+    //      if (!ModelState.IsValid)
+    //      {
+    //        return View(model);
+    //      }
+    //
+    //      return NotFound();
+    //
+    //      var result =
+    //        await _signInManager.PasswordSignInAsync(model.Username, model.Password, isPersistent: true,
+    //          lockoutOnFailure: false);
+    //      if (result.Succeeded)
+    //      {
+    //        _logger.LogInformation(1, "User logged in.");
+    //        return !string.IsNullOrEmpty(model.ReturnUrl) ? RedirectToLocal(model.ReturnUrl) : RedirectToAction("Index", "Dashboard");
+    //      }
+    //
+    //#if false
+    //        if (result.RequiresTwoFactor)
+    //        {
+    //          return RedirectToAction(nameof(SendCode), new {ReturnUrl = returnUrl, RememberMe = model.RememberMe});
+    //        }
+    //#endif
+    //
+    //      if (result.IsLockedOut)
+    //      {
+    //        _logger.LogWarning(2, "User account locked out.");
+    //        return View("Lockout");
+    //      }
+    //      else
+    //      {
+    //        ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+    //        return View(model);
+    //      }
+    //    }
 
     private IActionResult RedirectToLocal(string returnUrl)
     {

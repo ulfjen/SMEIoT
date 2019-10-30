@@ -39,6 +39,17 @@ const _UserAvatarMenu: React.FunctionComponent<IUserAvatarMenuProps & WithStyles
     setAnchorEl(null);
   };  
 
+  const handleLogout = async () => {
+    const url = "/logout";
+    await fetch(url, {
+      method: 'delete',
+      redirect: 'manual'
+    })
+    .then((resp) => {
+      window.location.href = "/";
+    });
+  }
+
   return <div>
     <IconButton
       aria-label="account of current user"
@@ -67,7 +78,7 @@ const _UserAvatarMenu: React.FunctionComponent<IUserAvatarMenuProps & WithStyles
       onClose={handleClose}
     >
       <MenuItem onClick={() => window.location.href = "/account"}>My account</MenuItem>
-      <MenuItem onClick={() => window.location.href = "/logout"}>Log out</MenuItem>
+      <MenuItem onClick={handleLogout}>Log out</MenuItem>
     </Menu>
   </div>;
 };
