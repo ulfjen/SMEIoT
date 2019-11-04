@@ -17,9 +17,11 @@
     },
     "SMEIoT": {
       "commandName": "Project",
+      "workingDirectory": "C:\\Dev\\SMEIoT\\src\\SMEIoT.Web",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
+      "nativeDebugging": true,
       "applicationUrl": "https://localhost:5001;http://localhost:5000"
     }
   }

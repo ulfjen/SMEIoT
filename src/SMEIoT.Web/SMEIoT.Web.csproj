@@ -21,6 +21,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="mosq">
+      <HintPath>mosq.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="ClientApp\src\components\ListItemRoutedLink.tsx" />
     <None Remove="ClientApp\src\components\SensorCard.tsx" />
   </ItemGroup>

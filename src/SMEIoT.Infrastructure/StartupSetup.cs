@@ -9,8 +9,6 @@ using StackExchange.Redis;
 using System;
 using SMEIoT.Infrastructure.MqttClient;
 using System.Linq;
-using MQTTnet.Extensions.ManagedClient;
-using MQTTnet.Client.Options;
 
 namespace SMEIoT.Infrastructure
 {
@@ -43,26 +41,16 @@ namespace SMEIoT.Infrastructure
 
     public static void ConfigureMqttClient(this IServiceCollection services, IConfiguration configuration)
     {
-      var mqttClientOptions = new ManagedMqttClientOptionsBuilder()
-        .WithAutoReconnectDelay(TimeSpan.FromSeconds(5));
-      var build = new MqttClientOptionsBuilder();
-    build
-        .WithClientId("Client1")
-        .WithTcpServer("193.10.119.35")
-        .WithTls(para =>
-        {
-          para.Certificates = configuration.GetConnectionString("MqttBrokerCertificates").Split(',').Select(StringToByteArray);
-          para.AllowUntrustedCertificates = true;
-          para.IgnoreCertificateChainErrors = true;
-          para.IgnoreCertificateRevocationErrors = true;
-        });
+      var builder = new MosquittoClientBuilder()
+        .SetConnectionInfo(configuration.GetConnectionString("MqttHost"), 8884)
+        .SetKeepAlive(60)
+        .SetPskTls(configuration.GetConnectionString("MqttPsk"), configuration.GetConnectionString("MqttIdentity"))
+        .SetMessageCallback(MqttJobs.OnMessage)
+        .SubscribeTopic("sensor/#");
 
-      mqttClientOptions.WithClientOptions(build.Build());
-
-      string[] topicFilters = { "sensor/#" };
       services.AddHostedService<BackgroundMqttClientHostedService>(provider =>
       {
-        return new BackgroundMqttClientHostedService(mqttClientOptions.Build(), topicFilters);
+        return new BackgroundMqttClientHostedService(builder.Client);
       });
     }
 

@@ -3,55 +3,45 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
-using MQTTnet;
-using MQTTnet.Client;
-using MQTTnet.Client.Receiving;
-using MQTTnet.Extensions.ManagedClient;
 
 namespace SMEIoT.Infrastructure.MqttClient
 {
   public class BackgroundMqttClientHostedService : IHostedService, IDisposable
   {
-    public IManagedMqttClient MqttClient { get; }
-
-    private readonly ManagedMqttClientOptions _options;
-    private readonly string[] _topicFilters;
+    private readonly MosquittoClient _client;
+    private Thread? _thread;
 
     public BackgroundMqttClientHostedService(
-        ManagedMqttClientOptions options,
-        string[] topicFilters)
+        MosquittoClient client)
     {
-      MqttClient = new MqttFactory().CreateManagedMqttClient();
-      _options = options;
-      _topicFilters = topicFilters;
+      _client = client;
     }
 
-    public async Task StartAsync(CancellationToken cancellationToken)
+    public Task StartAsync(CancellationToken cancellationToken)
     {
-      await Task.WhenAll(_topicFilters.Select(f => MqttClient.SubscribeAsync(new TopicFilterBuilder().WithTopic(f).Build())));
-      MqttClient.ApplicationMessageReceivedHandler = new MessageHandler();
-      await MqttClient.StartAsync(_options);
+      _client.Connect();
+      _thread = new Thread(() => _client.RunLoop());
+      _thread.Start();
+      return Task.CompletedTask;
     }
 
-    public async Task StopAsync(CancellationToken cancellationToken)
+    public Task StopAsync(CancellationToken cancellationToken)
     {
-      await MqttClient.StopAsync();
-    }
-
-    public class MessageHandler : IMqttApplicationMessageReceivedHandler
-    {
-      public async Task HandleApplicationMessageReceivedAsync(MqttApplicationMessageReceivedEventArgs eventArgs)
+      if (_thread != null)
       {
-        Console.WriteLine(eventArgs.ApplicationMessage);
-        if (eventArgs.ApplicationMessage.Topic == "name_of_desired_topic")
-        {
-          // Handle event
-        }
+        _thread.Abort();
       }
+      return Task.CompletedTask;
     }
 
     public void Dispose()
     {
+      if (_thread != null)
+      {
+        _thread.Abort();
+        _thread = null;
+      }
     }
+
   }
 }
