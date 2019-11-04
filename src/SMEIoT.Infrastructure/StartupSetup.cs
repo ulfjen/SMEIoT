@@ -45,6 +45,7 @@ namespace SMEIoT.Infrastructure
         .SetConnectionInfo(configuration.GetConnectionString("MqttHost"), 8884)
         .SetKeepAlive(60)
         .SetPskTls(configuration.GetConnectionString("MqttPsk"), configuration.GetConnectionString("MqttIdentity"))
+        .SetRunLoopInfo(-1, 1, 10)
         .SetMessageCallback(MqttJobs.OnMessage)
         .SubscribeTopic("sensor/#");
 

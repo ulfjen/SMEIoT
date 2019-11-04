@@ -15,9 +15,17 @@
 #    define LIBRARY_API
 #endif
 
+struct mosq_message {
+	int mid;
+	char* topic;
+	void* payload;
+	int payloadlen;
+	int qos;
+	int retain;
+};
 
 typedef void (*CONNECT_CALLBACK)(int);
-typedef void (*MESSAGE_CALLBACK)(const struct mosquitto_message*);
+typedef void (*MESSAGE_CALLBACK)(int, char*, void*, int, int, int);
 
 // return value 0 represents success. Or ENOMEM, EINVAL when error.
 LIBRARY_API int mosq_init();

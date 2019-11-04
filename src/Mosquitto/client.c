@@ -44,7 +44,7 @@ void _connect_callback(struct mosquitto* mosq, void* obj, int result)
 {
     struct callback_delegates* delegates = obj;
     CONNECT_CALLBACK cb = delegates->connect_callback_delegate;
-	printf("connect callback invoked with result: %d\n", result);
+	printf("connect callback %p invoked with result: %d\n", cb, result);
 
     cb(result);
 }
@@ -53,9 +53,29 @@ void _message_callback(struct mosquitto* mosq, void* obj, const struct mosquitto
 {
     struct callback_delegates* delegates = obj;
     MESSAGE_CALLBACK cb = delegates->message_callback_delegate;
-	printf("message callback called with a message.\n");
+#if 0
+	struct mosq_message* msg = malloc(sizeof(struct mosq_message));
+	if (msg != NULL) {
+		msg->mid = message->mid;
+		size_t tlen = strlen(message->topic);
+		msg->topic = malloc(tlen+1);
+		if (msg->topic != NULL) {
+			strncpy(msg->topic, message->topic, tlen);
+			msg->topic[tlen] = '\0';
+		}
+		msg->payload = malloc(message->payloadlen);
+		if (msg->payload != NULL) {
+			memcpy(msg->payload, message->payload, message->payloadlen);
+		}
+		msg->payloadlen = message->payloadlen;
+		msg->qos = message->qos;
+		msg->retain = message->retain;
+	}
+#endif
+	printf("message callback %p called with a message.\n", cb);
 
-    cb(message);
+	cb(message->mid, message->topic, message->payload, message->payloadlen, message->qos, message->retain);
+	// free(msg);
 }
 
 void mosq_set_callback(CONNECT_CALLBACK connect_callback_delegate, MESSAGE_CALLBACK message_callback_delegate)
@@ -74,6 +94,7 @@ void mosq_set_callback(CONNECT_CALLBACK connect_callback_delegate, MESSAGE_CALLB
 
 int mosq_connect(char* host, int port, int keepalive)
 {
+	printf("connects to %s:%d with keep alive %d\n", host, port, keepalive);
     rc = mosquitto_connect(mosq, host, port, keepalive);
     return rc;
 }
@@ -86,7 +107,7 @@ void mosq_runloop(int timeout, int max_packets, int sleep_on_reconnect)
 		printf("run loop invoked rc %d\n", rc);
         if (run && rc) {
 #ifdef _WIN32
-            Sleep(sleep_on_reconnect);
+            Sleep(sleep_on_reconnect * 1000); // milliseconds
 #else
             sleep(sleep_on_reconnect);
 #endif

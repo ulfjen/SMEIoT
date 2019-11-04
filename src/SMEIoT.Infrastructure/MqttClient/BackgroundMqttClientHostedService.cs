@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
@@ -41,6 +40,7 @@ namespace SMEIoT.Infrastructure.MqttClient
         _thread.Abort();
         _thread = null;
       }
+      _client.Dispose();
     }
 
   }

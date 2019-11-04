@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.InteropServices;
 
 namespace SMEIoT.Infrastructure.MqttClient
@@ -11,34 +12,22 @@ namespace SMEIoT.Infrastructure.MqttClient
   {
     public const string MosquittoDll = "mosq";
 
-    [StructLayout(LayoutKind.Sequential)]
-    public struct mosquitto_message
-    {
-      public int mid;
-      public string topic;
-      public byte[] payload;
-      public int payloadlen;
-      public int qos;
-      [MarshalAs(UnmanagedType.U1)]
-      public bool retain;
-    }
-
     public delegate void ConnectCallbackDelegate(int result);
-    public delegate void MessageCallbackDelegate(mosquitto_message mesage);
+    public delegate void MessageCallbackDelegate(int mid, string topic, IntPtr payload, int payloadlen, int qos, int retain);
 
     [DllImport(MosquittoDll, CallingConvention = CallingConvention.Cdecl)]
     public static extern int mosq_init();
 
-    [DllImport(MosquittoDll, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(MosquittoDll, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     internal static extern int mosq_set_tls_psk(string psk, string identity, string? ciphers);
 
     [DllImport(MosquittoDll, CallingConvention = CallingConvention.Cdecl)]
     internal static extern void mosq_set_callback(ConnectCallbackDelegate? connect_callback, MessageCallbackDelegate? message_callback);
 
-    [DllImport(MosquittoDll, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(MosquittoDll, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     internal static extern int mosq_connect(string host, int port, int keepalive);
 
-    [DllImport(MosquittoDll, CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(MosquittoDll, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     internal static extern int mosq_subscribe_topic(string topic);
 
     [DllImport(MosquittoDll, CallingConvention = CallingConvention.Cdecl)]

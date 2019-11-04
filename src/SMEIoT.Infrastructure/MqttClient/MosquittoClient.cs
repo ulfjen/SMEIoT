@@ -7,6 +7,7 @@ namespace SMEIoT.Infrastructure.MqttClient
 {
   /// <summary>
   /// must be used as a singleton otherwise it's not thread safe.
+  /// The parameters are needed to be configured properly because the error doesn't surface up to CLR.
   /// </summary>
   public class MosquittoClient : IDisposable
   {
@@ -31,10 +32,29 @@ namespace SMEIoT.Infrastructure.MqttClient
 
     public void Connect()
     {
-      MosquittoWrapper.mosq_set_tls_psk(Psk, Identity, Ciphers);
+      var res = MosquittoWrapper.mosq_set_tls_psk(Psk, Identity, Ciphers);
+      if (res != 0)
+      {
+        throw new ArgumentException($"Mosquitto mosq_set_tls_psk returned {res}");
+      }
       MosquittoWrapper.mosq_set_callback(ConnectCallback, MessageCallback);
-      MosquittoWrapper.mosq_connect(Host, Port, KeepAlive);
-      Topics.Select(t => MosquittoWrapper.mosq_subscribe_topic(t));
+
+      if (Host == null)
+      {
+        throw new ArgumentException($"Mosquitto host is null");
+      }
+
+      res = MosquittoWrapper.mosq_connect(Host!, Port, KeepAlive);
+      if (res != 0)
+      {
+        throw new ArgumentException($"Mosquitto mosq_connect returned {res}");
+      }
+
+      var res_list = Topics.Select(t => MosquittoWrapper.mosq_subscribe_topic(t));
+      if (res_list.Any(r => r != 0))
+      {
+        throw new ArgumentException("Mosquitto mosq_subscribe_topic returned error", string.Join(',', res_list));
+      }
     }
 
     public void RunLoop()
