@@ -59,6 +59,7 @@ namespace SMEIoT.Web
       services.AddScoped<ISensorAssignmentService, SensorAssignmentService>();
       services.AddScoped<ISensorService, SensorService>();
       services.AddScoped<IUserManagementService, UserManagementService>();
+      services.AddScoped<IUserProfileService, UserProfileService>();
 
       // reference Identity/Core/src/IdentityServiceCollectionExtensions.cs
       services.AddIdentity<User, IdentityRole<long>>(options =>
@@ -89,7 +90,6 @@ namespace SMEIoT.Web
         options.AccessDeniedPath = "/login";
         options.SlidingExpiration = true;
       });
-      services.AddScoped<IUserProfileService, UserProfileService>();
 
       services.AddApiVersioning(options =>
       {
