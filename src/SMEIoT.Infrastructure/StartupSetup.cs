@@ -5,11 +5,9 @@ using NodaTime;
 using SMEIoT.Core.Interfaces;
 using SMEIoT.Infrastructure.Data;
 using Hangfire;
-using StackExchange.Redis;
-using System;
 using SMEIoT.Infrastructure.MqttClient;
-using System.Linq;
 using SMEIoT.Core.EventHandlers;
+using Hangfire.LiteDB;
 
 namespace SMEIoT.Infrastructure
 {
@@ -19,21 +17,21 @@ namespace SMEIoT.Infrastructure
       services.AddDbContext<ApplicationDbContext>(options =>
         options.UseNpgsql(configuration.BuildConnectionString(), opts => opts.UseNodaTime()));
 
-    public static ConnectionMultiplexer? Redis;
-
-    public static void ConfigureRedis(this IServiceCollection services, IConfiguration configuration) =>
-      Redis = ConnectionMultiplexer.Connect(configuration.GetConnectionString("Redis"));
-
     public static void ConfigureHangfire(this IServiceCollection services, IConfiguration configuration) =>
       Hangfire.GlobalConfiguration.Configuration
         .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
         .UseSimpleAssemblyNameTypeSerializer()
         .UseRecommendedSerializerSettings()
+        .UseLiteDbStorage();
+        // we want less dependencies.
+        // and hangfire PostgreSql can't store Nodatime.
         // .UsePostgreSqlStorage(configuration.BuildConnectionString());
-        .UseRedisStorage(Redis);
+        // .UseRedisStorage(Redis);
 
     public static void ConfigureMqttClient(this IServiceCollection services, IConfiguration configuration)
     {
+      services.AddSingleton<MosquittoMessageHandler>();
+
       var builder = new MosquittoClientBuilder()
         .SetConnectionInfo(configuration.GetConnectionString("MqttHost"), 8884)
         .SetKeepAlive(60)
@@ -53,7 +51,6 @@ namespace SMEIoT.Infrastructure
     {
       services.AddSingleton<IClock>(SystemClock.Instance);
       services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
-      services.AddSingleton<MosquittoMessageHandler>();
     }
   }
 }

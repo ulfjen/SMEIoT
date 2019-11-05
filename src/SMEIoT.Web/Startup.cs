@@ -45,12 +45,9 @@ namespace SMEIoT.Web
       services.AddDbContext(Configuration);
 
       services.AddInfrastructure();
-      services.ConfigureRedis(Configuration);
       services.ConfigureHangfire(Configuration);
       services.AddHangfire(globalConfig => { });
 
-      services.ConfigureMqttClient(Configuration);
-      
       services.AddHangfireServer(options =>
       {
         options.Queues = new[] { "critical", "default" };
@@ -60,6 +57,9 @@ namespace SMEIoT.Web
       services.AddScoped<ISensorService, SensorService>();
       services.AddScoped<IUserManagementService, UserManagementService>();
       services.AddScoped<IUserProfileService, UserProfileService>();
+      services.AddScoped<IMqttSensorService, MqttSensorService>();
+
+      services.ConfigureMqttClient(Configuration);
 
       // reference Identity/Core/src/IdentityServiceCollectionExtensions.cs
       services.AddIdentity<User, IdentityRole<long>>(options =>
