@@ -24,6 +24,13 @@ namespace SMEIoT.Web.Controllers
     {
       return View();
     }
-    
+
+    [HttpGet]
+    public IActionResult Mqtt()
+    {
+      return View();
+    }
+
+
   }
 }

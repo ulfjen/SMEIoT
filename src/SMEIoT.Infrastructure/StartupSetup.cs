@@ -9,6 +9,7 @@ using StackExchange.Redis;
 using System;
 using SMEIoT.Infrastructure.MqttClient;
 using System.Linq;
+using SMEIoT.Core.EventHandlers;
 
 namespace SMEIoT.Infrastructure
 {
@@ -46,11 +47,12 @@ namespace SMEIoT.Infrastructure
         .SetKeepAlive(60)
         .SetPskTls(configuration.GetConnectionString("MqttPsk"), configuration.GetConnectionString("MqttIdentity"))
         .SetRunLoopInfo(-1, 1, 10)
-        .SetMessageCallback(MqttJobs.OnMessage)
         .SubscribeTopic("sensor/#");
 
       services.AddHostedService<BackgroundMqttClientHostedService>(provider =>
       {
+        var handler = provider.GetService<MosquittoMessageHandler>();
+        builder.SetMessageCallback(handler.HandleMessage);
         return new BackgroundMqttClientHostedService(builder.Client);
       });
     }
@@ -59,6 +61,7 @@ namespace SMEIoT.Infrastructure
     {
       services.AddSingleton<IClock>(SystemClock.Instance);
       services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
+      services.AddSingleton<MosquittoMessageHandler>();
     }
   }
 }

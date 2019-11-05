@@ -11,6 +11,7 @@ import DashboardIndex from "./dashboard/DashboardIndex";
 import theme from "./theme";
 import ThemeProvider from "@material-ui/styles/ThemeProvider";
 import { Router, Link } from "@reach/router";
+import DashboardMqtt from "./dashboard/DashboardMqtt";
 
 interface IAction {
   [action: string]: () => JSX.Element;
@@ -90,7 +91,8 @@ export namespace SMEIoT {
           <ThemeProvider theme={theme}>
             <Router>
               <DashboardIndex path="/dashboard"/>
-              <DashboardSensors path="/dashboard/sensors"/>
+              <DashboardSensors path="/dashboard/sensors" />
+              <DashboardMqtt path="/dashboard/mqtt" />
               <DashboardUsers path="/dashboard/users"/>
               <DashboardEditUser path="/dashboard/users/:username"/>
             </Router>

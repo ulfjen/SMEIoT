@@ -80,6 +80,9 @@ const _DashboardIndex: React.FunctionComponent<IDashboardIndexProps> = ({ classe
           {/* System stats */}
           <Grid item xs={12}>
             <Paper className={classes.paper}>
+              <Link color="primary" to="/dashboard/mqtt" component={ReachLink}>
+                View mqtt
+                </Link>
               <p>placeholder</p>
             </Paper>
           </Grid>

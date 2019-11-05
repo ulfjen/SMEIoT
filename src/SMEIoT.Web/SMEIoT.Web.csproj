@@ -28,16 +28,20 @@
 
   <ItemGroup>
     <None Remove="ClientApp\src\avatars.tsx" />
+    <None Remove="ClientApp\src\components\ListItemLine.tsx" />
     <None Remove="ClientApp\src\components\ListItemRoutedLink.tsx" />
     <None Remove="ClientApp\src\components\PasswordField.tsx" />
     <None Remove="ClientApp\src\components\SensorCard.tsx" />
+    <None Remove="ClientApp\src\dashboard\DashboardMqtt.tsx" />
+    <None Remove="ClientApp\src\dashboard\DashboardMqttLineRenderer.tsx" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Hangfire.NetCore" Version="1.7.7" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="3.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="4.0.0-preview8.19405.7" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="4.0.0-preview8.19405.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="4.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="4.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Core" Version="1.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="3.0.0" />
@@ -45,6 +49,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\src\components\ListItemLine.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\ListItemRoutedLink.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\ListItemLink.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\LoginForm.tsx" />
@@ -55,8 +60,12 @@
     <TypeScriptCompile Include="ClientApp\src\components\useUserCredentials.ts" />
     <TypeScriptCompile Include="ClientApp\src\dashboard\DashboardIndex.tsx" />
     <TypeScriptCompile Include="ClientApp\src\dashboard\DashboardEditUser.tsx" />
+    <TypeScriptCompile Include="ClientApp\src\dashboard\DashboardMqttLineRenderer.tsx">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="ClientApp\src\dashboard\DashboardSensors.tsx" />
     <TypeScriptCompile Include="ClientApp\src\dashboard\DashboardUsers.tsx" />
+    <TypeScriptCompile Include="ClientApp\src\dashboard\DashboardMqtt.tsx" />
     <TypeScriptCompile Include="ClientApp\src\index.tsx" />
     <TypeScriptCompile Include="ClientApp\src\avatars.tsx" />
     <TypeScriptCompile Include="ClientApp\src\routes.tsx" />

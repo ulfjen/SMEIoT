@@ -48,12 +48,15 @@
     "@material-ui/core": "^4.5.1",
     "@material-ui/icons": "^4.5.1",
     "@material-ui/lab": "^4.0.0-alpha.29",
+    "@microsoft/signalr": "^3.0.0",
     "@reach/router": "^1.2.1",
+    "@types/react-window": "^1.8.1",
     "jdenticon": "^2.2.0",
     "moment": "^2.24.0",
     "react": "^16.10.2",
     "react-dom": "^16.10.2",
     "react-vis": "^1.11.7",
+    "react-window": "^1.8.5",
     "smeiot-client": "file:vendor/smeiot-client"
   },
   "eslintConfig": {

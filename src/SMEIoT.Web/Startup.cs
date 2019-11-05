@@ -25,6 +25,8 @@ using SMEIoT.Core.Services;
 using SMEIoT.Web.Api.Filters;
 using Hangfire;
 using Microsoft.Extensions.Logging;
+using SMEIoT.Web.Hubs;
+using SMEIoT.Web.Services;
 
 namespace SMEIoT.Web
 {
@@ -120,6 +122,16 @@ namespace SMEIoT.Web
         c.SwaggerDoc("v1", new OpenApiInfo { Title = "SMEIoT API", Version = "v1" });
       });
       services.AddRazorPages();
+      services.AddSignalR();
+      services.AddSingleton<MqttMessageHubDeliveryService>(provider =>
+      {
+        var deliveryService = new MqttMessageHubDeliveryService(
+          provider.GetRequiredService<Microsoft.AspNetCore.SignalR.IHubContext<MqttHub>>()
+        );
+        var handler = provider.GetService<Core.EventHandlers.MosquittoMessageHandler>();
+        handler.Attach(deliveryService);
+        return deliveryService;
+      });
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -187,6 +199,7 @@ namespace SMEIoT.Web
           name: "default",
           pattern: "{controller:slugify=Home}/{action:slugify=Index}/{id?}");
         endpoints.MapRazorPages();
+        endpoints.MapHub<MqttHub>("/dashboard/mqtt_hub");
       });
     }
   }
