@@ -1,10 +1,14 @@
 language: csharp
 sudo: required
-dist: xenial
+dist: bionic
 language: csharp
 mono: none
 dotnet: 3.0.100
 solution: SMEIoT.sln
+before_script:
+    - mkdir -p out && cd out
+    - sudo apt-get install libmosquitto-dev
+    - cmake ..
 script:
     - dotnet --version
     - dotnet restore
