@@ -8,6 +8,7 @@ using Hangfire;
 using SMEIoT.Infrastructure.MqttClient;
 using SMEIoT.Core.EventHandlers;
 using Hangfire.LiteDB;
+using SMEIoT.Core.Services;
 
 namespace SMEIoT.Infrastructure
 {
@@ -51,6 +52,7 @@ namespace SMEIoT.Infrastructure
     {
       services.AddSingleton<IClock>(SystemClock.Instance);
       services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
+      services.AddSingleton<IMqttSensorService, MqttSensorService>();
     }
   }
 }

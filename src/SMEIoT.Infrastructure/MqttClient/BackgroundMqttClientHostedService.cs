@@ -29,6 +29,7 @@ namespace SMEIoT.Infrastructure.MqttClient
       if (_thread != null)
       {
         _thread.Abort();
+        _thread = null;
       }
       return Task.CompletedTask;
     }

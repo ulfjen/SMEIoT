@@ -16,11 +16,14 @@ namespace SMEIoT.Web.Api.V1
   {
     private readonly ILogger<SensorsController> _logger;
     private readonly ISensorService _service;
+    private readonly IMqttSensorService _mqttService;
 
-    public SensorsController(ILogger<SensorsController> logger, ISensorService service)
+
+    public SensorsController(ILogger<SensorsController> logger, ISensorService service, IMqttSensorService mqttService)
     {
       _logger = logger;
       _service = service;
+      _mqttService = mqttService;
     }
 
     [HttpGet("{name}")]
@@ -50,6 +53,17 @@ namespace SMEIoT.Web.Api.V1
       var res = new BasicSensorApiModel(sensor);
       return CreatedAtAction(nameof(Create), res);
     }
+
+    [HttpGet("candidates")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize]
+    public async Task<ActionResult<SensorCandidatesApiModel>> ListCandidates()
+    {
+      var sensor = _mqttService.ListSensorNames("dummy");
+      return Ok(new SensorCandidatesApiModel { Names = sensor });
+    }
+
 
   }
 }

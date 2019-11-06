@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using NodaTime;
 
 namespace SMEIoT.Core.Interfaces
 {
@@ -11,7 +10,7 @@ namespace SMEIoT.Core.Interfaces
     /// </summary>
     /// <param name="sensorName"></param>
     /// <returns></returns>
-    Task<bool> RegisterSensorByName(string sensorName, Period expiredIn);
-    IAsyncEnumerable<string> ListSensorNames(string pattern);
+    Task<bool> RegisterSensorByName(string sensorName);
+    IEnumerable<string> ListSensorNames(string pattern);
   }
 }
