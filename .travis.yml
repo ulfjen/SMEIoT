@@ -1,18 +1,10 @@
 language: csharp
-mono: none
 sudo: required
 dist: xenial
-addons:
-    snaps:
-      - name: dotnet-sdk
-        classic: true
-        channel: latest/stable
-sudo: required
 language: csharp
 mono: none
-install:
-    - export PATH="$PATH:/home/travis/.dotnet/tools"
-    - export PATH="$PATH:$HOME/.local/bin"
+dotnet: 3.0.100
+solution: SMEIoT.sln
 script:
     - dotnet --version
     - dotnet restore
