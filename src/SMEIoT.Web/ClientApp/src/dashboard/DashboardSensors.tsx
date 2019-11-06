@@ -1,7 +1,10 @@
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
+import Tooltip from '@material-ui/core/Tooltip';
+import Fab from '@material-ui/core/Fab';
 import * as React from "react";
+import AddIcon from '@material-ui/icons/Add';
 import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
@@ -12,7 +15,7 @@ import UserAvatarMenu from '../components/UserAvatarMenu';
 import { BasicUserApiModel, SensorDetailsApiModel } from 'smeiot-client/src';
 import moment from 'moment';
 import SensorCard from '../components/SensorCard';
-import { RouteComponentProps } from '@reach/router';
+import { Link, RouteComponentProps } from '@reach/router';
 
 const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Theme) => createStyles({
   container: {
@@ -27,6 +30,11 @@ const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Th
   },
   fixedHeight: {
     height: 240,
+  },
+  absolute: {
+    position: 'absolute',
+    bottom: spacing(2),
+    right: spacing(3),
   },
 });
 
@@ -51,6 +59,16 @@ const _DashboardSensors: React.FunctionComponent<IDashboardSensors> = ({ classes
         <Grid container spacing={3}>
           {renderSensors()}
         </Grid>
+        <Tooltip title="Add" aria-label="add">
+          <Fab
+            color="secondary"
+            className={classes.absolute}
+            to={"/dashboard/sensors/new"}
+            component={Link}
+          >
+            <AddIcon />
+          </Fab>
+        </Tooltip>
       </Container>} />;
 };
 

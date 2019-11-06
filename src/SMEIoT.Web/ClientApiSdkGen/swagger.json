@@ -447,6 +447,35 @@
         }
       }
     },
+    "/api/sensors/candidates": {
+      "get": {
+        "tags": [
+          "Sensors"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SensorCandidatesApiModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/sessions": {
       "post": {
         "tags": [
@@ -821,6 +850,19 @@
         "properties": {
           "sensorName": {
             "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SensorCandidatesApiModel": {
+        "type": "object",
+        "properties": {
+          "names": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
             "nullable": true
           }
         },

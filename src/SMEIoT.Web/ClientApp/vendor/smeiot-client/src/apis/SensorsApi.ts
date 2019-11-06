@@ -21,6 +21,9 @@ import {
     ProblemDetails,
     ProblemDetailsFromJSON,
     ProblemDetailsToJSON,
+    SensorCandidatesApiModel,
+    SensorCandidatesApiModelFromJSON,
+    SensorCandidatesApiModelToJSON,
     SensorDetailsApiModel,
     SensorDetailsApiModelFromJSON,
     SensorDetailsApiModelToJSON,
@@ -45,6 +48,30 @@ export interface SensorsApiSensorsNameGetRequest {
  * no description
  */
 export class SensorsApi extends runtime.BaseAPI {
+
+    /**
+     */
+    async apiSensorsCandidatesGetRaw(): Promise<runtime.ApiResponse<SensorCandidatesApiModel>> {
+        const queryParameters: runtime.HTTPQuery = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/sensors/candidates`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => SensorCandidatesApiModelFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiSensorsCandidatesGet(): Promise<SensorCandidatesApiModel> {
+        const response = await this.apiSensorsCandidatesGetRaw();
+        return await response.value();
+    }
 
     /**
      */

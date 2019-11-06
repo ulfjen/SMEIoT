@@ -8,6 +8,7 @@ export * from './LoginBindingModel';
 export * from './LoginedApiModel';
 export * from './ProblemDetails';
 export * from './SensorAssignmentApiModel';
+export * from './SensorCandidatesApiModel';
 export * from './SensorDetailsApiModel';
 export * from './SensorLocatorBindingModel';
 export * from './UserCredentialsUpdateApiModel';

@@ -34,6 +34,7 @@
     <None Remove="ClientApp\src\components\SensorCard.tsx" />
     <None Remove="ClientApp\src\dashboard\DashboardMqtt.tsx" />
     <None Remove="ClientApp\src\dashboard\DashboardMqttLineRenderer.tsx" />
+    <None Remove="ClientApp\src\dashboard\DashboardNewSensor.tsx" />
   </ItemGroup>
 
   <ItemGroup>
@@ -60,6 +61,7 @@
     <TypeScriptCompile Include="ClientApp\src\components\UserListItem.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\UserPasswordForm.tsx" />
     <TypeScriptCompile Include="ClientApp\src\components\useUserCredentials.ts" />
+    <TypeScriptCompile Include="ClientApp\src\dashboard\DashboardNewSensor.tsx" />
     <TypeScriptCompile Include="ClientApp\src\dashboard\DashboardIndex.tsx" />
     <TypeScriptCompile Include="ClientApp\src\dashboard\DashboardEditUser.tsx" />
     <TypeScriptCompile Include="ClientApp\src\dashboard\DashboardMqttLineRenderer.tsx">
