@@ -9,6 +9,8 @@ before_script:
     - mkdir -p out && cd out
     - sudo apt-get install libmosquitto-dev
     - cmake ..
+    - make -j8 && ls
+    - cd ..
 script:
     - dotnet --version
     - dotnet restore
