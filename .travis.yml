@@ -1,15 +1,21 @@
 language: csharp
+arch:
+  - amd64
+  - arm64
+os: linux
 sudo: required
 dist: bionic
 language: csharp
 mono: none
 dotnet: 3.0.100
 solution: SMEIoT.sln
+
 before_script:
     - mkdir -p out && cd out
     - sudo apt-get install libmosquitto-dev
     - cmake ..
-    - make -j8 && ls
+    - make -j8 && ls src && ls src/Mosquitto
+    - cp src/Mosquitto/*.so ../test/SMEIoT.TestsIntegrationTests/bin/Debug/netcoreapp3.0
     - cd ..
 script:
     - dotnet --version
