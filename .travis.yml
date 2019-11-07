@@ -15,7 +15,7 @@ before_script:
     - sudo apt-get install libmosquitto-dev
     - cmake ..
     - make -j8 && ls src && ls src/Mosquitto
-    - cp src/Mosquitto/*.so ../test/SMEIoT.TestsIntegrationTests/bin/Debug/netcoreapp3.0
+    - cp src/Mosquitto/*.so ../test/SMEIoT.IntegrationTests/bin/Debug/netcoreapp3.0
     - cd ..
 script:
     - dotnet --version
