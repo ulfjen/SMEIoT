@@ -1,6 +1,7 @@
 #include "client.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 
 #ifdef _WIN32
 #include <Windows.h>
