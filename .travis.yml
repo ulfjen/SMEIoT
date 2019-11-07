@@ -15,12 +15,12 @@ before_script:
     - sudo apt-get install libmosquitto-dev
     - cmake ..
     - make -j8 && ls src && ls src/Mosquitto
-    - cp src/Mosquitto/*.so ../test/SMEIoT.IntegrationTests/bin/Debug/netcoreapp3.0
     - cd ..
 script:
     - dotnet --version
     - dotnet restore
     - dotnet build
+    - cp out/src/Mosquitto/*.so test/SMEIoT.IntegrationTests/bin/Debug/netcoreapp3.0
     - dotnet test
 global:
     - DOTNET_SKIP_FIRST_TIME_EXPERIENCE=true
