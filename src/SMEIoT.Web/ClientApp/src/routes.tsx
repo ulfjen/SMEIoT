@@ -6,6 +6,7 @@ import * as ReactDOM from "react-dom";
 import NewSession from "./NewSession";
 import DashboardUsers from "./dashboard/DashboardUsers";
 import DashboardSensors from "./dashboard/DashboardSensors";
+import DashboardDevices from "./dashboard/DashboardDevices";
 import DashboardEditUser from "./dashboard/DashboardEditUser";
 import DashboardIndex from "./dashboard/DashboardIndex";
 import theme from "./theme";
@@ -13,6 +14,8 @@ import ThemeProvider from "@material-ui/styles/ThemeProvider";
 import { Router, Link } from "@reach/router";
 import DashboardMqtt from "./dashboard/DashboardMqtt";
 import DashboardNewSensor from "./dashboard/DashboardNewSensor";
+import DashboardNewDevice from "./dashboard/DashboardNewDevice";
+import { IntlProvider } from "react-intl";
 
 interface IAction {
   [action: string]: () => JSX.Element;
@@ -86,19 +89,24 @@ export namespace SMEIoT {
       let body = document.body;
       let controller = body.getAttribute("data-controller");
       let action = body.getAttribute("data-action");
+      let language = "en";
 
       if (controller !== null && controller.startsWith("Dashboard")) {
         ReactDOM.render(
-          <ThemeProvider theme={theme}>
-            <Router>
-              <DashboardIndex path="/dashboard"/>
-              <DashboardSensors path="/dashboard/sensors" />
-              <DashboardNewSensor path="/dashboard/sensors/new" />
-              <DashboardMqtt path="/dashboard/mqtt" />
-              <DashboardUsers path="/dashboard/users"/>
-              <DashboardEditUser path="/dashboard/users/:username"/>
-            </Router>
-          </ThemeProvider>,
+          <IntlProvider locale={language}>
+            <ThemeProvider theme={theme}>
+              <Router>
+                <DashboardIndex path="/dashboard"/>
+                <DashboardDevices path="/dashboard/devices" />
+                <DashboardNewDevice path="/dashboard/devices/new" />
+                <DashboardSensors path="/dashboard/sensors" />
+                <DashboardNewSensor path="/dashboard/sensors/new" />
+                <DashboardMqtt path="/dashboard/mqtt" />
+                <DashboardUsers path="/dashboard/users"/>
+                <DashboardEditUser path="/dashboard/users/:username"/>
+              </Router>
+            </ThemeProvider>
+          </IntlProvider>,
           document.getElementById("react-main")
         );
         return;
@@ -106,9 +114,11 @@ export namespace SMEIoT {
 
       if (controller !== null && action !== null) {
         ReactDOM.render(
-          <ThemeProvider theme={theme}>
-            {BodyRouter.bind(controller, action)}
-          </ThemeProvider>,
+          <IntlProvider locale={language}>
+            <ThemeProvider theme={theme}>
+              {BodyRouter.bind(controller, action)}
+            </ThemeProvider>
+          </IntlProvider>,
           document.getElementById("react-main")
         );
       }
