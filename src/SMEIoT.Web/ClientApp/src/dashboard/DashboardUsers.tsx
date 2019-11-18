@@ -119,13 +119,13 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({classes
         <Chip label="Admin"/>
       </Paper>
       <Card>
-      <List className={classes.list}>
-        {loaded ? (
-          renderUserLists()
-        ) : (
-          <Skeleton variant="rect" height={4}/>
-        )}
-      </List>
+        <List className={classes.list}>
+          {loaded ? (
+            renderUserLists()
+          ) : (
+            <Skeleton variant="rect" height={4}/>
+          )}
+        </List>
       </Card>
       <Menu
         id="user-management-menu"

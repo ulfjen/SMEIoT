@@ -2,9 +2,10 @@ import * as React from "react";
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import PeopleIcon from '@material-ui/icons/People';
 import BarChartIcon from '@material-ui/icons/BarChart';
+import DeviceHubIcon from '@material-ui/icons/DeviceHub';
 import ListItemRoutedLink from "../components/ListItemRoutedLink";
-import {defineMessages, useIntl} from 'react-intl';
 import List from '@material-ui/core/List';
+import {defineMessages, useIntl} from 'react-intl';
 
 const messages = defineMessages({
   dashboard: {
@@ -32,7 +33,7 @@ const DrawerList: React.FunctionComponent<IDrawerListProps> = () => {
 
   return <List>
     <ListItemRoutedLink primary={intl.formatMessage(messages.dashboard)} to="/dashboard" icon={<DashboardIcon/>}/>
-    <ListItemRoutedLink primary={intl.formatMessage(messages.devices)} to="/dashboard/devices" icon={<BarChartIcon/>} />
+    <ListItemRoutedLink primary={intl.formatMessage(messages.devices)} to="/dashboard/devices" icon={<DeviceHubIcon/>} />
     <ListItemRoutedLink primary={intl.formatMessage(messages.users)} to="/dashboard/users" icon={<PeopleIcon/>} />
   </List>
 };
