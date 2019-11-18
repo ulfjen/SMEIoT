@@ -51,7 +51,7 @@ module.exports = (env = {}, argv = {}) => {
         inject: false
       })
     ],
-    devtool: 'eval-source-map',
+    devtool: 'cheap-eval-source-map',
     module: {
       rules: [
         {
@@ -65,11 +65,6 @@ module.exports = (env = {}, argv = {}) => {
           test: /\.tsx?$/,
           use: 'ts-loader',
           exclude: /node_modules/
-        },
-        {
-          enforce: "pre",
-          test: /\.(js|ts|jsx|tsx)$/,
-          loader: "source-map-loader"
         },
         {
           test: /\.(sa|sc|c)ss$/,

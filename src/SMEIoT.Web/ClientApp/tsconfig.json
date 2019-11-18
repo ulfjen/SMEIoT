@@ -2,6 +2,8 @@
   "compilerOptions": {
     "outDir": "./wwwroot/dist/",
     "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
     "strictNullChecks": true,
@@ -19,7 +21,6 @@
       "./typings",
       "./node_modules/@types"
     ],
-    "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -27,6 +28,5 @@
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "isolatedModules": true
   }
 }
