@@ -23,7 +23,7 @@ namespace SMEIoT.Infrastructure
         .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
         .UseSimpleAssemblyNameTypeSerializer()
         .UseRecommendedSerializerSettings()
-        .UseLiteDbStorage();
+        .UseLiteDbStorage("Filename=Hangfire.db; Mode=Exclusive");
         // we want less dependencies.
         // and hangfire PostgreSql can't store Nodatime.
         // .UsePostgreSqlStorage(configuration.BuildConnectionString());

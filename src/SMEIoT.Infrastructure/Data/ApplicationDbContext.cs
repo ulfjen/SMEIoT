@@ -13,6 +13,13 @@ using SMEIoT.Core.Interfaces;
 
 namespace SMEIoT.Infrastructure.Data
 {
+  /// <summary>
+  /// 
+  /// </summary>
+  /// <para>Per day, with 30s interval, a sensor generates 2880 data points.
+  /// For a month, it generates 86400 data points. With 100 sensors, 8,640,000 data points were generated.
+  /// </para>
+  /// https://www.postgresql.org/docs/9.1/ddl-partitioning.html
   public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<long>, long, IdentityUserClaim<long>,
     IdentityUserRole<long>, IdentityUserLogin<long>, IdentityRoleClaim<long>, IdentityUserToken<long>>, IApplicationDbContext
   {
