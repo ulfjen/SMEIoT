@@ -110,6 +110,8 @@ namespace SMEIoT.Infrastructure.Data
       modelBuilder.Entity<IdentityUserLogin<long>>().ToTable("user_logins");
       modelBuilder.Entity<IdentityRoleClaim<long>>().ToTable("role_claims");
       modelBuilder.Entity<IdentityUserToken<long>>().ToTable("user_tokens");
+      modelBuilder.Entity<Device>();
+      modelBuilder.Entity<Sensor>();
 
       modelBuilder.Entity<UserSensor>()
         .HasKey(us => new {us.UserId, us.SensorId});
