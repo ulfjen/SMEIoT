@@ -67,7 +67,7 @@ const _DashboardDevices: React.FunctionComponent<IDashboardDevices> = ({ classes
   const loaded = true;
   const [sensors, setSensors] = React.useState<null | Array<SensorDetailsApiModel>>(null);
 
-  const renderSensors = () => {
+  const renderDevices = () => {
     if (sensors == null) { return null; }
 
     return sensors.map(sensor => <SensorCard sensor={sensor} key={sensor.sensorName || ""} />);
@@ -128,7 +128,7 @@ const _DashboardDevices: React.FunctionComponent<IDashboardDevices> = ({ classes
             <Paper>
               <List className={classes.list}>
                 {loaded ? (
-                  renderSensors()
+                  renderDevices()
                 ) : (
                   <Skeleton variant="rect" height={4}/>
                 )}

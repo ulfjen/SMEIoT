@@ -38,56 +38,56 @@ const _DashboardIndex: React.FunctionComponent<IDashboardIndexProps> = ({ classe
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
     return <Frame title="Dashboard" direction="ltr" toolbarRight={null}
-    content={
-      <Container maxWidth="lg" className={classes.container}>
-        <Grid container spacing={3}>
-          {/* Sensor stats */}
-          <Grid item xs={12} md={8} lg={9}>
-            <Paper className={fixedHeightPaper}>
-              <Typography component="h2" variant="h6" color="primary" gutterBottom>
-                Sensors
-            </Typography>
-              <Typography component="p" variant="h4">
-                1
-            </Typography>
-              <Typography color="textSecondary" className={classes.context}>
+      content={
+        <Container maxWidth="lg" className={classes.container}>
+          <Grid container spacing={3}>
+            {/* Sensor stats */}
+            <Grid item xs={12} md={8} lg={9}>
+              <Paper className={fixedHeightPaper}>
+                <Typography component="h2" variant="h6" color="primary" gutterBottom>
+                  Sensors
               </Typography>
-              <div>
-                <Link color="primary" to="/dashboard/sensors" component={ReachLink}>
-                  View sensors
-                </Link>
-              </div>
-            </Paper>
+                <Typography component="p" variant="h4">
+                  1
+              </Typography>
+                <Typography color="textSecondary" className={classes.context}>
+                </Typography>
+                <div>
+                  <Link color="primary" to="/dashboard/sensors" component={ReachLink}>
+                    View sensors
+                  </Link>
+                </div>
+              </Paper>
+            </Grid>
+            {/* User stats */}
+            <Grid item xs={12} md={4} lg={3}>
+              <Paper className={fixedHeightPaper}>
+                <Typography component="h2" variant="h6" color="primary" gutterBottom>
+                  Users
+                </Typography>
+                <Typography component="p" variant="h4">
+                  1
+                </Typography>
+                <Typography color="textSecondary" className={classes.context}>
+                </Typography>
+                <div>
+                  <Link color="primary" to="/dashboard/sensors" component={ReachLink}>
+                    View users
+                  </Link>
+                </div>
+              </Paper>
+            </Grid>
+            {/* System stats */}
+            <Grid item xs={12}>
+              <Paper className={classes.paper}>
+                <Link color="primary" to="/dashboard/mqtt" component={ReachLink}>
+                  View mqtt
+                  </Link>
+                <p>placeholder</p>
+              </Paper>
+            </Grid>
           </Grid>
-          {/* User stats */}
-          <Grid item xs={12} md={4} lg={3}>
-            <Paper className={fixedHeightPaper}>
-              <Typography component="h2" variant="h6" color="primary" gutterBottom>
-                Users
-              </Typography>
-              <Typography component="p" variant="h4">
-                1
-              </Typography>
-              <Typography color="textSecondary" className={classes.context}>
-              </Typography>
-              <div>
-                <Link color="primary" to="/dashboard/sensors" component={ReachLink}>
-                  View users
-                </Link>
-              </div>
-            </Paper>
-          </Grid>
-          {/* System stats */}
-          <Grid item xs={12}>
-            <Paper className={classes.paper}>
-              <Link color="primary" to="/dashboard/mqtt" component={ReachLink}>
-                View mqtt
-                </Link>
-              <p>placeholder</p>
-            </Paper>
-          </Grid>
-        </Grid>
-      </Container>
+        </Container>
     } />;
 };
 
