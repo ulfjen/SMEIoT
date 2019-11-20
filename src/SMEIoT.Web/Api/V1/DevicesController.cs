@@ -17,7 +17,7 @@ namespace SMEIoT.Web.Api.V1
     private readonly ILogger<DevicesController> _logger;
     private readonly IDeviceService _service;
 
-    public DevicesController(ILogger<SensorsController> logger, ISensorService service)
+    public DevicesController(ILogger<DevicesController> logger, IDeviceService service)
     {
       _logger = logger;
       _service = service;
@@ -30,9 +30,9 @@ namespace SMEIoT.Web.Api.V1
     public async Task<ActionResult<DeviceApiModel>> BootstrapWithPreSharedKey(DeviceBootstrapConfigBindingModel view)
     {
       var deviceName = await _service.BootstrapDeviceWithPreSharedKeyAsync(view.Identity, view.Key);
-      var deivce = await _service.GetDeviceByNameAsync(deviceName);
+      var device = await _service.GetDeviceByNameAsync(deviceName);
       var res = new DeviceApiModel(device);
-      return CreatedAtAction(nameof(Create), res);
+      return CreatedAtAction(nameof(BootstrapWithPreSharedKey), res);
     }
 
     [HttpPut("{name}")]

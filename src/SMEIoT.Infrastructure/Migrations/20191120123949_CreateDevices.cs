@@ -4,28 +4,29 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace SMEIoT.Infrastructure.Migrations
 {
-    public partial class AddDevices : Migration
+    public partial class CreateDevices : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Device",
+                name: "devices",
                 columns: table => new
                 {
-                    Id = table.Column<long>(nullable: false)
+                    id = table.Column<long>(nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(nullable: false),
-                    NormalizedName = table.Column<string>(nullable: false),
-                    CreatedAt = table.Column<Instant>(nullable: false),
-                    UpdatedAt = table.Column<Instant>(nullable: false),
-                    Key = table.Column<string>(nullable: false),
+                    name = table.Column<string>(nullable: false),
+                    normalized_name = table.Column<string>(nullable: false),
+                    created_at = table.Column<Instant>(nullable: false),
+                    updated_at = table.Column<Instant>(nullable: false),
+                    authentication_type = table.Column<string>(nullable: false),
+                    pre_shared_key = table.Column<string>(nullable: true),
                     connected = table.Column<bool>(nullable: false),
-                    ConnectedAt = table.Column<Instant>(nullable: true),
-                    LastMessageAt = table.Column<Instant>(nullable: true)
+                    connected_at = table.Column<Instant>(nullable: true),
+                    last_message_at = table.Column<Instant>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Device", x => x.Id);
+                    table.PrimaryKey("pk_devices", x => x.id);
                 });
 
             migrationBuilder.UpdateData(
@@ -33,13 +34,13 @@ namespace SMEIoT.Infrastructure.Migrations
                 keyColumn: "id",
                 keyValue: 1L,
                 column: "concurrency_stamp",
-                value: "e7ff9bc2-43ba-4cf7-ba9a-abe6bb271fcb");
+                value: "90ed430f-387b-47c5-bff1-91fa4407ccef");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Device");
+                name: "devices");
 
             migrationBuilder.UpdateData(
                 table: "roles",

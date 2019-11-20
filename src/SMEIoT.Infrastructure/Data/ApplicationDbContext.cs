@@ -26,6 +26,7 @@ namespace SMEIoT.Infrastructure.Data
     private IClock _clock;
     // inherited a Users DbSet
     public DbSet<Sensor> Sensors { get; set; }
+    public DbSet<Device> Devices { get; set; }
 
     public DbSet<UserSensor> UserSensors { get; set; }
 
@@ -110,8 +111,6 @@ namespace SMEIoT.Infrastructure.Data
       modelBuilder.Entity<IdentityUserLogin<long>>().ToTable("user_logins");
       modelBuilder.Entity<IdentityRoleClaim<long>>().ToTable("role_claims");
       modelBuilder.Entity<IdentityUserToken<long>>().ToTable("user_tokens");
-      modelBuilder.Entity<Device>();
-      modelBuilder.Entity<Sensor>();
 
       modelBuilder.Entity<UserSensor>()
         .HasKey(us => new {us.UserId, us.SensorId});
@@ -125,6 +124,12 @@ namespace SMEIoT.Infrastructure.Data
         .HasOne(us => us.Sensor)
         .WithMany(s => s.UserSensors)
         .HasForeignKey(us => us.SensorId);
+
+      modelBuilder.Entity<Device>()
+        .Property(d => d.AuthenticationType)
+        .HasConversion(
+            v => v.ToString(),
+            v => (DeviceAuthenticationType)Enum.Parse(typeof(DeviceAuthenticationType), v));
     }
   }
 }

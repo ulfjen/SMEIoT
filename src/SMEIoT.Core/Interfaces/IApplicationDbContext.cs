@@ -13,6 +13,7 @@ namespace SMEIoT.Core.Interfaces
     DbSet<Sensor> Sensors { get; set; }
     DbSet<UserSensor> UserSensors { get; set; }
     DbSet<IdentityUserRole<long>> UserRoles { get; set; }
+    DbSet<Device> Devices { get; set; }
 
     int SaveChanges();
     Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,

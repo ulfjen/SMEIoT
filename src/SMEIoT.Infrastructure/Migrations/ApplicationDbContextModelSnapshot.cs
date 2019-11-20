@@ -56,7 +56,7 @@ namespace SMEIoT.Infrastructure.Migrations
                         new
                         {
                             Id = 1L,
-                            ConcurrencyStamp = "e7ff9bc2-43ba-4cf7-ba9a-abe6bb271fcb",
+                            ConcurrencyStamp = "90ed430f-387b-47c5-bff1-91fa4407ccef",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });
@@ -194,39 +194,53 @@ namespace SMEIoT.Infrastructure.Migrations
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnName("id")
                         .HasColumnType("bigint")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
+                    b.Property<string>("AuthenticationType")
+                        .IsRequired()
+                        .HasColumnName("authentication_type")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("Connected")
+                        .HasColumnName("connected")
+                        .HasColumnType("boolean");
+
                     b.Property<Instant?>("ConnectedAt")
+                        .HasColumnName("connected_at")
                         .HasColumnType("timestamp");
 
                     b.Property<Instant>("CreatedAt")
+                        .HasColumnName("created_at")
                         .HasColumnType("timestamp");
 
-                    b.Property<string>("Key")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<Instant?>("LastMessageAt")
+                        .HasColumnName("last_message_at")
                         .HasColumnType("timestamp");
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasColumnName("name")
                         .HasColumnType("text");
 
                     b.Property<string>("NormalizedName")
                         .IsRequired()
+                        .HasColumnName("normalized_name")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PreSharedKey")
+                        .HasColumnName("pre_shared_key")
                         .HasColumnType("text");
 
                     b.Property<Instant>("UpdatedAt")
+                        .HasColumnName("updated_at")
                         .HasColumnType("timestamp");
 
-                    b.Property<bool>("connected")
-                        .HasColumnType("boolean");
+                    b.HasKey("Id")
+                        .HasName("pk_devices");
 
-                    b.HasKey("Id");
-
-                    b.ToTable("Device");
+                    b.ToTable("devices");
                 });
 
             modelBuilder.Entity("SMEIoT.Core.Entities.Sensor", b =>

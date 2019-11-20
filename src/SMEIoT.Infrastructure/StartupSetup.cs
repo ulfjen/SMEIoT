@@ -53,6 +53,8 @@ namespace SMEIoT.Infrastructure
       services.AddSingleton<IClock>(SystemClock.Instance);
       services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
       services.AddSingleton<IMqttSensorService, MqttSensorService>();
+      // services.AddScoped<IIdentifierSuggester, IdentifierSuggester>();
+      // services.AddScoped<IPreSharedKeyGenerator, PreSharedKeyGenerator>();
     }
   }
 }

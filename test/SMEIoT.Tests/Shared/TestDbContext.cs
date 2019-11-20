@@ -16,5 +16,6 @@ namespace SMEIoT.Tests.Shared
     public virtual DbSet<Sensor> Sensors { get; set; }
     public virtual DbSet<UserSensor> UserSensors { get; set; }
     public virtual DbSet<IdentityUserRole<long>> UserRoles { get; set; }
+    public virtual DbSet<Device> Devices { get; set; }
   }
 }

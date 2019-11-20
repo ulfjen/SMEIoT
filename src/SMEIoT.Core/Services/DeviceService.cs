@@ -19,14 +19,28 @@ namespace SMEIoT.Core.Services
       _dbContext = dbContext;
     } 
     
-    public async Task<string> BootstrapDeviceWithPreSharedKeyAsync(string identity, string key)
+    public async Task<string> BootstrapDeviceWithPreSharedKeyAsync(string name, string key)
     {
-      return "";
+      _dbContext.Devices.Add(new Device
+        {
+          Name = name,
+          NormalizedName = Device.NormalizeName(name),
+          AuthenticationType = DeviceAuthenticationType.PreSharedKey,
+          PreSharedKey = key
+      });
+      await _dbContext.SaveChangesAsync();
+      return name;
     }
 
     public async Task<Device> GetDeviceByNameAsync(string deviceName)
-    {
-      throw new NotImplementedException();
+    {      
+      var device = await _dbContext.Devices.Where(d => d.NormalizedName == Device.NormalizeName(deviceName)).FirstOrDefaultAsync();
+      if (device == null)
+      {
+        throw new EntityNotFoundException("cannot find the device.", "deviceName");
+      }
+
+      return device;
     }
   }
 }

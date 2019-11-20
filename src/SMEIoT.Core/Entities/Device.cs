@@ -14,8 +14,11 @@ namespace SMEIoT.Core.Entities
     
     public Instant CreatedAt { get; set; }
     public Instant UpdatedAt { get; set; }
-    public string Key { get; set; }
-    public bool connected { get; set; }
+
+    public DeviceAuthenticationType AuthenticationType { get; set; }
+    public string? PreSharedKey { get; set; }
+    /// Cached connection status for last 10 minutes
+    public bool Connected { get; set; }
     public Instant? ConnectedAt { get; set; }
     public Instant? LastMessageAt { get; set; }
 
