@@ -24,6 +24,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import { Link, RouteComponentProps } from "@reach/router";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
+import {Helmet} from "react-helmet";
 import {
   defineMessages,
   useIntl,
@@ -97,13 +98,13 @@ const messages = defineMessages({
     description: "The aria label for close action",
     defaultMessage: "Close this action"
   },
-  identityLabel: {
-    id: "dashboard.devices.new.psk.identity",
-    description: "The label for adding psk identity",
-    defaultMessage: "Identity"
+  nameLabel: {
+    id: "dashboard.devices.new.step1.name",
+    description: "The label for adding device name",
+    defaultMessage: "Device name"
   },
   keyLabel: {
-    id: "dashboard.devices.new.psk.key",
+    id: "dashboard.devices.new.step1.key",
     description: "The label for adding psk key",
     defaultMessage: "Key"
   },
@@ -116,13 +117,34 @@ const messages = defineMessages({
     id: "dashboard.devices.new.step2.label",
     description: "The label for connecting device - step 2",
     defaultMessage: "Install and connect"
+  },
+  step3: {
+    id: "dashboard.devices.new.step3.label",
+    description: "The label for connecting device - step 3",
+    defaultMessage: "Add sensors"
+  },
+  nextControl: {
+    id: "dashboard.devices.new.control.next",
+    description: "The button text for controling next",
+    defaultMessage: "Next"
+  },
+  finishControl: {
+    id: "dashboard.devices.new.control.finish",
+    description: "The button text for finishing",
+    defaultMessage: "Finish"
+  },
+  connectTitle: {
+    id: "dashboard.devices.new.title",
+    description: "HTML title for the connecting new device page",
+    defaultMessage: "Connect a new device"
   }
 });
 
 function getSteps(intl: IntlShape) {
   return [
     intl.formatMessage(messages.step1),
-    intl.formatMessage(messages.step2)
+    intl.formatMessage(messages.step2),
+    intl.formatMessage(messages.step3)
   ];
 }
 
@@ -146,8 +168,8 @@ function getStepContent(stepIndex: number, intl: IntlShape) {
             margin="normal"
             required
             fullWidth
-            id="psk-identity"
-            label={intl.formatMessage(messages.identityLabel)}
+            id="device-name"
+            label={intl.formatMessage(messages.nameLabel)}
             autoFocus
             onChange={event => {
               console.log(event.target.value);
@@ -171,17 +193,31 @@ function getStepContent(stepIndex: number, intl: IntlShape) {
         </React.Fragment>
       );
     case 1:
-      return <React.Fragment>
-      <p>
-        <FormattedMessage
-          id="dashboard.devices.new.step2.notice"
-          description="Notice related when we wait for new connection"
-          defaultMessage="Now you can copy the key to your device and start to connect with the broker.
+      return (
+        <React.Fragment>
+          <p>
+            <FormattedMessage
+              id="dashboard.devices.new.step2.notice"
+              description="Notice related when we wait for new connection"
+              defaultMessage="Now you can copy the key to your device and start to connect with the broker.
             Once we receive a new message from the broker, we will prompt you."
-        />
-      </p>
-      <p>(relevant information down here)</p>
-    </React.Fragment>
+            />
+          </p>
+          <p>(relevant information down here)</p>
+        </React.Fragment>
+      );
+    case 2:
+      return (
+        <React.Fragment>
+          <p>
+            <FormattedMessage
+              id="dashboard.devices.new.step3.notice"
+              description="Notice related when we add new sensors"
+              defaultMessage="The device is now installed. You can start to connect sensors. You can also add sensors in the device details page later."
+            />
+          </p>
+        </React.Fragment>
+      );
     default:
       return "Unknown stepIndex";
   }
@@ -197,10 +233,6 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
 
   const handleNext = () => {
     setActiveStep(prevActiveStep => prevActiveStep + 1);
-  };
-
-  const handleBack = () => {
-    setActiveStep(prevActiveStep => prevActiveStep - 1);
   };
 
   const handleReset = () => {
@@ -227,6 +259,9 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
           to={"/dashboard/devices"}
           component={Link}
         >
+          <Helmet>
+            <title>{intl.formatMessage(messages.connectTitle)}</title>
+          </Helmet>
           <CloseIcon />
         </IconButton>
       }
@@ -247,36 +282,29 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
 
             <Grid item xs={12}>
               <Paper className={classes.paper}>
-                {activeStep === steps.length ? (
+                <div>
+                  {getStepContent(activeStep, intl)}
                   <div>
-                    <Typography className={classes.instructions}>
-                      A new device is connected! Add sensors now (link).
-                    </Typography>
-                    <Button onClick={handleReset}>Connect with another device</Button>
-                  </div>
-                ) : (
-                  <div>
-                    <Typography className={classes.instructions}>
-                      {getStepContent(activeStep, intl)}
-                    </Typography>
-                    <div>
-                      <Button
-                        disabled={activeStep === 0}
-                        onClick={handleBack}
-                        className={classes.backButton}
-                      >
-                        Back
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={handleNext}
+                    >
+                      {activeStep === steps.length - 1
+                        ? intl.formatMessage(messages.finishControl)
+                        : intl.formatMessage(messages.nextControl)}
+                    </Button>
+                    {activeStep === steps.length - 1 ? (
+                      <Button variant="contained" onClick={handleReset}>
+                        <FormattedMessage
+                          id="dashboard.devices.new.control.create_new"
+                          description="Control for adding new device (reset the wizard)"
+                          defaultMessage="Connect new"
+                        />
                       </Button>
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleNext}
-                      >
-                        {activeStep === steps.length - 1 ? "Finish" : "Create"}
-                      </Button>
-                    </div>
+                    ) : null}
                   </div>
-                )}
+                </div>
               </Paper>
             </Grid>
           </Grid>
