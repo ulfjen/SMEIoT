@@ -908,7 +908,6 @@
         "properties": {
           "name": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "createdAt": {
@@ -924,7 +923,6 @@
           },
           "preSharedKey": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "connected": {
@@ -933,12 +931,10 @@
           },
           "connectedAt": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "lastMessageAt": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           }
         },

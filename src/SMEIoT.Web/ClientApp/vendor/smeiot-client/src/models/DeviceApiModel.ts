@@ -31,7 +31,7 @@ export interface DeviceApiModel {
      * @type {string}
      * @memberof DeviceApiModel
      */
-    readonly name?: string | null;
+    readonly name?: string;
     /**
      * 
      * @type {string}
@@ -55,7 +55,7 @@ export interface DeviceApiModel {
      * @type {string}
      * @memberof DeviceApiModel
      */
-    readonly preSharedKey?: string | null;
+    readonly preSharedKey?: string;
     /**
      * 
      * @type {boolean}
@@ -67,13 +67,13 @@ export interface DeviceApiModel {
      * @type {string}
      * @memberof DeviceApiModel
      */
-    readonly connectedAt?: string | null;
+    readonly connectedAt?: string;
     /**
      * 
      * @type {string}
      * @memberof DeviceApiModel
      */
-    readonly lastMessageAt?: string | null;
+    readonly lastMessageAt?: string;
 }
 
 export function DeviceApiModelFromJSON(json: any): DeviceApiModel {

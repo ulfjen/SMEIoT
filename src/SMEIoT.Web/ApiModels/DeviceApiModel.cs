@@ -6,13 +6,28 @@ namespace SMEIoT.Web.ApiModels
 {
   public class DeviceApiModel
   {
+    [JsonProperty(Required = Required.DisallowNull)]
     public string Name { get; }
+
+    [JsonProperty(Required = Required.DisallowNull)]
     public Instant CreatedAt { get; }
+
+    [JsonProperty(Required = Required.DisallowNull)]
     public Instant UpdatedAt { get; }
+
+    [JsonProperty(Required = Required.DisallowNull)]
     public DeviceAuthenticationType AuthenticationType { get; }
+
+    [JsonProperty(Required = Required.DisallowNull)]
     public string? PreSharedKey { get; }
+
+    [JsonProperty(Required = Required.DisallowNull)]
     public bool Connected { get; }
+
+    [JsonProperty(Required = Required.DisallowNull)]
     public Instant? ConnectedAt { get; }
+
+    [JsonProperty(Required = Required.DisallowNull)]
     public Instant? LastMessageAt { get; }
 
     public DeviceApiModel(Device device)

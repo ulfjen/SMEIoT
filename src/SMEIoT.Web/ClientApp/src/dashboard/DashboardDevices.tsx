@@ -6,7 +6,7 @@ import Fab from '@material-ui/core/Fab';
 import * as React from "react";
 import AddIcon from '@material-ui/icons/Add';
 import Link from '@material-ui/core/Link';
-import List from '@material-ui/core/List';
+import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import Skeleton from "@material-ui/lab/Skeleton";
 import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
@@ -15,9 +15,10 @@ import withStyles from "@material-ui/core/styles/withStyles";
 import Typography from "@material-ui/core/Typography";
 import Frame from "./Frame";
 import clsx from 'clsx';
+import {Helmet} from "react-helmet";
 import UserAvatarMenu from '../components/UserAvatarMenu';
 import DeviceListItem from '../components/DeviceListItem';
-import { BasicUserApiModel } from 'smeiot-client';
+import { BasicUserApiModel, DeviceApiModel, DeviceApiModelFromJSON } from 'smeiot-client';
 import moment from 'moment';
 import SensorCard from '../components/SensorCard';
 import {defineMessages, useIntl, FormattedMessage} from 'react-intl';
@@ -66,19 +67,39 @@ const messages = defineMessages({
 const _DashboardDevices: React.FunctionComponent<IDashboardDevices> = ({ classes }) => {
   const intl = useIntl();
   const loaded = true;
-  // const [sensors, setSensors] = React.useState<null | Array<DeviceApiModel>>(null);
+  const [devices, setDevices] = React.useState<Array<DeviceApiModel>>([
+    DeviceApiModelFromJSON({
+      name: "a1",
+      createdAt: "2019-01-01",
+      updatedAt: "2020-01-01",
+      authenticationType: 0,
+      preSharedKey: "aaaaaaaaaaaaaaaaaa111",
+      connected: true,
+      connectedAt: "2020-01-01",
+      lastMessageAt: "2020-01-01"
+    }), DeviceApiModelFromJSON({
+      name: "a2",
+      createdAt: "2019-01-01",
+      updatedAt: "2020-01-01",
+      authenticationType: 0,
+      preSharedKey: "aaaaaaaaaaaaaaaaaa112",
+      connected: true,
+      connectedAt: "2020-01-01",
+      lastMessageAt: "2020-01-01"
+    })
+  ]);
 
   const renderDevices = () => {
-    // if (sensors == null) { return null; }
-
-    return <div></div>;
-    // return sensors.map(device => <DeviceListItem device={device} key={device.deviceName || ""} />);
+    return devices.map((d: DeviceApiModel) => <DeviceListItem device={d} expanded={false} key={d.name}/>);
   };
 
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
   return <Frame title={intl.formatMessage(messages.title)} direction="ltr" toolbarRight={null}
     content={
       <Container maxWidth="lg" className={classes.container}>
+        <Helmet>
+          <title>{intl.formatMessage(messages.title)}</title>
+        </Helmet>
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <Paper className={classes.paper}>
@@ -128,13 +149,13 @@ const _DashboardDevices: React.FunctionComponent<IDashboardDevices> = ({ classes
           </Grid>
           <Grid item xs={12}>
             <Paper>
-              <List component="ul">
+              <div>
                 {loaded ? (
                   renderDevices()
                 ) : (
                   <Skeleton variant="rect" height={4}/>
                 )}
-              </List>
+              </div>
             </Paper>
           </Grid>
         </Grid>
