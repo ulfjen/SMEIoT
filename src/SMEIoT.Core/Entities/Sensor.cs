@@ -12,6 +12,9 @@ namespace SMEIoT.Core.Entities
     public string Name { get; set; } = null!;
     public string NormalizedName { get; set; } = null!;
     
+    [Required]
+    public long DeviceId { get; set; }
+    public Device Device { get; set; } = null!;
     public List<UserSensor> UserSensors { get; set; } = null!;
     
     public Instant CreatedAt { get; set; }

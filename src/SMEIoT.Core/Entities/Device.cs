@@ -22,6 +22,8 @@ namespace SMEIoT.Core.Entities
     public Instant? ConnectedAt { get; set; }
     public Instant? LastMessageAt { get; set; }
 
+    public List<Sensor> Sensors { get; set; } = null!;
+
     public static string NormalizeName(string name)
     {
       return name.ToUpperInvariant();

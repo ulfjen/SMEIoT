@@ -126,10 +126,20 @@ namespace SMEIoT.Infrastructure.Data
         .HasForeignKey(us => us.SensorId);
 
       modelBuilder.Entity<Device>()
+        .HasIndex(d => d.NormalizedName);
+      modelBuilder.Entity<Device>()
         .Property(d => d.AuthenticationType)
         .HasConversion(
             v => v.ToString(),
             v => (DeviceAuthenticationType)Enum.Parse(typeof(DeviceAuthenticationType), v));
+            
+      modelBuilder.Entity<Sensor>()
+        .HasOne(s => s.Device)
+        .WithMany(d => d.Sensors)
+        .HasForeignKey(s => s.DeviceId);
+
+      modelBuilder.Entity<Sensor>()
+        .HasIndex(s => new { s.NormalizedName, s.DeviceId });
     }
   }
 }
