@@ -1,13 +1,13 @@
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Newtonsoft.Json;
 
 namespace SMEIoT.Web.BindingModels
 {
   public class UserRolesBindingModel
   {
-    [Required]
+    [BindRequired]
     [JsonProperty(Required = Required.DisallowNull)]
-    public IEnumerable<string> Roles { get; set; }
+    public IEnumerable<string> Roles { get; set; } = null!;
   }
 }

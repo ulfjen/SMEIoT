@@ -1,16 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Newtonsoft.Json;
 
 namespace SMEIoT.Web.BindingModels
 {
   public class DeviceBootstrapConfigBindingModel
   {
-    [Required]
+    [BindRequired]
     [JsonProperty(Required = Required.DisallowNull)]
-    public string Identity { get; set; }
+    public string Identity { get; set; } = null!;
     
-    [Required]
+    [BindRequired]
     [JsonProperty(Required = Required.DisallowNull)]
-    public string Key { get; set; }
+    public string Key { get; set; } = null!;
   }
 }

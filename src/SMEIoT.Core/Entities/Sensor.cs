@@ -9,10 +9,10 @@ namespace SMEIoT.Core.Entities
     [Key]
     public long Id { get; set; }
     
-    public string Name { get; set; }
-    public string NormalizedName { get; set; }
+    public string Name { get; set; } = null!;
+    public string NormalizedName { get; set; } = null!;
     
-    public List<UserSensor> UserSensors { get; set; }
+    public List<UserSensor> UserSensors { get; set; } = null!;
     
     public Instant CreatedAt { get; set; }
     public Instant UpdatedAt { get; set; }

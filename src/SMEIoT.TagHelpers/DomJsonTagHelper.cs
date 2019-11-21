@@ -3,7 +3,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.AspNetCore.Html;
 using NodaTime;
-using NodaTime.Serialization.SystemText;
+using NodaTime.Serialization.SystemTextJson;
 
 namespace SMEIoT.TagHelpers
 {

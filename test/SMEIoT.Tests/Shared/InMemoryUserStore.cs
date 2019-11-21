@@ -7,7 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using SMEIoT.Core.Entities;
-using SMEIoT.Models;
 
 namespace SMEIoT.Tests.Shared
 {

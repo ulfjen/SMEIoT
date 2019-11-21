@@ -44,7 +44,7 @@ namespace SMEIoT.Web.Api.V1
         return Forbid(result.ToString());
       }
 
-      return Ok(new LoginedApiModel{ReturnUrl = "/dashboard"});
+      return Ok(new LoginedApiModel("/dashboard"));
 
 #if false
         if (result.RequiresTwoFactor)

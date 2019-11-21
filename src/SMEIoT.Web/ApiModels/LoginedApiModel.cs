@@ -6,5 +6,10 @@ namespace SMEIoT.Web.ApiModels
   {
     [JsonProperty(Required = Required.DisallowNull)]
     public string ReturnUrl { get; set; }
+
+    public LoginedApiModel(string returnUrl)
+    {
+      ReturnUrl = returnUrl;
+    }
   }
 }

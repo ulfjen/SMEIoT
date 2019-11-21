@@ -35,7 +35,7 @@ namespace SMEIoT.Web.Api.V1
         list.Add(new AdminUserApiModel(user, roles));
       }
 
-      return Ok(new AdminUserApiModelList {Users = list});
+      return Ok(new AdminUserApiModelList(list));
     }
 
     [HttpGet("{username}")]

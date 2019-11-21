@@ -24,13 +24,13 @@ namespace SMEIoT.Infrastructure.Data
     IdentityUserRole<long>, IdentityUserLogin<long>, IdentityRoleClaim<long>, IdentityUserToken<long>>, IApplicationDbContext
   {
     private IClock _clock;
-    // inherited a Users DbSet
-    public DbSet<Sensor> Sensors { get; set; }
-    public DbSet<Device> Devices { get; set; }
+    // inherited Users, UserRoles DbSet
+    public DbSet<Sensor> Sensors { get; set; } = null!;
+    public DbSet<Device> Devices { get; set; } = null!;
 
-    public DbSet<UserSensor> UserSensors { get; set; }
+    public DbSet<UserSensor> UserSensors { get; set; } = null!;
 
-    public DbSet<IdentityUserRole<long>> UserRoles { get; set; }
+    // public override DbSet<IdentityUserRole<long>> UserRoles { get; set; }
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IClock clock)
       : base(options)

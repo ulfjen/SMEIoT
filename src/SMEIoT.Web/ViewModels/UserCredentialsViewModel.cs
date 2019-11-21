@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SMEIoT.Models.AccountViewModels
+namespace SMEIoT.Web.ViewModels
 {
   public class UserCredentialsViewModel
   {

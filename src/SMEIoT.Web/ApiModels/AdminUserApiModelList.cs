@@ -7,5 +7,10 @@ namespace SMEIoT.Web.ApiModels
   {
     [JsonProperty(Required = Required.DisallowNull)]
     public IEnumerable<AdminUserApiModel> Users { get; set; }
+
+    public AdminUserApiModelList(IEnumerable<AdminUserApiModel> users)
+    {
+      Users = users;
+    }
   }
 }

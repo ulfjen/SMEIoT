@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using SMEIoT.Core.Entities;
-using SMEIoT.Models.AccountViewModels;
+using SMEIoT.Web.ViewModels;
 using SMEIoT.Tests.Shared;
 using SMEIoT.Web.Api.V1;
 using Xunit;

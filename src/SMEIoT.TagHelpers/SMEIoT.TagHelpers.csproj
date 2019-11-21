@@ -8,11 +8,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\vendor\NodaTime.Serialization.SystemText\NodaTime.Serialization.SystemText.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
       <PackageReference Include="NodaTime" Version="3.0.0-beta01" />
+      <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.0.0-beta01" />
     </ItemGroup>
 
 </Project>

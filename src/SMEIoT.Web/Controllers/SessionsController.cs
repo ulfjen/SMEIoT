@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SMEIoT.Core.Entities;
-using SMEIoT.Models.AccountViewModels;
 
 namespace SMEIoT.Web.Controllers
 {
