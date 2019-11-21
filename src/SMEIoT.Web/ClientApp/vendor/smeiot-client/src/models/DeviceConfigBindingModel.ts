@@ -16,32 +16,46 @@ import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface SensorLocatorBindingModel
+ * @interface DeviceConfigBindingModel
  */
-export interface SensorLocatorBindingModel {
+export interface DeviceConfigBindingModel {
     /**
      * 
      * @type {string}
-     * @memberof SensorLocatorBindingModel
+     * @memberof DeviceConfigBindingModel
      */
     name: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof DeviceConfigBindingModel
+     */
+    identity: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof DeviceConfigBindingModel
+     */
+    key: string;
 }
 
-export function SensorLocatorBindingModelFromJSON(json: any): SensorLocatorBindingModel {
-    return SensorLocatorBindingModelFromJSONTyped(json, false);
+export function DeviceConfigBindingModelFromJSON(json: any): DeviceConfigBindingModel {
+    return DeviceConfigBindingModelFromJSONTyped(json, false);
 }
 
-export function SensorLocatorBindingModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): SensorLocatorBindingModel {
+export function DeviceConfigBindingModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): DeviceConfigBindingModel {
     if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
         
         'name': json['name'],
+        'identity': json['identity'],
+        'key': json['key'],
     };
 }
 
-export function SensorLocatorBindingModelToJSON(value?: SensorLocatorBindingModel | null): any {
+export function DeviceConfigBindingModelToJSON(value?: DeviceConfigBindingModel | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -51,6 +65,8 @@ export function SensorLocatorBindingModelToJSON(value?: SensorLocatorBindingMode
     return {
         
         'name': value.name,
+        'identity': value.identity,
+        'key': value.key,
     };
 }
 

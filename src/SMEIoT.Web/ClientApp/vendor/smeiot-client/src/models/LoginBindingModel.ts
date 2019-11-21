@@ -24,19 +24,19 @@ export interface LoginBindingModel {
      * @type {string}
      * @memberof LoginBindingModel
      */
-    username: string | null;
+    username: string;
     /**
      * 
      * @type {string}
      * @memberof LoginBindingModel
      */
-    password: string | null;
+    password: string;
     /**
      * 
      * @type {string}
      * @memberof LoginBindingModel
      */
-    returnUrl?: string | null;
+    returnUrl?: string;
 }
 
 export function LoginBindingModelFromJSON(json: any): LoginBindingModel {

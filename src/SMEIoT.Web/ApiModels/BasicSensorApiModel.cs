@@ -1,14 +1,16 @@
 using SMEIoT.Core.Entities;
+using Newtonsoft.Json;
 
 namespace SMEIoT.Web.ApiModels
 {
   public class BasicSensorApiModel
   {
-    public string sensorName { get; set; }
+    [JsonProperty(Required = Required.DisallowNull)]
+    public string SensorName { get; set; }
 
     public BasicSensorApiModel(Sensor sensor)
     {
-      sensorName = sensor.Name;
+      SensorName = sensor.Name;
     }
   }
 }

@@ -173,6 +173,112 @@
         }
       }
     },
+    "/api/devices/bootstrap": {
+      "post": {
+        "tags": [
+          "Devices"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json; v=1.0": {
+              "schema": {
+                "$ref": "#/components/schemas/DeviceBootstrapConfigBindingModel"
+              }
+            },
+            "text/json; v=1.0": {
+              "schema": {
+                "$ref": "#/components/schemas/DeviceBootstrapConfigBindingModel"
+              }
+            },
+            "application/*+json; v=1.0": {
+              "schema": {
+                "$ref": "#/components/schemas/DeviceBootstrapConfigBindingModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceApiModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/devices/{name}": {
+      "put": {
+        "tags": [
+          "Devices"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json; v=1.0": {
+              "schema": {
+                "$ref": "#/components/schemas/DeviceConfigBindingModel"
+              }
+            },
+            "text/json; v=1.0": {
+              "schema": {
+                "$ref": "#/components/schemas/DeviceConfigBindingModel"
+              }
+            },
+            "application/*+json; v=1.0": {
+              "schema": {
+                "$ref": "#/components/schemas/DeviceConfigBindingModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceApiModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/sensors/{name}/users": {
       "post": {
         "tags": [
@@ -680,15 +786,13 @@
             "format": "int64"
           },
           "username": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "roles": {
             "type": "array",
             "items": {
               "type": "string"
-            },
-            "nullable": true
+            }
           },
           "createdAt": {
             "type": "string"
@@ -706,8 +810,7 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/AdminUserApiModel"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -758,8 +861,7 @@
             "type": "array",
             "items": {
               "type": "string"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -771,17 +873,55 @@
             "type": "boolean"
           },
           "username": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "roles": {
             "type": "array",
             "items": {
               "type": "string"
-            },
-            "nullable": true
+            }
           },
           "createdAt": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "DeviceBootstrapConfigBindingModel": {
+        "required": [
+          "identity",
+          "key"
+        ],
+        "type": "object",
+        "properties": {
+          "identity": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "DeviceApiModel": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "DeviceConfigBindingModel": {
+        "required": [
+          "identity",
+          "key",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "identity": {
+            "type": "string"
+          },
+          "key": {
             "type": "string"
           }
         },
@@ -794,8 +934,7 @@
         "type": "object",
         "properties": {
           "username": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -804,12 +943,10 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "username": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "assignmentCount": {
             "type": "integer",
@@ -822,12 +959,33 @@
         "type": "object",
         "additionalProperties": false
       },
+      "SensorValuesApiModel": {
+        "type": "object",
+        "properties": {
+          "values": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          "startedAt": {
+            "type": "string"
+          },
+          "interval": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "SensorDetailsApiModel": {
         "type": "object",
         "properties": {
+          "values": {
+            "$ref": "#/components/schemas/SensorValuesApiModel"
+          },
           "sensorName": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -839,8 +997,7 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -849,8 +1006,7 @@
         "type": "object",
         "properties": {
           "sensorName": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -862,8 +1018,7 @@
             "type": "array",
             "items": {
               "type": "string"
-            },
-            "nullable": true
+            }
           }
         },
         "additionalProperties": false
@@ -876,17 +1031,14 @@
         "type": "object",
         "properties": {
           "username": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "password": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "returnUrl": {
             "type": "string",
-            "format": "uri",
-            "nullable": true
+            "format": "uri"
           }
         },
         "additionalProperties": false
@@ -895,8 +1047,7 @@
         "type": "object",
         "properties": {
           "returnUrl": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -909,15 +1060,13 @@
         "type": "object",
         "properties": {
           "username": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "password": {
             "maxLength": 1024,
             "minLength": 8,
             "type": "string",
-            "format": "password",
-            "nullable": true
+            "format": "password"
           }
         },
         "additionalProperties": false
@@ -926,15 +1075,13 @@
         "type": "object",
         "properties": {
           "username": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "roles": {
             "type": "array",
             "items": {
               "type": "string"
-            },
-            "nullable": true
+            }
           },
           "createdAt": {
             "type": "string"
@@ -953,15 +1100,13 @@
             "maxLength": 1024,
             "minLength": 8,
             "type": "string",
-            "format": "password",
-            "nullable": true
+            "format": "password"
           },
           "newPassword": {
             "maxLength": 1024,
             "minLength": 8,
             "type": "string",
-            "format": "password",
-            "nullable": true
+            "format": "password"
           }
         },
         "additionalProperties": false

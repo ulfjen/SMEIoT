@@ -30,13 +30,13 @@ export interface AdminUserApiModel {
      * @type {string}
      * @memberof AdminUserApiModel
      */
-    username?: string | null;
+    username?: string;
     /**
      * 
      * @type {Array<string>}
      * @memberof AdminUserApiModel
      */
-    roles?: Array<string> | null;
+    roles?: Array<string>;
     /**
      * 
      * @type {string}

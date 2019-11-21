@@ -13,6 +13,13 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import {
+    SensorValuesApiModel,
+    SensorValuesApiModelFromJSON,
+    SensorValuesApiModelFromJSONTyped,
+    SensorValuesApiModelToJSON,
+} from './';
+
 /**
  * 
  * @export
@@ -21,10 +28,16 @@ import { exists, mapValues } from '../runtime';
 export interface SensorDetailsApiModel {
     /**
      * 
+     * @type {SensorValuesApiModel}
+     * @memberof SensorDetailsApiModel
+     */
+    values?: SensorValuesApiModel;
+    /**
+     * 
      * @type {string}
      * @memberof SensorDetailsApiModel
      */
-    sensorName?: string | null;
+    sensorName?: string;
 }
 
 export function SensorDetailsApiModelFromJSON(json: any): SensorDetailsApiModel {
@@ -37,6 +50,7 @@ export function SensorDetailsApiModelFromJSONTyped(json: any, ignoreDiscriminato
     }
     return {
         
+        'values': !exists(json, 'values') ? undefined : SensorValuesApiModelFromJSON(json['values']),
         'sensorName': !exists(json, 'sensorName') ? undefined : json['sensorName'],
     };
 }
@@ -50,6 +64,7 @@ export function SensorDetailsApiModelToJSON(value?: SensorDetailsApiModel | null
     }
     return {
         
+        'values': SensorValuesApiModelToJSON(value.values),
         'sensorName': value.sensorName,
     };
 }

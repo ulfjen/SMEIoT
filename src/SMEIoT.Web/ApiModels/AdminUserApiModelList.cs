@@ -1,10 +1,11 @@
 using System.Collections.Generic;
-using SMEIoT.Core.Entities;
+using Newtonsoft.Json;
 
 namespace SMEIoT.Web.ApiModels
 {
   public class AdminUserApiModelList
   {
+    [JsonProperty(Required = Required.DisallowNull)]
     public IEnumerable<AdminUserApiModel> Users { get; set; }
   }
 }

@@ -30,13 +30,13 @@ export interface UserCredentialsUpdateApiModel {
      * @type {string}
      * @memberof UserCredentialsUpdateApiModel
      */
-    username?: string | null;
+    username?: string;
     /**
      * 
      * @type {Array<string>}
      * @memberof UserCredentialsUpdateApiModel
      */
-    roles?: Array<string> | null;
+    roles?: Array<string>;
     /**
      * 
      * @type {string}

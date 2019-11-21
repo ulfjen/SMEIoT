@@ -24,13 +24,13 @@ export interface ConfirmedUserCredentialsUpdateBindingModel {
      * @type {string}
      * @memberof ConfirmedUserCredentialsUpdateBindingModel
      */
-    currentPassword: string | null;
+    currentPassword: string;
     /**
      * 
      * @type {string}
      * @memberof ConfirmedUserCredentialsUpdateBindingModel
      */
-    newPassword: string | null;
+    newPassword: string;
 }
 
 export function ConfirmedUserCredentialsUpdateBindingModelFromJSON(json: any): ConfirmedUserCredentialsUpdateBindingModel {

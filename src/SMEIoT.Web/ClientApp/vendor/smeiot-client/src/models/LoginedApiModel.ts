@@ -24,7 +24,7 @@ export interface LoginedApiModel {
      * @type {string}
      * @memberof LoginedApiModel
      */
-    returnUrl?: string | null;
+    returnUrl?: string;
 }
 
 export function LoginedApiModelFromJSON(json: any): LoginedApiModel {

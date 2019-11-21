@@ -1,5 +1,6 @@
 export * from './AdminUsersApi';
 export * from './DashboardUsersApi';
+export * from './DevicesApi';
 export * from './SensorAssignmentsApi';
 export * from './SensorsApi';
 export * from './SessionsApi';

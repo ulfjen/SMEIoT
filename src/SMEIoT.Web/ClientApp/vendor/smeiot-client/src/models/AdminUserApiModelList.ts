@@ -31,7 +31,7 @@ export interface AdminUserApiModelList {
      * @type {Array<AdminUserApiModel>}
      * @memberof AdminUserApiModelList
      */
-    users?: Array<AdminUserApiModel> | null;
+    users?: Array<AdminUserApiModel>;
 }
 
 export function AdminUserApiModelListFromJSON(json: any): AdminUserApiModelList {
@@ -44,7 +44,7 @@ export function AdminUserApiModelListFromJSONTyped(json: any, ignoreDiscriminato
     }
     return {
         
-        'users': !exists(json, 'users') ? undefined : (json['users'] as Array<any>).map(AdminUserApiModelFromJSON),
+        'users': !exists(json, 'users') ? undefined : ((json['users'] as Array<any>).map(AdminUserApiModelFromJSON)),
     };
 }
 
@@ -57,7 +57,7 @@ export function AdminUserApiModelListToJSON(value?: AdminUserApiModelList | null
     }
     return {
         
-        'users': value.users == null ? undefined : (value.users as Array<any>).map(AdminUserApiModelToJSON),
+        'users': value.users === undefined ? undefined : ((value.users as Array<any>).map(AdminUserApiModelToJSON)),
     };
 }
 

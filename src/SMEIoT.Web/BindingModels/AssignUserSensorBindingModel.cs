@@ -1,10 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
 
 namespace SMEIoT.Web.BindingModels
 {
   public class AssignUserSensorBindingModel
   {
-    [Required] public string Username { get; set; }
+    [Required]
+    [JsonProperty(Required = Required.DisallowNull)]
+    public string Username { get; set; }
 
   }
 }

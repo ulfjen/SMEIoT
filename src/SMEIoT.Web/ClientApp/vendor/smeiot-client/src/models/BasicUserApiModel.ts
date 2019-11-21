@@ -24,13 +24,13 @@ export interface BasicUserApiModel {
      * @type {string}
      * @memberof BasicUserApiModel
      */
-    username?: string | null;
+    username?: string;
     /**
      * 
      * @type {Array<string>}
      * @memberof BasicUserApiModel
      */
-    roles?: Array<string> | null;
+    roles?: Array<string>;
     /**
      * 
      * @type {string}

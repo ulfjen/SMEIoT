@@ -24,7 +24,7 @@ export interface BasicSensorApiModel {
      * @type {string}
      * @memberof BasicSensorApiModel
      */
-    sensorName?: string | null;
+    sensorName?: string;
 }
 
 export function BasicSensorApiModelFromJSON(json: any): BasicSensorApiModel {

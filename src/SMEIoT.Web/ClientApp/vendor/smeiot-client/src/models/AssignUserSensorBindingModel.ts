@@ -24,7 +24,7 @@ export interface AssignUserSensorBindingModel {
      * @type {string}
      * @memberof AssignUserSensorBindingModel
      */
-    username: string | null;
+    username: string;
 }
 
 export function AssignUserSensorBindingModelFromJSON(json: any): AssignUserSensorBindingModel {

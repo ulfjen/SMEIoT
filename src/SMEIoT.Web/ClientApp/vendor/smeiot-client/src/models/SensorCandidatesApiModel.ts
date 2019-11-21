@@ -24,7 +24,7 @@ export interface SensorCandidatesApiModel {
      * @type {Array<string>}
      * @memberof SensorCandidatesApiModel
      */
-    names?: Array<string> | null;
+    names?: Array<string>;
 }
 
 export function SensorCandidatesApiModelFromJSON(json: any): SensorCandidatesApiModel {

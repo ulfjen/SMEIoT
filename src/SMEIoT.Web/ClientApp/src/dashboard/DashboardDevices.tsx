@@ -16,7 +16,8 @@ import Typography from "@material-ui/core/Typography";
 import Frame from "./Frame";
 import clsx from 'clsx';
 import UserAvatarMenu from '../components/UserAvatarMenu';
-import { BasicUserApiModel, SensorDetailsApiModel } from 'smeiot-client/src';
+import DeviceListItem from '../components/DeviceListItem';
+import { BasicUserApiModel } from 'smeiot-client';
 import moment from 'moment';
 import SensorCard from '../components/SensorCard';
 import {defineMessages, useIntl, FormattedMessage} from 'react-intl';
@@ -65,12 +66,13 @@ const messages = defineMessages({
 const _DashboardDevices: React.FunctionComponent<IDashboardDevices> = ({ classes }) => {
   const intl = useIntl();
   const loaded = true;
-  const [sensors, setSensors] = React.useState<null | Array<SensorDetailsApiModel>>(null);
+  // const [sensors, setSensors] = React.useState<null | Array<DeviceApiModel>>(null);
 
   const renderDevices = () => {
-    if (sensors == null) { return null; }
+    // if (sensors == null) { return null; }
 
-    return sensors.map(sensor => <SensorCard sensor={sensor} key={sensor.sensorName || ""} />);
+    return <div></div>;
+    // return sensors.map(device => <DeviceListItem device={device} key={device.deviceName || ""} />);
   };
 
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
@@ -126,7 +128,7 @@ const _DashboardDevices: React.FunctionComponent<IDashboardDevices> = ({ classes
           </Grid>
           <Grid item xs={12}>
             <Paper>
-              <List className={classes.list}>
+              <List component="ul">
                 {loaded ? (
                   renderDevices()
                 ) : (

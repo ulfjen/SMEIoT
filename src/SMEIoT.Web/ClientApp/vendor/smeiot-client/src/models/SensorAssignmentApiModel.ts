@@ -24,13 +24,13 @@ export interface SensorAssignmentApiModel {
      * @type {string}
      * @memberof SensorAssignmentApiModel
      */
-    name?: string | null;
+    name?: string;
     /**
      * 
      * @type {string}
      * @memberof SensorAssignmentApiModel
      */
-    username?: string | null;
+    username?: string;
     /**
      * 
      * @type {number}

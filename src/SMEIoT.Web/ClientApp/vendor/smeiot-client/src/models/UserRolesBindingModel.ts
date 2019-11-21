@@ -24,7 +24,7 @@ export interface UserRolesBindingModel {
      * @type {Array<string>}
      * @memberof UserRolesBindingModel
      */
-    roles: Array<string> | null;
+    roles: Array<string>;
 }
 
 export function UserRolesBindingModelFromJSON(json: any): UserRolesBindingModel {

@@ -24,13 +24,13 @@ export interface ValidatedUserCredentialsBindingModel {
      * @type {string}
      * @memberof ValidatedUserCredentialsBindingModel
      */
-    username: string | null;
+    username: string;
     /**
      * 
      * @type {string}
      * @memberof ValidatedUserCredentialsBindingModel
      */
-    password: string | null;
+    password: string;
 }
 
 export function ValidatedUserCredentialsBindingModelFromJSON(json: any): ValidatedUserCredentialsBindingModel {

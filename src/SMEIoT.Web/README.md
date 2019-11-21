@@ -26,3 +26,8 @@ dotnet ef database update
 ## Environment
 
 We uses environments for some configurations. To switch it, you can set env by bash. On Windows (Powershell), use `$env:SMEIOT_ENVIRONMENT='Development'` to set `DCRAWL_ENVIRONMENT` with `Development` for example.
+
+## Notes on Swagger
+
+Undefined is supported with Required flag. Null is determined by [JsonProperty(Required = Required.DisallowNull)]
+Being nullable doesn't annotate the swagger API generation.
