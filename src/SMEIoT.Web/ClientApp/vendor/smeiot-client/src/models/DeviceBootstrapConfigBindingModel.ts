@@ -24,13 +24,13 @@ export interface DeviceBootstrapConfigBindingModel {
      * @type {string}
      * @memberof DeviceBootstrapConfigBindingModel
      */
-    identity: string;
+    identity?: string;
     /**
      * 
      * @type {string}
      * @memberof DeviceBootstrapConfigBindingModel
      */
-    key: string;
+    key?: string;
 }
 
 export function DeviceBootstrapConfigBindingModelFromJSON(json: any): DeviceBootstrapConfigBindingModel {
@@ -43,8 +43,8 @@ export function DeviceBootstrapConfigBindingModelFromJSONTyped(json: any, ignore
     }
     return {
         
-        'identity': json['identity'],
-        'key': json['key'],
+        'identity': !exists(json, 'identity') ? undefined : json['identity'],
+        'key': !exists(json, 'key') ? undefined : json['key'],
     };
 }
 

@@ -66,8 +66,8 @@ const _DashboardNewSensor: React.FunctionComponent<IDashboardNewSensorProps> = (
   const [candidates, setCandidates] = React.useState<string[]>([]);
 
   const requestCandidates = async () => {
-    let candidatesApiModel = await new SensorsApi(GetDefaultApiConfig()).apiSensorsCandidatesGet();
-    setCandidates(candidatesApiModel.names || []);
+    // let candidatesApiModel = await new SensorsApi(GetDefaultApiConfig()).apiSensorsCandidatesGet();
+    setCandidates([]);
   };
 
   React.useEffect(() => {

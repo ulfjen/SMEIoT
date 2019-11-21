@@ -24,7 +24,7 @@ export interface SensorLocatorBindingModel {
      * @type {string}
      * @memberof SensorLocatorBindingModel
      */
-    name: string;
+    name?: string;
 }
 
 export function SensorLocatorBindingModelFromJSON(json: any): SensorLocatorBindingModel {
@@ -37,7 +37,7 @@ export function SensorLocatorBindingModelFromJSONTyped(json: any, ignoreDiscrimi
     }
     return {
         
-        'name': json['name'],
+        'name': !exists(json, 'name') ? undefined : json['name'],
     };
 }
 

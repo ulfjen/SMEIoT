@@ -24,7 +24,7 @@ export interface UserRolesBindingModel {
      * @type {Array<string>}
      * @memberof UserRolesBindingModel
      */
-    roles: Array<string>;
+    roles?: Array<string>;
 }
 
 export function UserRolesBindingModelFromJSON(json: any): UserRolesBindingModel {
@@ -37,7 +37,7 @@ export function UserRolesBindingModelFromJSONTyped(json: any, ignoreDiscriminato
     }
     return {
         
-        'roles': json['roles'],
+        'roles': !exists(json, 'roles') ? undefined : json['roles'],
     };
 }
 

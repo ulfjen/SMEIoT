@@ -7,5 +7,10 @@ namespace SMEIoT.Web.ApiModels
   {
     [JsonProperty(Required = Required.DisallowNull)]
     public IEnumerable<string> Names { get; set; }
+
+    public SensorCandidatesApiModel(IEnumerable<string> names)
+    {
+      Names = names;
+    }
   }
 }

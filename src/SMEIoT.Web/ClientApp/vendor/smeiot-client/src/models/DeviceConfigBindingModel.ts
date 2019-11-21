@@ -24,19 +24,19 @@ export interface DeviceConfigBindingModel {
      * @type {string}
      * @memberof DeviceConfigBindingModel
      */
-    name: string;
+    name?: string;
     /**
      * 
      * @type {string}
      * @memberof DeviceConfigBindingModel
      */
-    identity: string;
+    identity?: string;
     /**
      * 
      * @type {string}
      * @memberof DeviceConfigBindingModel
      */
-    key: string;
+    key?: string;
 }
 
 export function DeviceConfigBindingModelFromJSON(json: any): DeviceConfigBindingModel {
@@ -49,9 +49,9 @@ export function DeviceConfigBindingModelFromJSONTyped(json: any, ignoreDiscrimin
     }
     return {
         
-        'name': json['name'],
-        'identity': json['identity'],
-        'key': json['key'],
+        'name': !exists(json, 'name') ? undefined : json['name'],
+        'identity': !exists(json, 'identity') ? undefined : json['identity'],
+        'key': !exists(json, 'key') ? undefined : json['key'],
     };
 }
 

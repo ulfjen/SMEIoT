@@ -279,6 +279,35 @@
         }
       }
     },
+    "/api/devices/sensor_candidates": {
+      "get": {
+        "tags": [
+          "Devices"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SensorCandidatesApiModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/sensors/{name}/users": {
       "post": {
         "tags": [
@@ -542,35 +571,6 @@
           },
           "400": {
             "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/sensors/candidates": {
-      "get": {
-        "tags": [
-          "Sensors"
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SensorCandidatesApiModel"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
             "content": {
               "application/json": {
                 "schema": {
@@ -852,9 +852,6 @@
         "additionalProperties": false
       },
       "UserRolesBindingModel": {
-        "required": [
-          "roles"
-        ],
         "type": "object",
         "properties": {
           "roles": {
@@ -888,10 +885,6 @@
         "additionalProperties": false
       },
       "DeviceBootstrapConfigBindingModel": {
-        "required": [
-          "identity",
-          "key"
-        ],
         "type": "object",
         "properties": {
           "identity": {
@@ -903,16 +896,55 @@
         },
         "additionalProperties": false
       },
+      "DeviceAuthenticationType": {
+        "enum": [
+          0
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
       "DeviceApiModel": {
         "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "createdAt": {
+            "type": "string",
+            "readOnly": true
+          },
+          "updatedAt": {
+            "type": "string",
+            "readOnly": true
+          },
+          "authenticationType": {
+            "$ref": "#/components/schemas/DeviceAuthenticationType"
+          },
+          "preSharedKey": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "connected": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "connectedAt": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "lastMessageAt": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          }
+        },
         "additionalProperties": false
       },
       "DeviceConfigBindingModel": {
-        "required": [
-          "identity",
-          "key",
-          "name"
-        ],
         "type": "object",
         "properties": {
           "name": {
@@ -927,10 +959,19 @@
         },
         "additionalProperties": false
       },
+      "SensorCandidatesApiModel": {
+        "type": "object",
+        "properties": {
+          "names": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
       "AssignUserSensorBindingModel": {
-        "required": [
-          "username"
-        ],
         "type": "object",
         "properties": {
           "username": {
@@ -991,9 +1032,6 @@
         "additionalProperties": false
       },
       "SensorLocatorBindingModel": {
-        "required": [
-          "name"
-        ],
         "type": "object",
         "properties": {
           "name": {
@@ -1011,23 +1049,7 @@
         },
         "additionalProperties": false
       },
-      "SensorCandidatesApiModel": {
-        "type": "object",
-        "properties": {
-          "names": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        },
-        "additionalProperties": false
-      },
       "LoginBindingModel": {
-        "required": [
-          "password",
-          "username"
-        ],
         "type": "object",
         "properties": {
           "username": {
@@ -1053,10 +1075,6 @@
         "additionalProperties": false
       },
       "ValidatedUserCredentialsBindingModel": {
-        "required": [
-          "password",
-          "username"
-        ],
         "type": "object",
         "properties": {
           "username": {
@@ -1090,10 +1108,6 @@
         "additionalProperties": false
       },
       "ConfirmedUserCredentialsUpdateBindingModel": {
-        "required": [
-          "currentPassword",
-          "newPassword"
-        ],
         "type": "object",
         "properties": {
           "currentPassword": {

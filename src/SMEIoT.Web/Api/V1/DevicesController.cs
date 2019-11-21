@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NodaTime;
+using System;
 using SMEIoT.Core.Entities;
 using SMEIoT.Core.Interfaces;
 using SMEIoT.Web.ApiModels;
@@ -44,6 +45,17 @@ namespace SMEIoT.Web.Api.V1
       var device = await _service.GetDeviceByNameAsync(view.Name);
       var res = new DeviceApiModel(device);
       return Ok(res);
+    }
+
+    [HttpGet("sensor_candidates")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<SensorCandidatesApiModel>> ListSensorCandidates()
+    {
+      throw new NotImplementedException();
+      // var sensor = _mqttService.ListSensorNames("dummy");
+      return Ok(new SensorCandidatesApiModel(new[]{"name1", "name2"}));
     }
   }
 }

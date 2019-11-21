@@ -53,17 +53,5 @@ namespace SMEIoT.Web.Api.V1
       var res = new BasicSensorApiModel(sensor);
       return CreatedAtAction(nameof(Create), res);
     }
-
-    [HttpGet("candidates")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [Authorize]
-    public async Task<ActionResult<SensorCandidatesApiModel>> ListCandidates()
-    {
-      var sensor = _mqttService.ListSensorNames("dummy");
-      return Ok(new SensorCandidatesApiModel { Names = sensor });
-    }
-
-
   }
 }

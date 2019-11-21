@@ -1,4 +1,5 @@
 using SMEIoT.Core.Entities;
+using NodaTime;
 using Newtonsoft.Json;
 
 namespace SMEIoT.Web.ApiModels

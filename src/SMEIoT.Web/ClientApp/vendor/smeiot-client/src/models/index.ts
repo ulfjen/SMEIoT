@@ -4,6 +4,8 @@ export * from './AssignUserSensorBindingModel';
 export * from './BasicSensorApiModel';
 export * from './BasicUserApiModel';
 export * from './ConfirmedUserCredentialsUpdateBindingModel';
+export * from './DeviceApiModel';
+export * from './DeviceAuthenticationType';
 export * from './DeviceBootstrapConfigBindingModel';
 export * from './DeviceConfigBindingModel';
 export * from './LoginBindingModel';

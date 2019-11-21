@@ -15,6 +15,9 @@
 
 import * as runtime from '../runtime';
 import {
+    DeviceApiModel,
+    DeviceApiModelFromJSON,
+    DeviceApiModelToJSON,
     DeviceBootstrapConfigBindingModel,
     DeviceBootstrapConfigBindingModelFromJSON,
     DeviceBootstrapConfigBindingModelToJSON,
@@ -24,6 +27,9 @@ import {
     ProblemDetails,
     ProblemDetailsFromJSON,
     ProblemDetailsToJSON,
+    SensorCandidatesApiModel,
+    SensorCandidatesApiModelFromJSON,
+    SensorCandidatesApiModelToJSON,
 } from '../models';
 
 export interface DevicesApiApiDevicesBootstrapPostRequest {
@@ -42,7 +48,7 @@ export class DevicesApi extends runtime.BaseAPI {
 
     /**
      */
-    async apiDevicesBootstrapPostRaw(requestParameters: DevicesApiApiDevicesBootstrapPostRequest): Promise<runtime.ApiResponse<object>> {
+    async apiDevicesBootstrapPostRaw(requestParameters: DevicesApiApiDevicesBootstrapPostRequest): Promise<runtime.ApiResponse<DeviceApiModel>> {
         const queryParameters: runtime.HTTPQuery = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -57,19 +63,19 @@ export class DevicesApi extends runtime.BaseAPI {
             body: DeviceBootstrapConfigBindingModelToJSON(requestParameters.deviceBootstrapConfigBindingModel),
         });
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => DeviceApiModelFromJSON(jsonValue));
     }
 
     /**
      */
-    async apiDevicesBootstrapPost(requestParameters: DevicesApiApiDevicesBootstrapPostRequest): Promise<object> {
+    async apiDevicesBootstrapPost(requestParameters: DevicesApiApiDevicesBootstrapPostRequest): Promise<DeviceApiModel> {
         const response = await this.apiDevicesBootstrapPostRaw(requestParameters);
         return await response.value();
     }
 
     /**
      */
-    async apiDevicesNamePutRaw(requestParameters: DevicesApiApiDevicesNamePutRequest): Promise<runtime.ApiResponse<object>> {
+    async apiDevicesNamePutRaw(requestParameters: DevicesApiApiDevicesNamePutRequest): Promise<runtime.ApiResponse<DeviceApiModel>> {
         if (requestParameters.name === null || requestParameters.name === undefined) {
             throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling apiDevicesNamePut.');
         }
@@ -88,13 +94,37 @@ export class DevicesApi extends runtime.BaseAPI {
             body: DeviceConfigBindingModelToJSON(requestParameters.deviceConfigBindingModel),
         });
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => DeviceApiModelFromJSON(jsonValue));
     }
 
     /**
      */
-    async apiDevicesNamePut(requestParameters: DevicesApiApiDevicesNamePutRequest): Promise<object> {
+    async apiDevicesNamePut(requestParameters: DevicesApiApiDevicesNamePutRequest): Promise<DeviceApiModel> {
         const response = await this.apiDevicesNamePutRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiDevicesSensorCandidatesGetRaw(): Promise<runtime.ApiResponse<SensorCandidatesApiModel>> {
+        const queryParameters: runtime.HTTPQuery = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/devices/sensor_candidates`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => SensorCandidatesApiModelFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiDevicesSensorCandidatesGet(): Promise<SensorCandidatesApiModel> {
+        const response = await this.apiDevicesSensorCandidatesGetRaw();
         return await response.value();
     }
 
