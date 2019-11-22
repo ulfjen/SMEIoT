@@ -16,6 +16,7 @@ import clsx from "clsx";
 import { Helmet } from "react-helmet";
 import BrokerCard from "../components/BrokerCard";
 import DeviceCard from "../components/DeviceCard";
+import DeviceBoard from "../components/DeviceBoard";
 import BannerNotice from "../components/BannerNotice";
 import {
   DeviceApiModel,
@@ -129,18 +130,6 @@ const _DashboardDevices: React.FunctionComponent<IDashboardDevices> = ({
     })
   ]);
 
-  const unconnectedDeviceNames = devices
-    .filter((d: DeviceApiModel) => !d.connected)
-    .map(d => d.name);
-
-  const renderDevices = () => {
-    return devices.map((d: DeviceApiModel) => (
-      <Grid item xs={4}>
-        <DeviceCard device={d} key={d.name} />
-      </Grid>
-    ));
-  };
-
   return (
     <Frame
       title={intl.formatMessage(messages.title)}
@@ -155,17 +144,7 @@ const _DashboardDevices: React.FunctionComponent<IDashboardDevices> = ({
             <Grid item xs={12}>
               <BrokerCard />
             </Grid>
-            {unconnectedDeviceNames.length > 0 && (
-              <Grid item xs={12}>
-                <BannerNotice to={null}>
-                  <Typography component="p">
-                    notice: your device {unconnectedDeviceNames} is not
-                    connected. Continue to connect one?
-                  </Typography>
-                </BannerNotice>
-              </Grid>
-            )}
-            {loaded ? renderDevices() : <Skeleton variant="rect" height={4} />}
+            <DeviceBoard devices={devices} loaded={true} />
           </Grid>
           <Tooltip
             title={intl.formatMessage(messages.fabTooltip)}

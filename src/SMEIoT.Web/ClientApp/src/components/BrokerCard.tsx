@@ -11,6 +11,7 @@ import CardHeader from "@material-ui/core/CardHeader";
 import CardContent from "@material-ui/core/CardContent";
 import CardActions from "@material-ui/core/CardActions";
 import IconButton from "@material-ui/core/IconButton";
+import Button from "@material-ui/core/Button";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import AssessmentIcon from "@material-ui/icons/Assessment";
 import NotesIcon from "@material-ui/icons/Notes";
@@ -86,10 +87,14 @@ const _BrokerCard: React.FunctionComponent<IBrokerCard> = ({ classes }) => {
     setAnchorEl(null);
   };
 
-  return <Card>
+  return (
+    <Card>
       <CardHeader
         action={
-          <IconButton aria-label={intl.formatMessage(messages.more)} onClick={handleClick}>
+          <IconButton
+            aria-label={intl.formatMessage(messages.more)}
+            onClick={handleClick}
+          >
             <MoreVertIcon />
           </IconButton>
         }
@@ -105,20 +110,16 @@ const _BrokerCard: React.FunctionComponent<IBrokerCard> = ({ classes }) => {
         </Typography>
       </CardContent>
       <CardActions disableSpacing>
-        <IconButton
-          aria-label={intl.formatMessage(messages.statistics)}
+        <Button
+          size="small"
           component={ReachLink}
           to="/dashboard/broker/statistics"
         >
-          <AssessmentIcon />
-        </IconButton>
-        <IconButton
-          aria-label={intl.formatMessage(messages.logs)}
-          component={ReachLink}
-          to="/dashboard/broker/logs"
-        >
-          <NotesIcon />
-        </IconButton>
+          {intl.formatMessage(messages.statistics)}
+        </Button>
+        <Button size="small" component={ReachLink} to="/dashboard/broker/logs">
+          {intl.formatMessage(messages.logs)}
+        </Button>
       </CardActions>
       <Menu
         anchorEl={anchorEl}
@@ -153,7 +154,8 @@ const _BrokerCard: React.FunctionComponent<IBrokerCard> = ({ classes }) => {
           />
         </MenuItem>
       </Menu>
-    </Card>;
+    </Card>
+  );
 };
 
 const BrokerCard = withStyles(styles)(_BrokerCard);

@@ -10,10 +10,18 @@ import CardHeader from "@material-ui/core/CardHeader";
 import CardContent from "@material-ui/core/CardContent";
 import CardActions from "@material-ui/core/CardActions";
 import IconButton from "@material-ui/core/IconButton";
+import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import ListAltIcon from '@material-ui/icons/ListAlt';
 import { SensorDetailsApiModel, DeviceApiModel } from "smeiot-client";
+import { defineMessages, useIntl, FormattedMessage } from "react-intl";
+import {
+  Link as ReachLink,
+  LinkProps as ReachLinkProps,
+  RouteComponentProps
+} from "@reach/router";
 
 const styles = ({
   transitions,
@@ -44,10 +52,11 @@ const styles = ({
 
 export interface IDeviceCard extends WithStyles<typeof styles> {
   device: DeviceApiModel;
+  onMoreClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 const _DeviceCard: React.FunctionComponent<IDeviceCard &
-  WithStyles<typeof styles>> = ({ classes, device }) => {
+  WithStyles<typeof styles>> = ({ classes, device, onMoreClick }) => {
 
   var summary = "";
   if (device.name === "L401") {
@@ -62,7 +71,7 @@ const _DeviceCard: React.FunctionComponent<IDeviceCard &
     <Card className={clsx(classes.card, !device.connected && classes.notConnected)}>
       <CardHeader
         action={
-          <IconButton aria-label="settings">
+          <IconButton aria-label="settings" onClick={onMoreClick}>
             <MoreVertIcon />
           </IconButton>
         }
@@ -75,8 +84,20 @@ const _DeviceCard: React.FunctionComponent<IDeviceCard &
         </Typography>
       </CardContent>
       <CardActions disableSpacing>
-        <IconButton aria-label="add to favorites"></IconButton>
-        <IconButton aria-label="share"></IconButton>
+        <Button size="small" component={ReachLink} to="/dashboard/sensors?device=L401">
+          <FormattedMessage
+            id="dashboard.device.actions.see_sensor"
+            description="The action to go to see sensors in the device card."
+            defaultMessage="Sensors"
+          />
+        </Button>
+        <Button size="small" component={ReachLink} to="/dashboard/logs?device=L401">
+          <FormattedMessage
+            id="dashboard.device.actions.logs"
+            description="The action for device cards."
+            defaultMessage="Logs"
+          />
+        </Button>
       </CardActions>
     </Card>
   );
