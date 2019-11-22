@@ -16,10 +16,10 @@ namespace SMEIoT.Web.Api.V1
   {
     private readonly ILogger<SensorsController> _logger;
     private readonly ISensorService _service;
-    private readonly IMqttSensorService _mqttService;
+    private readonly IMqttIdentifierService _mqttService;
 
 
-    public SensorsController(ILogger<SensorsController> logger, ISensorService service, IMqttSensorService mqttService)
+    public SensorsController(ILogger<SensorsController> logger, ISensorService service, IMqttIdentifierService mqttService)
     {
       _logger = logger;
       _service = service;

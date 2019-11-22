@@ -38,7 +38,8 @@ namespace SMEIoT.Infrastructure
         .SetKeepAlive(60)
         .SetPskTls(configuration.GetConnectionString("MqttPsk"), configuration.GetConnectionString("MqttIdentity"))
         .SetRunLoopInfo(-1, 1, 10)
-        .SubscribeTopic("sensor/#");
+        .SubscribeTopic(MosquittoClientBuilder.BrokerTopic)
+        .SubscribeTopic(MosquittoClientBuilder.SensorTopic);
 
       services.AddHostedService<BackgroundMqttClientHostedService>(provider =>
       {
@@ -52,8 +53,9 @@ namespace SMEIoT.Infrastructure
     {
       services.AddSingleton<IClock>(SystemClock.Instance);
       services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
-      services.AddSingleton<IMqttSensorService, MqttSensorService>();
-      // services.AddScoped<IIdentifierSuggester, IdentifierSuggester>();
+      services.AddSingleton<IMqttIdentifierService, MqttIdentifierService>();
+      services.AddScoped<IdentifierDictionaryFileAccessor>();
+      services.AddScoped<IDeviceSensorIdentifierSuggester, DeviceSensorIdentifierSuggester>();
       // services.AddScoped<IPreSharedKeyGenerator, PreSharedKeyGenerator>();
     }
   }

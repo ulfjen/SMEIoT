@@ -10,11 +10,12 @@ namespace SMEIoT.Core.EventHandlers
 {
   public class MosquittoMessageHandler : IMqttMessageObserver
   {
+    public const string SensorTopicPrefix = "pub/";
     private readonly List<IMqttMessageObserver> _observers = new List<IMqttMessageObserver>();
     private readonly IClock _clock;
-    private readonly IMqttSensorService _mqttService;
+    private readonly IMqttIdentifierService _mqttService;
 
-    public MosquittoMessageHandler(IClock clock, IMqttSensorService mqttService)
+    public MosquittoMessageHandler(IClock clock, IMqttIdentifierService mqttService)
     {
       _clock = clock;
       _mqttService = mqttService;
@@ -52,9 +53,9 @@ namespace SMEIoT.Core.EventHandlers
     public void Update(MqttMessage message)
     {
       var topic = message.Topic;
-      if (topic.StartsWith("sensor/"))
+      if (topic.StartsWith(SensorTopicPrefix))
       {
-        _mqttService.RegisterSensorByName(topic.Substring(7));
+        _mqttService.RegisterSensorNameAsync(topic.Substring(7));
       }
       // TODO: Sends a job into dispatch for storage
     }
