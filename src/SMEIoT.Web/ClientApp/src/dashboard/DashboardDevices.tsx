@@ -5,7 +5,7 @@ import Tooltip from "@material-ui/core/Tooltip";
 import Fab from "@material-ui/core/Fab";
 import * as React from "react";
 import AddIcon from "@material-ui/icons/Add";
-import Link from "@material-ui/core/Link";
+import Typography from "@material-ui/core/Typography";
 import Skeleton from "@material-ui/lab/Skeleton";
 import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
@@ -16,13 +16,12 @@ import clsx from "clsx";
 import { Helmet } from "react-helmet";
 import BrokerCard from "../components/BrokerCard";
 import DeviceCard from "../components/DeviceCard";
+import BannerNotice from "../components/BannerNotice";
 import {
-  BasicUserApiModel,
   DeviceApiModel,
   DeviceApiModelFromJSON
 } from "smeiot-client";
 import moment from "moment";
-import SensorCard from "../components/SensorCard";
 import { defineMessages, useIntl, FormattedMessage } from "react-intl";
 import {
   Link as ReachLink,
@@ -88,7 +87,7 @@ const messages = defineMessages({
     id: "dashboard.devices.index.action.tooltip",
     description: "The tooltip title and aria label for the action button",
     defaultMessage: "Add"
-  },
+  }
 });
 
 const _DashboardDevices: React.FunctionComponent<IDashboardDevices> = ({
@@ -99,7 +98,7 @@ const _DashboardDevices: React.FunctionComponent<IDashboardDevices> = ({
 
   const [devices, setDevices] = React.useState<Array<DeviceApiModel>>([
     DeviceApiModelFromJSON({
-      name: "a1",
+      name: "L401",
       createdAt: "2019-01-01",
       updatedAt: "2020-01-01",
       authenticationType: 0,
@@ -109,7 +108,7 @@ const _DashboardDevices: React.FunctionComponent<IDashboardDevices> = ({
       lastMessageAt: "2020-01-01"
     }),
     DeviceApiModelFromJSON({
-      name: "a2",
+      name: "L402",
       createdAt: "2019-01-01",
       updatedAt: "2020-01-01",
       authenticationType: 0,
@@ -119,7 +118,7 @@ const _DashboardDevices: React.FunctionComponent<IDashboardDevices> = ({
       lastMessageAt: "2020-01-01"
     }),
     DeviceApiModelFromJSON({
-      name: "a3",
+      name: "L403",
       createdAt: "2019-01-01",
       updatedAt: "2020-01-01",
       authenticationType: 0,
@@ -130,22 +129,16 @@ const _DashboardDevices: React.FunctionComponent<IDashboardDevices> = ({
     })
   ]);
 
-  const renderDevices = () => {
-    const unconnectedDeviceNames = devices
-      .filter((d: DeviceApiModel) => !d.connected)
-      .map(d => d.name);
+  const unconnectedDeviceNames = devices
+    .filter((d: DeviceApiModel) => !d.connected)
+    .map(d => d.name);
 
-    return (
-      <React.Fragment>
-        <Paper>
-          notice: your device {unconnectedDeviceNames} is not connected.
-          Continue to connect one?
-        </Paper>
-        {devices.map((d: DeviceApiModel) => (
-          <DeviceCard device={d} expanded={false} key={d.name} />
-        ))}
-      </React.Fragment>
-    );
+  const renderDevices = () => {
+    return devices.map((d: DeviceApiModel) => (
+      <Grid item xs={4}>
+        <DeviceCard device={d} key={d.name} />
+      </Grid>
+    ));
   };
 
   return (
@@ -160,19 +153,19 @@ const _DashboardDevices: React.FunctionComponent<IDashboardDevices> = ({
           </Helmet>
           <Grid container spacing={3}>
             <Grid item xs={12}>
-              <BrokerCard/>
+              <BrokerCard />
             </Grid>
-            <Grid item xs={12}>
-              <Paper>
-                <div>
-                  {loaded ? (
-                    renderDevices()
-                  ) : (
-                    <Skeleton variant="rect" height={4} />
-                  )}
-                </div>
-              </Paper>
-            </Grid>
+            {unconnectedDeviceNames.length > 0 && (
+              <Grid item xs={12}>
+                <BannerNotice to={null}>
+                  <Typography component="p">
+                    notice: your device {unconnectedDeviceNames} is not
+                    connected. Continue to connect one?
+                  </Typography>
+                </BannerNotice>
+              </Grid>
+            )}
+            {loaded ? renderDevices() : <Skeleton variant="rect" height={4} />}
           </Grid>
           <Tooltip
             title={intl.formatMessage(messages.fabTooltip)}

@@ -9,7 +9,6 @@ import TextField from "@material-ui/core/TextField";
 import Skeleton from "@material-ui/lab/Skeleton";
 import { GetDefaultApiConfig } from "../index";
 import Paper from "@material-ui/core/Paper";
-import { AdminUserApiModel, AdminUsersApi, UsersApi } from "smeiot-client";
 import moment from "moment";
 import Avatar from "@material-ui/core/Avatar";
 import CardHeader from "@material-ui/core/CardHeader";
@@ -22,9 +21,8 @@ import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 import { Link, RouteComponentProps } from "@reach/router";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Switch from "@material-ui/core/Switch";
-import {Helmet} from "react-helmet";
+import BannerNotice from "../components/BannerNotice";
+import { Helmet } from "react-helmet";
 import {
   defineMessages,
   useIntl,
@@ -228,6 +226,7 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
 }) => {
   const intl = useIntl();
 
+  const deviceNotConnected = true;
   const [activeStep, setActiveStep] = React.useState(0);
   const steps = getSteps(intl);
 
@@ -279,6 +278,19 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
                 </Stepper>
               </Paper>
             </Grid>
+
+
+          {activeStep === 0 && deviceNotConnected &&
+                      <Grid item xs={12}>
+
+            <BannerNotice to={null}>
+              <Typography component="p">
+                notice: your device L403 is not connected. Continue to connect
+                instead of create a new one?
+              </Typography>
+            </BannerNotice>
+            </Grid>
+          }
 
             <Grid item xs={12}>
               <Paper className={classes.paper}>

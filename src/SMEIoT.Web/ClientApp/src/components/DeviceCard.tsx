@@ -31,45 +31,35 @@ const styles = ({
       height: 0,
       paddingTop: "56.25%" // 16:9
     },
-    expand: {
-      transform: "rotate(0deg)",
-      marginLeft: "auto",
-      transition: transitions.create("transform", {
-        duration: transitions.duration.shortest
-      })
-    },
     expandOpen: {
       transform: "rotate(180deg)"
     },
     avatar: {
       backgroundColor: red[500]
+    },
+    notConnected: {
+      backgroundColor: "#eeeeee", // needs to dim other component
     }
   });
 
 export interface IDeviceCard extends WithStyles<typeof styles> {
   device: DeviceApiModel;
-  expanded: boolean;
 }
 
 const _DeviceCard: React.FunctionComponent<IDeviceCard &
   WithStyles<typeof styles>> = ({ classes, device }) => {
-  const [expanded, setExpanded] = React.useState(false);
-
-  const handleExpandClick = () => {
-    setExpanded(!expanded);
-  };
 
   var summary = "";
-  if (device.name === "a1") {
+  if (device.name === "L401") {
     summary = "Connected with temp1";
-  } else if (device.name === "a2") {
+  } else if (device.name === "L402") {
     summary = "No sensor connected.";
   } else {
     summary = "Device is not configured.";
   }
 
   return (
-    <Card className={classes.card}>
+    <Card className={clsx(classes.card, !device.connected && classes.notConnected)}>
       <CardHeader
         action={
           <IconButton aria-label="settings">
