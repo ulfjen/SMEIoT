@@ -17,7 +17,7 @@ import withStyles from "@material-ui/core/styles/withStyles";
 import Hidden from "@material-ui/core/Hidden";
 import CloseIcon from '@material-ui/icons/Close';
 import UserAvatarMenu from "../components/UserAvatarMenu";
-import { BasicUserApiModel } from 'smeiot-client/src';
+import { BasicUserApiModel } from 'smeiot-client';
 import moment from 'moment';
 
 const drawerWidth = 240;

@@ -5,7 +5,7 @@ import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import IconButton from "@material-ui/core/IconButton";
 import Avatar from "@material-ui/core/Avatar";
-import {AdminUserApiModel} from "smeiot-client/src";
+import {AdminUserApiModel} from "smeiot-client";
 import Avatars from "@dicebear/avatars";
 import sprites from "@dicebear/avatars-jdenticon-sprites";
 import Menu from '@material-ui/core/Menu';

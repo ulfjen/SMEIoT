@@ -10,7 +10,7 @@ import CardContent from "@material-ui/core/CardContent";
 import CardActions from "@material-ui/core/CardActions";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
-import { SensorDetailsApiModel } from "smeiot-client/src";
+import { SensorDetailsApiModel } from "smeiot-client";
 
 const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Theme) => createStyles({
   container: {
@@ -24,9 +24,10 @@ const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Th
 
 export interface ISensorCardProps extends WithStyles<typeof styles> {
   sensor: SensorDetailsApiModel;
+  onMoreClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
-const _SensorCard: React.FunctionComponent<ISensorCardProps & WithStyles<typeof styles>> = ({ classes, sensor }) => {
+const _SensorCard: React.FunctionComponent<ISensorCardProps & WithStyles<typeof styles>> = ({ classes, sensor, onMoreClick}) => {
   const onClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
   };
 
