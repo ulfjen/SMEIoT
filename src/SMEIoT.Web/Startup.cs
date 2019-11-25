@@ -17,6 +17,7 @@ using SMEIoT.Core.Entities;
 using SMEIoT.Infrastructure;
 using SMEIoT.Infrastructure.Data;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
+using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 using Microsoft.OpenApi.Models;
 using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
@@ -32,9 +33,12 @@ namespace SMEIoT.Web
 {
   public class Startup
   {
-    public Startup(IConfiguration configuration)
+    private IHostingEnvironment _env;
+
+    public Startup(IConfiguration configuration, IHostingEnvironment env)
     {
       Configuration = configuration;
+      _env = env;
     }
 
     public IConfiguration Configuration { get; }
@@ -44,7 +48,7 @@ namespace SMEIoT.Web
     {
       services.AddDbContext(Configuration);
 
-      services.AddInfrastructure();
+      services.AddInfrastructure(_env);
       services.ConfigureHangfire(Configuration);
       services.AddHangfire(globalConfig => { });
 

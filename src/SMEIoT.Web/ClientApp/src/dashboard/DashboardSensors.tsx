@@ -12,14 +12,13 @@ import withStyles from "@material-ui/core/styles/withStyles";
 import Frame from "./Frame";
 import clsx from "clsx";
 import UserAvatarMenu from "../components/UserAvatarMenu";
-import { BasicUserApiModel, SensorDetailsApiModel } from "smeiot-client";
+import { BasicUserApiModel, SensorDetailsApiModel, SensorDetailsApiModelFromJSON } from "smeiot-client";
 import moment from "moment";
 import SensorCard from "../components/SensorCard";
 import SensorBoard from "../components/SensorBoard";
 import { defineMessages, useIntl, FormattedMessage } from "react-intl";
 import { Link, RouteComponentProps } from "@reach/router";
 import { Helmet } from "react-helmet";
-import { SensorDetailsApiModelFromJSON } from "smeiot-client/src";
 
 const styles = ({
   palette,

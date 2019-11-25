@@ -10,6 +10,8 @@ using SMEIoT.Core.EventHandlers;
 using Hangfire.LiteDB;
 using SMEIoT.Core.Services;
 using Npgsql;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore.Hosting;
 using System.Data;
 
 namespace SMEIoT.Infrastructure
@@ -58,12 +60,15 @@ namespace SMEIoT.Infrastructure
       });
     }
 
-    public static void AddInfrastructure(this IServiceCollection services)
+    public static void AddInfrastructure(this IServiceCollection services, IHostingEnvironment env)
     {
       services.AddSingleton<IClock>(SystemClock.Instance);
       services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
       services.AddSingleton<IMqttIdentifierService, MqttIdentifierService>();
-      services.AddScoped<IdentifierDictionaryFileAccessor>();
+      services.AddSingleton<IFileProvider>(provider => {
+        return env.ContentRootFileProvider;
+      });
+      services.AddScoped<IIdentifierDictionaryFileAccessor, IdentifierDictionaryFileAccessor>();
       services.AddScoped<IDeviceSensorIdentifierSuggestService, DeviceSensorIdentifierSuggestService>();
       // services.AddScoped<IPreSharedKeyGenerator, PreSharedKeyGenerator>();
     }
