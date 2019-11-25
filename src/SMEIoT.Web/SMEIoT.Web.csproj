@@ -84,7 +84,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\vendor\NodaTime.Serialization.SystemText\NodaTime.Serialization.SystemText.csproj" />
     <ProjectReference Include="..\SMEIoT.Core\SMEIoT.Core.csproj" />
     <ProjectReference Include="..\SMEIoT.TagHelpers\SMEIoT.TagHelpers.csproj" />
     <ProjectReference Include="..\SMEIoT.Infrastructure\SMEIoT.Infrastructure.csproj" />

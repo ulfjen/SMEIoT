@@ -19,7 +19,7 @@ using SMEIoT.Infrastructure.Data;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 using Microsoft.OpenApi.Models;
 using NodaTime;
-using NodaTime.Serialization.SystemText;
+using NodaTime.Serialization.SystemTextJson;
 using SMEIoT.Core.Interfaces;
 using SMEIoT.Core.Services;
 using SMEIoT.Web.Api.Filters;
