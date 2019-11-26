@@ -51,7 +51,7 @@ namespace SMEIoT.Core.Services
       while (retries-- > 0)
       {
         var name = GenerateRandomIdentifier(numWords);
-        if (_dbConnection.ExecuteScalar<bool>("SELECT COUNT(DISTINCT 1) FROM devices WHERE normalized_name = @NormalizedName;", new {NormalizedName = Device.NormalizeName(name)}))
+        if (!_dbConnection.ExecuteScalar<bool>("SELECT COUNT(DISTINCT 1) FROM devices WHERE normalized_name = @NormalizedName;", new {NormalizedName = Device.NormalizeName(name)}))
         {
           return name;
         }

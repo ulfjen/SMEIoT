@@ -22,7 +22,7 @@ namespace SMEIoT.Tests.Core.Services
       identifierService.RegisterSensorNameWithDeviceName("sensor3", "device2");
 
       var mockedDb = new Mock<IApplicationDbConnection>(MockBehavior.Strict);
-      mockedDb.Setup(x => x.ExecuteScalar<bool>("SELECT COUNT(DISTINCT 1) FROM devices WHERE normalized_name = @NormalizedName;", It.IsAny<object>(), null, null, null)).Returns(true);
+      mockedDb.Setup(x => x.ExecuteScalar<bool>("SELECT COUNT(DISTINCT 1) FROM devices WHERE normalized_name = @NormalizedName;", It.IsAny<object>(), null, null, null)).Returns(false);
       return new DeviceSensorIdentifierSuggestService(identifierService, mockedAccessor.Object, mockedDb.Object);
     }
 

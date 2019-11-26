@@ -8,6 +8,7 @@ export * from './DeviceApiModel';
 export * from './DeviceAuthenticationType';
 export * from './DeviceBootstrapConfigBindingModel';
 export * from './DeviceConfigBindingModel';
+export * from './DeviceConfigSuggestApiModel';
 export * from './LoginBindingModel';
 export * from './LoginedApiModel';
 export * from './ProblemDetails';

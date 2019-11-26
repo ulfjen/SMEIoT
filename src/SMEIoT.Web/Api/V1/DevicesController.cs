@@ -17,11 +17,19 @@ namespace SMEIoT.Web.Api.V1
   {
     private readonly ILogger<DevicesController> _logger;
     private readonly IDeviceService _service;
+    private readonly IDeviceSensorIdentifierSuggestService _identifierSuggestService;
+    private readonly ISecureKeySuggestService _secureKeySuggestService;
 
-    public DevicesController(ILogger<DevicesController> logger, IDeviceService service)
+    public DevicesController(
+      ILogger<DevicesController> logger,
+      IDeviceService service,
+      IDeviceSensorIdentifierSuggestService identifierSuggestService,
+      ISecureKeySuggestService secureKeySuggestService)
     {
       _logger = logger;
       _service = service;
+      _identifierSuggestService = identifierSuggestService;
+      _secureKeySuggestService = secureKeySuggestService;
     }
 
     [HttpPost("bootstrap")]
@@ -56,6 +64,24 @@ namespace SMEIoT.Web.Api.V1
       throw new NotImplementedException();
       // var sensor = _mqttService.ListSensorNames("dummy");
       return Ok(new SensorCandidatesApiModel(new[]{"name1", "name2"}));
+    }
+
+    [HttpGet("suggest_bootstrap_config")]
+    public async Task<ActionResult<DeviceConfigSuggestApiModel>> SuggestBootstrap()
+    {
+      return Ok(new DeviceConfigSuggestApiModel(_identifierSuggestService.GenerateRandomIdentifierForDevice(2), _secureKeySuggestService.GenerateSecureKey(64)));
+    }
+
+    [HttpGet("suggest_key")]
+    public async Task<ActionResult<DeviceConfigSuggestApiModel>> SuggestSecureKey()
+    {
+      return Ok(new DeviceConfigSuggestApiModel(null, _secureKeySuggestService.GenerateSecureKey(64)));
+    }
+
+    [HttpGet("suggest_device_name")]
+    public async Task<ActionResult<DeviceConfigSuggestApiModel>> SuggestDeviceName()
+    {
+      return Ok(new DeviceConfigSuggestApiModel(_identifierSuggestService.GenerateRandomIdentifierForDevice(2)));
     }
   }
 }

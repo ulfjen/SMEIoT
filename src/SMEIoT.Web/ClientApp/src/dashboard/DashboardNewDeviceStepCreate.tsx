@@ -3,24 +3,19 @@ import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
-import TextField from "@material-ui/core/TextField";
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
-import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
+import Skeleton from "@material-ui/lab/Skeleton";
+import Button from "@material-ui/core/Button";
 import { RouteComponentProps } from "@reach/router";
 import BannerNotice from "../components/BannerNotice";
-import {
-  defineMessages,
-  useIntl,
-  FormattedMessage,
-} from "react-intl";
-import { SensorsApi } from "smeiot-client";
+import SuggestTextField from "../components/SuggestTextField";
+import { defineMessages, useIntl, FormattedMessage } from "react-intl";
+import { GetDefaultApiConfig } from "../index";
+import { DevicesApi } from "smeiot-client";
 
-const styles = ({
-  palette,
-  spacing,
-}: Theme) =>
+const styles = ({ palette, spacing }: Theme) =>
   createStyles({
     container: {
       paddingTop: spacing(4),
@@ -59,7 +54,10 @@ const styles = ({
       color: palette.error.main
     },
     avatar: {},
-    cardContent: {}
+    cardContent: {},
+    loadingPanel: {
+      height: 200
+    }
   });
 
 export interface IDashboardNewDeviceStepCreateProps
@@ -88,10 +86,53 @@ const _DashboardNewDeviceStepCreate: React.FunctionComponent<IDashboardNewDevice
   const intl = useIntl();
 
   const deviceNotConnected = true;
+  const [loading, setLoading] = React.useState<boolean>(true);
+  const api = new DevicesApi(GetDefaultApiConfig());
+
+  const [suggestingDeviceName, setSuggestingDeviceName] = React.useState<
+    boolean
+  >(false);
+  const [deviceName, setDeviceName] = React.useState<string | null | undefined>(
+    null
+  );
+  const onSuggestDeviceName: React.MouseEventHandler<HTMLButtonElement> = async event => {
+    setSuggestingDeviceName(true);
+    const res = await api.apiDevicesSuggestDeviceNameGet();
+    setDeviceName(res.deviceName);
+    setSuggestingDeviceName(false);
+  };
+  const onDeviceNameChange: React.ChangeEventHandler<
+    HTMLInputElement | HTMLTextAreaElement
+  > = event => {
+    setDeviceName(event.target.value);
+  };
+
+  const [suggestingKey, setSuggestingKey] = React.useState<boolean>(false);
+  const [key, setKey] = React.useState<string | null | undefined>();
+  const onSuggestKey: React.MouseEventHandler<HTMLButtonElement> = async event => {
+    setSuggestingKey(true);
+    const res = await api.apiDevicesSuggestKeyGet();
+    setKey(res.key);
+    setSuggestingKey(false);
+  };
+  const onKeyChange: React.ChangeEventHandler<
+    HTMLInputElement | HTMLTextAreaElement
+  > = event => {
+    setKey(event.target.value);
+  };
+
+  React.useEffect(() => {
+    (async () => {
+      var res = await api.apiDevicesSuggestBootstrapConfigGet();
+      setKey(res.key);
+      setDeviceName(res.deviceName);
+      setLoading(false);
+    })();
+  }, []);
 
   return (
     <React.Fragment>
-      {deviceNotConnected && (
+      {!loading && deviceNotConnected && (
         <Grid item xs={12}>
           <BannerNotice to={null}>
             <Typography component="p">
@@ -104,54 +145,50 @@ const _DashboardNewDeviceStepCreate: React.FunctionComponent<IDashboardNewDevice
 
       <Grid item xs={12}>
         <Paper className={classes.paper}>
-          <div>
-            <p>
-              <FormattedMessage
-                id="dashboard.devices.new.step1.notice"
-                description="Notice related with how we can add a new device"
-                defaultMessage="We create a pre-shared key (PSK) for your new device and install it in our MQTT broker. 
+          {loading ? (
+            <Skeleton variant="rect" className={classes.loadingPanel} />
+          ) : (
+            <div>
+              <p>
+                <FormattedMessage
+                  id="dashboard.devices.new.step1.notice"
+                  description="Notice related with how we can add a new device"
+                  defaultMessage="We create a pre-shared key (PSK) for your new device and install it in our MQTT broker. 
               When your device connects with the broker with this key, you can add its sensor values in the dashboard.
               Registed and unused keys are shown on the devices page. 
               Notice: the MQTT broker will be reloaded to install the key."
-              />
-            </p>
-            <TextField
-              variant="outlined"
-              margin="normal"
-              required
-              fullWidth
-              id="device-name"
-              label={intl.formatMessage(messages.nameLabel)}
-              autoFocus
-              onChange={event => {
-                console.log(event.target.value);
-              }}
-              // error={usernameErrors.length > 0}
-              // helperText={usernameErrors}
-            />
-            <TextField
-              variant="outlined"
-              margin="normal"
-              required
-              fullWidth
-              id="psk-key"
-              label={intl.formatMessage(messages.keyLabel)}
-              onChange={event => {
-                console.log(event.target.value);
-              }}
-              // error={passwordErrors.length > 0}
-              // helperText={passwordErrors}
-            />
-            <div>
-              <Button variant="contained" color="primary" onClick={handleNext}>
-                <FormattedMessage
-                  id="dashboard.devices.new.control.next"
-                  description="The button text for going next page"
-                  defaultMessage="Next"
                 />
-              </Button>
+              </p>
+              <SuggestTextField
+                label={intl.formatMessage(messages.nameLabel)}
+                autoFocus
+                value={deviceName}
+                onChange={onDeviceNameChange}
+                onSuggest={onSuggestDeviceName}
+                suggesting={suggestingDeviceName}
+              />
+              <SuggestTextField
+                label={intl.formatMessage(messages.keyLabel)}
+                value={key}
+                onChange={onKeyChange}
+                onSuggest={onSuggestKey}
+                suggesting={suggestingKey}
+              />
+              <div>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleNext}
+                >
+                  <FormattedMessage
+                    id="dashboard.devices.new.control.create"
+                    description="The button text for creating devices"
+                    defaultMessage="Create"
+                  />
+                </Button>
+              </div>
             </div>
-          </div>
+          )}
         </Paper>
       </Grid>
     </React.Fragment>

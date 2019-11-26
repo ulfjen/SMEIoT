@@ -61,6 +61,8 @@ namespace SMEIoT.Web
       services.AddScoped<ISensorService, SensorService>();
       services.AddScoped<IUserManagementService, UserManagementService>();
       services.AddScoped<IUserProfileService, UserProfileService>();
+      services.AddScoped<IDeviceService, DeviceService>();
+      services.AddScoped<ISecureKeySuggestService, SecureKeySuggestService>();
 
       services.ConfigureMqttClient(Configuration);
 

@@ -51,7 +51,7 @@ const messages = defineMessages({
   title: {
     id: "dashboard.devices.new.title",
     description: "Used as title in the new device page on the dashboard",
-    defaultMessage: "Connect with a device"
+    defaultMessage: "Connect with a new device"
   },
   closeAriaLabel: {
     id: "dashboard.devices.new.close",
@@ -78,11 +78,6 @@ const messages = defineMessages({
     description: "The label for connecting device - step 3",
     defaultMessage: "Add sensors"
   },
-  connectTitle: {
-    id: "dashboard.devices.new.title",
-    description: "HTML title for the connecting new device page",
-    defaultMessage: "Connect a new device"
-  }
 });
 
 function getSteps(intl: IntlShape) {
@@ -143,7 +138,7 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
           component={Link}
         >
           <Helmet>
-            <title>{intl.formatMessage(messages.connectTitle)}</title>
+            <title>{intl.formatMessage(messages.title)}</title>
           </Helmet>
           <CloseIcon />
         </IconButton>

@@ -308,6 +308,63 @@
         }
       }
     },
+    "/api/devices/suggest_bootstrap_config": {
+      "get": {
+        "tags": [
+          "Devices"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceConfigSuggestApiModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/devices/suggest_key": {
+      "get": {
+        "tags": [
+          "Devices"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceConfigSuggestApiModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/devices/suggest_device_name": {
+      "get": {
+        "tags": [
+          "Devices"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceConfigSuggestApiModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/sensors/{name}/users": {
       "post": {
         "tags": [
@@ -963,6 +1020,24 @@
             "items": {
               "type": "string"
             }
+          }
+        },
+        "additionalProperties": false
+      },
+      "DeviceConfigSuggestApiModel": {
+        "type": "object",
+        "properties": {
+          "deviceName": {
+            "type": "string",
+            "nullable": true
+          },
+          "key": {
+            "type": "string",
+            "nullable": true
+          },
+          "continuedConfigurationDevice": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
