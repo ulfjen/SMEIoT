@@ -59,7 +59,7 @@ namespace SMEIoT.Core.Services
       throw new SystemException("Can't generate device names after retried 3 times.");
     }
 
-    public string? ListIdentifierCandidatesForSensor(string deviceName)
+    public string? GetARandomIdentifierCandidatesForSensor(string deviceName)
     {
       var candidates = _mqttIdentifierService.ListSensorNamesByDeviceName(deviceName).ToList();
       if (candidates.Count == 0)

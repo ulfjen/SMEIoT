@@ -86,5 +86,27 @@ namespace SMEIoT.Tests.Core.Services
       Assert.Equal(name, device.Name); 
     }
 
+    [Fact]
+    public async Task GetARandomUnconnectedDeviceAsync_ReturnsNull()
+    {
+      var (service, dbContext) = await BuildService();
+
+      var device = await service.GetARandomUnconnectedDeviceAsync();
+      
+      Assert.Null(device); 
+    }
+
+    [Fact]
+    public async Task GetARandomUnconnectedDeviceAsync_ReturnsDevice()
+    {
+      var (service, dbContext) = await BuildService();
+      const string name = "named-device";
+      dbContext.Devices.Add(new Device{Name=name, NormalizedName = Device.NormalizeName(name)});
+      await dbContext.SaveChangesAsync();
+
+      var device = await service.GetARandomUnconnectedDeviceAsync();
+      
+      Assert.Equal(name, device.Name); 
+    }
   }
 }

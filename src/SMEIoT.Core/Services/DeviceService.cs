@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -38,6 +39,14 @@ namespace SMEIoT.Core.Services
       }
 
       return device;
+    }
+
+    public async Task<Device?> GetARandomUnconnectedDeviceAsync()
+    {
+      return await (from d in _dbContext.Devices
+                    where !d.Connected
+                    orderby Guid.NewGuid()
+                    select d).FirstOrDefaultAsync();
     }
   }
 }

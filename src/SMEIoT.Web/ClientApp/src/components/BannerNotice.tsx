@@ -8,16 +8,19 @@ import Card from "@material-ui/core/Card";
 import CardActionArea from "@material-ui/core/CardActionArea";
 import { Link as ReachLink } from "@reach/router";
 
-const styles = ({ palette, transitions }: Theme) =>
+const styles = ({ spacing }: Theme) =>
   createStyles({
     root: {
       backgroundColor: "#eeeeee",
+    },
+    action: {
+      padding: spacing(2)
     }
   });
 
 export interface IBannerNoticeProps extends WithStyles<typeof styles> {
   children: JSX.Element;
-  to: string | null | undefined;
+  to?: string | null | undefined;
 }
 
 const _BannerNotice: React.FunctionComponent<IBannerNoticeProps &
@@ -26,7 +29,7 @@ const _BannerNotice: React.FunctionComponent<IBannerNoticeProps &
     return (
       <Link underline="none" component={ReachLink} to={to}>
         <Card className={classes.root}>
-          <CardActionArea>
+          <CardActionArea className={classes.action}>
             {children}
           </CardActionArea>
         </Card>
@@ -35,7 +38,7 @@ const _BannerNotice: React.FunctionComponent<IBannerNoticeProps &
   } else {
     return (
       <Card className={classes.root}>
-        <CardActionArea>
+        <CardActionArea className={classes.action}>
           {children}
         </CardActionArea>
       </Card>

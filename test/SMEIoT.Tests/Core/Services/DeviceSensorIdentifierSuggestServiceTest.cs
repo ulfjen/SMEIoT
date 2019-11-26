@@ -49,32 +49,32 @@ namespace SMEIoT.Tests.Core.Services
 
 
     [Fact]
-    public void ListIdentifierCandidatesForSensor_ReturnsCandidate()
+    public void GetARandomIdentifierCandidatesForSensor_ReturnsCandidate()
     {
       var service = BuildService();
 
-      var cand = service.ListIdentifierCandidatesForSensor("device2");
+      var cand = service.GetARandomIdentifierCandidatesForSensor("device2");
 
-      Assert.Equal("device3", cand);
+      Assert.Equal("sensor3", cand);
     }
 
 
     [Fact]
-    public void ListIdentifierCandidatesForSensor_ReturnsOneCandidate()
+    public void GetARandomIdentifierCandidatesForSensor_ReturnsOneCandidate()
     {
       var service = BuildService();
 
-      var cand = service.ListIdentifierCandidatesForSensor("device1");
+      var cand = service.GetARandomIdentifierCandidatesForSensor("device1");
 
-      Assert.True(cand == "device1" || cand == "device2");
+      Assert.True(cand == "sensor1" || cand == "sensor2");
     }
 
     [Fact]
-    public void ListIdentifierCandidatesForSensor_ReturnsNull()
+    public void GetARandomIdentifierCandidatesForSensor_ReturnsNull()
     {
       var service = BuildService();
 
-      var cand = service.ListIdentifierCandidatesForSensor("device-not-existed");
+      var cand = service.GetARandomIdentifierCandidatesForSensor("device-not-existed");
 
       Assert.Null(cand);
     }

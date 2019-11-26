@@ -69,7 +69,8 @@ namespace SMEIoT.Web.Api.V1
     [HttpGet("suggest_bootstrap_config")]
     public async Task<ActionResult<DeviceConfigSuggestApiModel>> SuggestBootstrap()
     {
-      return Ok(new DeviceConfigSuggestApiModel(_identifierSuggestService.GenerateRandomIdentifierForDevice(2), _secureKeySuggestService.GenerateSecureKey(64)));
+      var device = await _service.GetARandomUnconnectedDeviceAsync();
+      return Ok(new DeviceConfigSuggestApiModel(_identifierSuggestService.GenerateRandomIdentifierForDevice(2), _secureKeySuggestService.GenerateSecureKey(64), device?.Name));
     }
 
     [HttpGet("suggest_key")]

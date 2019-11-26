@@ -85,7 +85,7 @@ const _DashboardNewDeviceStepCreate: React.FunctionComponent<IDashboardNewDevice
 }) => {
   const intl = useIntl();
 
-  const deviceNotConnected = true;
+  const [unconnectedDeviceName, setUnconnectedDeviceName] = React.useState<string | null | undefined>(null);
   const [loading, setLoading] = React.useState<boolean>(true);
   const api = new DevicesApi(GetDefaultApiConfig());
 
@@ -126,18 +126,25 @@ const _DashboardNewDeviceStepCreate: React.FunctionComponent<IDashboardNewDevice
       var res = await api.apiDevicesSuggestBootstrapConfigGet();
       setKey(res.key);
       setDeviceName(res.deviceName);
+      setUnconnectedDeviceName(res.continuedConfigurationDevice);
       setLoading(false);
     })();
   }, []);
 
   return (
     <React.Fragment>
-      {!loading && deviceNotConnected && (
+      {!loading && unconnectedDeviceName && (
         <Grid item xs={12}>
-          <BannerNotice to={null}>
+          <BannerNotice>
             <Typography component="p">
-              notice: your device L403 is not connected. Continue to connect
-              instead of create a new one?
+              <FormattedMessage
+                id="dashboard.devices.new.step1.unconnected_notice"
+                description="Notice related with continuing connecting a device"
+                defaultMessage="Notice: your device {name} is not connected. Continue to connect instead of create a new one?"
+                values={{
+                  name: unconnectedDeviceName
+                }}
+              />
             </Typography>
           </BannerNotice>
         </Grid>

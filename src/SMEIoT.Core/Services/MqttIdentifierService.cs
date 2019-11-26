@@ -19,6 +19,7 @@ namespace SMEIoT.Core.Services
 
     public bool RegisterDeviceName(string name)
     {
+      if (string.IsNullOrEmpty(name)) { return false; }
       return _deviceNames.TryAdd(name, _clock.GetCurrentInstant());
     }
 

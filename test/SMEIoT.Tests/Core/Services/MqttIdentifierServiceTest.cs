@@ -36,7 +36,7 @@ namespace SMEIoT.Tests.Core.Services
     }
 
     [Fact]
-    public async Task RegisterDeviceNameAsync_ReturnsFalseWhenEmpty()
+    public async Task RegisterDeviceName_ReturnsFalseWhenEmpty()
     {
       var service = await BuildService();
 
