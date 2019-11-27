@@ -21,10 +21,11 @@ const styles = ({ spacing }: Theme) =>
 export interface IBannerNoticeProps extends WithStyles<typeof styles> {
   children: JSX.Element;
   to?: string | null | undefined;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
 }
 
 const _BannerNotice: React.FunctionComponent<IBannerNoticeProps &
-  WithStyles<typeof styles>> = ({ classes, children, to }) => {
+  WithStyles<typeof styles>> = ({ classes, children, to, onClick }) => {
   if (to) {
     return (
       <Link underline="none" component={ReachLink} to={to}>
@@ -38,7 +39,7 @@ const _BannerNotice: React.FunctionComponent<IBannerNoticeProps &
   } else {
     return (
       <Card className={classes.root}>
-        <CardActionArea className={classes.action}>
+        <CardActionArea className={classes.action} onClick={onClick}>
           {children}
         </CardActionArea>
       </Card>

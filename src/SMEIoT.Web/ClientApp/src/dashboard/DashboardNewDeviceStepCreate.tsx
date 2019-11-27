@@ -7,54 +7,22 @@ import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import Skeleton from "@material-ui/lab/Skeleton";
-import Button from "@material-ui/core/Button";
 import { RouteComponentProps } from "@reach/router";
 import BannerNotice from "../components/BannerNotice";
 import SuggestTextField from "../components/SuggestTextField";
+import ProgressButton from "../components/ProgressButton";
 import { defineMessages, useIntl, FormattedMessage } from "react-intl";
 import { GetDefaultApiConfig } from "../index";
-import { DevicesApi } from "smeiot-client";
+import { DevicesApi, DeviceConfigBindingModel } from "smeiot-client";
 
 const styles = ({ palette, spacing }: Theme) =>
   createStyles({
-    container: {
-      paddingTop: spacing(4),
-      paddingBottom: spacing(4)
-    },
-    backButton: {
-      marginRight: spacing(1)
-    },
-    instructions: {
-      marginTop: spacing(1),
-      marginBottom: spacing(1)
-    },
-    list: {
-      backgroundColor: "#ffffff"
-    },
-    filterBar: {
-      backgroundColor: "#ffffff",
-      display: "flex",
-      flexWrap: "wrap",
-      "& > *": {
-        margin: spacing(0.5)
-      },
-      marginBottom: spacing(2)
-    },
     paper: {
       padding: spacing(2),
       display: "flex",
       overflow: "auto",
       flexDirection: "column"
     },
-    fixedHeight: {
-      height: 240
-    },
-    usersMenu: {},
-    usersMenuDeleteItem: {
-      color: palette.error.main
-    },
-    avatar: {},
-    cardContent: {},
     loadingPanel: {
       height: 200
     }
@@ -63,7 +31,13 @@ const styles = ({ palette, spacing }: Theme) =>
 export interface IDashboardNewDeviceStepCreateProps
   extends RouteComponentProps,
     WithStyles<typeof styles> {
-  handleNext: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  handleNext: React.MouseEventHandler<HTMLButtonElement>;
+  handlingNext: boolean;
+  device: DeviceConfigBindingModel;
+  setDevice: React.Dispatch<React.SetStateAction<DeviceConfigBindingModel>>;
+  onBannerClick: React.MouseEventHandler<HTMLButtonElement>;
+  unconnectedDeviceName: string | null;
+  setUnconnectedDeviceName: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 const messages = defineMessages({
@@ -81,52 +55,75 @@ const messages = defineMessages({
 
 const _DashboardNewDeviceStepCreate: React.FunctionComponent<IDashboardNewDeviceStepCreateProps> = ({
   classes,
-  handleNext
+  handleNext,
+  handlingNext,
+  device,
+  setDevice,
+  onBannerClick,
+  unconnectedDeviceName,
+  setUnconnectedDeviceName
 }) => {
   const intl = useIntl();
 
-  const [unconnectedDeviceName, setUnconnectedDeviceName] = React.useState<string | null | undefined>(null);
   const [loading, setLoading] = React.useState<boolean>(true);
   const api = new DevicesApi(GetDefaultApiConfig());
 
-  const [suggestingDeviceName, setSuggestingDeviceName] = React.useState<
-    boolean
-  >(false);
-  const [deviceName, setDeviceName] = React.useState<string | null | undefined>(
-    null
+  const [suggestingDeviceName, setSuggestDeviceName] = React.useState<boolean>(
+    false
   );
   const onSuggestDeviceName: React.MouseEventHandler<HTMLButtonElement> = async event => {
-    setSuggestingDeviceName(true);
-    const res = await api.apiDevicesSuggestDeviceNameGet();
-    setDeviceName(res.deviceName);
-    setSuggestingDeviceName(false);
+    setSuggestDeviceName(true);
+
+    const res = await api.apiDevicesConfigSuggestDeviceNameGet();
+
+    if (res.deviceName !== null) {
+      device.name = res.deviceName;
+      setDevice(device);
+    }
+
+    setSuggestDeviceName(false);
   };
+
   const onDeviceNameChange: React.ChangeEventHandler<
     HTMLInputElement | HTMLTextAreaElement
   > = event => {
-    setDeviceName(event.target.value);
+    device.name = event.target.value;
+    setDevice(device);
   };
 
-  const [suggestingKey, setSuggestingKey] = React.useState<boolean>(false);
-  const [key, setKey] = React.useState<string | null | undefined>();
+  const [suggestingKey, setSuggestKey] = React.useState<boolean>(false);
   const onSuggestKey: React.MouseEventHandler<HTMLButtonElement> = async event => {
-    setSuggestingKey(true);
-    const res = await api.apiDevicesSuggestKeyGet();
-    setKey(res.key);
-    setSuggestingKey(false);
+    setSuggestKey(true);
+
+    const res = await api.apiDevicesConfigSuggestKeyGet();
+
+    if (res.key !== null) {
+      device.key = res.key;
+    }
+
+    setSuggestKey(false);
   };
+
   const onKeyChange: React.ChangeEventHandler<
     HTMLInputElement | HTMLTextAreaElement
   > = event => {
-    setKey(event.target.value);
+    device.key = event.target.value;
+    setDevice(device);
   };
 
   React.useEffect(() => {
     (async () => {
-      var res = await api.apiDevicesSuggestBootstrapConfigGet();
-      setKey(res.key);
-      setDeviceName(res.deviceName);
-      setUnconnectedDeviceName(res.continuedConfigurationDevice);
+      var res = await api.apiDevicesConfigSuggestBootstrapGet();
+      if (res.deviceName) {
+        device.name = res.deviceName;
+      }
+      if (res.key) {
+        device.key = res.key;
+      }
+      setDevice(device);
+      if (res.continuedConfigurationDevice) {
+        setUnconnectedDeviceName(res.continuedConfigurationDevice);
+      }
       setLoading(false);
     })();
   }, []);
@@ -135,7 +132,7 @@ const _DashboardNewDeviceStepCreate: React.FunctionComponent<IDashboardNewDevice
     <React.Fragment>
       {!loading && unconnectedDeviceName && (
         <Grid item xs={12}>
-          <BannerNotice>
+          <BannerNotice onClick={onBannerClick}>
             <Typography component="p">
               <FormattedMessage
                 id="dashboard.devices.new.step1.unconnected_notice"
@@ -168,31 +165,32 @@ const _DashboardNewDeviceStepCreate: React.FunctionComponent<IDashboardNewDevice
               </p>
               <SuggestTextField
                 label={intl.formatMessage(messages.nameLabel)}
-                autoFocus
-                value={deviceName}
+                // autoFocus
+                value={device.name}
                 onChange={onDeviceNameChange}
                 onSuggest={onSuggestDeviceName}
                 suggesting={suggestingDeviceName}
               />
               <SuggestTextField
                 label={intl.formatMessage(messages.keyLabel)}
-                value={key}
+                value={device.key}
                 onChange={onKeyChange}
                 onSuggest={onSuggestKey}
                 suggesting={suggestingKey}
               />
               <div>
-                <Button
+                <ProgressButton
+                  onClick={handleNext}
+                  loading={handlingNext}
                   variant="contained"
                   color="primary"
-                  onClick={handleNext}
                 >
                   <FormattedMessage
                     id="dashboard.devices.new.control.create"
                     description="The button text for creating devices"
                     defaultMessage="Create"
                   />
-                </Button>
+                </ProgressButton>
               </div>
             </div>
           )}

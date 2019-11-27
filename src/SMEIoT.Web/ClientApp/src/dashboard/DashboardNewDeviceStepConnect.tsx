@@ -11,7 +11,7 @@ import Typography from "@material-ui/core/Typography";
 import { RouteComponentProps } from "@reach/router";
 import BannerNotice from "../components/BannerNotice";
 import { defineMessages, useIntl, FormattedMessage } from "react-intl";
-import { SensorsApi } from "smeiot-client";
+import { DeviceApiModel } from "smeiot-client";
 
 const styles = ({ palette, spacing }: Theme) =>
   createStyles({
@@ -58,14 +58,18 @@ const styles = ({ palette, spacing }: Theme) =>
 export interface IDashboardNewDeviceStepConnectProps
   extends RouteComponentProps,
     WithStyles<typeof styles> {
+  device: DeviceApiModel;
   handleNext: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  loading: boolean;
 }
 
 const messages = defineMessages({});
 
 const _DashboardNewDeviceStepConnect: React.FunctionComponent<IDashboardNewDeviceStepConnectProps> = ({
   classes,
-  handleNext
+  device,
+  handleNext,
+  loading
 }) => {
   const intl = useIntl();
 
@@ -79,10 +83,15 @@ const _DashboardNewDeviceStepConnect: React.FunctionComponent<IDashboardNewDevic
                 id="dashboard.devices.new.step2.notice"
                 description="Notice related when we wait for new connection"
                 defaultMessage="Now you can copy the key to your device and start to connect with the broker.
-            Once we receive a new message from the broker, we will prompt you."
+            Once we receive a new message from the broker, we will prompt you to continue.
+            Your device's name is: {name}.
+            Your device's key is: {key}."
+                values={{
+                  name: device.name,
+                  key: device.preSharedKey
+                }}
               />
             </p>
-            <p>(relevant information down here)</p>
             <div>
               <Button variant="contained" color="primary" onClick={handleNext}>
                 <FormattedMessage

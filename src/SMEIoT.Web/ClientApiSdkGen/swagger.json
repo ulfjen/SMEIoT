@@ -182,17 +182,17 @@
           "content": {
             "application/json; v=1.0": {
               "schema": {
-                "$ref": "#/components/schemas/DeviceBootstrapConfigBindingModel"
+                "$ref": "#/components/schemas/DeviceConfigBindingModel"
               }
             },
             "text/json; v=1.0": {
               "schema": {
-                "$ref": "#/components/schemas/DeviceBootstrapConfigBindingModel"
+                "$ref": "#/components/schemas/DeviceConfigBindingModel"
               }
             },
             "application/*+json; v=1.0": {
               "schema": {
-                "$ref": "#/components/schemas/DeviceBootstrapConfigBindingModel"
+                "$ref": "#/components/schemas/DeviceConfigBindingModel"
               }
             }
           }
@@ -277,9 +277,46 @@
             }
           }
         }
+      },
+      "get": {
+        "tags": [
+          "Devices"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceApiModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
       }
     },
-    "/api/devices/sensor_candidates": {
+    "/api/devices/config_suggest/sensor_candidates": {
       "get": {
         "tags": [
           "Devices"
@@ -308,7 +345,7 @@
         }
       }
     },
-    "/api/devices/suggest_bootstrap_config": {
+    "/api/devices/config_suggest/bootstrap": {
       "get": {
         "tags": [
           "Devices"
@@ -327,7 +364,7 @@
         }
       }
     },
-    "/api/devices/suggest_key": {
+    "/api/devices/config_suggest/key": {
       "get": {
         "tags": [
           "Devices"
@@ -346,7 +383,7 @@
         }
       }
     },
-    "/api/devices/suggest_device_name": {
+    "/api/devices/config_suggest/device_name": {
       "get": {
         "tags": [
           "Devices"
@@ -941,10 +978,10 @@
         },
         "additionalProperties": false
       },
-      "DeviceBootstrapConfigBindingModel": {
+      "DeviceConfigBindingModel": {
         "type": "object",
         "properties": {
-          "identity": {
+          "name": {
             "type": "string"
           },
           "key": {
@@ -993,21 +1030,6 @@
           "lastMessageAt": {
             "type": "string",
             "readOnly": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "DeviceConfigBindingModel": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "identity": {
-            "type": "string"
-          },
-          "key": {
-            "type": "string"
           }
         },
         "additionalProperties": false

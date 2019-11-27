@@ -1,5 +1,4 @@
 import * as React from "react";
-import Button from "@material-ui/core/Button";
 import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
@@ -8,6 +7,7 @@ import TextField from "@material-ui/core/TextField";
 import Divider from "@material-ui/core/Divider";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import InputAdornment from "@material-ui/core/InputAdornment";
+import ProgressButton from "./ProgressButton";
 import { FormattedMessage } from "react-intl";
 
 const styles = ({ palette, spacing }: Theme) =>
@@ -61,21 +61,13 @@ const _SuggestTextField: React.FunctionComponent<ISuggestTextFieldProps &
         endAdornment: (
           <InputAdornment position="end">
             <Divider className={classes.divider} orientation="vertical" />
-            <div className={classes.wrapper}>
-              <Button onClick={onSuggest} disabled={suggesting}>
-                <FormattedMessage
-                  id="dashboard.components.suggest"
-                  description="Suggest button on the right of the text field."
-                  defaultMessage="Suggest"
-                />
-              </Button>
-              {suggesting && (
-                <CircularProgress
-                  size={24}
-                  className={classes.buttonProgress}
-                />
-              )}
-            </div>
+            <ProgressButton onClick={onSuggest} loading={suggesting}>
+              <FormattedMessage
+                id="dashboard.components.suggest"
+                description="Suggest button on the right of the text field."
+                defaultMessage="Suggest"
+              />
+            </ProgressButton>
           </InputAdornment>
         )
       }}

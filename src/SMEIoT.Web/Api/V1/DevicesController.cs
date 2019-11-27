@@ -36,9 +36,9 @@ namespace SMEIoT.Web.Api.V1
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<DeviceApiModel>> BootstrapWithPreSharedKey(DeviceBootstrapConfigBindingModel view)
+    public async Task<ActionResult<DeviceApiModel>> BootstrapWithPreSharedKey(DeviceConfigBindingModel view)
     {
-      var deviceName = await _service.BootstrapDeviceWithPreSharedKeyAsync(view.Identity, view.Key);
+      var deviceName = await _service.BootstrapDeviceWithPreSharedKeyAsync(view.Name, view.Key);
       var device = await _service.GetDeviceByNameAsync(deviceName);
       var res = new DeviceApiModel(device);
       return CreatedAtAction(nameof(BootstrapWithPreSharedKey), res);
@@ -55,7 +55,18 @@ namespace SMEIoT.Web.Api.V1
       return Ok(res);
     }
 
-    [HttpGet("sensor_candidates")]
+    [HttpGet("{name}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<DeviceApiModel>> Show(string name)
+    {
+      var device = await _service.GetDeviceByNameAsync(name);
+      var res = new DeviceApiModel(device);
+      return Ok(res);
+    }
+
+    [HttpGet("config_suggest/sensor_candidates")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Authorize(Roles = "Admin")]
@@ -66,20 +77,20 @@ namespace SMEIoT.Web.Api.V1
       return Ok(new SensorCandidatesApiModel(new[]{"name1", "name2"}));
     }
 
-    [HttpGet("suggest_bootstrap_config")]
+    [HttpGet("config_suggest/bootstrap")]
     public async Task<ActionResult<DeviceConfigSuggestApiModel>> SuggestBootstrap()
     {
       var device = await _service.GetARandomUnconnectedDeviceAsync();
       return Ok(new DeviceConfigSuggestApiModel(_identifierSuggestService.GenerateRandomIdentifierForDevice(2), _secureKeySuggestService.GenerateSecureKey(64), device?.Name));
     }
 
-    [HttpGet("suggest_key")]
+    [HttpGet("config_suggest/key")]
     public async Task<ActionResult<DeviceConfigSuggestApiModel>> SuggestSecureKey()
     {
       return Ok(new DeviceConfigSuggestApiModel(null, _secureKeySuggestService.GenerateSecureKey(64)));
     }
 
-    [HttpGet("suggest_device_name")]
+    [HttpGet("config_suggest/device_name")]
     public async Task<ActionResult<DeviceConfigSuggestApiModel>> SuggestDeviceName()
     {
       return Ok(new DeviceConfigSuggestApiModel(_identifierSuggestService.GenerateRandomIdentifierForDevice(2)));

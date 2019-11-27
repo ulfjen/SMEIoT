@@ -6,7 +6,6 @@ export * from './BasicUserApiModel';
 export * from './ConfirmedUserCredentialsUpdateBindingModel';
 export * from './DeviceApiModel';
 export * from './DeviceAuthenticationType';
-export * from './DeviceBootstrapConfigBindingModel';
 export * from './DeviceConfigBindingModel';
 export * from './DeviceConfigSuggestApiModel';
 export * from './LoginBindingModel';

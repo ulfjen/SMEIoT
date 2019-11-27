@@ -11,10 +11,6 @@ namespace SMEIoT.Web.BindingModels
     
     [BindRequired]
     [JsonProperty(Required = Required.DisallowNull)]
-    public string Identity { get; set; } = null!;
-    
-    [BindRequired]
-    [JsonProperty(Required = Required.DisallowNull)]
     public string Key { get; set; } = null!;
   }
 }

@@ -14,18 +14,18 @@ import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 import { Link, RouteComponentProps } from "@reach/router";
 import { Helmet } from "react-helmet";
-import {
-  defineMessages,
-  useIntl,
-  IntlShape
-} from "react-intl";
+import { defineMessages, useIntl, IntlShape } from "react-intl";
 import DashboardNewDeviceStepCreate from "./DashboardNewDeviceStepCreate";
 import DashboardNewDeviceStepConnect from "./DashboardNewDeviceStepConnect";
 import DashboardNewDeviceStepConnectSensors from "./DashboardNewDeviceStepConnectSensors";
+import {
+  DeviceConfigBindingModel,
+  DevicesApi,
+  DeviceApiModel
+} from "smeiot-client";
+import { GetDefaultApiConfig } from "../index";
 
-const styles = ({
-  spacing,
-}: Theme) =>
+const styles = ({ spacing }: Theme) =>
   createStyles({
     container: {
       paddingTop: spacing(4),
@@ -77,7 +77,7 @@ const messages = defineMessages({
     id: "dashboard.devices.new.step3.label",
     description: "The label for connecting device - step 3",
     defaultMessage: "Add sensors"
-  },
+  }
 });
 
 function getSteps(intl: IntlShape) {
@@ -95,23 +95,91 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
 
   const [activeStep, setActiveStep] = React.useState(0);
   const steps = getSteps(intl);
+  const [handlingNext, setHandlingNext] = React.useState<boolean>(false);
+  const [deviceConfig, setDeviceConfig] = React.useState<
+    DeviceConfigBindingModel
+  >({});
+  const [unconnectedDeviceName, setUnconnectedDeviceName] = React.useState<
+    string | null
+  >(null);
+  const [device, setDevice] = React.useState<DeviceApiModel>({});
 
-  const handleNext = () => {
+  const handleNext = async () => {
+    setHandlingNext(true);
+    switch (activeStep) {
+      case 0:
+        const api = new DevicesApi(GetDefaultApiConfig());
+        const res = await api.apiDevicesBootstrapPost({
+          deviceConfigBindingModel: deviceConfig
+        });
+        if (res !== null) {
+          setDevice(res);
+        }
+        break;
+      case 1:
+        break;
+      case 2:
+        break;
+      default:
+        break;
+    }
     setActiveStep(prevActiveStep => prevActiveStep + 1);
+    setHandlingNext(false);
   };
 
   const handleReset = () => {
     setActiveStep(0);
   };
 
+  const [loadingConnect, setLoadingConnect] = React.useState<boolean>(false);
+
+  const onConnectBannerClick = async (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    setLoadingConnect(true);
+    setActiveStep(1);
+    setHandlingNext(false);
+    if (unconnectedDeviceName !== null) {
+      const api = new DevicesApi(GetDefaultApiConfig());
+      const res = await api.apiDevicesNameGet({
+        name: unconnectedDeviceName
+      });
+      if (res !== null) {
+        setDevice(res);
+      }
+    }
+    setLoadingConnect(false);
+  };
+
   const getStepContent = () => {
     switch (activeStep) {
       case 0:
-        return <DashboardNewDeviceStepCreate handleNext={handleNext} />;
+        return (
+          <DashboardNewDeviceStepCreate
+            unconnectedDeviceName={unconnectedDeviceName}
+            setUnconnectedDeviceName={setUnconnectedDeviceName}
+            onBannerClick={onConnectBannerClick}
+            device={deviceConfig}
+            setDevice={setDeviceConfig}
+            handleNext={handleNext}
+            handlingNext={handlingNext}
+          />
+        );
       case 1:
-        return <DashboardNewDeviceStepConnect handleNext={handleNext} />;
+        return (
+          <DashboardNewDeviceStepConnect
+            loading={loadingConnect}
+            device={device}
+            handleNext={handleNext}
+          />
+        );
       case 2:
-        return <DashboardNewDeviceStepConnectSensors handleNext={handleNext} handleReset={handleReset} />;
+        return (
+          <DashboardNewDeviceStepConnectSensors
+            handleNext={handleNext}
+            handleReset={handleReset}
+          />
+        );
       default:
         return "Unknown stepIndex";
     }

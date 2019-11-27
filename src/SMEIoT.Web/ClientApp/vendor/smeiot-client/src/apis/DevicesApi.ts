@@ -18,9 +18,6 @@ import {
     DeviceApiModel,
     DeviceApiModelFromJSON,
     DeviceApiModelToJSON,
-    DeviceBootstrapConfigBindingModel,
-    DeviceBootstrapConfigBindingModelFromJSON,
-    DeviceBootstrapConfigBindingModelToJSON,
     DeviceConfigBindingModel,
     DeviceConfigBindingModelFromJSON,
     DeviceConfigBindingModelToJSON,
@@ -36,7 +33,11 @@ import {
 } from '../models';
 
 export interface DevicesApiApiDevicesBootstrapPostRequest {
-    deviceBootstrapConfigBindingModel?: DeviceBootstrapConfigBindingModel;
+    deviceConfigBindingModel?: DeviceConfigBindingModel;
+}
+
+export interface DevicesApiApiDevicesNameGetRequest {
+    name: string;
 }
 
 export interface DevicesApiApiDevicesNamePutRequest {
@@ -63,7 +64,7 @@ export class DevicesApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: DeviceBootstrapConfigBindingModelToJSON(requestParameters.deviceBootstrapConfigBindingModel),
+            body: DeviceConfigBindingModelToJSON(requestParameters.deviceConfigBindingModel),
         });
 
         return new runtime.JSONApiResponse(response, (jsonValue) => DeviceApiModelFromJSON(jsonValue));
@@ -73,6 +74,130 @@ export class DevicesApi extends runtime.BaseAPI {
      */
     async apiDevicesBootstrapPost(requestParameters: DevicesApiApiDevicesBootstrapPostRequest): Promise<DeviceApiModel> {
         const response = await this.apiDevicesBootstrapPostRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiDevicesConfigSuggestBootstrapGetRaw(): Promise<runtime.ApiResponse<DeviceConfigSuggestApiModel>> {
+        const queryParameters: runtime.HTTPQuery = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/devices/config_suggest/bootstrap`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => DeviceConfigSuggestApiModelFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiDevicesConfigSuggestBootstrapGet(): Promise<DeviceConfigSuggestApiModel> {
+        const response = await this.apiDevicesConfigSuggestBootstrapGetRaw();
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiDevicesConfigSuggestDeviceNameGetRaw(): Promise<runtime.ApiResponse<DeviceConfigSuggestApiModel>> {
+        const queryParameters: runtime.HTTPQuery = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/devices/config_suggest/device_name`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => DeviceConfigSuggestApiModelFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiDevicesConfigSuggestDeviceNameGet(): Promise<DeviceConfigSuggestApiModel> {
+        const response = await this.apiDevicesConfigSuggestDeviceNameGetRaw();
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiDevicesConfigSuggestKeyGetRaw(): Promise<runtime.ApiResponse<DeviceConfigSuggestApiModel>> {
+        const queryParameters: runtime.HTTPQuery = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/devices/config_suggest/key`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => DeviceConfigSuggestApiModelFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiDevicesConfigSuggestKeyGet(): Promise<DeviceConfigSuggestApiModel> {
+        const response = await this.apiDevicesConfigSuggestKeyGetRaw();
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiDevicesConfigSuggestSensorCandidatesGetRaw(): Promise<runtime.ApiResponse<SensorCandidatesApiModel>> {
+        const queryParameters: runtime.HTTPQuery = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/devices/config_suggest/sensor_candidates`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => SensorCandidatesApiModelFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiDevicesConfigSuggestSensorCandidatesGet(): Promise<SensorCandidatesApiModel> {
+        const response = await this.apiDevicesConfigSuggestSensorCandidatesGetRaw();
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiDevicesNameGetRaw(requestParameters: DevicesApiApiDevicesNameGetRequest): Promise<runtime.ApiResponse<DeviceApiModel>> {
+        if (requestParameters.name === null || requestParameters.name === undefined) {
+            throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling apiDevicesNameGet.');
+        }
+
+        const queryParameters: runtime.HTTPQuery = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/devices/{name}`.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters.name))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => DeviceApiModelFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiDevicesNameGet(requestParameters: DevicesApiApiDevicesNameGetRequest): Promise<DeviceApiModel> {
+        const response = await this.apiDevicesNameGetRaw(requestParameters);
         return await response.value();
     }
 
@@ -104,102 +229,6 @@ export class DevicesApi extends runtime.BaseAPI {
      */
     async apiDevicesNamePut(requestParameters: DevicesApiApiDevicesNamePutRequest): Promise<DeviceApiModel> {
         const response = await this.apiDevicesNamePutRaw(requestParameters);
-        return await response.value();
-    }
-
-    /**
-     */
-    async apiDevicesSensorCandidatesGetRaw(): Promise<runtime.ApiResponse<SensorCandidatesApiModel>> {
-        const queryParameters: runtime.HTTPQuery = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/api/devices/sensor_candidates`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        });
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => SensorCandidatesApiModelFromJSON(jsonValue));
-    }
-
-    /**
-     */
-    async apiDevicesSensorCandidatesGet(): Promise<SensorCandidatesApiModel> {
-        const response = await this.apiDevicesSensorCandidatesGetRaw();
-        return await response.value();
-    }
-
-    /**
-     */
-    async apiDevicesSuggestBootstrapConfigGetRaw(): Promise<runtime.ApiResponse<DeviceConfigSuggestApiModel>> {
-        const queryParameters: runtime.HTTPQuery = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/api/devices/suggest_bootstrap_config`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        });
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => DeviceConfigSuggestApiModelFromJSON(jsonValue));
-    }
-
-    /**
-     */
-    async apiDevicesSuggestBootstrapConfigGet(): Promise<DeviceConfigSuggestApiModel> {
-        const response = await this.apiDevicesSuggestBootstrapConfigGetRaw();
-        return await response.value();
-    }
-
-    /**
-     */
-    async apiDevicesSuggestDeviceNameGetRaw(): Promise<runtime.ApiResponse<DeviceConfigSuggestApiModel>> {
-        const queryParameters: runtime.HTTPQuery = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/api/devices/suggest_device_name`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        });
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => DeviceConfigSuggestApiModelFromJSON(jsonValue));
-    }
-
-    /**
-     */
-    async apiDevicesSuggestDeviceNameGet(): Promise<DeviceConfigSuggestApiModel> {
-        const response = await this.apiDevicesSuggestDeviceNameGetRaw();
-        return await response.value();
-    }
-
-    /**
-     */
-    async apiDevicesSuggestKeyGetRaw(): Promise<runtime.ApiResponse<DeviceConfigSuggestApiModel>> {
-        const queryParameters: runtime.HTTPQuery = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/api/devices/suggest_key`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        });
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => DeviceConfigSuggestApiModelFromJSON(jsonValue));
-    }
-
-    /**
-     */
-    async apiDevicesSuggestKeyGet(): Promise<DeviceConfigSuggestApiModel> {
-        const response = await this.apiDevicesSuggestKeyGetRaw();
         return await response.value();
     }
 
