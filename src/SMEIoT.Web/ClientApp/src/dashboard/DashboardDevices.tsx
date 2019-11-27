@@ -5,25 +5,19 @@ import Tooltip from "@material-ui/core/Tooltip";
 import Fab from "@material-ui/core/Fab";
 import * as React from "react";
 import AddIcon from "@material-ui/icons/Add";
-import Typography from "@material-ui/core/Typography";
-import Skeleton from "@material-ui/lab/Skeleton";
 import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Frame from "./Frame";
-import clsx from "clsx";
 import { Helmet } from "react-helmet";
 import BrokerCard from "../components/BrokerCard";
-import DeviceCard from "../components/DeviceCard";
 import DeviceBoard from "../components/DeviceBoard";
-import BannerNotice from "../components/BannerNotice";
 import {
   DeviceApiModel,
   DeviceApiModelFromJSON
 } from "smeiot-client";
-import moment from "moment";
-import { defineMessages, useIntl, FormattedMessage } from "react-intl";
+import { defineMessages, useIntl } from "react-intl";
 import {
   Link as ReachLink,
   LinkProps as ReachLinkProps,
@@ -97,6 +91,7 @@ const _DashboardDevices: React.FunctionComponent<IDashboardDevices> = ({
   const intl = useIntl();
   const loaded = true;
 
+
   const [devices, setDevices] = React.useState<Array<DeviceApiModel>>([
     DeviceApiModelFromJSON({
       name: "L401",
@@ -130,6 +125,24 @@ const _DashboardDevices: React.FunctionComponent<IDashboardDevices> = ({
     })
   ]);
 
+  const onContinueBannerClick = async (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    // setLoadingConnect(true);
+    // setActiveStep(1);
+    // setHandlingNext(false);
+    // if (unconnectedDeviceName !== null) {
+    //   const api = new DevicesApi(GetDefaultApiConfig());
+    //   const res = await api.apiDevicesNameGet({
+    //     name: unconnectedDeviceName
+    //   });
+    //   if (res !== null) {
+    //     setDevice(res);
+    //   }
+    // }
+    // setLoadingConnect(false);
+  };
+
   return (
     <Frame
       title={intl.formatMessage(messages.title)}
@@ -144,7 +157,7 @@ const _DashboardDevices: React.FunctionComponent<IDashboardDevices> = ({
             <Grid item xs={12}>
               <BrokerCard />
             </Grid>
-            <DeviceBoard devices={devices} loaded={true} />
+            <DeviceBoard onBannerClick={onContinueBannerClick} devices={devices} loaded={true} />
           </Grid>
           <Tooltip
             title={intl.formatMessage(messages.fabTooltip)}

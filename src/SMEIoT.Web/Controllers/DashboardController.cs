@@ -12,29 +12,5 @@ namespace SMEIoT.Web.Controllers
     {
       return View();
     }
-    
-    [HttpGet]
-    public IActionResult Sensors()
-    {
-      return View();
-    } 
-    
-    [HttpGet]
-    public IActionResult Users()
-    {
-      return View();
-    }
-
-    [HttpGet]
-    public IActionResult Mqtt()
-    {
-      return View();
-    }
-
-    [HttpGet]
-    public IActionResult Devices()
-    {
-      return View();
-    }
   }
 }

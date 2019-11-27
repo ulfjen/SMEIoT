@@ -59,6 +59,7 @@
     "@types/react-window": "^1.8.1",
     "jdenticon": "^2.2.0",
     "moment": "^2.24.0",
+    "query-string": "^6.9.0",
     "react": "^16.10.2",
     "react-dom": "^16.10.2",
     "react-helmet": "^6.0.0-beta",

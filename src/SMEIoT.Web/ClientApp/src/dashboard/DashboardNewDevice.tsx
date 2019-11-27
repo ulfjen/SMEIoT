@@ -1,27 +1,26 @@
-import Container from "@material-ui/core/Container";
 import * as React from "react";
 import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
-import Frame from "./Frame";
-import Paper from "@material-ui/core/Paper";
+import DashboardNewDeviceFrame from "./DashboardNewDeviceFrame";
 import Grid from "@material-ui/core/Grid";
-import Stepper from "@material-ui/core/Stepper";
-import Step from "@material-ui/core/Step";
-import StepLabel from "@material-ui/core/StepLabel";
-import IconButton from "@material-ui/core/IconButton";
-import CloseIcon from "@material-ui/icons/Close";
-import { Link, RouteComponentProps } from "@reach/router";
+import Paper from "@material-ui/core/Paper";
+import Skeleton from "@material-ui/lab/Skeleton";
+import Typography from "@material-ui/core/Typography";
+import { RouteComponentProps } from "@reach/router";
 import { Helmet } from "react-helmet";
-import { defineMessages, useIntl, IntlShape } from "react-intl";
-import DashboardNewDeviceStepCreate from "./DashboardNewDeviceStepCreate";
-import DashboardNewDeviceStepConnect from "./DashboardNewDeviceStepConnect";
-import DashboardNewDeviceStepConnectSensors from "./DashboardNewDeviceStepConnectSensors";
 import {
-  DeviceConfigBindingModel,
+  defineMessages,
+  useIntl,
+  FormattedMessage
+} from "react-intl";
+import BannerNotice from "../components/BannerNotice";
+import ProgressButton from "../components/ProgressButton";
+import SuggestTextField from "../components/SuggestTextField";
+import {
   DevicesApi,
-  DeviceApiModel
+  DeviceConfigBindingModel
 } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
 
@@ -40,6 +39,9 @@ const styles = ({ spacing }: Theme) =>
       display: "flex",
       overflow: "auto",
       flexDirection: "column"
+    },
+    loadingPanel: {
+      height: 200
     }
   });
 
@@ -53,184 +55,186 @@ const messages = defineMessages({
     description: "Used as title in the new device page on the dashboard",
     defaultMessage: "Connect with a new device"
   },
-  closeAriaLabel: {
-    id: "dashboard.devices.new.close",
-    description: "The aria label for close action",
-    defaultMessage: "Close this action"
+  nameLabel: {
+    id: "dashboard.devices.new.step1.name",
+    description: "The label for adding device name",
+    defaultMessage: "Device name"
   },
   keyLabel: {
     id: "dashboard.devices.new.step1.key",
     description: "The label for adding psk key",
     defaultMessage: "Key"
-  },
-  step1: {
-    id: "dashboard.devices.new.step1.label",
-    description: "The label for connecting device - step 1",
-    defaultMessage: "Create a key"
-  },
-  step2: {
-    id: "dashboard.devices.new.step2.label",
-    description: "The label for connecting device - step 2",
-    defaultMessage: "Install and connect"
-  },
-  step3: {
-    id: "dashboard.devices.new.step3.label",
-    description: "The label for connecting device - step 3",
-    defaultMessage: "Add sensors"
   }
 });
 
-function getSteps(intl: IntlShape) {
-  return [
-    intl.formatMessage(messages.step1),
-    intl.formatMessage(messages.step2),
-    intl.formatMessage(messages.step3)
-  ];
-}
-
 const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = ({
-  classes
+  classes,
+  navigate
 }) => {
   const intl = useIntl();
 
-  const [activeStep, setActiveStep] = React.useState(0);
-  const steps = getSteps(intl);
+  const [device, setDevice] = React.useState<DeviceConfigBindingModel>({});
   const [handlingNext, setHandlingNext] = React.useState<boolean>(false);
-  const [deviceConfig, setDeviceConfig] = React.useState<
-    DeviceConfigBindingModel
-  >({});
+  const [loading, setLoading] = React.useState<boolean>(true);
   const [unconnectedDeviceName, setUnconnectedDeviceName] = React.useState<
     string | null
   >(null);
-  const [device, setDevice] = React.useState<DeviceApiModel>({});
+  const api = new DevicesApi(GetDefaultApiConfig());
 
   const handleNext = async () => {
     setHandlingNext(true);
-    switch (activeStep) {
-      case 0:
-        const api = new DevicesApi(GetDefaultApiConfig());
-        const res = await api.apiDevicesBootstrapPost({
-          deviceConfigBindingModel: deviceConfig
-        });
-        if (res !== null) {
-          setDevice(res);
-        }
-        break;
-      case 1:
-        break;
-      case 2:
-        break;
-      default:
-        break;
-    }
-    setActiveStep(prevActiveStep => prevActiveStep + 1);
-    setHandlingNext(false);
-  };
-
-  const handleReset = () => {
-    setActiveStep(0);
-  };
-
-  const [loadingConnect, setLoadingConnect] = React.useState<boolean>(false);
-
-  const onConnectBannerClick = async (
-    event: React.MouseEvent<HTMLButtonElement>
-  ) => {
-    setLoadingConnect(true);
-    setActiveStep(1);
-    setHandlingNext(false);
-    if (unconnectedDeviceName !== null) {
-      const api = new DevicesApi(GetDefaultApiConfig());
-      const res = await api.apiDevicesNameGet({
-        name: unconnectedDeviceName
-      });
-      if (res !== null) {
-        setDevice(res);
+    const api = new DevicesApi(GetDefaultApiConfig());
+    const res = await api.apiDevicesBootstrapPost({
+      deviceConfigBindingModel: device
+    });
+    if (res !== null) {
+      setDevice(res);
+      if (navigate) {
+        navigate(`connect?name=${device.name}`);
       }
     }
-    setLoadingConnect(false);
   };
 
-  const getStepContent = () => {
-    switch (activeStep) {
-      case 0:
-        return (
-          <DashboardNewDeviceStepCreate
-            unconnectedDeviceName={unconnectedDeviceName}
-            setUnconnectedDeviceName={setUnconnectedDeviceName}
-            onBannerClick={onConnectBannerClick}
-            device={deviceConfig}
-            setDevice={setDeviceConfig}
-            handleNext={handleNext}
-            handlingNext={handlingNext}
-          />
-        );
-      case 1:
-        return (
-          <DashboardNewDeviceStepConnect
-            loading={loadingConnect}
-            device={device}
-            handleNext={handleNext}
-          />
-        );
-      case 2:
-        return (
-          <DashboardNewDeviceStepConnectSensors
-            handleNext={handleNext}
-            handleReset={handleReset}
-          />
-        );
-      default:
-        return "Unknown stepIndex";
+  const [suggestingDeviceName, setSuggestDeviceName] = React.useState<boolean>(
+    false
+  );
+  const onSuggestDeviceName: React.MouseEventHandler<HTMLButtonElement> = async event => {
+    setSuggestDeviceName(true);
+
+    const res = await api.apiDevicesConfigSuggestDeviceNameGet();
+
+    if (res.deviceName !== null) {
+      device.name = res.deviceName;
+      setDevice(device);
     }
+
+    setSuggestDeviceName(false);
   };
+
+  const onDeviceNameChange: React.ChangeEventHandler<
+    HTMLInputElement | HTMLTextAreaElement
+  > = event => {
+    device.name = event.target.value;
+    setDevice(device);
+  };
+
+  const [suggestingKey, setSuggestKey] = React.useState<boolean>(false);
+  const onSuggestKey: React.MouseEventHandler<HTMLButtonElement> = async event => {
+    setSuggestKey(true);
+
+    const res = await api.apiDevicesConfigSuggestKeyGet();
+
+    if (res.key !== null) {
+      device.key = res.key;
+    }
+
+    setSuggestKey(false);
+  };
+
+  const onKeyChange: React.ChangeEventHandler<
+    HTMLInputElement | HTMLTextAreaElement
+  > = event => {
+    device.key = event.target.value;
+    setDevice(device);
+  };
+
+  const onBannerClick = async (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    if (navigate) {
+      navigate(`connect?name=${unconnectedDeviceName}`);
+    }
+  }
 
   React.useEffect(() => {
-    // @ts-ignore
-    if (window.SMEIoTPreRendered && window.SMEIoTPreRendered["user"]) {
-      // @ts-ignore
-      // saveUser(window.SMEIoTPreRendered["user"]);
-    }
+    (async () => {
+      var res = await api.apiDevicesConfigSuggestBootstrapGet();
+      if (res.deviceName) {
+        device.name = res.deviceName;
+      }
+      if (res.key) {
+        device.key = res.key;
+      }
+      setDevice(device);
+      if (res.continuedConfigurationDevice) {
+        setUnconnectedDeviceName(res.continuedConfigurationDevice);
+      }
+      setLoading(false);
+    })();
   }, []);
 
   return (
-    <Frame
-      title={intl.formatMessage(messages.title)}
-      direction="ltr"
-      toolbarRight={
-        <IconButton
-          edge="end"
-          color="inherit"
-          aria-label={intl.formatMessage(messages.closeAriaLabel)}
-          to={"/dashboard/devices"}
-          component={Link}
-        >
-          <Helmet>
-            <title>{intl.formatMessage(messages.title)}</title>
-          </Helmet>
-          <CloseIcon />
-        </IconButton>
-      }
-      content={
-        <Container maxWidth="lg" className={classes.container}>
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <Paper className={classes.paper}>
-                <Stepper activeStep={activeStep} alternativeLabel>
-                  {steps.map(label => (
-                    <Step key={label}>
-                      <StepLabel>{label}</StepLabel>
-                    </Step>
-                  ))}
-                </Stepper>
-              </Paper>
-            </Grid>
+    <DashboardNewDeviceFrame activeStep={0}>
+      <Helmet>
+        <title>{intl.formatMessage(messages.title)}</title>
+      </Helmet>
+      {!loading && unconnectedDeviceName && (
+        <Grid item xs={12}>
+          <BannerNotice onClick={onBannerClick}>
+            <Typography component="p">
+              <FormattedMessage
+                id="dashboard.devices.new.step1.unconnected_notice"
+                description="Notice related with continuing connecting a device"
+                defaultMessage="Notice: your device {name} is not connected. Continue to connect instead of create a new one?"
+                values={{
+                  name: unconnectedDeviceName
+                }}
+              />
+            </Typography>
+          </BannerNotice>
+        </Grid>
+      )}
 
-            {getStepContent()}
-          </Grid>
-        </Container>
-      }
-    />
+      <Grid item xs={12}>
+        <Paper className={classes.paper}>
+          {loading ? (
+            <Skeleton variant="rect" className={classes.loadingPanel} />
+          ) : (
+            <div>
+              <p>
+                <FormattedMessage
+                  id="dashboard.devices.new.step1.notice"
+                  description="Notice related with how we can add a new device"
+                  defaultMessage="We create a pre-shared key (PSK) for your new device and install it in our MQTT broker. 
+              When your device connects with the broker with this key, you can add its sensor values in the dashboard.
+              Registed and unused keys are shown on the devices page. 
+              Notice: the MQTT broker will be reloaded to install the key."
+                />
+              </p>
+              <SuggestTextField
+                label={intl.formatMessage(messages.nameLabel)}
+                // autoFocus
+                value={device.name}
+                onChange={onDeviceNameChange}
+                onSuggest={onSuggestDeviceName}
+                suggesting={suggestingDeviceName}
+              />
+              <SuggestTextField
+                label={intl.formatMessage(messages.keyLabel)}
+                value={device.key}
+                onChange={onKeyChange}
+                onSuggest={onSuggestKey}
+                suggesting={suggestingKey}
+              />
+              <div>
+                <ProgressButton
+                  onClick={handleNext}
+                  loading={handlingNext}
+                  variant="contained"
+                  color="primary"
+                >
+                  <FormattedMessage
+                    id="dashboard.devices.new.control.create"
+                    description="The button text for creating devices"
+                    defaultMessage="Create"
+                  />
+                </ProgressButton>
+              </div>
+            </div>
+          )}
+        </Paper>
+      </Grid>
+    </DashboardNewDeviceFrame>
   );
 };
 

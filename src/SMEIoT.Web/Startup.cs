@@ -199,6 +199,7 @@ namespace SMEIoT.Web
         endpoints.MapControllerRoute("signup", "/signup", new { controller = "Users", action = "New" });
         endpoints.MapControllerRoute("edit_user", "/account", new { controller = "Users", action = "Edit" });
 
+        endpoints.MapControllerRoute("dashboard", "/dashboard/{*url}", new { controller = "Dashboard", action = "Index" });
 
         endpoints.MapControllerRoute(
           name: "default",

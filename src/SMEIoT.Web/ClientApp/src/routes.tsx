@@ -1,21 +1,23 @@
+import * as React from "react";
+import * as ReactDOM from "react-dom";
+import { Router } from "@reach/router";
+import { IntlProvider } from "react-intl";
+import ThemeProvider from "@material-ui/styles/ThemeProvider";
+import theme from "./theme";
 import NewUser from "./NewUser";
 import EditUser from "./EditUser";
 import SensorDetails from "./SensorDetails";
-import * as React from "react";
-import * as ReactDOM from "react-dom";
 import NewSession from "./NewSession";
 import DashboardUsers from "./dashboard/DashboardUsers";
 import DashboardSensors from "./dashboard/DashboardSensors";
 import DashboardDevices from "./dashboard/DashboardDevices";
 import DashboardEditUser from "./dashboard/DashboardEditUser";
 import DashboardIndex from "./dashboard/DashboardIndex";
-import theme from "./theme";
-import ThemeProvider from "@material-ui/styles/ThemeProvider";
-import { Router, Link } from "@reach/router";
 import DashboardMqtt from "./dashboard/DashboardMqtt";
 import DashboardNewSensor from "./dashboard/DashboardNewSensor";
 import DashboardNewDevice from "./dashboard/DashboardNewDevice";
-import { IntlProvider } from "react-intl";
+import DashboardNewDeviceConnect from "./dashboard/DashboardNewDeviceConnect";
+import DashboardNewDeviceConnectSensors from "./dashboard/DashboardNewDeviceConnectSensors";
 
 interface IAction {
   [action: string]: () => JSX.Element;
@@ -99,6 +101,8 @@ export namespace SMEIoT {
                 <DashboardIndex path="/dashboard"/>
                 <DashboardDevices path="/dashboard/devices" />
                 <DashboardNewDevice path="/dashboard/devices/new" />
+                <DashboardNewDeviceConnect path="/dashboard/devices/new/connect" />
+                <DashboardNewDeviceConnectSensors path="/dashboard/devices/new/connect_sensors" />
                 <DashboardSensors path="/dashboard/sensors" />
                 <DashboardNewSensor path="/dashboard/sensors/new" />
                 <DashboardMqtt path="/dashboard/mqtt" />

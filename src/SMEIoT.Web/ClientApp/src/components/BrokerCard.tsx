@@ -102,12 +102,12 @@ const _BrokerCard: React.FunctionComponent<IBrokerCard> = ({ classes }) => {
         subheader={""}
       />
       <CardContent>
-        <Typography variant="body2" color="textSecondary" component="p">
+        {/* <Typography variant="body2" color="textSecondary" component="p"> */}
           <span>Running</span>
           <p>Connected: </p>
           <p>Received bytes</p>
           <p>Received placeholder</p>
-        </Typography>
+        {/* </Typography> */}
       </CardContent>
       <CardActions disableSpacing>
         <Button

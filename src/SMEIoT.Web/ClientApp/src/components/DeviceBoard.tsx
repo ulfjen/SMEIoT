@@ -72,25 +72,16 @@ export interface IDeviceBoard
     WithStyles<typeof styles> {
   devices: Array<DeviceApiModel>;
   loaded: boolean;
+  onBannerClick: React.MouseEventHandler<HTMLButtonElement>;
 }
 
-const messages = defineMessages({
-  title: {
-    id: "dashboard.devices.index.title",
-    description: "Used as title in the devices index page on the dashboard",
-    defaultMessage: "Devices"
-  },
-  fabTooltip: {
-    id: "dashboard.devices.index.action.tooltip",
-    description: "The tooltip title and aria label for the action button",
-    defaultMessage: "Add"
-  }
-});
+const messages = defineMessages({});
 
 const _DeviceBoard: React.FunctionComponent<IDeviceBoard> = ({
   classes,
   devices,
-  loaded
+  loaded,
+  onBannerClick
 }) => {
   const intl = useIntl();
 
@@ -109,8 +100,8 @@ const _DeviceBoard: React.FunctionComponent<IDeviceBoard> = ({
 
   const renderDevices = () => {
     return devices.map((d: DeviceApiModel) => (
-      <Grid item xs={4}>
-        <DeviceCard device={d} key={d.name} onMoreClick={handleMoreClicked} />
+      <Grid item key={d.name} xs={4}>
+        <DeviceCard device={d} onMoreClick={handleMoreClicked} />
       </Grid>
     ));
   };
@@ -119,10 +110,16 @@ const _DeviceBoard: React.FunctionComponent<IDeviceBoard> = ({
     <React.Fragment>
       {unconnectedDeviceNames.length > 0 && (
         <Grid item xs={12}>
-          <BannerNotice to={null}>
+          <BannerNotice onClick={onBannerClick}>
             <Typography component="p">
-              notice: your device {unconnectedDeviceNames} is not connected.
-              Continue to connect one?
+              <FormattedMessage
+                id="dashboard.devices.index.unconnected_notice"
+                description="Notice related with continuing connecting devices"
+                defaultMessage="Notice: your devices {names} are not connected. Continue to connect instead of creating a new one?"
+                values={{
+                  name: unconnectedDeviceNames[0]
+                }}
+              />
             </Typography>
           </BannerNotice>
         </Grid>
