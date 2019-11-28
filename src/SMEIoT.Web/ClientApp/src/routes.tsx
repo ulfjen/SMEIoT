@@ -75,8 +75,8 @@ export const Routes: IController = {
   }
 };
 
-
-export namespace SMEIoT {
+// eslint-disable-next-line @typescript-eslint/no-namespace
+// export namespace SMEIoT {
 
   export class BodyRouter {
     public static bind(controller: string, action: string) {
@@ -128,6 +128,6 @@ export namespace SMEIoT {
       }
     }
   }
-}
+// }
 
 

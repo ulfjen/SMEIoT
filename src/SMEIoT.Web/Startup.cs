@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.AspNetCore.Mvc.Versioning.Conventions;
 using Microsoft.AspNetCore.Routing.Constraints;
-using Microsoft.AspNetCore.SpaServices.Webpack;
+using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Net.Http.Headers;
 using SMEIoT.Core.Entities;
 using SMEIoT.Infrastructure;
@@ -147,17 +147,13 @@ namespace SMEIoT.Web
       {
         app.UseDeveloperExceptionPage();
         app.UseDatabaseErrorPage();
-        app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
-        {
-          HotModuleReplacement = true,
-          ProjectPath = Path.Join(env.ContentRootPath, @"ClientApp")
-        });
       }
       else
       {
         app.UseExceptionHandler("/error");
         // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
         app.UseHsts();
+        app.UseSpaStaticFiles();
       }
 
       Hangfire.GlobalConfiguration.Configuration
@@ -204,8 +200,19 @@ namespace SMEIoT.Web
         endpoints.MapControllerRoute(
           name: "default",
           pattern: "{controller:slugify=Home}/{action:slugify=Index}/{id?}");
+
         endpoints.MapRazorPages();
         endpoints.MapHub<MqttHub>("/dashboard/mqtt_hub");
+      });
+
+      app.UseSpa(spa =>
+      {
+        spa.Options.SourcePath = "ClientApp";
+
+        if (env.IsDevelopment())
+        {
+          spa.UseProxyToSpaDevelopmentServer("http://localhost:3000");
+        }
       });
     }
   }

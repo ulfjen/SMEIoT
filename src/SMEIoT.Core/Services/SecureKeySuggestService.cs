@@ -5,7 +5,7 @@ namespace SMEIoT.Core.Services
 {
   public class SecureKeySuggestService : ISecureKeySuggestService
   {
-    public const int KeyLengthThreshold = 0;
+    public const int KeyLengthThreshold = 32;
 
     public string GenerateSecureKey(int length)
     {

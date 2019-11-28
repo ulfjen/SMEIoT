@@ -19,7 +19,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import { Link, RouteComponentProps } from '@reach/router';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
-import { SMEIoT } from "../avatars";
+import { Avatars } from "../avatars";
 
 const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Theme) => createStyles({
   container: {
@@ -76,7 +76,7 @@ const _DashboardEditUser: React.FunctionComponent<IDashboardEditUserProps> = ({ 
   
   const saveUser = (user: AdminUserApiModel) => {
     setUser(user);
-    setAvatar(SMEIoT.Avatars.create(user.username || ""));
+    setAvatar(Avatars.create(user.username || ""));
 
     if (user && user.roles && user.roles.indexOf("Admin") !== -1) {
       setAdmin(true);

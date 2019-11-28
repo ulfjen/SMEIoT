@@ -13,7 +13,7 @@ import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import Avatar from "@material-ui/core/Avatar";
 import {AdminUserApiModel} from "smeiot-client";
 import moment from "moment";
-import { SMEIoT } from "../avatars";
+import { Avatars } from "../avatars";
 
 const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Theme) => createStyles({
   container: {
@@ -30,7 +30,7 @@ export interface IUserListItemProps extends WithStyles<typeof styles> {
 
 const _UserListItem: React.FunctionComponent<IUserListItemProps & WithStyles<typeof styles>> = ({classes, user, setAnchorEl, setFocusedUsername}) => {
   const username = user.username || "";
-  const avatar = SMEIoT.Avatars.create(username);
+  const avatar = Avatars.create(username);
   const lastSeenAt = moment(user.lastSeenAt).fromNow();
   
   const onClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
