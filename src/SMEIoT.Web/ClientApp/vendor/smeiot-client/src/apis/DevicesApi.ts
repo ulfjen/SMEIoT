@@ -18,6 +18,9 @@ import {
     DeviceApiModel,
     DeviceApiModelFromJSON,
     DeviceApiModelToJSON,
+    DeviceApiModelList,
+    DeviceApiModelListFromJSON,
+    DeviceApiModelListToJSON,
     DeviceConfigBindingModel,
     DeviceConfigBindingModelFromJSON,
     DeviceConfigBindingModelToJSON,
@@ -34,6 +37,11 @@ import {
 
 export interface DevicesApiApiDevicesBootstrapPostRequest {
     deviceConfigBindingModel?: DeviceConfigBindingModel;
+}
+
+export interface DevicesApiApiDevicesGetRequest {
+    start?: number;
+    limit?: number;
 }
 
 export interface DevicesApiApiDevicesNameGetRequest {
@@ -170,6 +178,38 @@ export class DevicesApi extends runtime.BaseAPI {
      */
     async apiDevicesConfigSuggestSensorCandidatesGet(): Promise<SensorCandidatesApiModel> {
         const response = await this.apiDevicesConfigSuggestSensorCandidatesGetRaw();
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiDevicesGetRaw(requestParameters: DevicesApiApiDevicesGetRequest): Promise<runtime.ApiResponse<DeviceApiModelList>> {
+        const queryParameters: runtime.HTTPQuery = {};
+
+        if (requestParameters.start !== undefined) {
+            queryParameters['start'] = requestParameters.start;
+        }
+
+        if (requestParameters.limit !== undefined) {
+            queryParameters['limit'] = requestParameters.limit;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/devices`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => DeviceApiModelListFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiDevicesGet(requestParameters: DevicesApiApiDevicesGetRequest): Promise<DeviceApiModelList> {
+        const response = await this.apiDevicesGetRaw(requestParameters);
         return await response.value();
     }
 

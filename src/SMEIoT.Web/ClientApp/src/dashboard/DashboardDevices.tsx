@@ -12,11 +12,13 @@ import withStyles from "@material-ui/core/styles/withStyles";
 import Frame from "./Frame";
 import { Helmet } from "react-helmet";
 import BrokerCard from "../components/BrokerCard";
-import DeviceBoard from "../components/DeviceBoard";
+import DashboardDeviceBoard from "./DashboardDeviceBoard";
 import {
   DeviceApiModel,
-  DeviceApiModelFromJSON
+  DeviceApiModelFromJSON,
+  DevicesApi
 } from "smeiot-client";
+import { GetDefaultApiConfig } from "../index";
 import { defineMessages, useIntl } from "react-intl";
 import {
   Link as ReachLink,
@@ -89,59 +91,6 @@ const _DashboardDevices: React.FunctionComponent<IDashboardDevices> = ({
   classes
 }) => {
   const intl = useIntl();
-  const loaded = true;
-
-
-  const [devices, setDevices] = React.useState<Array<DeviceApiModel>>([
-    DeviceApiModelFromJSON({
-      name: "L401",
-      createdAt: "2019-01-01",
-      updatedAt: "2020-01-01",
-      authenticationType: 0,
-      preSharedKey: "aaaaaaaaaaaaaaaaaa111",
-      connected: true,
-      connectedAt: "2020-01-01",
-      lastMessageAt: "2020-01-01"
-    }),
-    DeviceApiModelFromJSON({
-      name: "L402",
-      createdAt: "2019-01-01",
-      updatedAt: "2020-01-01",
-      authenticationType: 0,
-      preSharedKey: "aaaaaaaaaaaaaaaaaa112",
-      connected: true,
-      connectedAt: "2020-01-01",
-      lastMessageAt: "2020-01-01"
-    }),
-    DeviceApiModelFromJSON({
-      name: "L403",
-      createdAt: "2019-01-01",
-      updatedAt: "2020-01-01",
-      authenticationType: 0,
-      preSharedKey: "aaaaaaaaaaaaaaaaaa112",
-      connected: false,
-      connectedAt: "2020-01-01",
-      lastMessageAt: "2020-01-01"
-    })
-  ]);
-
-  const onContinueBannerClick = async (
-    event: React.MouseEvent<HTMLButtonElement>
-  ) => {
-    // setLoadingConnect(true);
-    // setActiveStep(1);
-    // setHandlingNext(false);
-    // if (unconnectedDeviceName !== null) {
-    //   const api = new DevicesApi(GetDefaultApiConfig());
-    //   const res = await api.apiDevicesNameGet({
-    //     name: unconnectedDeviceName
-    //   });
-    //   if (res !== null) {
-    //     setDevice(res);
-    //   }
-    // }
-    // setLoadingConnect(false);
-  };
 
   return (
     <Frame
@@ -157,7 +106,7 @@ const _DashboardDevices: React.FunctionComponent<IDashboardDevices> = ({
             <Grid item xs={12}>
               <BrokerCard />
             </Grid>
-            <DeviceBoard onBannerClick={onContinueBannerClick} devices={devices} loaded={true} />
+            <DashboardDeviceBoard />
           </Grid>
           <Tooltip
             title={intl.formatMessage(messages.fabTooltip)}

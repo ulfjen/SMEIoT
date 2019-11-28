@@ -95,5 +95,21 @@ namespace SMEIoT.Web.Api.V1
     {
       return Ok(new DeviceConfigSuggestApiModel(_identifierSuggestService.GenerateRandomIdentifierForDevice(2)));
     }
+
+    [HttpGet("")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<DeviceApiModelList>> Index([FromQuery] int start = 1, [FromQuery] int limit = 10)
+    {
+      var list = new List<DeviceApiModel>();
+      await foreach (var device in _service.ListDevicesAsync(start, limit))
+      {
+        list.Add(new DeviceApiModel(device));
+      }
+
+      return Ok(new DeviceApiModelList(list));
+    }
+
   }
 }

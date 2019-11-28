@@ -52,7 +52,7 @@ const styles = ({
 
 export interface IDeviceCard extends WithStyles<typeof styles> {
   device: DeviceApiModel;
-  onMoreClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  onMoreClick: (event: React.MouseEvent<HTMLButtonElement>, deviceName?: string) => void;
 }
 
 const _DeviceCard: React.FunctionComponent<IDeviceCard &
@@ -67,11 +67,13 @@ const _DeviceCard: React.FunctionComponent<IDeviceCard &
     summary = "Device is not configured.";
   }
 
+  const onMoreClickHandler = (event: React.MouseEvent<HTMLButtonElement>) => onMoreClick(event, device.name);
+
   return (
     <Card className={clsx(classes.card, !device.connected && classes.notConnected)}>
       <CardHeader
         action={
-          <IconButton aria-label="settings" onClick={onMoreClick}>
+          <IconButton aria-label="settings" onClick={onMoreClickHandler}>
             <MoreVertIcon />
           </IconButton>
         }

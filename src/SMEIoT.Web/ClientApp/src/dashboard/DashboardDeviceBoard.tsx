@@ -11,10 +11,10 @@ import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import clsx from "clsx";
 import { Helmet } from "react-helmet";
-import BrokerCard from "./BrokerCard";
-import DeviceCard from "./DeviceCard";
-import BannerNotice from "./BannerNotice";
-import { DeviceApiModel, DeviceApiModelFromJSON } from "smeiot-client";
+import BrokerCard from "../components/BrokerCard";
+import DeviceCard from "../components/DeviceCard";
+import BannerNotice from "../components/BannerNotice";
+import { DeviceApiModel, DeviceApiModelFromJSON, DevicesApi } from "smeiot-client";
 import moment from "moment";
 import { defineMessages, useIntl, FormattedMessage } from "react-intl";
 import {
@@ -22,6 +22,7 @@ import {
   LinkProps as ReachLinkProps,
   RouteComponentProps
 } from "@reach/router";
+import { GetDefaultApiConfig } from "../index";
 
 const styles = ({
   palette,
@@ -67,36 +68,35 @@ const styles = ({
     }
   });
 
-export interface IDeviceBoard
-  extends RouteComponentProps,
-    WithStyles<typeof styles> {
-  devices: Array<DeviceApiModel>;
-  loaded: boolean;
-  onBannerClick: React.MouseEventHandler<HTMLButtonElement>;
+export interface IDashboardDeviceBoard
+  extends WithStyles<typeof styles> {
 }
 
 const messages = defineMessages({});
 
-const _DeviceBoard: React.FunctionComponent<IDeviceBoard> = ({
+interface IAnchoredDeviceCard
+{
+  element: HTMLElement;
+  deviceName: string;
+}
+
+const _DashboardDeviceBoard: React.FunctionComponent<IDashboardDeviceBoard> = ({
   classes,
-  devices,
-  loaded,
-  onBannerClick
 }) => {
   const intl = useIntl();
 
+  const [loading, setLoading] = React.useState<boolean>(true);
+  const [loadingError, setLoadingError] = React.useState<boolean>(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const handleMoreClicked = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const [anchoredDeviceName, setAnchoredDeviceName] = React.useState<string>("");
+  const handleMoreClicked = (event: React.MouseEvent<HTMLButtonElement>, deviceName?: string) => {
     setAnchorEl(event.currentTarget);
+    setAnchoredDeviceName(deviceName);
   };
 
   const handleClose = () => {
     setAnchorEl(null);
   };
-
-  const unconnectedDeviceNames = devices
-    .filter((d: DeviceApiModel) => !d.connected)
-    .map(d => d.name);
 
   const renderDevices = () => {
     return devices.map((d: DeviceApiModel) => (
@@ -106,25 +106,47 @@ const _DeviceBoard: React.FunctionComponent<IDeviceBoard> = ({
     ));
   };
 
+  const [devices, setDevices] = React.useState<Array<DeviceApiModel>>([]);
+
+  const unconnectedDeviceNames = devices
+    .filter((d: DeviceApiModel) => !d.connected)
+    .map(d => d.name);
+
+  React.useEffect(() => {
+    (async () => {
+      const api = new DevicesApi(GetDefaultApiConfig());
+      var res = await api.apiDevicesGet({
+        // start, limit
+      });
+      if (res !== null && res.devices) {
+        setDevices(res.devices);
+      } else {
+        setLoadingError(true);
+      }
+      setLoading(false);
+    })();
+  }, []);
+
+
   return (
     <React.Fragment>
       {unconnectedDeviceNames.length > 0 && (
         <Grid item xs={12}>
-          <BannerNotice onClick={onBannerClick}>
+          <BannerNotice to={`/dashboard/devices/new/connect?name=${unconnectedDeviceNames[0]}`}>
             <Typography component="p">
               <FormattedMessage
                 id="dashboard.devices.index.unconnected_notice"
                 description="Notice related with continuing connecting devices"
                 defaultMessage="Notice: your devices {names} are not connected. Continue to connect instead of creating a new one?"
                 values={{
-                  name: unconnectedDeviceNames[0]
+                  names: unconnectedDeviceNames.join(", ")
                 }}
               />
             </Typography>
           </BannerNotice>
         </Grid>
       )}
-      {loaded ? renderDevices() : <Skeleton variant="rect" height={4} />}
+      {loading ? <Skeleton variant="rect" height={4} /> : renderDevices()}
       <Menu
         anchorEl={anchorEl}
         keepMounted
@@ -133,7 +155,7 @@ const _DeviceBoard: React.FunctionComponent<IDeviceBoard> = ({
       >
         <MenuItem
           button
-          to="/dashboard/device/L401/edit"
+          to={`/dashboard/device/${anchoredDeviceName}/edit`}
           component={ReachLink}
           onClick={handleClose}
         >
@@ -162,6 +184,6 @@ const _DeviceBoard: React.FunctionComponent<IDeviceBoard> = ({
   );
 };
 
-const DeviceBoard = withStyles(styles)(_DeviceBoard);
+const DashboardDeviceBoard = withStyles(styles)(_DashboardDeviceBoard);
 
-export default DeviceBoard;
+export default DashboardDeviceBoard;

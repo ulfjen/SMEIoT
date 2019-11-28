@@ -5,6 +5,7 @@ export * from './BasicSensorApiModel';
 export * from './BasicUserApiModel';
 export * from './ConfirmedUserCredentialsUpdateBindingModel';
 export * from './DeviceApiModel';
+export * from './DeviceApiModelList';
 export * from './DeviceAuthenticationType';
 export * from './DeviceConfigBindingModel';
 export * from './DeviceConfigSuggestApiModel';

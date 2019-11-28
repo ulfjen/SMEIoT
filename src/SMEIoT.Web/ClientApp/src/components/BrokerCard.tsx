@@ -33,9 +33,7 @@ const styles = ({ transitions }: Theme) =>
     }
   });
 
-export interface IBrokerCard
-  extends RouteComponentProps,
-    WithStyles<typeof styles> {}
+export interface IBrokerCard extends WithStyles<typeof styles> { }
 
 const messages = defineMessages({
   broker: {
@@ -103,10 +101,10 @@ const _BrokerCard: React.FunctionComponent<IBrokerCard> = ({ classes }) => {
       />
       <CardContent>
         {/* <Typography variant="body2" color="textSecondary" component="p"> */}
-          <span>Running</span>
-          <p>Connected: </p>
-          <p>Received bytes</p>
-          <p>Received placeholder</p>
+        <span>Running</span>
+        <p>Connected: </p>
+        <p>Received bytes</p>
+        <p>Received placeholder</p>
         {/* </Typography> */}
       </CardContent>
       <CardActions disableSpacing>
