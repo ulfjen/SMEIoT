@@ -1,6 +1,5 @@
 import '@fortawesome/fontawesome-free/css/all.css';
 import './styles/site.scss';
-import {BodyRouter} from "./routes";
 import {Configuration} from "smeiot-client";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
@@ -22,14 +21,21 @@ import DashboardNewSensor from "./dashboard/DashboardNewSensor";
 import DashboardNewDevice from "./dashboard/DashboardNewDevice";
 import DashboardNewDeviceConnect from "./dashboard/DashboardNewDeviceConnect";
 import DashboardNewDeviceConnectSensors from "./dashboard/DashboardNewDeviceConnectSensors";
+import EnMessages from "./locales/en.json";
 
 export function GetDefaultApiConfig() {
   return new Configuration({basePath: "https://localhost:5001"});
 }
 let language = "en";
+let messages: Record<string, string>;
+switch (language) {
+  case "en":
+  default:
+    messages = EnMessages;
+}
 
 ReactDOM.render(
-  <IntlProvider locale={language}>
+  <IntlProvider locale={language} messages={messages}>
     <ThemeProvider theme={theme}>
       <Router>
         <DashboardIndex path="/dashboard"/>

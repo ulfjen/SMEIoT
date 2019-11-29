@@ -2,13 +2,11 @@
   "compilerOptions": {
     "outDir": "./wwwroot/dist/",
     "sourceMap": true,
-    "declaration": true,
-    "declarationMap": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
     "strictNullChecks": true,
     "module": "esnext",
-    "target": "es5",
+    "target": "es6",
     "lib": [
       "es2018",
       "dom",
