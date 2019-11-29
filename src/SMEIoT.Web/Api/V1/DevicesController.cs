@@ -19,6 +19,8 @@ namespace SMEIoT.Web.Api.V1
     private readonly IDeviceService _service;
     private readonly IDeviceSensorIdentifierSuggestService _identifierSuggestService;
     private readonly ISecureKeySuggestService _secureKeySuggestService;
+    private const int SecureKeyByteLength = 256;
+    private const int DefaultDeviceNameSuggestWordLength = 2;
 
     public DevicesController(
       ILogger<DevicesController> logger,
@@ -81,19 +83,23 @@ namespace SMEIoT.Web.Api.V1
     public async Task<ActionResult<DeviceConfigSuggestApiModel>> SuggestBootstrap()
     {
       var device = await _service.GetARandomUnconnectedDeviceAsync();
-      return Ok(new DeviceConfigSuggestApiModel(_identifierSuggestService.GenerateRandomIdentifierForDevice(2), _secureKeySuggestService.GenerateSecureKey(64), device?.Name));
+      return Ok(new DeviceConfigSuggestApiModel(
+        _identifierSuggestService.GenerateRandomIdentifierForDevice(DefaultDeviceNameSuggestWordLength),
+        _secureKeySuggestService.GenerateSecureKeyWithByteLength(SecureKeyByteLength),
+        device?.Name
+      ));
     }
 
     [HttpGet("config_suggest/key")]
     public async Task<ActionResult<DeviceConfigSuggestApiModel>> SuggestSecureKey()
     {
-      return Ok(new DeviceConfigSuggestApiModel(null, _secureKeySuggestService.GenerateSecureKey(64)));
+      return Ok(new DeviceConfigSuggestApiModel(null, _secureKeySuggestService.GenerateSecureKeyWithByteLength(SecureKeyByteLength)));
     }
 
     [HttpGet("config_suggest/device_name")]
     public async Task<ActionResult<DeviceConfigSuggestApiModel>> SuggestDeviceName()
     {
-      return Ok(new DeviceConfigSuggestApiModel(_identifierSuggestService.GenerateRandomIdentifierForDevice(2)));
+      return Ok(new DeviceConfigSuggestApiModel(_identifierSuggestService.GenerateRandomIdentifierForDevice(DefaultDeviceNameSuggestWordLength)));
     }
 
     [HttpGet("")]

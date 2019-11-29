@@ -13,17 +13,17 @@ namespace SMEIoT.Tests.Core.Services
     }
 
     [Fact]
-    public void GenerateSecureKey_ReturnsKey()
+    public void GenerateSecureKeyWithByteLength_ReturnsKey()
     {
       // arrange
       var service = BuildService();
 
       // act
-      var key = service.GenerateSecureKey(128);
+      var key = service.GenerateSecureKeyWithByteLength(128);
 
       // assert
       Assert.NotNull(key);
-      Assert.Equal(172, key.Length);
+      Assert.Equal(256, key.Length);
     }
   }
 }

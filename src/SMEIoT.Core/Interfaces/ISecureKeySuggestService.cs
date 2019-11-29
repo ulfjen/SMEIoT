@@ -2,6 +2,6 @@ namespace SMEIoT.Core.Interfaces
 {
   public interface ISecureKeySuggestService
   {
-    string GenerateSecureKey(int length);
+    string GenerateSecureKeyWithByteLength(int length);
   }
 }
