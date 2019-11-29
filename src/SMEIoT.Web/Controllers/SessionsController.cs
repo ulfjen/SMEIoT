@@ -83,7 +83,7 @@ namespace SMEIoT.Web.Controllers
       }
       else
       {
-        return RedirectToAction(nameof(DashboardController.Index), "Dashboard");
+        return Redirect("/dashboard");
       }
     }
   }
