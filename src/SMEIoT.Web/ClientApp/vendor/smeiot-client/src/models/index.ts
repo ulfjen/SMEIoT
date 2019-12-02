@@ -3,6 +3,7 @@ export * from './AdminUserApiModelList';
 export * from './AssignUserSensorBindingModel';
 export * from './BasicSensorApiModel';
 export * from './BasicUserApiModel';
+export * from './BrokerDetailsApiModel';
 export * from './ConfirmedUserCredentialsUpdateBindingModel';
 export * from './DeviceApiModel';
 export * from './DeviceApiModelList';

@@ -65,6 +65,7 @@ namespace SMEIoT.Infrastructure
       services.AddSingleton<IClock>(SystemClock.Instance);
       services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
       services.AddSingleton<IMqttIdentifierService, MqttIdentifierService>();
+      services.AddSingleton<IMosquittoBrokerService, MosquittoBrokerService>();
       services.AddSingleton<IFileProvider>(provider => {
         return env.ContentRootFileProvider;
       });

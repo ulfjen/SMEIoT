@@ -1,5 +1,5 @@
 export * from './AdminUsersApi';
-export * from './DashboardUsersApi';
+export * from './BrokerApi';
 export * from './DevicesApi';
 export * from './SensorAssignmentsApi';
 export * from './SensorsApi';

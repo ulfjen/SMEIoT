@@ -151,24 +151,31 @@
         }
       }
     },
-    "/dashboard/users/{username}": {
+    "/api/broker": {
       "get": {
         "tags": [
-          "DashboardUsers"
-        ],
-        "parameters": [
-          {
-            "name": "username",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
+          "Broker"
         ],
         "responses": {
           "200": {
-            "description": "Success"
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BrokerDetailsApiModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -1022,6 +1029,24 @@
             }
           },
           "createdAt": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "BrokerDetailsApiModel": {
+        "type": "object",
+        "properties": {
+          "statistics": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "running": {
+            "type": "boolean"
+          },
+          "lastUpdatedAt": {
             "type": "string"
           }
         },

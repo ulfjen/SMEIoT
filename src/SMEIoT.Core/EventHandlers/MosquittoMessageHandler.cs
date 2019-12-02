@@ -10,15 +10,20 @@ namespace SMEIoT.Core.EventHandlers
 {
   public class MosquittoMessageHandler : IMqttMessageObserver
   {
-    public const string SensorTopicPrefix = "pub/";
+    public const string SensorTopicPrefix = "iot/";
+    public const string BrokerTopicPrefix = "$SYS/broker/";
+    private const string SecondsPostfix = "seconds";
+
     private readonly List<IMqttMessageObserver> _observers = new List<IMqttMessageObserver>();
     private readonly IClock _clock;
     private readonly IMqttIdentifierService _mqttService;
+    private readonly IMosquittoBrokerService _brokerService;
 
-    public MosquittoMessageHandler(IClock clock, IMqttIdentifierService mqttService)
+    public MosquittoMessageHandler(IClock clock, IMqttIdentifierService mqttService, IMosquittoBrokerService brokerService)
     {
       _clock = clock;
       _mqttService = mqttService;
+      _brokerService = brokerService;
       Attach(this);
     }
 
@@ -75,6 +80,17 @@ namespace SMEIoT.Core.EventHandlers
         {
           // TODO: generates parsed error
         }
+      } else if (topic.StartsWith(BrokerTopicPrefix)) {
+        var parsed = topic.AsSpan();
+        parsed = parsed.Slice(BrokerTopicPrefix.Length);
+        var value = message.Payload.AsSpan();
+
+        if (value.EndsWith(SecondsPostfix)) {
+          value = value.Slice(0, value.Length - SecondsPostfix.Length).TrimEnd();
+        }
+        _brokerService.RegisterBrokerStatistics(parsed.ToString(), value.ToString());
+
+        _brokerService.SetBrokerRunningStatus(true, message.ReceivedAt);
       }
 
       // TODO: Sends a job into dispatch for storage
