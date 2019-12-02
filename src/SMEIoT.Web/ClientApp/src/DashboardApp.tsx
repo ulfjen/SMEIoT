@@ -15,6 +15,7 @@ import DashboardNewSensor from "./dashboard/DashboardNewSensor";
 import DashboardNewDevice from "./dashboard/DashboardNewDevice";
 import DashboardNewDeviceConnect from "./dashboard/DashboardNewDeviceConnect";
 import DashboardNewDeviceConnectSensors from "./dashboard/DashboardNewDeviceConnectSensors";
+import DashboardBrokerStatistics from "./dashboard/DashboardBrokerStatistics";
 import EnMessages from "./locales/en.json";
 
 export interface IDashboardApp {
@@ -51,6 +52,7 @@ const DashboardApp: React.FunctionComponent<IDashboardApp> = ({
       <Router>
         <DashboardIndex path="/dashboard" />
         <DashboardDevices path="/dashboard/devices" />
+        <DashboardBrokerStatistics path="/dashboard/broker_statistics" />
         <DashboardNewDevice path="/dashboard/devices/new" />
         <DashboardNewDeviceConnect path="/dashboard/devices/new/connect" />
         <DashboardNewDeviceConnectSensors path="/dashboard/devices/new/connect_sensors" />

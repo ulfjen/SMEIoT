@@ -21,7 +21,10 @@ import {
   LinkProps as ReachLinkProps,
   RouteComponentProps
 } from "@reach/router";
-import StatusBadge from "./StatusBadge";
+import StatusBadge from "../components/StatusBadge";
+import useInterval from "../helpers/useInterval";
+import { BrokerApi } from "smeiot-client";
+import { GetDefaultApiConfig } from "../index";
 
 const styles = ({ transitions }: Theme) =>
   createStyles({
@@ -74,10 +77,17 @@ const messages = defineMessages({
   }
 });
 
+interface BasicBrokerStatistics {
+  [receivedMessages: string]: string;
+}
+
 const _BrokerCard: React.FunctionComponent<IBrokerCard> = ({ classes }) => {
   const intl = useIntl();
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [running, setRunning] = React.useState<boolean>(false);
+  const [statistics, setStatistics] = React.useState<BasicBrokerStatistics>({
+  });
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -85,6 +95,19 @@ const _BrokerCard: React.FunctionComponent<IBrokerCard> = ({ classes }) => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const api = new BrokerApi(GetDefaultApiConfig());
+  const updateBroker = async () => {
+    let details = await api.apiBrokerGet();
+    if (details === null) { return; }
+    setRunning(details.running);
+    setStatistics({
+      receivedMessages: details.statistics["messages/received"]
+    });
+  }
+
+  useInterval(updateBroker, 10000);
+  React.useEffect(() => { updateBroker() }, []);
 
   return (
     <Card>
@@ -98,20 +121,18 @@ const _BrokerCard: React.FunctionComponent<IBrokerCard> = ({ classes }) => {
           </IconButton>
         }
         title={intl.formatMessage(messages.broker)}
-        subheader={<StatusBadge status="stopped">Stopped</StatusBadge>}
+        subheader={<StatusBadge status={running ? "running" : "stopped"}/>}
       />
       <CardContent>
         {/* <Typography variant="body2" color="textSecondary" component="p"> */}
-        <p>Connected: </p>
-        <p>Received bytes</p>
-        <p>Received placeholder</p>
+        <p>Received Messages {statistics.receivedMessages}</p>
         {/* </Typography> */}
       </CardContent>
       <CardActions disableSpacing>
         <Button
           size="small"
           component={ReachLink}
-          to="/dashboard/broker/statistics"
+          to="/dashboard/broker_statistics"
         >
           {intl.formatMessage(messages.statistics)}
         </Button>

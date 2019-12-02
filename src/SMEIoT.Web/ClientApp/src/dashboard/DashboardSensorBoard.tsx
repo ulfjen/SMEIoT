@@ -11,7 +11,7 @@ import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import clsx from "clsx";
 import { Helmet } from "react-helmet";
-import BrokerCard from "../components/BrokerCard";
+import BrokerCard from "./BrokerCard";
 import SensorCard from "../components/SensorCard";
 import BannerNotice from "../components/BannerNotice";
 import moment from "moment";
