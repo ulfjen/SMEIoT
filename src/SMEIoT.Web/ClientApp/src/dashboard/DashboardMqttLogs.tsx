@@ -76,7 +76,8 @@ const _DashboardMqttLogs: React.FunctionComponent<IDashboardMqttLogsProps> = ({ 
     createHubConnection();
   }, []);
 
-  return <Frame title="Dashboard" direction="ltr"
+  return <Frame direction="ltr"
+    title={intl.formatMessage(messages.title)}
     content={
       <Container maxWidth="lg" className={classes.container}>
         <Helmet>

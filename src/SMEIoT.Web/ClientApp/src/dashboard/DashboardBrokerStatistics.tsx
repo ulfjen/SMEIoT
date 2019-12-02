@@ -48,7 +48,7 @@ const styles = ({
 
 export interface IDashboardBrokerStatistics
   extends RouteComponentProps,
-    WithStyles<typeof styles> {}
+  WithStyles<typeof styles> { }
 
 const messages = defineMessages({
   title: {
@@ -89,7 +89,7 @@ const _DashboardBrokerStatistics: React.FunctionComponent<IDashboardBrokerStatis
           to={"/dashboard/devices"}
           component={ReachLink}
         >
-          <CloseIcon/>
+          <CloseIcon />
         </IconButton>
       }
       content={
@@ -98,24 +98,24 @@ const _DashboardBrokerStatistics: React.FunctionComponent<IDashboardBrokerStatis
             <title>{intl.formatMessage(messages.title)}</title>
           </Helmet>
           <Paper className={classes.paper}>
-        <Table className={classes.table} size="small" aria-label="a dense table">
-          <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell align="right">Value</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {Object.keys(statistics).sort().map(k => <TableRow key={k}>
-                <TableCell component="th" scope="row">
-                  {k}
-                </TableCell>
-                <TableCell align="right">{statistics[k]}</TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </Paper>
+            <Table className={classes.table} size="small" aria-label="a dense table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Name</TableCell>
+                  <TableCell align="right">Value</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {Object.keys(statistics).sort().map(k => <TableRow key={k}>
+                  <TableCell component="th" scope="row">
+                    {k}
+                  </TableCell>
+                  <TableCell align="right">{statistics[k]}</TableCell>
+                </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </Paper>
         </Container>
       }
     />
