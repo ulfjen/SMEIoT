@@ -21,6 +21,7 @@ import {
   LinkProps as ReachLinkProps,
   RouteComponentProps
 } from "@reach/router";
+import StatusBadge from "./StatusBadge";
 
 const styles = ({ transitions }: Theme) =>
   createStyles({
@@ -97,11 +98,10 @@ const _BrokerCard: React.FunctionComponent<IBrokerCard> = ({ classes }) => {
           </IconButton>
         }
         title={intl.formatMessage(messages.broker)}
-        subheader={""}
+        subheader={<StatusBadge status="stopped">Stopped</StatusBadge>}
       />
       <CardContent>
         {/* <Typography variant="body2" color="textSecondary" component="p"> */}
-        <span>Running</span>
         <p>Connected: </p>
         <p>Received bytes</p>
         <p>Received placeholder</p>
@@ -115,7 +115,7 @@ const _BrokerCard: React.FunctionComponent<IBrokerCard> = ({ classes }) => {
         >
           {intl.formatMessage(messages.statistics)}
         </Button>
-        <Button size="small" component={ReachLink} to="/dashboard/broker/logs">
+        <Button size="small" component={ReachLink} to="/dashboard/mqtt_logs">
           {intl.formatMessage(messages.logs)}
         </Button>
       </CardActions>

@@ -5,6 +5,7 @@ import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Frame from "./Frame";
 import Container from "@material-ui/core/Container";
+import Paper from "@material-ui/core/Paper";
 import ListItemLine from "../components/ListItemLine";
 import Grid from "@material-ui/core/Grid";
 import { Helmet } from "react-helmet";
@@ -12,6 +13,7 @@ import { Link, RouteComponentProps } from '@reach/router';
 import * as SignalR from "@microsoft/signalr";
 import { FixedSizeList, areEqual, ListChildComponentProps } from 'react-window';
 import { defineMessages, useIntl, FormattedMessage } from "react-intl";
+import StatusBadge from "../components/StatusBadge";
 
 const styles = ({ palette, spacing, transitions, zIndex, mixins, breakpoints }: Theme) => createStyles({
   container: {
@@ -21,6 +23,9 @@ const styles = ({ palette, spacing, transitions, zIndex, mixins, breakpoints }: 
   fixedHeight: {
     height: 240,
   },
+  paper: {
+    padding: spacing(4)
+  }
 });
 
 const DashboardMqttLogRenderer: React.FunctionComponent<ListChildComponentProps> = ({ data, index, style }) => {
@@ -31,20 +36,20 @@ export interface IDashboardMqttLogsProps extends RouteComponentProps, WithStyles
 
 }
 
+const messages = defineMessages({
+  title: {
+    id: "dashboard.mqtt_logs.index.title",
+    description: "Used as title in the mqtt logs page on the dashboard",
+    defaultMessage: "MQTT Logs"
+  },
+});
+
 const _DashboardMqttLogs: React.FunctionComponent<IDashboardMqttLogsProps> = ({ classes }) => {
   const intl = useIntl();
 
   const [hubConnection, setHubConnection] = React.useState<SignalR.HubConnection>();
   const [logs, setLogs] = React.useState<string[]>([]);
   const [length, setLength] = React.useState<number>(0);
-
-  const messages = defineMessages({
-    title: {
-      id: "dashboard.mqtt_logs.index.title",
-      description: "Used as title in the mqtt logs page on the dashboard",
-      defaultMessage: "MQTT Logs"
-    },
-  });
 
   React.useEffect(() => {
     const createHubConnection = async () => {
@@ -79,6 +84,14 @@ const _DashboardMqttLogs: React.FunctionComponent<IDashboardMqttLogsProps> = ({ 
         </Helmet>
         <Grid container spacing={3}>
           <Grid item xs={12}>
+            <Paper className={classes.paper}>
+              <h4>Broker</h4>
+              <StatusBadge status="running"></StatusBadge>
+            </Paper>
+            </Grid>
+          <Grid item xs={12}>
+            <Paper className={classes.paper}>
+
             <FixedSizeList
               height={400}
               itemCount={length}
@@ -88,6 +101,7 @@ const _DashboardMqttLogs: React.FunctionComponent<IDashboardMqttLogsProps> = ({ 
             >
               {DashboardMqttLogRenderer}
             </FixedSizeList>
+            </Paper>
           </Grid>
         </Grid>
       </Container>} />;
