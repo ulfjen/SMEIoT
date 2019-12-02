@@ -92,11 +92,13 @@ const _DashboardDevices: React.FunctionComponent<IDashboardDevices> = ({
 }) => {
   const intl = useIntl();
 
+  const [loading, setLoading] = React.useState<boolean>(true);
+  const [loadingError, setLoadingError] = React.useState<boolean>(false);
+
   return (
     <Frame
       title={intl.formatMessage(messages.title)}
       direction="ltr"
-      toolbarRight={null}
       content={
         <Container maxWidth="lg" className={classes.container}>
           <Helmet>

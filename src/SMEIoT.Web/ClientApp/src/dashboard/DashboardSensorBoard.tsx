@@ -11,9 +11,9 @@ import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import clsx from "clsx";
 import { Helmet } from "react-helmet";
-import BrokerCard from "./BrokerCard";
-import SensorCard from "./SensorCard";
-import BannerNotice from "./BannerNotice";
+import BrokerCard from "../components/BrokerCard";
+import SensorCard from "../components/SensorCard";
+import BannerNotice from "../components/BannerNotice";
 import moment from "moment";
 import { defineMessages, useIntl, FormattedMessage } from "react-intl";
 import {
@@ -21,8 +21,8 @@ import {
   LinkProps as ReachLinkProps,
   RouteComponentProps
 } from "@reach/router";
-import { SensorDetailsApiModel } from "smeiot-client";
-
+import { SensorDetailsApiModel, SensorsApi } from "smeiot-client";
+import { GetDefaultApiConfig } from "../index";
 
 const styles = ({
   palette,
@@ -68,11 +68,9 @@ const styles = ({
     }
   });
 
-export interface ISensorBoard
+export interface IDashboardSensorBoard
   extends RouteComponentProps,
     WithStyles<typeof styles> {
-  sensors: Array<SensorDetailsApiModel>;
-  loaded: boolean;
 }
 
 const messages = defineMessages({
@@ -88,13 +86,13 @@ const messages = defineMessages({
   }
 });
 
-const _SensorBoard: React.FunctionComponent<ISensorBoard> = ({
+const _DashboardSensorBoard: React.FunctionComponent<IDashboardSensorBoard> = ({
   classes,
-  sensors,
-  loaded
 }) => {
   const intl = useIntl();
 
+  const [loading, setLoading] = React.useState<boolean>(true);
+  const [loadingError, setLoadingError] = React.useState<boolean>(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const handleMoreClicked = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -103,6 +101,22 @@ const _SensorBoard: React.FunctionComponent<ISensorBoard> = ({
   const handleClose = () => {
     setAnchorEl(null);
   };
+  const [sensors, setSensors] = React.useState<Array<SensorDetailsApiModel>>([]);
+
+  React.useEffect(() => {
+    (async () => {
+      const api = new SensorsApi(GetDefaultApiConfig());
+      // var res = await api({
+      //   // start, limit
+      // });
+      // if (res !== null && res.sensors) {
+      //   setSensors(res.devices);
+      // } else {
+      //   setLoadingError(true);
+      // }
+      setLoading(false);
+    })();
+  }, []);
 
   const renderSensors = () => {
     return sensors.map((s: SensorDetailsApiModel) => (
@@ -114,7 +128,7 @@ const _SensorBoard: React.FunctionComponent<ISensorBoard> = ({
 
   return (
     <React.Fragment>
-      {loaded ? renderSensors() : <Skeleton variant="rect" height={4} />}
+      {loading ? <Skeleton variant="rect" height={4}/> : renderSensors()}
       <Menu
         anchorEl={anchorEl}
         keepMounted
@@ -152,6 +166,6 @@ const _SensorBoard: React.FunctionComponent<ISensorBoard> = ({
   );
 };
 
-const SensorBoard = withStyles(styles)(_SensorBoard);
+const DashboardSensorBoard = withStyles(styles)(_DashboardSensorBoard);
 
-export default SensorBoard;
+export default DashboardSensorBoard;

@@ -33,10 +33,8 @@ const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Th
     paddingBottom: spacing(4),
   },
   list: {
-    backgroundColor: "#ffffff"
   },
   filterBar: {
-    backgroundColor: "#ffffff",
     display: 'flex',
     flexWrap: 'wrap',
     '& > *': {

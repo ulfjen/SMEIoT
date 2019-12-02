@@ -63,7 +63,6 @@ const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Th
     height: '100vh',
     overflow: 'auto',
     padding: spacing(3),
-    backgroundColor: "#fafafa"
   },
 
 });
@@ -71,8 +70,8 @@ const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Th
 export interface IFrameProps extends WithStyles<typeof styles> {
   title: string;
   direction: string;
-  content: null | React.ReactNode;
-  toolbarRight: null | React.ReactNode;
+  content: React.ReactNode;
+  toolbarRight?: React.ReactNode;
 }
 
 const _Frame: React.FunctionComponent<IFrameProps> = ({classes, title, direction, content, toolbarRight}) => {
@@ -88,7 +87,7 @@ const _Frame: React.FunctionComponent<IFrameProps> = ({classes, title, direction
     // @ts-ignore
     currentUser = window.SMEIoTPreRendered["currentUser"];
   }
-  if (toolbarRight === null) {
+  if (toolbarRight === undefined || toolbarRight === null) {
     toolbarRight = <UserAvatarMenu user={currentUser} />;
   }
 

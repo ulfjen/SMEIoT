@@ -74,12 +74,6 @@ export interface IDashboardDeviceBoard
 
 const messages = defineMessages({});
 
-interface IAnchoredDeviceCard
-{
-  element: HTMLElement;
-  deviceName: string;
-}
-
 const _DashboardDeviceBoard: React.FunctionComponent<IDashboardDeviceBoard> = ({
   classes,
 }) => {
@@ -100,7 +94,7 @@ const _DashboardDeviceBoard: React.FunctionComponent<IDashboardDeviceBoard> = ({
 
   const renderDevices = () => {
     return devices.map((d: DeviceApiModel) => (
-      <Grid item key={d.name} xs={4}>
+      <Grid item key={d.name} xs={6} sm={4}>
         <DeviceCard device={d} onMoreClick={handleMoreClicked} />
       </Grid>
     ));

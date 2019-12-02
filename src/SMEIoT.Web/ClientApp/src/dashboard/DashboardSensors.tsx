@@ -11,11 +11,7 @@ import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Frame from "./Frame";
 import clsx from "clsx";
-import UserAvatarMenu from "../components/UserAvatarMenu";
-import { BasicUserApiModel, SensorDetailsApiModel, SensorDetailsApiModelFromJSON } from "smeiot-client";
-import moment from "moment";
-import SensorCard from "../components/SensorCard";
-import SensorBoard from "../components/SensorBoard";
+import DashboardSensorBoard from "./DashboardSensorBoard";
 import { defineMessages, useIntl, FormattedMessage } from "react-intl";
 import { Link, RouteComponentProps } from "@reach/router";
 import { Helmet } from "react-helmet";
@@ -70,30 +66,19 @@ const _DashboardSensors: React.FunctionComponent<IDashboardSensors> = ({
   classes
 }) => {
   const intl = useIntl();
-  const [sensors, setSensors] = React.useState<Array<SensorDetailsApiModel>>([
-    SensorDetailsApiModelFromJSON({
-      values: [0.1, 0.2, 0.33],
-      sensorName: "L401/temp1"
-    }),
-    SensorDetailsApiModelFromJSON({
-      values: [0.14, 0.22, 0.33],
-      sensorName: "L401/temp2"
-    })
-  ]);
 
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
   return (
     <Frame
       title="Sensors"
       direction="ltr"
-      toolbarRight={null}
       content={
         <Container maxWidth="lg" className={classes.container}>
           <Helmet>
             <title>{intl.formatMessage(messages.title)}</title>
           </Helmet>
           <Grid container spacing={3}>
-            <SensorBoard sensors={sensors} loaded={true} />
+            <DashboardSensorBoard />
           </Grid>
           <Tooltip
             title={intl.formatMessage(messages.fabTooltip)}
