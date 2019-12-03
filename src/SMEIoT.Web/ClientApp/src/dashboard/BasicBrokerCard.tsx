@@ -88,8 +88,6 @@ const _BasicBrokerCard: React.FunctionComponent<IBasicBrokerCard> = ({ classes }
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [running, setRunning] = React.useState<boolean>(false);
-  const [statistics, setStatistics] = React.useState<BasicBrokerStatistics>({
-  });
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -103,9 +101,6 @@ const _BasicBrokerCard: React.FunctionComponent<IBasicBrokerCard> = ({ classes }
     let details = await api.apiBrokerBasicGet();
     if (details === null) { return; }
     setRunning(details.running);
-    setStatistics({
-      receivedMessages: ""
-    });
   }
 
   useInterval(updateBroker, 10000);
@@ -113,7 +108,7 @@ const _BasicBrokerCard: React.FunctionComponent<IBasicBrokerCard> = ({ classes }
 
   return (
     <Card>
-      <CardActionArea className={classes.action}>
+      <CardActionArea className={classes.action} component={ReachLink} to={"/dashboard/devices"}>
         {intl.formatMessage(messages.broker)}
         <StatusBadge status={running ? "running" : "stopped"}/>
       </CardActionArea>

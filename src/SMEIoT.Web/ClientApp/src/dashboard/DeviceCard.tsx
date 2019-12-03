@@ -86,14 +86,14 @@ const _DeviceCard: React.FunctionComponent<IDeviceCard &
         </Typography>
       </CardContent>
       <CardActions disableSpacing>
-        <Button size="small" component={ReachLink} to="/dashboard/sensors?device=L401">
+        <Button size="small" component={ReachLink} to={`/dashboard/sensors?device_name=${device.name}`}>
           <FormattedMessage
             id="dashboard.device.actions.see_sensor"
             description="The action to go to see sensors in the device card."
             defaultMessage="Sensors"
           />
         </Button>
-        <Button size="small" component={ReachLink} to="/dashboard/broker/logs?device_name=L401">
+        <Button size="small" component={ReachLink} to={`/dashboard/broker/logs?device_name=${device.name}`}>
           <FormattedMessage
             id="dashboard.device.actions.logs"
             description="The action for device cards."
