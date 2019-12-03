@@ -93,7 +93,7 @@ const _DeviceCard: React.FunctionComponent<IDeviceCard &
             defaultMessage="Sensors"
           />
         </Button>
-        <Button size="small" component={ReachLink} to="/dashboard/logs?device=L401">
+        <Button size="small" component={ReachLink} to="/dashboard/broker/logs?device_name=L401">
           <FormattedMessage
             id="dashboard.device.actions.logs"
             description="The action for device cards."

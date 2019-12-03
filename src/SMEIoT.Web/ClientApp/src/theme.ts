@@ -17,11 +17,6 @@ const palette = {
   error: {
     main: red.A400,
   },
-  background: {
-    light: '#fff',
-    main: '#efefef',
-    dark: "#000"
-  },
 };
 
 export default palette;

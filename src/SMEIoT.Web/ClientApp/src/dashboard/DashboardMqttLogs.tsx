@@ -14,6 +14,7 @@ import * as SignalR from "@microsoft/signalr";
 import { FixedSizeList, areEqual, ListChildComponentProps } from 'react-window';
 import { defineMessages, useIntl, FormattedMessage } from "react-intl";
 import StatusBadge from "../components/StatusBadge";
+import DashboardBrokerFrame from "./DashboardBrokerFrame";
 
 const styles = ({ palette, spacing, transitions, zIndex, mixins, breakpoints }: Theme) => createStyles({
   container: {
@@ -76,36 +77,23 @@ const _DashboardMqttLogs: React.FunctionComponent<IDashboardMqttLogsProps> = ({ 
     createHubConnection();
   }, []);
 
-  return <Frame direction="ltr"
-    title={intl.formatMessage(messages.title)}
-    content={
-      <Container maxWidth="lg" className={classes.container}>
-        <Helmet>
-          <title>{intl.formatMessage(messages.title)}</title>
-        </Helmet>
-        <Grid container spacing={3}>
-          <Grid item xs={12}>
-            <Paper className={classes.paper}>
-              <h4>Broker</h4>
-              <StatusBadge status="running"></StatusBadge>
-            </Paper>
-            </Grid>
-          <Grid item xs={12}>
-            <Paper className={classes.paper}>
+  return <DashboardBrokerFrame
+    title={intl.formatMessage(messages.title)}>
+    <Grid item xs={12}>
+      <Paper className={classes.paper}>
 
-            <FixedSizeList
-              height={400}
-              itemCount={length}
-              itemData={logs}
-              itemSize={35}
-              width={"100%"}
-            >
-              {DashboardMqttLogRenderer}
-            </FixedSizeList>
-            </Paper>
-          </Grid>
-        </Grid>
-      </Container>} />;
+        <FixedSizeList
+          height={400}
+          itemCount={length}
+          itemData={logs}
+          itemSize={35}
+          width={"100%"}
+        >
+          {DashboardMqttLogRenderer}
+        </FixedSizeList>
+      </Paper>
+    </Grid>
+  </DashboardBrokerFrame>
 };
 
 const DashboardMqttLogs = withStyles(styles)(_DashboardMqttLogs);

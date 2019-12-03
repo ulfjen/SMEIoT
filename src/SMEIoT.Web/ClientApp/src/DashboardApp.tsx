@@ -1,3 +1,4 @@
+import "./styles/site.scss";
 import * as React from "react";
 import { Router } from "@reach/router"
 import { IntlProvider } from "react-intl";
@@ -52,13 +53,13 @@ const DashboardApp: React.FunctionComponent<IDashboardApp> = ({
       <Router>
         <DashboardIndex path="/dashboard" />
         <DashboardDevices path="/dashboard/devices" />
-        <DashboardBrokerStatistics path="/dashboard/broker_statistics" />
+        <DashboardBrokerStatistics path="/dashboard/broker/statistics" />
         <DashboardNewDevice path="/dashboard/devices/new" />
         <DashboardNewDeviceConnect path="/dashboard/devices/new/connect" />
         <DashboardNewDeviceConnectSensors path="/dashboard/devices/new/connect_sensors" />
         <DashboardSensors path="/dashboard/sensors" />
         <DashboardNewSensor path="/dashboard/sensors/new" />
-        <DashboardMqttLogs path="/dashboard/mqtt_logs" />
+        <DashboardMqttLogs path="/dashboard/broker/logs" />
         <DashboardUsers path="/dashboard/users" />
         <DashboardEditUser path="/dashboard/users/:username" />
       </Router>

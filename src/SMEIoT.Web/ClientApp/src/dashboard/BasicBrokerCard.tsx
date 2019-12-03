@@ -3,9 +3,8 @@ import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
-import Typography from "@material-ui/core/Typography";
 import Card from "@material-ui/core/Card";
-import Menu from "@material-ui/core/Menu";
+import CardActionArea from "@material-ui/core/CardActionArea";
 import MenuItem from "@material-ui/core/MenuItem";
 import CardHeader from "@material-ui/core/CardHeader";
 import CardContent from "@material-ui/core/CardContent";
@@ -26,7 +25,7 @@ import useInterval from "../helpers/useInterval";
 import { BrokerApi } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
 
-const styles = ({ transitions }: Theme) =>
+const styles = ({ transitions, spacing }: Theme) =>
   createStyles({
     expand: {
       transform: "rotate(0deg)",
@@ -34,10 +33,13 @@ const styles = ({ transitions }: Theme) =>
       transition: transitions.create("transform", {
         duration: transitions.duration.shortest
       })
+    },
+    action: {
+      padding: spacing(2),
     }
   });
 
-export interface IBrokerCard extends WithStyles<typeof styles> { }
+export interface IBasicBrokerCard extends WithStyles<typeof styles> { }
 
 const messages = defineMessages({
   broker: {
@@ -81,7 +83,7 @@ interface BasicBrokerStatistics {
   [receivedMessages: string]: string;
 }
 
-const _BrokerCard: React.FunctionComponent<IBrokerCard> = ({ classes }) => {
+const _BasicBrokerCard: React.FunctionComponent<IBasicBrokerCard> = ({ classes }) => {
   const intl = useIntl();
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -111,72 +113,14 @@ const _BrokerCard: React.FunctionComponent<IBrokerCard> = ({ classes }) => {
 
   return (
     <Card>
-      <CardHeader
-        action={
-          <IconButton
-            aria-label={intl.formatMessage(messages.more)}
-            onClick={handleClick}
-          >
-            <MoreVertIcon />
-          </IconButton>
-        }
-        title={intl.formatMessage(messages.broker)}
-        subheader={<StatusBadge status={running ? "running" : "stopped"}/>}
-      />
-      <CardContent>
-        {/* <Typography variant="body2" color="textSecondary" component="p"> */}
-        <p>Received Messages {statistics.receivedMessages}</p>
-        {/* </Typography> */}
-      </CardContent>
-      <CardActions disableSpacing>
-        <Button
-          size="small"
-          component={ReachLink}
-          to="/dashboard/broker/statistics"
-        >
-          {intl.formatMessage(messages.statistics)}
-        </Button>
-        <Button size="small" component={ReachLink} to="/dashboard/broker/logs">
-          {intl.formatMessage(messages.logs)}
-        </Button>
-      </CardActions>
-      <Menu
-        anchorEl={anchorEl}
-        keepMounted
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
-      >
-        <MenuItem
-          button
-          to="/dashboard/broker/config"
-          component={ReachLink}
-          onClick={handleClose}
-        >
-          <FormattedMessage
-            id="dashboard.broker.actions.config"
-            description="The action for editing config file on the broker block."
-            defaultMessage="Config"
-          />
-        </MenuItem>
-        <MenuItem button onClick={handleClose}>
-          <FormattedMessage
-            id="dashboard.broker.actions.reload"
-            description="The action for reloading config file on the broker block."
-            defaultMessage="Reload"
-          />
-        </MenuItem>
-        <MenuItem button onClick={handleClose}>
-          <FormattedMessage
-            id="dashboard.broker.actions.restart"
-            description="The action for restarting config file on the broker block."
-            defaultMessage="Restart"
-          />
-        </MenuItem>
-      </Menu>
+      <CardActionArea className={classes.action}>
+        {intl.formatMessage(messages.broker)}
+        <StatusBadge status={running ? "running" : "stopped"}/>
+      </CardActionArea>
     </Card>
   );
 };
 
-const BrokerCard = withStyles(styles)(_BrokerCard);
+const BasicBrokerCard = withStyles(styles)(_BasicBrokerCard);
 
-export default BrokerCard;
+export default BasicBrokerCard;

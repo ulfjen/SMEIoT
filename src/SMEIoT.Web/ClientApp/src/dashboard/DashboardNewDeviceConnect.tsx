@@ -16,6 +16,8 @@ import {
 import { GetDefaultApiConfig } from "../index";
 import DashboardNewDeviceFrame from "./DashboardNewDeviceFrame";
 import extractParamFromQuery from "../helpers/extractParamFromQuery";
+import BlockCode from "../components/BlockCode";
+import LineCode from "../components/LineCode";
 import {
   defineMessages,
   useIntl,
@@ -32,6 +34,10 @@ const styles = ({ spacing }: Theme) =>
     },
     loadingPanel: {
       height: 200
+    },
+    blockCode: {
+      whiteSpace: "pre-wrap",
+      wordWrap: "break-word"
     }
   });
 
@@ -116,18 +122,21 @@ const _DashboardNewDeviceConnect: React.FunctionComponent<IDashboardNewDeviceCon
                 }}
               />)
              : 
+             <div>
               <FormattedMessage
                 id="dashboard.devices.new.step2.notice"
                 description="Notice related when we wait for new connection"
                 defaultMessage="Now you can copy the key to your device and start to connect with the broker.
             Once we receive a new message from the broker, we will prompt you to continue.
-            Your device's name is: {name}.
-            Your device's key is: {key}."
+            Your device's name is {name}.
+            Your device's key is shown below.
+            {code}"
                 values={{
-                  name: device.name,
-                  key: device.preSharedKey
+                  name: <LineCode>{device.name}</LineCode>,
+                  code: <BlockCode>{device.preSharedKey}</BlockCode>
                 }}
               />
+              </div>
             }
             <div>
                 <Button
