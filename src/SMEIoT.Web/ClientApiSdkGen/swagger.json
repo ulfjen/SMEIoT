@@ -151,7 +151,7 @@
         }
       }
     },
-    "/api/broker": {
+    "/api/broker/basic": {
       "get": {
         "tags": [
           "Broker"
@@ -162,7 +162,36 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BrokerDetailsApiModel"
+                  "$ref": "#/components/schemas/BasicBrokerApiModel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/broker/statistics": {
+      "get": {
+        "tags": [
+          "Broker"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BrokerStatisticsApiModel"
                 }
               }
             }
@@ -1034,7 +1063,19 @@
         },
         "additionalProperties": false
       },
-      "BrokerDetailsApiModel": {
+      "BasicBrokerApiModel": {
+        "type": "object",
+        "properties": {
+          "running": {
+            "type": "boolean"
+          },
+          "lastUpdatedAt": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "BrokerStatisticsApiModel": {
         "type": "object",
         "properties": {
           "statistics": {
@@ -1042,12 +1083,6 @@
             "additionalProperties": {
               "type": "string"
             }
-          },
-          "running": {
-            "type": "boolean"
-          },
-          "lastUpdatedAt": {
-            "type": "string"
           }
         },
         "additionalProperties": false

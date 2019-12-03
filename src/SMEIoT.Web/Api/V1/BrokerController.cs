@@ -26,14 +26,25 @@ namespace SMEIoT.Web.Api.V1
       _service = service;
     }
 
-    [HttpGet("")]
+    [HttpGet("basic")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<BrokerDetailsApiModel>> Index()
+    public async Task<ActionResult<BasicBrokerApiModel>> ShowBasic()
     {
       var statistics = _service.ListBrokerStatistics();
-      var res = new BrokerDetailsApiModel(statistics, _service.BrokerRunning, _service.BrokerLastUpdatedAt);
+      var res = new BasicBrokerApiModel(_service.BrokerRunning, _service.BrokerLastUpdatedAt, statistics);
+      return Ok(res);
+    }
+
+    [HttpGet("statistics")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<BrokerStatisticsApiModel>> ShowStatistics()
+    {
+      var statistics = _service.ListBrokerStatistics();
+      var res = new BrokerStatisticsApiModel(statistics);
       return Ok(res);
     }
   }

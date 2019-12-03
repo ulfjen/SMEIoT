@@ -15,9 +15,12 @@
 
 import * as runtime from '../runtime';
 import {
-    BrokerDetailsApiModel,
-    BrokerDetailsApiModelFromJSON,
-    BrokerDetailsApiModelToJSON,
+    BasicBrokerApiModel,
+    BasicBrokerApiModelFromJSON,
+    BasicBrokerApiModelToJSON,
+    BrokerStatisticsApiModel,
+    BrokerStatisticsApiModelFromJSON,
+    BrokerStatisticsApiModelToJSON,
     ProblemDetails,
     ProblemDetailsFromJSON,
     ProblemDetailsToJSON,
@@ -30,25 +33,49 @@ export class BrokerApi extends runtime.BaseAPI {
 
     /**
      */
-    async apiBrokerGetRaw(): Promise<runtime.ApiResponse<BrokerDetailsApiModel>> {
+    async apiBrokerBasicGetRaw(): Promise<runtime.ApiResponse<BasicBrokerApiModel>> {
         const queryParameters: runtime.HTTPQuery = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/api/broker`,
+            path: `/api/broker/basic`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
         });
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => BrokerDetailsApiModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => BasicBrokerApiModelFromJSON(jsonValue));
     }
 
     /**
      */
-    async apiBrokerGet(): Promise<BrokerDetailsApiModel> {
-        const response = await this.apiBrokerGetRaw();
+    async apiBrokerBasicGet(): Promise<BasicBrokerApiModel> {
+        const response = await this.apiBrokerBasicGetRaw();
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiBrokerStatisticsGetRaw(): Promise<runtime.ApiResponse<BrokerStatisticsApiModel>> {
+        const queryParameters: runtime.HTTPQuery = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/broker/statistics`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => BrokerStatisticsApiModelFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiBrokerStatisticsGet(): Promise<BrokerStatisticsApiModel> {
+        const response = await this.apiBrokerStatisticsGetRaw();
         return await response.value();
     }
 
