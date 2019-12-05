@@ -1071,6 +1071,18 @@
           },
           "lastUpdatedAt": {
             "type": "string"
+          },
+          "min1": {
+            "type": "number",
+            "format": "double"
+          },
+          "min5": {
+            "type": "number",
+            "format": "double"
+          },
+          "min15": {
+            "type": "number",
+            "format": "double"
           }
         },
         "additionalProperties": false

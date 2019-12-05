@@ -32,8 +32,8 @@ namespace SMEIoT.Web.Api.V1
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<BasicBrokerApiModel>> ShowBasic()
     {
-      var statistics = _service.ListBrokerStatistics();
-      var res = new BasicBrokerApiModel(_service.BrokerRunning, _service.BrokerLastUpdatedAt, statistics);
+      var loads = _service.GetBrokerLoads();
+      var res = new BasicBrokerApiModel(_service.BrokerRunning, _service.BrokerLastUpdatedAt, loads);
       return Ok(res);
     }
 

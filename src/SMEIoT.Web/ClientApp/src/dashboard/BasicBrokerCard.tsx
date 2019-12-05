@@ -5,15 +5,9 @@ import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Card from "@material-ui/core/Card";
 import CardActionArea from "@material-ui/core/CardActionArea";
-import MenuItem from "@material-ui/core/MenuItem";
-import CardHeader from "@material-ui/core/CardHeader";
-import CardContent from "@material-ui/core/CardContent";
-import CardActions from "@material-ui/core/CardActions";
+import Avatar from "@material-ui/core/Avatar";
 import IconButton from "@material-ui/core/IconButton";
-import Button from "@material-ui/core/Button";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
-import AssessmentIcon from "@material-ui/icons/Assessment";
-import NotesIcon from "@material-ui/icons/Notes";
+import Typography from "@material-ui/core/Typography";
 import { defineMessages, useIntl, FormattedMessage } from "react-intl";
 import {
   Link as ReachLink,
@@ -24,83 +18,53 @@ import StatusBadge from "../components/StatusBadge";
 import useInterval from "../helpers/useInterval";
 import { BrokerApi } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
+import { ReactComponent as Broker } from "../images/broker.svg";
+import LoadFactors from "../components/LoadFactors";
 
 const styles = ({ transitions, spacing }: Theme) =>
   createStyles({
-    expand: {
-      transform: "rotate(0deg)",
-      marginLeft: "auto",
-      transition: transitions.create("transform", {
-        duration: transitions.duration.shortest
-      })
-    },
-    action: {
+    root: {
       padding: spacing(2),
+    },
+    container: {
+      display: 'flex',
+      alignItems: "baseline",
+    },
+    media: {
+      height: "60%",
+      filter: "brightness(0) invert(1)"
+    },
+    status: {
+      marginLeft: "auto",
     }
   });
 
 export interface IBasicBrokerCard extends WithStyles<typeof styles> { }
 
-const messages = defineMessages({
-  broker: {
-    id: "dashboard.broker.title",
-    description: "The broker block title on the dashboard page.",
-    defaultMessage: "Broker"
-  },
-  statistics: {
-    id: "dashboard.broker.actions.statistics",
-    description: "The action for viewing statistics on the broker block.",
-    defaultMessage: "Statistics"
-  },
-  logs: {
-    id: "dashboard.broker.actions.logs",
-    description: "The action for viewing logs on the broker block.",
-    defaultMessage: "Logs"
-  },
-  config: {
-    id: "dashboard.broker.actions.config",
-    description: "The action for editing config file on the broker block.",
-    defaultMessage: "Config"
-  },
-  reload: {
-    id: "dashboard.broker.actions.reload",
-    description: "The action for reloading config file on the broker block.",
-    defaultMessage: "Reload"
-  },
-  restart: {
-    id: "dashboard.broker.actions.restart",
-    description: "The action for restarting config file on the broker block.",
-    defaultMessage: "Restart"
-  },
-  more: {
-    id: "dashboard.broker.actions.more",
-    description: "The action label for showing menu.",
-    defaultMessage: "More"
-  }
-});
-
-interface BasicBrokerStatistics {
-  [receivedMessages: string]: string;
+interface BasicBroker {
+  running: boolean;
+  min1?: number;
+  min5?: number;
+  min15?: number;
 }
 
 const _BasicBrokerCard: React.FunctionComponent<IBasicBrokerCard> = ({ classes }) => {
   const intl = useIntl();
 
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [running, setRunning] = React.useState<boolean>(false);
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  const [broker, setBroker] = React.useState<BasicBroker>({
+    running: false
+  });
 
   const api = new BrokerApi(GetDefaultApiConfig());
   const updateBroker = async () => {
     let details = await api.apiBrokerBasicGet();
     if (details === null) { return; }
-    setRunning(details.running);
+    setBroker({
+      running: details.running || broker.running,
+      min1: details.min1,
+      min5: details.min5,
+      min15: details.min15
+    });
   }
 
   useInterval(updateBroker, 10000);
@@ -108,9 +72,34 @@ const _BasicBrokerCard: React.FunctionComponent<IBasicBrokerCard> = ({ classes }
 
   return (
     <Card>
-      <CardActionArea className={classes.action} component={ReachLink} to={"/dashboard/devices"}>
-        {intl.formatMessage(messages.broker)}
-        <StatusBadge status={running ? "running" : "stopped"}/>
+      <CardActionArea className={classes.root} component={ReachLink} to={"/dashboard/devices"}>
+        <Avatar>
+          <Broker className={classes.media} />
+        </Avatar>
+        <div className={classes.container}>
+          <Typography component="span" variant="h5" display="block">
+            <FormattedMessage
+              id="dashboard.components.basic_broker_card.title"
+              description="Title on the broker card"
+              defaultMessage="Broker"
+            />
+          </Typography>
+          <StatusBadge className={classes.status} status={broker.running ? "running" : "stopped"} />
+        </div>
+        <LoadFactors min1={broker.min1} min5={broker.min5} min15={broker.min15}/>
+        <Typography color="textSecondary">
+          {
+            broker.running ? <FormattedMessage
+              id="dashboard.components.basic_broker_card.instruct_running"
+              description="Running instruction on the broker card when the broker runs normally."
+              defaultMessage="The broker is operating."
+            /> : <FormattedMessage
+                id="dashboard.components.basic_broker_card.instruct_stopped"
+                description="Running instruction on the broker card when the broker stopped."
+                defaultMessage="The broker is stopped. Please wait a few seconds."
+              />
+          }
+        </Typography>
       </CardActionArea>
     </Card>
   );

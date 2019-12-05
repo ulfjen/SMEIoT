@@ -14,29 +14,19 @@ const styles = ({ palette, typography, transitions, spacing }: Theme) =>
       position: "relative"
     },
     content: {
-      position: "absolute",
-      paddingLeft: RADIUS_STANDARD*2.5,
-      display: 'flex',
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      justifyContent: 'center',
-      alignContent: 'center',
-      alignItems: 'center',
+      paddingLeft: RADIUS_STANDARD*0.5,
+      display: "inline-box",
       lineHeight: 1,
       fontSize: typography.pxToRem(14),
+      verticalAlign: "middle"
     },
     status: {
-      display: 'flex',
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      justifyContent: 'center',
-      alignItems: 'center',
-      position: 'absolute',
+      display: "inline-box",
       boxSizing: "border-box",
-      marginBottom: RADIUS_STANDARD * 2,
       minWidth: RADIUS_STANDARD * 2,
       height: RADIUS_STANDARD * 2,
       borderRadius: RADIUS_STANDARD,
+      verticalAlign: "middle",
       transition: transitions.create('transform', {
         easing: transitions.easing.easeInOut,
         duration: transitions.duration.enteringScreen,
@@ -53,6 +43,7 @@ const styles = ({ palette, typography, transitions, spacing }: Theme) =>
 export interface IStatusBadgeProps extends WithStyles<typeof styles> {
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   status: "running" | "stopped";
+  className?: string;
 }
 
 const messages = defineMessages({
@@ -72,11 +63,12 @@ const _StatusBadge: React.FunctionComponent<IStatusBadgeProps &
   WithStyles<typeof styles>> = ({
     classes,
     status,
+    className
   }) => {
     const intl = useIntl();
 
     return (
-      <div className={classes.root}>
+      <div className={clsx(classes.root, className)}>
         <span
           className={clsx(classes.status, status === "running" ? classes.statusRunning : classes.statusStopped)}
         >
