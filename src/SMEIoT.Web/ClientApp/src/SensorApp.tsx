@@ -1,6 +1,6 @@
 import "./styles/site.scss";
 import * as React from "react";
-import { Router, RouteComponentProps } from "@reach/router";
+import { Router } from "@reach/router"
 import { IntlProvider } from "react-intl";
 import ThemeProvider from "@material-ui/styles/ThemeProvider";
 import useMediaQuery from '@material-ui/core/useMediaQuery';
@@ -19,21 +19,22 @@ import DashboardNewDeviceConnectSensors from "./dashboard/DashboardNewDeviceConn
 import DashboardBrokerStatistics from "./dashboard/DashboardBrokerStatistics";
 import EnMessages from "./locales/en.json";
 
-export interface IDashboardApp extends RouteComponentProps {
-  locale?: string
+export interface ISensorApp {
+  language?: string
 }
 
-const DashboardApp: React.FunctionComponent<IDashboardApp> = ({
-  locale
+const DashboardApp: React.FunctionComponent<ISensorApp> = ({
+  language
 }) => {
-  if (locale === undefined) {
-    locale = "en";
+  if (language === undefined) {
+    language = "en";
   }
   let messages: Record<string, string>;
-  switch (locale) {
+  switch (language) {
     case "en":
     default:
       messages = EnMessages;
+      // messages = {}
   }
 
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -48,19 +49,23 @@ const DashboardApp: React.FunctionComponent<IDashboardApp> = ({
     [prefersDarkMode],
   );
 
-  return <Router>
-        <DashboardIndex path="/" />
-        <DashboardDevices path="/devices" />
-        <DashboardBrokerStatistics path="broker/statistics" />
-        <DashboardNewDevice path="devices/new" />
-        <DashboardNewDeviceConnect path="devices/new/connect" />
-        <DashboardNewDeviceConnectSensors path="devices/new/connect_sensors" />
-        <DashboardSensors path="sensors" />
-        <DashboardNewSensor path="sensors/new" />
-        <DashboardMqttLogs path="broker/logs" />
-        <DashboardUsers path="users" />
-        <DashboardEditUser path="users/:username" />
-      </Router>;
+  return <IntlProvider locale={language} messages={messages}>
+    <ThemeProvider theme={theme}>
+      <Router>
+        <DashboardIndex path="/dashboard" />
+        <DashboardDevices path="/dashboard/devices" />
+        <DashboardBrokerStatistics path="/dashboard/broker/statistics" />
+        <DashboardNewDevice path="/dashboard/devices/new" />
+        <DashboardNewDeviceConnect path="/dashboard/devices/new/connect" />
+        <DashboardNewDeviceConnectSensors path="/dashboard/devices/new/connect_sensors" />
+        <DashboardSensors path="/dashboard/sensors" />
+        <DashboardNewSensor path="/dashboard/sensors/new" />
+        <DashboardMqttLogs path="/dashboard/broker/logs" />
+        <DashboardUsers path="/dashboard/users" />
+        <DashboardEditUser path="/dashboard/users/:username" />
+      </Router>
+    </ThemeProvider>
+  </IntlProvider>;
 };
 
 export default DashboardApp;

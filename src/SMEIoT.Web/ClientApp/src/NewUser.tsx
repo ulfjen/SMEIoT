@@ -11,6 +11,7 @@ import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Container from '@material-ui/core/Container';
+import { Router, RouteComponentProps } from "@reach/router";
 import UserPasswordForm from "./components/UserPasswordForm";
 import useUserCredentials from "./components/useUserCredentials";
 import {
@@ -44,7 +45,7 @@ const styles = ({palette, spacing}: Theme) => createStyles({
   },
 });
 
-export interface INewUserProps extends WithStyles<typeof styles> {
+export interface INewUserProps extends RouteComponentProps, WithStyles<typeof styles> {
   csrfToken: string
 }
 

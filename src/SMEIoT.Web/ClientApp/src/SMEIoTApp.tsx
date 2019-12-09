@@ -18,17 +18,30 @@ import DashboardNewDeviceConnect from "./dashboard/DashboardNewDeviceConnect";
 import DashboardNewDeviceConnectSensors from "./dashboard/DashboardNewDeviceConnectSensors";
 import DashboardBrokerStatistics from "./dashboard/DashboardBrokerStatistics";
 import EnMessages from "./locales/en.json";
+import DashboardApp from "./DashboardApp";
+import NewSession from "./NewSession";
+import NewUser from "./NewUser";
 
-export interface IDashboardApp extends RouteComponentProps {
-  locale?: string
+function GetXsrfTokenFromDom()
+{
+  var token = "";
+  try {
+    const ele = document.getElementById("RequestVerificationToken");
+    const raw = ele !== null ? ele.getAttribute("value") : "";
+    token = raw !== null ? raw : "";
+  } catch {
+    token = "";
+  }
+  return token;
 }
 
-const DashboardApp: React.FunctionComponent<IDashboardApp> = ({
-  locale
+
+export interface ISMEIoTApp {
+}
+
+const SMEIoTApp: React.FunctionComponent<ISMEIoTApp> = ({
 }) => {
-  if (locale === undefined) {
-    locale = "en";
-  }
+  let locale = "en";
   let messages: Record<string, string>;
   switch (locale) {
     case "en":
@@ -48,19 +61,16 @@ const DashboardApp: React.FunctionComponent<IDashboardApp> = ({
     [prefersDarkMode],
   );
 
-  return <Router>
-        <DashboardIndex path="/" />
-        <DashboardDevices path="/devices" />
-        <DashboardBrokerStatistics path="broker/statistics" />
-        <DashboardNewDevice path="devices/new" />
-        <DashboardNewDeviceConnect path="devices/new/connect" />
-        <DashboardNewDeviceConnectSensors path="devices/new/connect_sensors" />
-        <DashboardSensors path="sensors" />
-        <DashboardNewSensor path="sensors/new" />
-        <DashboardMqttLogs path="broker/logs" />
-        <DashboardUsers path="users" />
-        <DashboardEditUser path="users/:username" />
-      </Router>;
+  
+  return <IntlProvider locale={locale} messages={messages}>
+  <ThemeProvider theme={theme}>
+    <Router>
+    <DashboardApp path="/dashboard/*" locale={locale}/>
+    <NewSession path="/login" csrfToken={GetXsrfTokenFromDom()}/>
+    <NewUser path="/signup" csrfToken={GetXsrfTokenFromDom()}/>
+    </Router>
+  </ThemeProvider>
+</IntlProvider>;
 };
 
-export default DashboardApp;
+export default SMEIoTApp;

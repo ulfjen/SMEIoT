@@ -31,6 +31,6 @@
     "noEmit": true
   },
   "include": [
-    "**/*.ts"
+    "**/*.ts", "src/SMEIoTApp.tsx"
   ]
 }

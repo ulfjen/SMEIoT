@@ -65,13 +65,13 @@ const _DashboardBrokerStatistics: React.FunctionComponent<IDashboardBrokerStatis
 }) => {
   const intl = useIntl();
 
-  const [statistics, setStatistics] = React.useState<{}>({});
+  const [statistics, setStatistics] = React.useState<{[key: string]: any}>({});
 
   const api = new BrokerApi(GetDefaultApiConfig());
   const updateBroker = async () => {
     let details = await api.apiBrokerStatisticsGet();
     if (details === null) { return; }
-    setStatistics(details.statistics);
+    setStatistics(details.statistics || {});
   }
 
   useInterval(updateBroker, 10000);

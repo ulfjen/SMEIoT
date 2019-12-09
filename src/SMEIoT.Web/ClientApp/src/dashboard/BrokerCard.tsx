@@ -100,7 +100,7 @@ const _BrokerCard: React.FunctionComponent<IBrokerCard> = ({ classes }) => {
   const updateBroker = async () => {
     let details = await api.apiBrokerBasicGet();
     if (details === null) { return; }
-    setRunning(details.running);
+    setRunning(details.running || false);
     setStatistics({
       receivedMessages: ""
     });

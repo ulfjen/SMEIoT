@@ -85,7 +85,9 @@ const _DashboardDeviceBoard: React.FunctionComponent<IDashboardDeviceBoard> = ({
   const [anchoredDeviceName, setAnchoredDeviceName] = React.useState<string>("");
   const handleMoreClicked = (event: React.MouseEvent<HTMLButtonElement>, deviceName?: string) => {
     setAnchorEl(event.currentTarget);
-    setAnchoredDeviceName(deviceName);
+    if (deviceName) {
+      setAnchoredDeviceName(deviceName);
+    }
   };
 
   const handleClose = () => {

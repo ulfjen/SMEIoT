@@ -11,6 +11,7 @@ import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Container from '@material-ui/core/Container';
+import { Router, RouteComponentProps } from "@reach/router";
 import UserPasswordForm from "./components/UserPasswordForm";
 import useUserCredentials from "./components/useUserCredentials";
 import {SessionsApi} from "smeiot-client";
@@ -41,7 +42,7 @@ const styles = ({palette, spacing}: Theme) => createStyles({
   },
 });
 
-export interface INewSessionProps extends WithStyles<typeof styles> {
+export interface INewSessionProps extends RouteComponentProps, WithStyles<typeof styles> {
   csrfToken: string
 }
 
@@ -75,6 +76,7 @@ const _NewSession: React.FunctionComponent<INewSessionProps & WithStyles<typeof 
     }
 
     try {
+      console.log(GetDefaultApiConfig());
       const login = await new SessionsApi(GetDefaultApiConfig()).apiSessionsPost({
         loginBindingModel: {
           username, password
@@ -116,7 +118,7 @@ const _NewSession: React.FunctionComponent<INewSessionProps & WithStyles<typeof 
           color="primary"
           className={classes.submit}
         >
-          Sign Up
+          Log in
         </Button>
         <Grid container justify="flex-end">
           <Grid item>
