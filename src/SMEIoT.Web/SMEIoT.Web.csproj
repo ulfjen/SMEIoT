@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>aspnet-SMEIoT-E793A15C-2A48-412E-A9B8-87778666BCC1</UserSecretsId>
     <LangVersion>8</LangVersion>
     <Nullable>enable</Nullable>
@@ -27,26 +27,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="ClientApp\src\avatars.tsx" />
-    <None Remove="ClientApp\src\components\ListItemLine.tsx" />
-    <None Remove="ClientApp\src\components\ListItemRoutedLink.tsx" />
-    <None Remove="ClientApp\src\components\PasswordField.tsx" />
-    <None Remove="ClientApp\src\components\SensorCard.tsx" />
-    <None Remove="ClientApp\src\dashboard\DashboardMqtt.tsx" />
-    <None Remove="ClientApp\src\dashboard\DashboardMqttLineRenderer.tsx" />
-    <None Remove="ClientApp\src\dashboard\DashboardNewSensor.tsx" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Hangfire.NetCore" Version="1.7.7" />
-    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="3.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="4.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="4.0.0" />
+    <PackageReference Include="Hangfire.AspNetCore" Version="1.7.8" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="3.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="4.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="4.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Core" Version="1.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="3.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="3.0.1" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="3.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0-rc4" />
   </ItemGroup>
 
