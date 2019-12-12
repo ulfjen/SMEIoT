@@ -11,7 +11,7 @@ using Hangfire.LiteDB;
 using SMEIoT.Core.Services;
 using Npgsql;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 using System.Data;
 
 namespace SMEIoT.Infrastructure
@@ -60,7 +60,7 @@ namespace SMEIoT.Infrastructure
       });
     }
 
-    public static void AddInfrastructure(this IServiceCollection services, IHostingEnvironment env)
+    public static void AddInfrastructureServices(this IServiceCollection services, IHostEnvironment env)
     {
       services.AddSingleton<IClock>(SystemClock.Instance);
       services.AddScoped<IApplicationDbContext, ApplicationDbContext>();

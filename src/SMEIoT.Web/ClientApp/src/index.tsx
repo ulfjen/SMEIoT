@@ -14,7 +14,7 @@ import NewUser from './NewUser';
 import SMEIoTApp from './SMEIoTApp';
 
 export function GetDefaultApiConfig() {
-  return new Configuration({basePath: "http://localhost:5000"});
+  return new Configuration({basePath: "https://localhost:5001"});
 }
 
 ReactDOM.render(

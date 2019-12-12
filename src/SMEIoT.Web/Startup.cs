@@ -16,8 +16,6 @@ using Microsoft.Net.Http.Headers;
 using SMEIoT.Core.Entities;
 using SMEIoT.Infrastructure;
 using SMEIoT.Infrastructure.Data;
-using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
-using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 using Microsoft.OpenApi.Models;
 using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
@@ -33,9 +31,9 @@ namespace SMEIoT.Web
 {
   public class Startup
   {
-    private IHostingEnvironment _env;
+    private IWebHostEnvironment _env;
 
-    public Startup(IConfiguration configuration, IHostingEnvironment env)
+    public Startup(IConfiguration configuration, IWebHostEnvironment env)
     {
       Configuration = configuration;
       _env = env;
@@ -48,7 +46,7 @@ namespace SMEIoT.Web
     {
       services.AddDbContext(Configuration);
 
-      services.AddInfrastructure(_env);
+      services.AddInfrastructureServices(_env);
       services.ConfigureHangfire(Configuration);
       services.AddHangfire(globalConfig => { });
 
@@ -66,36 +64,9 @@ namespace SMEIoT.Web
 
       services.ConfigureMqttClient(Configuration);
 
-      // reference Identity/Core/src/IdentityServiceCollectionExtensions.cs
-      services.AddIdentity<User, IdentityRole<long>>(options =>
-        {
-          options.Stores.MaxLengthForKeys = 128;
-          options.SignIn.RequireConfirmedAccount = false;
+      StartupConfigureIdentity.Configure<User, IdentityRole<long>, ApplicationDbContext>(services);
 
-          StartupConfigureIdentityOptions.Configure(options);
-        })
-        .AddDefaultTokenProviders()
-        .AddEntityFrameworkStores<ApplicationDbContext>();
-
-      services.Configure<CookiePolicyOptions>(options =>
-      {
-        // This lambda determines whether user consent for non-essential 
-        // cookies is needed for a given request.
-        options.CheckConsentNeeded = context => true;
-        // requires using Microsoft.AspNetCore.Http;
-        options.MinimumSameSitePolicy = SameSiteMode.None;
-      });
-      services.ConfigureApplicationCookie(options =>
-      {
-        // Cookie settings
-        options.Cookie.HttpOnly = true;
-        options.ExpireTimeSpan = TimeSpan.FromDays(99999);
-
-        options.LoginPath = "/login";
-        options.AccessDeniedPath = "/login";
-        options.SlidingExpiration = true;
-      });
-
+      services.AddVersionedApiExplorer(options => options.GroupNameFormat = "'v'VVV");
       services.AddApiVersioning(options =>
       {
         options.ReportApiVersions = true;
@@ -137,6 +108,7 @@ namespace SMEIoT.Web
         handler.Attach(deliveryService);
         return deliveryService;
       });
+
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -175,7 +147,7 @@ namespace SMEIoT.Web
       app.UseSwaggerUI(c =>
       {
         var swaggerJsonBasePath = string.IsNullOrWhiteSpace(c.RoutePrefix) ? "." : "..";
-        c.SwaggerEndpoint($"/swagger/v1/swagger.json", "SMEIoT API V1");
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "SMEIoT API V1");
       });
 
       app.UseCookiePolicy();
@@ -187,19 +159,20 @@ namespace SMEIoT.Web
       app.UseEndpoints(endpoints =>
       {
         endpoints.MapControllers();
-        endpoints.MapControllerRoute("new_login", "/login", new { controller = "Sessions", action = "New" },
-          new { httpMethod = new HttpMethodRouteConstraint(nameof(HttpMethod.Get)) });
+        // endpoints.MapControllerRoute("new_login", "/login", new { controller = "Sessions", action = "New" },
+        //   new { httpMethod = new HttpMethodRouteConstraint(nameof(HttpMethod.Get)) });
         endpoints.MapControllerRoute("create_login", "/login", new { controller = "Sessions", action = "Create" });
         endpoints.MapControllerRoute("destroy_login", "/logout", new { controller = "Sessions", action = "Destroy" },
           new { httpMethod = new HttpMethodRouteConstraint(nameof(HttpMethod.Delete)) });
-        endpoints.MapControllerRoute("signup", "/signup", new { controller = "Users", action = "New" });
-        endpoints.MapControllerRoute("edit_user", "/account", new { controller = "Users", action = "Edit" });
+        // endpoints.MapControllerRoute("signup", "/signup", new { controller = "Users", action = "New" });
+        // endpoints.MapControllerRoute("edit_user", "/account", new { controller = "Users", action = "Edit" });
 
-        endpoints.MapControllerRoute("dashboard", "/dashboard/{*url}", new { controller = "Dashboard", action = "Index" });
+        // endpoints.MapControllerRoute("dashboard", "/dashboard/{*url}", new { controller = "Dashboard", action = "Index" });
+        // endpoints.MapControllerRoute("app", "/{*url}", new { controller = "Home", action = "Index" });
 
-        endpoints.MapControllerRoute(
-          name: "default",
-          pattern: "{controller:slugify=Home}/{action:slugify=Index}/{id?}");
+        // endpoints.MapControllerRoute(
+        //   name: "default",
+        //   pattern: "{controller:slugify=Home}/{action:slugify=Index}/{id?}");
 
         endpoints.MapRazorPages();
         endpoints.MapHub<MqttHub>("/dashboard/mqtt_hub");

@@ -75,24 +75,23 @@ const _NewSession: React.FunctionComponent<INewSessionProps & WithStyles<typeof 
       return;
     }
 
-    try {
-      console.log(GetDefaultApiConfig());
       const login = await new SessionsApi(GetDefaultApiConfig()).apiSessionsPost({
         loginBindingModel: {
           username, password
         }
       });
+      console.log(login);
 
       window.location.replace(login.returnUrl || "/");
-    } catch (response) {
-      const {status, errors} = await response.json();
-      if (errors.hasOwnProperty("Username")) {
-        setUsernameErrors(errors["Username"].join("\n"));
-      }
-      if (errors.hasOwnProperty("Password")) {
-        setPasswordErrors(errors["Password"].join("\n"));
-      }
-    }
+    // catch (response) {
+    //   const {status, errors} = await response.json();
+    //   if (errors.hasOwnProperty("Username")) {
+    //     setUsernameErrors(errors["Username"].join("\n"));
+    //   }
+    //   if (errors.hasOwnProperty("Password")) {
+    //     setPasswordErrors(errors["Password"].join("\n"));
+    //   }
+    // }
   };
 
   return <Container component="main" maxWidth="xs">

@@ -24,7 +24,7 @@ namespace SMEIoT.Web.Controllers
       }
       else
       {
-        return RedirectToAction("New", "Sessions");
+        return View();
       }
     }
 

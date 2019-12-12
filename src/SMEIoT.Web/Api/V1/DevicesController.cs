@@ -68,6 +68,20 @@ namespace SMEIoT.Web.Api.V1
       return Ok(res);
     }
 
+    [HttpGet("{name}/psk")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<string>> ShowPsk(string name)
+    {
+      var device = await _service.GetDeviceByNameAsync(name);
+      var res = device.PreSharedKey;
+      if (res == null) {
+        throw new NotImplementedException();
+      }
+      return Ok(res);
+    }
+
     [HttpGet("config_suggest/sensor_candidates")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
