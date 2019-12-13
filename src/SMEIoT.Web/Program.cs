@@ -27,11 +27,7 @@ namespace SMEIoT.Web
         .ConfigureWebHostDefaults(webBuilder =>
         {
           webBuilder.UseStartup<Startup>();
-          
-      webBuilder.ConfigureKestrel(ServerSetup.ConfigureKestrel);
-      
-        })
-        
-        ;
+          webBuilder.ConfigureKestrel(ServerSetup.ConfigureKestrel);
+        });
   }
 }

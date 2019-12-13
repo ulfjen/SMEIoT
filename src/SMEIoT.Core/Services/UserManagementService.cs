@@ -63,7 +63,7 @@ namespace SMEIoT.Core.Services
       }
       else
       {
-        throw new Exception(result.Errors.Select(e => e.Code).ToString());
+        throw new InvalidArgumentException("entity", result.ToString());
       }
 
       return true;

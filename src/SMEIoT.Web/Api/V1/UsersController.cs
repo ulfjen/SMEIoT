@@ -29,7 +29,6 @@ namespace SMEIoT.Web.Api.V1
     [AllowAnonymous]
     public async Task<ActionResult<BasicUserApiModel>> Create(ValidatedUserCredentialsBindingModel user)
     {
-      _logger.LogDebug($"Creates user {user.Username}");
       await _userService.CreateUserWithPassword(user.Username, user.Password);
       var result = await GetBasicUserResultAsync(user.Username);
       return CreatedAtAction(nameof(Show), result);

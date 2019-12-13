@@ -65,9 +65,9 @@ const SMEIoTApp: React.FunctionComponent<ISMEIoTApp> = ({
   return <IntlProvider locale={locale} messages={messages}>
   <ThemeProvider theme={theme}>
     <Router>
-    <DashboardApp path="/dashboard/*" locale={locale}/>
-    <NewSession path="/login" csrfToken={GetXsrfTokenFromDom()}/>
-    <NewUser path="/signup" csrfToken={GetXsrfTokenFromDom()}/>
+      <DashboardApp path="/dashboard/*" locale={locale}/>
+      <NewSession path="/login" csrfToken={GetXsrfTokenFromDom()}/>
+      <NewUser path="/signup" csrfToken={GetXsrfTokenFromDom()}/>
     </Router>
   </ThemeProvider>
 </IntlProvider>;
