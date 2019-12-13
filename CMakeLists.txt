@@ -8,3 +8,5 @@ project("SMEIoT")
 find_library(MOSQUITTO_LIBRARY mosquitto)
 
 add_subdirectory("src/Mosquitto")
+add_subdirectory("src/MosquittoPlugin")
+
