@@ -58,6 +58,8 @@ namespace SMEIoT.Core.EventHandlers
     public void Update(MqttMessage message)
     {
       var topic = message.Topic;
+      Console.WriteLine(message.Payload);
+
       if (topic.StartsWith(SensorTopicPrefix))
       {
         var parsed = topic.AsSpan();

@@ -138,8 +138,13 @@ int mosqauth_receive(int fd, char* buffer, int len_buffer)
         break;
     }
   }
-  buffer[read_bytes] = 0; // rewrite the terminal
-  mosquitto_log_printf(MOSQ_LOG_DEBUG, "Result = %s\n", buffer);
+  buffer[read_bytes-1] = 0; // rewrite the terminal
+  mosquitto_log_printf(MOSQ_LOG_DEBUG, "Result = %s (buffer max len = %d)\n", buffer, len_buffer);
+  if (read_bytes - 2 >= 0) { // TODO: buffer[127] = 'C' so I'm chaning someone else's buffer. Assume the server sends 128 bytes as key and 1 for "\n" Then we overrun the buffer
+  // why we overrun the buffer? because mosquitto expects a NUL-terminated string. Then psk_server_callback will dump this into OpenSSL.
+  // As we all know it's hard to avoid this/that... so our key gets truncated somehow. 
+    mosquitto_log_printf(MOSQ_LOG_DEBUG, "buffer[%d] = %c\n", read_bytes-2, buffer[read_bytes-2]);
+  }
   return read_bytes;
 }
 

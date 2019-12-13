@@ -10,6 +10,7 @@ using SMEIoT.Core.Entities;
 using SMEIoT.Core.Interfaces;
 using SMEIoT.Web.ApiModels;
 using SMEIoT.Web.BindingModels;
+using System.Diagnostics.Contracts; 
 
 namespace SMEIoT.Web.Api.V1
 {
@@ -19,7 +20,6 @@ namespace SMEIoT.Web.Api.V1
     private readonly IDeviceService _service;
     private readonly IDeviceSensorIdentifierSuggestService _identifierSuggestService;
     private readonly ISecureKeySuggestService _secureKeySuggestService;
-    private const int SecureKeyByteLength = 256;
     private const int DefaultDeviceNameSuggestWordLength = 2;
 
     public DevicesController(
@@ -99,7 +99,7 @@ namespace SMEIoT.Web.Api.V1
       var device = await _service.GetARandomUnconnectedDeviceAsync();
       return Ok(new DeviceConfigSuggestApiModel(
         _identifierSuggestService.GenerateRandomIdentifierForDevice(DefaultDeviceNameSuggestWordLength),
-        _secureKeySuggestService.GenerateSecureKeyWithByteLength(SecureKeyByteLength),
+        _secureKeySuggestService.GenerateSecureKeyWithByteLength(64),
         device?.Name
       ));
     }
@@ -107,7 +107,7 @@ namespace SMEIoT.Web.Api.V1
     [HttpGet("config_suggest/key")]
     public async Task<ActionResult<DeviceConfigSuggestApiModel>> SuggestSecureKey()
     {
-      return Ok(new DeviceConfigSuggestApiModel(null, _secureKeySuggestService.GenerateSecureKeyWithByteLength(SecureKeyByteLength)));
+      return Ok(new DeviceConfigSuggestApiModel(null, _secureKeySuggestService.GenerateSecureKeyWithByteLength(64))); // TODO: Add a max length
     }
 
     [HttpGet("config_suggest/device_name")]

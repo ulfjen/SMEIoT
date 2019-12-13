@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-// using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
+using SMEIoT.Web.Services;
 
 namespace SMEIoT.Web
 {
@@ -17,9 +17,10 @@ namespace SMEIoT.Web
             where TRole : class
             where TContext : DbContext
     {
-      // ref ASP.NET Core src/Identity/Extensions.Core/src/IdentityServiceCollectionExtensions.cs
+      // ref ASP.NET Core 3.1 src/Identity/Extensions.Core/src/IdentityServiceCollectionExtensions.cs
       AddCustomedIdentity<TUser, TRole>(services, ConfigureIdentityOptions)
-        .AddEntityFrameworkStores<TContext>();
+        .AddEntityFrameworkStores<TContext>()
+        .AddSignInManager<SignInManager>();
       
       services.Configure<CookiePolicyOptions>(options =>
       {
@@ -104,7 +105,7 @@ namespace SMEIoT.Web
             services.TryAddScoped<IUserClaimsPrincipalFactory<TUser>, UserClaimsPrincipalFactory<TUser, TRole>>();
             services.TryAddScoped<IUserConfirmation<TUser>, DefaultUserConfirmation<TUser>>();
             services.TryAddScoped<UserManager<TUser>>();
-            services.TryAddScoped<SignInManager<TUser>>();
+            // services.TryAddScoped<SignInManager<TUser>>();
             services.TryAddScoped<RoleManager<TRole>>();
 
             if (setupAction != null)
