@@ -42,18 +42,21 @@ namespace SMEIoT.Infrastructure
 
     public static void ConfigureMqttClient(this IServiceCollection services, IConfiguration configuration)
     {
+      services.AddSingleton<MosquittoClientAuthenticationService>();
       services.AddSingleton<MosquittoMessageHandler>();
-
-      var builder = new MosquittoClientBuilder()
-        .SetConnectionInfo(configuration.GetConnectionString("MqttHost"), 8884)
-        .SetKeepAlive(60)
-        .SetPskTls(configuration.GetConnectionString("MqttPsk"), configuration.GetConnectionString("MqttIdentity"))
-        .SetRunLoopInfo(-1, 1, 10)
-        .SubscribeTopic(MosquittoClientBuilder.BrokerTopic)
-        .SubscribeTopic(MosquittoClientBuilder.SensorTopic);
 
       services.AddHostedService<BackgroundMqttClientHostedService>(provider =>
       {
+        var auth = provider.GetService<MosquittoClientAuthenticationService>();
+
+        var builder = new MosquittoClientBuilder()
+          .SetPskTls(auth.ClientPsk, auth.ClientName)
+          .SetConnectionInfo(configuration.GetConnectionString("MqttHost"), int.Parse(configuration.GetConnectionString("MqttPort")))
+          .SetKeepAlive(60)
+          .SetRunLoopInfo(-1, 1, 10)
+          .SubscribeTopic(MosquittoClientBuilder.BrokerTopic)
+          .SubscribeTopic(MosquittoClientBuilder.SensorTopic);
+
         var handler = provider.GetService<MosquittoMessageHandler>();
         builder.SetMessageCallback(handler.HandleMessage);
         return new BackgroundMqttClientHostedService(builder.Client);

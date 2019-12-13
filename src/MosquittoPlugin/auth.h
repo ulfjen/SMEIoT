@@ -7,18 +7,9 @@
 #include <mosquitto_plugin.h>
 #include <mosquitto_broker.h>
 
-#ifdef _WIN32
-#    ifdef LIBRARY_EXPORTS
-#        define LIBRARY_API __declspec(dllexport)
-#    else
-#        define LIBRARY_API __declspec(dllimport)
-#    endif
-#else
-#    define LIBRARY_API
-#endif
-
 struct mosqauth_aux {
   int socket_fd;
+  int pid;
 };
 
 const char* mosqauth_socket_path = "/tmp/smeiot.auth.broker";

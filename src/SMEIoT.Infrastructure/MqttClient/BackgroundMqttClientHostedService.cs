@@ -18,8 +18,10 @@ namespace SMEIoT.Infrastructure.MqttClient
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-      _client.Connect();
-      _thread = new Thread(() => _client.RunLoop());
+      _thread = new Thread(() => {
+        _client.Connect();
+        _client.RunLoop();
+      });
       _thread.Start();
       return Task.CompletedTask;
     }

@@ -32,6 +32,7 @@ namespace SMEIoT.Infrastructure.MqttClient
 
     public void Connect()
     {
+      Console.WriteLine($"My psk: {Psk} {Identity}");
       var res = MosquittoWrapper.mosq_set_tls_psk(Psk, Identity, Ciphers);
       if (res != 0)
       {

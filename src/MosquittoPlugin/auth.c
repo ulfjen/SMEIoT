@@ -1,9 +1,11 @@
 #include "auth.h"
 
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <unistd.h>
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/un.h>
 
@@ -98,7 +100,7 @@ int mosqauth_request_psk(int fd, const char *identity)
 
 const char* META_CMD = "POSTMETA ";
 
-int mosqauth_request_meta(int fd)
+int mosqauth_request_meta(int fd, int pid)
 {
   int sent = 0;
   int ret = mosqauth_request(fd, META_CMD, 0);
@@ -106,8 +108,12 @@ int mosqauth_request_meta(int fd)
     return ret;
   }
   sent += ret;
-  // MOSQ_AUTH_PLUGIN_VERSION is a macro. it should be an integer
-  ret = mosqauth_request(fd, "{\"mosquitto_auth_plugin_version\": \"MOSQ_AUTH_PLUGIN_VERSION\"}", 1);
+
+  int version = MOSQ_AUTH_PLUGIN_VERSION;
+  char buffer[1024] = {0};
+  sprintf(buffer, "{\"mosquitto_auth_plugin_version\":%d,\"pid\":%d}", version, pid);
+
+  ret = mosqauth_request(fd, buffer, 1);
   sent += ret;
   return sent;
 }
@@ -135,6 +141,21 @@ int mosqauth_receive(int fd, char* buffer, int len_buffer)
   buffer[read_bytes] = 0; // rewrite the terminal
   mosquitto_log_printf(MOSQ_LOG_DEBUG, "Result = %s\n", buffer);
   return read_bytes;
+}
+
+// 0 means okay. -1 means FAIL, -2 means something else
+int mosqauth_receive_ok(int fd)
+{
+  char buffer[1024];
+  mosqauth_receive(fd, buffer, 1023);
+  buffer[1023] = '\0';
+  mosquitto_log_printf(MOSQ_LOG_DEBUG, "Received: %s\n", buffer); // should get an OK.
+  if (strncmp(buffer, "OK", 2) == 0) {
+    return 0;
+  } else if (strncmp(buffer, "FAIL", 4) == 0) {
+    return -1;
+  }
+  return -2;
 }
 
 /*
@@ -173,8 +194,9 @@ int mosquitto_auth_plugin_init(void **user_data, struct mosquitto_opt *opts, int
   // we don't need to clean up this as this will die with the mosquitto broker.
   struct mosqauth_aux* aux = malloc(sizeof(struct mosqauth_aux));
   aux->socket_fd = -1;
+  aux->pid = -1;
   *user_data = aux;
-  mosquitto_log_printf(MOSQ_LOG_DEBUG, "init the auth plugin with socket\n");
+  mosquitto_log_printf(MOSQ_LOG_DEBUG, "init the auth plugin with a socket struct\n");
   return 0;
 }
 
@@ -237,16 +259,31 @@ int mosquitto_auth_security_init(void *user_data, struct mosquitto_opt *opts, in
   if (aux->socket_fd != -1) {
     // try to disconnect and ignores what can be wrong
     mosqauth_close_socket(aux->socket_fd);
+    aux->socket_fd = -1;
   }
-  aux->socket_fd = mosqauth_connect_socket(mosqauth_socket_path);
+  int remaining_retries = 10;
+  int fd = -1;
+  while (remaining_retries-- > 0) {
+    fd = mosqauth_connect_socket(mosqauth_socket_path);
+    if (fd == -1) {
+      sleep((10 - remaining_retries) * 2); // wait for a few second to try connect again
+    } else {
+      break;
+    }
+  }
+  if (fd == -1) { // okay, we can't connect to the server
+    mosquitto_log_printf(MOSQ_LOG_INFO, "mosquitto_auth_security_init: Server is not responding on %s. Exit.\n", mosqauth_socket_path);
+    errno = ENOTCONN;
+    return -1; // returns -1 should exit the mosquitto
+  }
+
+  aux->socket_fd = fd;
+  aux->pid = getpid();
   mosquitto_log_printf(MOSQ_LOG_INFO, "mosquitto_auth_security_init: Connects to %s\n", mosqauth_socket_path);
 
-  mosqauth_request_meta(aux->socket_fd);
-  char buffer[1024];
-  mosqauth_receive(aux->socket_fd, buffer, 1023);
-  buffer[1023] = '\0';
-  mosquitto_log_printf(MOSQ_LOG_DEBUG, "Received: %s\n", buffer);
-  return 0;
+  mosqauth_request_meta(aux->socket_fd, aux->pid);
+  int ret = mosqauth_receive_ok(aux->socket_fd);
+  return ret < 0 ? -ret : 0; // returns errors should exit the mosquitto
 }
 
 /* 
@@ -279,7 +316,8 @@ int mosquitto_auth_security_cleanup(void *user_data, struct mosquitto_opt *opts,
   struct mosqauth_aux* aux = user_data;
   mosqauth_close_socket(aux->socket_fd);
   aux->socket_fd = -1;
-  mosquitto_log_printf(MOSQ_LOG_DEBUG, "security_cleanup\n");
+  aux->pid = -1;
+  mosquitto_log_printf(MOSQ_LOG_DEBUG, "security_cleanup: cleans user_data\n");
 
   return 0;
 }
@@ -310,8 +348,8 @@ int mosquitto_auth_security_cleanup(void *user_data, struct mosquitto_opt *opts,
  */
 int mosquitto_auth_acl_check(void *user_data, int access, struct mosquitto *client, const struct mosquitto_acl_msg *msg)
 {
-  mosquitto_log_printf(MOSQ_LOG_DEBUG, "access: %d\n", access);
-  return MOSQ_ERR_SUCCESS;
+  mosquitto_log_printf(MOSQ_LOG_DEBUG, "access: type %d\n", access);
+  return MOSQ_ERR_PLUGIN_DEFER; // skips check
 }
 
 /*
@@ -342,7 +380,7 @@ int mosquitto_auth_acl_check(void *user_data, int access, struct mosquitto *clie
 int mosquitto_auth_psk_key_get(void *user_data, struct mosquitto *client, const char *hint, const char *identity, char *key, int max_key_len)
 {
   struct mosqauth_aux* aux = user_data;
-  mosquitto_log_printf(MOSQ_LOG_DEBUG, "auth: %s %d\n", identity, max_key_len);
+  mosquitto_log_printf(MOSQ_LOG_DEBUG, "psk request: id %s max_key_len %d\n", identity, max_key_len);
 
   int ret = mosqauth_request_psk(aux->socket_fd, identity);
   if (ret == -1) {
@@ -356,7 +394,7 @@ int mosquitto_auth_psk_key_get(void *user_data, struct mosquitto *client, const 
   mosquitto_log_printf(MOSQ_LOG_DEBUG, "key returned val: %d\n", ret);
 
   if (strncmp(key, "FAIL", 4) == 0) {
-    return 3; // server returns failed
+    return 3; // server returns fail
   }
 
   return 0;

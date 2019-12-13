@@ -25,5 +25,25 @@ namespace SMEIoT.Tests.Core.Services
       Assert.NotNull(key);
       Assert.Equal(256, key.Length);
     }
+
+    [Fact]
+    public void GenerateSecureKeyWithByteLength_ThrowsIfLargeThanUpperBound()
+    {
+      var service = BuildService();
+
+      var action = () => service.GenerateSecureKeyWithByteLength(SecureKeySuggestService.ByteLengthUpperBound+1);
+
+      Assert.Throws<ArgumentOutOfRangeException>(action);
+    }
+
+    [Fact]
+    public void GenerateSecureKeyWithByteLength_ThrowsIfLowerThanLowerBound()
+    {
+      var service = BuildService();
+
+      var action = () => service.GenerateSecureKeyWithByteLength(SecureKeySuggestService.ByteLengthLowerBound-1);
+
+      Assert.Throws<ArgumentOutOfRangeException>(action);
+    }
   }
 }

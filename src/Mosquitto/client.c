@@ -76,8 +76,18 @@ void mosq_set_callback(CONNECT_CALLBACK connect_callback_delegate, MESSAGE_CALLB
 int mosq_connect(char* host, int port, int keepalive)
 {
     printf("connects to %s:%d with keep alive %d\n", host, port, keepalive);
-    rc = mosquitto_connect(mosq, host, port, keepalive);
-    return rc;
+    int remaining_retries = 10;
+    int rc = MOSQ_ERR_INVAL;
+    while (remaining_retries-- > 0) {
+        rc = mosquitto_connect(mosq, host, port, keepalive);
+        if (rc == MOSQ_ERR_INVAL || rc == MOSQ_ERR_SUCCESS) { // invalid parameters or success
+            return rc;
+        }
+        // else the system reports error, perhaps the socket is not up yet. we can retry.
+        printf("connection faild, we will try again later.\n");
+        sleep((10 - remaining_retries) * 2); // wait for a few second to try connect again
+    }
+    return rc; // failed rc
 }
 
 void mosq_runloop(int timeout, int max_packets, int sleep_on_reconnect)
@@ -85,14 +95,15 @@ void mosq_runloop(int timeout, int max_packets, int sleep_on_reconnect)
     while (run) {
         // run message loop
         rc = mosquitto_loop(mosq, timeout, max_packets);
-        printf("run loop invoked rc %d\n", rc);
+        printf("loop rc %d\n", rc);
         if (run && rc) {
 #ifdef _WIN32
             Sleep(sleep_on_reconnect * 1000); // milliseconds
 #else
             sleep(sleep_on_reconnect);
 #endif
-            mosquitto_reconnect(mosq);
+            rc = mosquitto_reconnect(mosq);
+            printf("reconnect rc %d\n", rc);
         }
     }
 }

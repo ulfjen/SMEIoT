@@ -6,7 +6,7 @@ namespace SMEIoT.Infrastructure.MqttClient
   public class MosquittoClientBuilder
   {
     public const string BrokerTopic = "$SYS/broker/#";
-    public const string SensorTopic = "pub/#";
+    public const string SensorTopic = "iot/#";
     
     private readonly MosquittoClient _client;
     private List<string> _topics = new List<string>();

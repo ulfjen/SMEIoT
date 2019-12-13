@@ -7,7 +7,10 @@ namespace SMEIoT.Core.Services
   public class SecureKeySuggestService : ISecureKeySuggestService
   {
     public const int ByteLengthLowerBound = 32;
-    public const int ByteLengthUpperBound = 512;
+    // RFC4279 requires the TLS library supporting arbitrary PSKs up to 64 octets in length, we can safely use this size.
+    // OpenSSL 1.1.1 has a default buffer length for the psk (256). But libmosquitto will truncates our psk if it's larger than 64
+    public const int ByteLengthUpperBound = 64;
+    
     private static readonly string[] HexStringTable = new string[]
       {
         "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "0A", "0B", "0C", "0D", "0E", "0F",
@@ -28,14 +31,14 @@ namespace SMEIoT.Core.Services
         "F0", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "FA", "FB", "FC", "FD", "FE", "FF"
       };
 
-    // string length is twice the length of bytes
+    // string length is twice the length of bytes (hex form)
     public string GenerateSecureKeyWithByteLength(int length)
     {
       if (length < ByteLengthLowerBound)
       {
         throw new ArgumentOutOfRangeException($"Requested a {length} bytes array for the secured key. Use a positive length larger or equal than {ByteLengthLowerBound}.");
       }
-      if (length >= ByteLengthUpperBound)
+      if (length > ByteLengthUpperBound)
       {
         throw new ArgumentOutOfRangeException($"Requested a {length} bytes array for the secured key. Use a positive length smaller than {ByteLengthUpperBound}.");
       }

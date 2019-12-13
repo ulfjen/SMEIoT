@@ -21,7 +21,7 @@ namespace SMEIoT.Web
         builder.Protocols = HttpProtocols.None;
         builder.UseConnectionHandler<MosquittoBrokerAuthHandler>();
       });
-      options.ListenLocalhost(5000);
+      // options.ListenLocalhost(5000);
       options.ListenLocalhost(5001, builder => {
         builder.UseHttps();
       });
