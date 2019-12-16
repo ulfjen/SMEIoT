@@ -16,7 +16,6 @@ struct callback_delegates {
 
 struct mosquitto* mosq;
 int rc;
-int run;
 struct callback_delegates delegates;
 
 int mosq_init()
@@ -25,7 +24,6 @@ int mosq_init()
     delegates.connect_callback_delegate = NULL;
     delegates.message_callback_delegate = NULL;
     rc = 0;
-    run = 1;
 
     mosquitto_lib_init();
     mosq = mosquitto_new(NULL, 1, &delegates);
@@ -92,11 +90,14 @@ int mosq_connect(char* host, int port, int keepalive)
 
 void mosq_runloop(int timeout, int max_packets, int sleep_on_reconnect)
 {
-    while (run) {
+    while (1) {
         // run message loop
         rc = mosquitto_loop(mosq, timeout, max_packets);
         printf("loop rc %d\n", rc);
-        if (run && rc) {
+        if (rc == MOSQ_ERR_CONN_REFUSED) { // connection errors
+            break;
+        }
+        if (rc != MOSQ_ERR_SUCCESS) {
 #ifdef _WIN32
             Sleep(sleep_on_reconnect * 1000); // milliseconds
 #else
@@ -120,7 +121,6 @@ int mosq_destroy()
 
     delegates.connect_callback_delegate = NULL;
     delegates.message_callback_delegate = NULL;
-    run = 0;
     mosq = NULL;
     rc = 0;
     return res;

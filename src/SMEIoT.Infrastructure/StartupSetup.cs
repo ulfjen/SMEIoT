@@ -42,7 +42,6 @@ namespace SMEIoT.Infrastructure
 
     public static void ConfigureMqttClient(this IServiceCollection services, IConfiguration configuration)
     {
-      services.AddSingleton<MosquittoClientAuthenticationService>();
       services.AddSingleton<MosquittoMessageHandler>();
 
       services.AddHostedService<BackgroundMqttClientHostedService>(provider =>
@@ -53,7 +52,7 @@ namespace SMEIoT.Infrastructure
           .SetPskTls(auth.ClientPsk, auth.ClientName)
           .SetConnectionInfo(configuration.GetConnectionString("MqttHost"), int.Parse(configuration.GetConnectionString("MqttPort")))
           .SetKeepAlive(60)
-          .SetRunLoopInfo(-1, 1, 10)
+          .SetRunLoopInfo(-1, 10)
           .SubscribeTopic(MosquittoClientBuilder.BrokerTopic)
           .SubscribeTopic(MosquittoClientBuilder.SensorTopic);
 
@@ -69,6 +68,8 @@ namespace SMEIoT.Infrastructure
       services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
       services.AddSingleton<IMqttIdentifierService, MqttIdentifierService>();
       services.AddSingleton<IMosquittoBrokerService, MosquittoBrokerService>();
+      services.AddSingleton<MosquittoClientAuthenticationService>();
+      services.AddScoped<IMosquittoBrokerMessageService, MosquittoBrokerMessageService>();
       services.AddSingleton<IFileProvider>(provider => {
         return env.ContentRootFileProvider;
       });

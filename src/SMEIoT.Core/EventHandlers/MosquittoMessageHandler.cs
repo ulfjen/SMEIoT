@@ -92,7 +92,8 @@ namespace SMEIoT.Core.EventHandlers
         }
         _brokerService.RegisterBrokerStatistics(parsed.ToString(), value.ToString());
 
-        _brokerService.SetBrokerRunningStatus(true, message.ReceivedAt);
+        _brokerService.BrokerRunning = true;
+        _brokerService.BrokerLastUpdatedAt = message.ReceivedAt;
       }
 
       // TODO: Sends a job into dispatch for storage

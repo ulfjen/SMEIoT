@@ -11,9 +11,8 @@ namespace SMEIoT.Core.Interfaces
     IEnumerable<KeyValuePair<string, string>> ListBrokerStatistics();
     Tuple<double?, double?, double?> GetBrokerLoads();
 
-    bool SetBrokerRunningStatus(bool running, Instant lastUpdatedAt);
-
-    bool BrokerRunning { get; }
-    Instant? BrokerLastUpdatedAt { get; }
+    bool BrokerRunning { get; set; }
+    int? BrokerPid { get; set; }
+    Instant? BrokerLastUpdatedAt { get; set; }
   }
 }

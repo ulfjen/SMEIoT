@@ -11,8 +11,9 @@ namespace SMEIoT.Core.Services
   public class MosquittoBrokerService : IMosquittoBrokerService
   {
     private readonly ConcurrentDictionary<string, string> _values = new ConcurrentDictionary<string, string>();
-    public bool BrokerRunning { get; private set; } = false;
-    public Instant? BrokerLastUpdatedAt { get; private set; }
+    public bool BrokerRunning { get; set; } = false;
+    public Instant? BrokerLastUpdatedAt { get; set; }
+    public int? BrokerPid { get; set; }
     private const string ByteLoadReceived1Min = "load/bytes/received/1min";
     private const string ByteLoadReceived5Min = "load/bytes/received/5min";
     private const string ByteLoadReceived15Min = "load/bytes/received/15min";
@@ -69,13 +70,6 @@ namespace SMEIoT.Core.Services
       double number;
       var got = Double.TryParse(value, out number);
       return got ? (double?)number : null;
-    }
-
-    public bool SetBrokerRunningStatus(bool running, Instant lastUpdatedAt)
-    {
-      BrokerRunning = running;
-      BrokerLastUpdatedAt = lastUpdatedAt;
-      return true;
     }
   }
 }

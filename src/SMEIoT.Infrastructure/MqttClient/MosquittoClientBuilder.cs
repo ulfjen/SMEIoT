@@ -55,10 +55,10 @@ namespace SMEIoT.Infrastructure.MqttClient
       return this;
     }
 
-    public MosquittoClientBuilder SetRunLoopInfo(int timeout, int maxPackets, int sleepOnReconnect)
+    public MosquittoClientBuilder SetRunLoopInfo(int timeout, int sleepOnReconnect)
     {
       _client.Timeout = timeout;
-      _client.MaxPackets = maxPackets;
+      _client.MaxPackets = 1; // document says it's unused and should be set to 1 for future compatibility
       _client.SleepOnReconnect = sleepOnReconnect;
       return this;
     }
