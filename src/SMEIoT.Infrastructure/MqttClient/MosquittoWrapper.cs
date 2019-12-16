@@ -31,7 +31,10 @@ namespace SMEIoT.Infrastructure.MqttClient
     internal static extern int mosq_subscribe_topic(string topic);
 
     [DllImport(MosquittoDll, CallingConvention = CallingConvention.Cdecl)]
-    internal static extern void mosq_runloop(int timeout, int max_packets, int sleep_on_reconnect);
+    internal static extern int mosq_runloop(int timeout, int max_packets, int sleep_on_reconnect);
+
+    [DllImport(MosquittoDll, CallingConvention = CallingConvention.Cdecl)]
+    internal static extern int mosq_reconnect();
 
     [DllImport(MosquittoDll, CallingConvention = CallingConvention.Cdecl)]
     internal static extern int mosq_destroy();

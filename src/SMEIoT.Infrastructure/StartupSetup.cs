@@ -12,6 +12,7 @@ using SMEIoT.Core.Services;
 using Npgsql;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System.Data;
 
 namespace SMEIoT.Infrastructure
@@ -58,7 +59,7 @@ namespace SMEIoT.Infrastructure
 
         var handler = provider.GetService<MosquittoMessageHandler>();
         builder.SetMessageCallback(handler.HandleMessage);
-        return new BackgroundMqttClientHostedService(builder.Client);
+        return new BackgroundMqttClientHostedService(builder.Client, provider.GetService<ILogger<BackgroundMqttClientHostedService>>());
       });
     }
 
@@ -69,7 +70,7 @@ namespace SMEIoT.Infrastructure
       services.AddSingleton<IMqttIdentifierService, MqttIdentifierService>();
       services.AddSingleton<IMosquittoBrokerService, MosquittoBrokerService>();
       services.AddSingleton<IMosquittoClientAuthenticationService, MosquittoClientAuthenticationService>();
-      services.AddScoped<IMosquittoBrokerMessageService, MosquittoBrokerMessageService>();
+      services.AddTransient<IMosquittoBrokerMessageService, MosquittoBrokerMessageService>();
       services.AddSingleton<IFileProvider>(provider => {
         return env.ContentRootFileProvider;
       });

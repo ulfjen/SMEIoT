@@ -27,7 +27,7 @@ namespace SMEIoT.Infrastructure.Mosquitto
       _scopeFactory = scopeFactory;
     }
 
-    private Task<StringBuilder> ProcessLineAsync(Encoding encoding, in ReadOnlySequence<byte> buffer)
+    private StringBuilder ProcessLine(Encoding encoding, in ReadOnlySequence<byte> buffer)
     {
       var builder = new StringBuilder(BufferSize);
       foreach (var segment in buffer)
@@ -37,9 +37,17 @@ namespace SMEIoT.Infrastructure.Mosquitto
       var str = builder.ToString();
       _logger.LogDebug(str);
 
-      using var scope = _scopeFactory.CreateScope();
-      var messageHandler = scope.ServiceProvider.GetService<IMosquittoBrokerMessageService>();
-      return messageHandler.ProcessDecodedMessageAsync(str);
+      // return async directly with DI causes an exception that will fail the socket pipeline.
+      return ProcessLineAsync(str).GetAwaiter().GetResult();
+    }
+
+    private async Task<StringBuilder> ProcessLineAsync(string decoded)
+    {
+      using (var scope = _scopeFactory.CreateScope())
+      {
+        var messageHandler = scope.ServiceProvider.GetService<IMosquittoBrokerMessageService>();
+        return await messageHandler.ProcessDecodedMessageAsync(decoded);
+      }
     }
 
     private static bool TryReadLine(ref ReadOnlySequence<byte> buffer, out ReadOnlySequence<byte> line)
@@ -72,7 +80,7 @@ namespace SMEIoT.Infrastructure.Mosquitto
         while (TryReadLine(ref buffer, out ReadOnlySequence<byte> line))
         {
           // Process the line.
-          var builder = await ProcessLineAsync(encoding, line);
+          var builder = ProcessLine(encoding, line);
           builder.Append('\n');
           var resp = builder.ToString();
           _logger.LogDebug(resp);
@@ -80,12 +88,12 @@ namespace SMEIoT.Infrastructure.Mosquitto
           await connection.Transport.Output.WriteAsync(new ReadOnlyMemory<byte>(encoding.GetBytes(resp)));
         }
 
+        connection.Transport.Input.AdvanceTo(buffer.Start, buffer.End);
+
         if (result.IsCompleted)
         {
           break;
         }
-
-        connection.Transport.Input.AdvanceTo(buffer.Start, buffer.End);
       }
 
       _logger.LogInformation(connection.ConnectionId + " disconnected");

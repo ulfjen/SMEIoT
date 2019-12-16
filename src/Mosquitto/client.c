@@ -88,25 +88,14 @@ int mosq_connect(char* host, int port, int keepalive)
     return rc; // failed rc
 }
 
-void mosq_runloop(int timeout, int max_packets, int sleep_on_reconnect)
+int mosq_runloop(int timeout, int max_packets, int sleep_on_reconnect)
 {
-    while (1) {
-        // run message loop
-        rc = mosquitto_loop(mosq, timeout, max_packets);
-        printf("loop rc %d\n", rc);
-        if (rc == MOSQ_ERR_CONN_REFUSED) { // connection errors
-            break;
-        }
-        if (rc != MOSQ_ERR_SUCCESS) {
-#ifdef _WIN32
-            Sleep(sleep_on_reconnect * 1000); // milliseconds
-#else
-            sleep(sleep_on_reconnect);
-#endif
-            rc = mosquitto_reconnect(mosq);
-            printf("reconnect rc %d\n", rc);
-        }
-    }
+    return mosquitto_loop(mosq, timeout, max_packets);
+}
+
+int mosq_reconnect()
+{
+    return mosquitto_reconnect(mosq);
 }
 
 int mosq_subscribe_topic(char* topic)

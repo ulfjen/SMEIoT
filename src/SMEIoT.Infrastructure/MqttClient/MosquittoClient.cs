@@ -32,7 +32,6 @@ namespace SMEIoT.Infrastructure.MqttClient
 
     public void Connect()
     {
-      Console.WriteLine($"My psk: {Psk} {Identity}");
       var res = MosquittoWrapper.mosq_set_tls_psk(Psk, Identity, Ciphers);
       if (res != 0)
       {
@@ -58,9 +57,14 @@ namespace SMEIoT.Infrastructure.MqttClient
       }
     }
 
-    public void RunLoop()
+    public int RunLoop()
     {
-      MosquittoWrapper.mosq_runloop(Timeout, MaxPackets, SleepOnReconnect);
+      return MosquittoWrapper.mosq_runloop(Timeout, MaxPackets, SleepOnReconnect);
+    }
+    
+    public int Reconnect()
+    {
+      return MosquittoWrapper.mosq_reconnect();
     }
 
     public void Dispose()

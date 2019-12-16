@@ -9,8 +9,8 @@ namespace SMEIoT.Core.Services
 {
   class BrokerMeta
   {
-    string MosquittoAuthPluginVersion { get; set; }
-    int Pid { get; set; }
+    public int MosquittoAuthPluginVersion { get; set; }
+    public int Pid { get; set; }
   }
 
   /// Broker will starts to ask us things. This is our message handler.

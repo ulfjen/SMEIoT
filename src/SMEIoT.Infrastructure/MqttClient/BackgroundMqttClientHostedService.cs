@@ -2,47 +2,72 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace SMEIoT.Infrastructure.MqttClient
 {
   public class BackgroundMqttClientHostedService : IHostedService, IDisposable
   {
     private readonly MosquittoClient _client;
-    private Thread? _thread;
+    private Timer? _timer;
+    private ILogger<BackgroundMqttClientHostedService> _logger;
+    private bool _reconnect;
 
-    public BackgroundMqttClientHostedService(
-        MosquittoClient client)
+    public BackgroundMqttClientHostedService(MosquittoClient client, ILogger<BackgroundMqttClientHostedService> logger)
     {
       _client = client;
+      _logger = logger;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-      _thread = new Thread(() => {
-        _client.Connect();
-        _client.RunLoop();
-      });
-      _thread.Start();
+      ThreadPool.QueueUserWorkItem(ConnectClient);
+
       return Task.CompletedTask;
     }
 
+    private void ConnectClient(object state)
+    {
+      _logger.LogInformation("Start to connect MQTT client with the Mosquitto broker.");
+
+      _client.Connect();
+      // defaults to 10s
+      _reconnect = false;
+      _timer = new Timer(ExecuteRunLoop, null, 0, _client.Timeout == -1 ? 10000 : _client.Timeout);
+    }
+
+    private void ExecuteRunLoop(object state)
+    {
+      if (_reconnect) {
+        var ret = _client.Reconnect();
+        _logger.LogInformation($"MQTT client failed, trying to reconnect. got status: {ret}");
+ 
+        if (ret == 0) {
+          _reconnect = false;
+        }
+      } else {
+        var ret = _client.RunLoop();
+        _logger.LogDebug($"runloop returned: {ret}");
+
+        if (ret == 5) { // connection refused.
+          throw new SystemException("We can't connect with the broker. Socket error.");
+        }
+        if (ret != 0) { // try to reconnect next time
+          _reconnect = true;
+        }
+      }
+    }
+    
     public Task StopAsync(CancellationToken cancellationToken)
     {
-      if (_thread != null)
-      {
-        _thread.Abort();
-        _thread = null;
-      }
+      _timer?.Change(Timeout.Infinite, 0);
+
       return Task.CompletedTask;
     }
 
     public void Dispose()
-    {
-      if (_thread != null)
-      {
-        _thread.Abort();
-        _thread = null;
-      }
+    {       
+      _timer?.Dispose();
       _client.Dispose();
     }
 
