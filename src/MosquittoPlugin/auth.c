@@ -345,7 +345,7 @@ int mosquitto_auth_security_cleanup(void *user_data, struct mosquitto_opt *opts,
  *	MOSQ_ERR_UNKNOWN for an application specific error.
  *	MOSQ_ERR_PLUGIN_DEFER if your plugin does not wish to handle this check.
  */
-int mosquitto_auth_acl_check(void *user_data, int access, struct mosquitto *client, const struct mosquitto_acl_msg *msg)
+int mosquitto_auth_acl_check(void *user_data, int access, const struct mosquitto *client, const struct mosquitto_acl_msg *msg)
 {
   mosquitto_log_printf(MOSQ_LOG_DEBUG, "access: type %d\n", access);
   return MOSQ_ERR_PLUGIN_DEFER; // skips check
@@ -376,7 +376,7 @@ int mosquitto_auth_acl_check(void *user_data, int access, struct mosquitto *clie
  * Key validation is handled by OpenSSL so key should not exceed max_key_len.
  * Or it's an error for OpenSSL (On ubuntu 18.04, OpenSSL 1.1.1  11 Sep 2018, it's 1032).
  */
-int mosquitto_auth_psk_key_get(void *user_data, struct mosquitto *client, const char *hint, const char *identity, char *key, int max_key_len)
+int mosquitto_auth_psk_key_get(void *user_data, const struct mosquitto *client, const char *hint, const char *identity, char *key, int max_key_len)
 {
   struct mosqauth_aux* aux = user_data;
   mosquitto_log_printf(MOSQ_LOG_DEBUG, "psk request: id %s max_key_len %d\n", identity, max_key_len);
