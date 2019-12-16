@@ -111,7 +111,7 @@ int mosqauth_request_meta(int fd, int pid)
 
   int version = MOSQ_AUTH_PLUGIN_VERSION;
   char buffer[1024] = {0};
-  sprintf(buffer, "{\"mosquitto_auth_plugin_version\":%d,\"pid\":%d}", version, pid);
+  sprintf(buffer, "{\"mosquittoAuthPluginVersion\":%d,\"pid\":%d}", version, pid);
 
   ret = mosqauth_request(fd, buffer, 1);
   sent += ret;

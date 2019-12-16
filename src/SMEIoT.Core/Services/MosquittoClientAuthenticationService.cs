@@ -5,7 +5,7 @@ using System.Diagnostics.Contracts;
 namespace SMEIoT.Core.Services
 {
   /// handles client psk id / key generation
-  public class MosquittoClientAuthenticationService
+  public class MosquittoClientAuthenticationService : IMosquittoClientAuthenticationService
   {
     // identifier can't be larger than 128 as the RFC. Some implementations might use the final byte for NULL.
     public const int ClientNameLength = 128 - 1;

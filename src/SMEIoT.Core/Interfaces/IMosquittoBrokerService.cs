@@ -12,7 +12,7 @@ namespace SMEIoT.Core.Interfaces
     Tuple<double?, double?, double?> GetBrokerLoads();
 
     bool BrokerRunning { get; set; }
-    int? BrokerPid { get; set; }
+    int? BrokerPidFromAuthPlugin { get; set; }
     Instant? BrokerLastUpdatedAt { get; set; }
   }
 }

@@ -13,7 +13,7 @@ namespace SMEIoT.Core.Services
     private readonly ConcurrentDictionary<string, string> _values = new ConcurrentDictionary<string, string>();
     public bool BrokerRunning { get; set; } = false;
     public Instant? BrokerLastUpdatedAt { get; set; }
-    public int? BrokerPid { get; set; }
+    public int? BrokerPidFromAuthPlugin { get; set; }
     private const string ByteLoadReceived1Min = "load/bytes/received/1min";
     private const string ByteLoadReceived5Min = "load/bytes/received/5min";
     private const string ByteLoadReceived15Min = "load/bytes/received/15min";

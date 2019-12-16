@@ -46,7 +46,7 @@ namespace SMEIoT.Infrastructure
 
       services.AddHostedService<BackgroundMqttClientHostedService>(provider =>
       {
-        var auth = provider.GetService<MosquittoClientAuthenticationService>();
+        var auth = provider.GetService<IMosquittoClientAuthenticationService>();
 
         var builder = new MosquittoClientBuilder()
           .SetPskTls(auth.ClientPsk, auth.ClientName)
@@ -68,7 +68,7 @@ namespace SMEIoT.Infrastructure
       services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
       services.AddSingleton<IMqttIdentifierService, MqttIdentifierService>();
       services.AddSingleton<IMosquittoBrokerService, MosquittoBrokerService>();
-      services.AddSingleton<MosquittoClientAuthenticationService>();
+      services.AddSingleton<IMosquittoClientAuthenticationService, MosquittoClientAuthenticationService>();
       services.AddScoped<IMosquittoBrokerMessageService, MosquittoBrokerMessageService>();
       services.AddSingleton<IFileProvider>(provider => {
         return env.ContentRootFileProvider;

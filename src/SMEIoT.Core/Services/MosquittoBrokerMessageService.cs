@@ -1,11 +1,18 @@
 using System;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using SMEIoT.Core.Interfaces;
 using SMEIoT.Core.Exceptions;
 
 namespace SMEIoT.Core.Services
 {
+  class BrokerMeta
+  {
+    string MosquittoAuthPluginVersion { get; set; }
+    int Pid { get; set; }
+  }
+
   /// Broker will starts to ask us things. This is our message handler.
   public class MosquittoBrokerMessageService: IMosquittoBrokerMessageService
   {
@@ -14,17 +21,26 @@ namespace SMEIoT.Core.Services
     public const string STATUS_OK = "OK";
     public const string STATUS_FAIL = "FAIL";
 
-    private readonly MosquittoClientAuthenticationService _clientService; // we need to subscribe the client as well as authenticate ourselves.
+    private readonly IMosquittoClientAuthenticationService _clientService; // we need to subscribe the client as well as authenticate ourselves.
+    private readonly IMosquittoBrokerService _brokerService;
     private readonly IDeviceService _deviceService;
 
-    public MosquittoBrokerMessageService(MosquittoClientAuthenticationService clientService, IDeviceService deviceService)
+    public MosquittoBrokerMessageService(IMosquittoClientAuthenticationService clientService, IMosquittoBrokerService brokerService, IDeviceService deviceService)
     {
       _clientService = clientService;
+      _brokerService = brokerService;
       _deviceService = deviceService;
     }
 
     private Task<StringBuilder> HandleMetaCommandAsync(StringBuilder builder, string body)
     {
+      var serializeOptions = new JsonSerializerOptions
+      {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+      };
+      var meta = JsonSerializer.Deserialize<BrokerMeta>(body, serializeOptions);
+      _brokerService.BrokerPidFromAuthPlugin = meta.Pid;
+
       return Task.FromResult(builder.Append(STATUS_OK));
     }
 
