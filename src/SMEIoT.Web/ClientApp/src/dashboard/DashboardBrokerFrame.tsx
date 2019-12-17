@@ -5,12 +5,16 @@ import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Grid from '@material-ui/core/Grid';
+import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import IconButton from '@material-ui/core/IconButton';
+import Typography from '@material-ui/core/Typography';
+import Link from '@material-ui/core/Link';
 import CloseIcon from "@material-ui/icons/Close";
+import NavigateNextIcon from "@material-ui/icons/NavigateNext";
 import Frame from "./Frame";
 import { Helmet } from "react-helmet";
 import BasicBrokerCard from "./BasicBrokerCard";
-import { defineMessages, useIntl } from "react-intl";
+import { defineMessages, useIntl, FormattedMessage } from "react-intl";
 import {
   Link as ReachLink,
 } from "@reach/router";
@@ -52,8 +56,8 @@ const _DashboardBrokerFrame: React.FunctionComponent<IDashboardBrokerFrameProps>
         <IconButton
           edge="end"
           color="inherit"
-          aria-label="close this action"
-          to={"/dashboard/devices"}
+          aria-label={intl.formatMessage(messages.closeAriaLabel)}
+          to={"../../devices"}
           component={ReachLink}
         >
           <CloseIcon />
@@ -65,6 +69,24 @@ const _DashboardBrokerFrame: React.FunctionComponent<IDashboardBrokerFrameProps>
             <title>{title}</title>
           </Helmet>
           <Grid container spacing={2}>
+            <Grid item xs={12}>
+            <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} aria-label="breadcrumb">
+              <Link component={ReachLink} color="inherit" to="../../devices">
+                <FormattedMessage
+                 id="dashboard.devices.breadcrumb.devices"
+                 description="The label at the breadcrumb for devices"
+                 defaultMessage="Devices"
+                />
+              </Link>
+              <Typography color="textPrimary">
+                <FormattedMessage
+                 id="dashboard.devices.breadcrumb.broker"
+                 description="The label at the breadcrumb for the broker"
+                 defaultMessage="Broker"
+                />
+              </Typography>
+            </Breadcrumbs>
+            </Grid>
             <Grid item xs={12}>
               <BasicBrokerCard/>
             </Grid>

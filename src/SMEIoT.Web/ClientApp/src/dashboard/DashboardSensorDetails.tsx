@@ -15,6 +15,8 @@ import DashboardSensorBoard from "./DashboardSensorBoard";
 import { defineMessages, useIntl, FormattedMessage } from "react-intl";
 import { Link, RouteComponentProps } from "@reach/router";
 import { Helmet } from "react-helmet";
+import { SensorsApi } from "smeiot-client";
+import { GetDefaultApiConfig } from "../index";
 
 const styles = ({
   palette,
@@ -46,6 +48,7 @@ const styles = ({
   });
 
 export interface IDashboardSensorDetailsRouteParams {
+  deviceName: string;
   sensorName: string;
 }
   
@@ -67,9 +70,28 @@ const messages = defineMessages({
 });
 
 const _DashboardSensorDetails: React.FunctionComponent<IDashboardSensorDetails> = ({
-  classes
+  classes,
+  deviceName,
+  sensorName
 }) => {
   const intl = useIntl();
+
+  const [value, setValues] = React.useState<number[] | undefined>();
+
+  React.useEffect(() => {
+    (async () => {
+      const api = new SensorsApi(GetDefaultApiConfig());
+      if (!deviceName || !sensorName) { return; }
+
+      const res = await api.apiSensorsDeviceNameSensorNameGet({
+        deviceName, sensorName
+      });
+      if (res !== null) {
+        setValues(res.values);
+      }
+      // setLoading(false);
+    })();
+  }, []);
 
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
   return (
@@ -82,6 +104,7 @@ const _DashboardSensorDetails: React.FunctionComponent<IDashboardSensorDetails> 
             <title>{intl.formatMessage(messages.title)}</title>
           </Helmet>
           <Grid container spacing={3}>
+            {value !== undefined && value ? value.map(v => <p key={v}>{v}</p>) : null}
           </Grid>
         </Container>
       }

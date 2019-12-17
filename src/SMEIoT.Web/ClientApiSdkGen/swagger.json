@@ -701,26 +701,28 @@
         }
       }
     },
-    "/api/sensors/{deviceName}/{sensorName}": {
+    "/api/sensors": {
       "get": {
         "tags": [
           "Sensors"
         ],
         "parameters": [
           {
-            "name": "deviceName",
-            "in": "path",
-            "required": true,
+            "name": "start",
+            "in": "query",
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "format": "int32",
+              "default": 1
             }
           },
           {
-            "name": "sensorName",
-            "in": "path",
-            "required": true,
+            "name": "limit",
+            "in": "query",
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "format": "int32",
+              "default": 10
             }
           }
         ],
@@ -730,13 +732,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SensorDetailsApiModel"
+                  "$ref": "#/components/schemas/SensorDetailsApiModelList"
                 }
               }
             }
           },
-          "404": {
-            "description": "Not Found",
+          "400": {
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
@@ -746,9 +748,7 @@
             }
           }
         }
-      }
-    },
-    "/api/sensors": {
+      },
       "post": {
         "tags": [
           "Sensors"
@@ -785,6 +785,53 @@
           },
           "400": {
             "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sensors/{deviceName}/{sensorName}": {
+      "get": {
+        "tags": [
+          "Sensors"
+        ],
+        "parameters": [
+          {
+            "name": "deviceName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sensorName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SensorDetailsApiModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
             "content": {
               "application/json": {
                 "schema": {
@@ -1251,7 +1298,7 @@
         "type": "object",
         "additionalProperties": false
       },
-      "SensorValuesApiModel": {
+      "SensorDetailsApiModel": {
         "type": "object",
         "properties": {
           "values": {
@@ -1266,18 +1313,21 @@
           },
           "interval": {
             "type": "string"
+          },
+          "sensorName": {
+            "type": "string"
           }
         },
         "additionalProperties": false
       },
-      "SensorDetailsApiModel": {
+      "SensorDetailsApiModelList": {
         "type": "object",
         "properties": {
-          "values": {
-            "$ref": "#/components/schemas/SensorValuesApiModel"
-          },
-          "sensorName": {
-            "type": "string"
+          "sensors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SensorDetailsApiModel"
+            }
           }
         },
         "additionalProperties": false

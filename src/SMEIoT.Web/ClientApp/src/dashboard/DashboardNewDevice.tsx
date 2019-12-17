@@ -8,7 +8,7 @@ import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import Skeleton from "@material-ui/lab/Skeleton";
 import Typography from "@material-ui/core/Typography";
-import { RouteComponentProps } from "@reach/router";
+import { Link as ReachLink, RouteComponentProps } from "@reach/router";
 import { Helmet } from "react-helmet";
 import {
   defineMessages,

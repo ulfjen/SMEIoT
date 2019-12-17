@@ -67,6 +67,22 @@ namespace SMEIoT.Core.Services
       }
     }
 
+    public async IAsyncEnumerable<Sensor> ListSensorsAsync(int start, int limit)
+    {
+      if (start <= 0)
+      {
+        throw new ArgumentException("start can't be negative or zero");
+      }
+      if (limit < 0)
+      {
+        throw new ArgumentException("limit can't be negative"); 
+      }
+      await foreach (var sensor in _dbContext.Sensors.OrderBy(u => u.Id).Skip(start-1).Take(limit).AsAsyncEnumerable())
+      {
+        yield return sensor;
+      }
+    }
+
     public async Task CreateSensorByDeviceAndNameAsync(Device device, string sensorName)
     {
       _dbContext.Sensors.Add(new Sensor { Name = sensorName, NormalizedName = Sensor.NormalizeName(sensorName), DeviceId = device.Id });

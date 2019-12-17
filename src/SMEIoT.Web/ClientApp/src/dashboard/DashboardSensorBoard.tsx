@@ -106,14 +106,15 @@ const _DashboardSensorBoard: React.FunctionComponent<IDashboardSensorBoard> = ({
   React.useEffect(() => {
     (async () => {
       const api = new SensorsApi(GetDefaultApiConfig());
-      // var res = await api({
-      //   // start, limit
-      // });
-      // if (res !== null && res.sensors) {
-      //   setSensors(res.devices);
-      // } else {
-      //   setLoadingError(true);
-      // }
+      var res = await api.apiSensorsGet({
+        start: 1,
+        limit: 10
+      });
+      if (res !== null && res.sensors) {
+        setSensors(res.sensors);
+      } else {
+        setLoadingError(true);
+      }
       setLoading(false);
     })();
   }, []);

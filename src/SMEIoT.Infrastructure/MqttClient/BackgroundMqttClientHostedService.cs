@@ -21,11 +21,16 @@ namespace SMEIoT.Infrastructure.MqttClient
       _logger = logger;
     }
 
-    public Task StartAsync(CancellationToken cancellationToken)
+    public async Task StartAsync(CancellationToken cancellationToken)
     {
-      ThreadPool.QueueUserWorkItem(ConnectClient);
-
-      return Task.CompletedTask;
+      try
+      {
+        await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
+        ThreadPool.QueueUserWorkItem(ConnectClient);
+      }
+      catch (OperationCanceledException)
+      {
+      }
     }
 
     private void ConnectClient(object state)
@@ -51,7 +56,7 @@ namespace SMEIoT.Infrastructure.MqttClient
           }
         } else {
           var ret = _client.RunLoop();
-          _logger.LogDebug($"runloop returned: {ret}");
+          _logger.LogTrace($"runloop returned: {ret}");
 
           if (ret == 5) { // connection refused.
             throw new SystemException("We can't connect with the broker. Socket error.");

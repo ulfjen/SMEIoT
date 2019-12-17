@@ -8,6 +8,7 @@ import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import Skeleton from "@material-ui/lab/Skeleton";
 import Typography from "@material-ui/core/Typography";
+import AddIcon from "@material-ui/icons/Add";
 import { RouteComponentProps } from "@reach/router";
 import { Helmet } from "react-helmet";
 import {
@@ -20,12 +21,14 @@ import ProgressButton from "../components/ProgressButton";
 import SuggestTextField from "../components/SuggestTextField";
 import {
   DevicesApi,
-  DeviceConfigBindingModel
+  DeviceConfigBindingModel,
+  SensorsApi
 } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
-import Frame from "./Frame";
+import DashboardDeviceEditFrame from "./DashboardDeviceEditFrame";
 import Container from "@material-ui/core/Container";
 import Tooltip from "@material-ui/core/Tooltip";
+import TwoLayerLabelAction from "../components/TwoLayerLabelAction";
 
 const styles = ({ spacing }: Theme) =>
   createStyles({
@@ -54,7 +57,7 @@ export interface IDashboardEditDeviceRouteParams {
 
 export interface IDashboardDeviceEditProps
   extends RouteComponentProps<IDashboardEditDeviceRouteParams>,
-    WithStyles<typeof styles> {}
+  WithStyles<typeof styles> { }
 
 const messages = defineMessages({
   title: {
@@ -88,21 +91,32 @@ const _DashboardDeviceEdit: React.FunctionComponent<IDashboardDeviceEditProps> =
   const [unconnectedDeviceName, setUnconnectedDeviceName] = React.useState<
     string | null
   >(null);
-  const api = new DevicesApi(GetDefaultApiConfig());
+  const api = new SensorsApi(GetDefaultApiConfig());
 
-  const [suggestingDeviceName, setSuggestDeviceName] = React.useState<boolean>(
-    false
-  );
-
-  const [suggestingKey, setSuggestKey] = React.useState<boolean>(false);
-  const onSuggestKey: React.MouseEventHandler<HTMLButtonElement> = async event => {
-    setSuggestKey(true);
-
-    const res = await api.apiDevicesConfigSuggestKeyGet();
-
-
-    setSuggestKey(false);
-  };
+  const renderActionList = (deviceName: string, names: string[]) => {
+    return names.map(name => <TwoLayerLabelAction
+      firstLabel={deviceName}
+      key={name}
+      secondLabel={name}
+      firstLabelVariant="inherit"
+      actionIcon={<AddIcon/>}
+      actionIconOnClick={async (event) => {
+        let parent = event.currentTarget.parentElement
+        if (!parent) { return; }
+        // .parentElement.children;
+        let deviceName = parent.childNodes[0].textContent;
+        let sensorName = parent.childNodes[2].textContent;
+        if (deviceName === null || sensorName === null) { return; }
+        let sensor = await api.apiSensorsPost({
+          sensorLocatorBindingModel: {
+            deviceName: deviceName,
+            name: sensorName
+          }
+        });
+        console.log(sensor);
+      }}
+     />);
+  }
 
   React.useEffect(() => {
     (async () => {
@@ -119,39 +133,14 @@ const _DashboardDeviceEdit: React.FunctionComponent<IDashboardDeviceEditProps> =
     })();
   }, []);
 
-  return (
-    <Frame
-      title={intl.formatMessage(messages.title)}
-      direction="ltr"
-      content={
-        <Container maxWidth="lg" className={classes.container}>
-          <Helmet>
-            <title>{intl.formatMessage(messages.title)}</title>
-          </Helmet>
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-      <Paper>{sensorNames ? sensorNames.map(n => <p>{n}</p>) : null}</Paper>
-            </Grid>
-            <Grid item xs={12}>
-            </Grid>
-          </Grid>
-          {/* <Tooltip
-            title={intl.formatMessage(messages.fabTooltip)}
-            aria-label={intl.formatMessage(messages.fabTooltip)}
-          > */}
-            {/* <Fab
-              color="secondary"
-              className={classes.absolute}
-              to={"/dashboard/devices/new"}
-              component={ReachLink}
-            >
-              <AddIcon />
-            </Fab> */}
-          {/* </Tooltip> */}
-        </Container>
-      }
-    />
-  );
+  return <DashboardDeviceEditFrame device={undefined}>
+    <Helmet>
+      <title>{intl.formatMessage(messages.title)}</title>
+    </Helmet>
+    <Grid item xs={12}>
+      <Paper>{renderActionList("pupate-potteen", sensorNames || [])}</Paper>
+    </Grid>
+  </DashboardDeviceEditFrame>;
 };
 
 const DashboardDeviceEdit = withStyles(styles)(_DashboardDeviceEdit);

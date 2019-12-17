@@ -13,13 +13,6 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import {
-    SensorValuesApiModel,
-    SensorValuesApiModelFromJSON,
-    SensorValuesApiModelFromJSONTyped,
-    SensorValuesApiModelToJSON,
-} from './';
-
 /**
  * 
  * @export
@@ -28,10 +21,22 @@ import {
 export interface SensorDetailsApiModel {
     /**
      * 
-     * @type {SensorValuesApiModel}
+     * @type {Array<number>}
      * @memberof SensorDetailsApiModel
      */
-    values?: SensorValuesApiModel;
+    values?: Array<number>;
+    /**
+     * 
+     * @type {string}
+     * @memberof SensorDetailsApiModel
+     */
+    startedAt?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SensorDetailsApiModel
+     */
+    interval?: string;
     /**
      * 
      * @type {string}
@@ -50,7 +55,9 @@ export function SensorDetailsApiModelFromJSONTyped(json: any, ignoreDiscriminato
     }
     return {
         
-        'values': !exists(json, 'values') ? undefined : SensorValuesApiModelFromJSON(json['values']),
+        'values': !exists(json, 'values') ? undefined : json['values'],
+        'startedAt': !exists(json, 'startedAt') ? undefined : json['startedAt'],
+        'interval': !exists(json, 'interval') ? undefined : json['interval'],
         'sensorName': !exists(json, 'sensorName') ? undefined : json['sensorName'],
     };
 }
@@ -64,7 +71,9 @@ export function SensorDetailsApiModelToJSON(value?: SensorDetailsApiModel | null
     }
     return {
         
-        'values': SensorValuesApiModelToJSON(value.values),
+        'values': value.values,
+        'startedAt': value.startedAt,
+        'interval': value.interval,
         'sensorName': value.sensorName,
     };
 }

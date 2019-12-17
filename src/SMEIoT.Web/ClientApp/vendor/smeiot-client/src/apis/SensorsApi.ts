@@ -24,6 +24,9 @@ import {
     SensorDetailsApiModel,
     SensorDetailsApiModelFromJSON,
     SensorDetailsApiModelToJSON,
+    SensorDetailsApiModelList,
+    SensorDetailsApiModelListFromJSON,
+    SensorDetailsApiModelListToJSON,
     SensorLocatorBindingModel,
     SensorLocatorBindingModelFromJSON,
     SensorLocatorBindingModelToJSON,
@@ -32,6 +35,11 @@ import {
 export interface SensorsApiApiSensorsDeviceNameSensorNameGetRequest {
     deviceName: string;
     sensorName: string;
+}
+
+export interface SensorsApiApiSensorsGetRequest {
+    start?: number;
+    limit?: number;
 }
 
 export interface SensorsApiApiSensorsPostRequest {
@@ -72,6 +80,38 @@ export class SensorsApi extends runtime.BaseAPI {
      */
     async apiSensorsDeviceNameSensorNameGet(requestParameters: SensorsApiApiSensorsDeviceNameSensorNameGetRequest): Promise<SensorDetailsApiModel> {
         const response = await this.apiSensorsDeviceNameSensorNameGetRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiSensorsGetRaw(requestParameters: SensorsApiApiSensorsGetRequest): Promise<runtime.ApiResponse<SensorDetailsApiModelList>> {
+        const queryParameters: runtime.HTTPQuery = {};
+
+        if (requestParameters.start !== undefined) {
+            queryParameters['start'] = requestParameters.start;
+        }
+
+        if (requestParameters.limit !== undefined) {
+            queryParameters['limit'] = requestParameters.limit;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/sensors`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => SensorDetailsApiModelListFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiSensorsGet(requestParameters: SensorsApiApiSensorsGetRequest): Promise<SensorDetailsApiModelList> {
+        const response = await this.apiSensorsGetRaw(requestParameters);
         return await response.value();
     }
 

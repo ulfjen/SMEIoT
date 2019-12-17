@@ -18,7 +18,7 @@ namespace SMEIoT.Infrastructure.Mosquitto
   {
     public const int BufferSize = 512;
 
-    private readonly ILogger<MosquittoBrokerAuthHandler> _logger;
+    private readonly ILogger _logger;
     private readonly IServiceScopeFactory _scopeFactory;
 
     public MosquittoBrokerAuthHandler(IServiceScopeFactory scopeFactory, ILogger<MosquittoBrokerAuthHandler> logger)
@@ -35,7 +35,7 @@ namespace SMEIoT.Infrastructure.Mosquitto
         builder.Append(encoding.GetString(segment.Span));
       }
       var str = builder.ToString();
-      _logger.LogDebug(str);
+      _logger.LogTrace(str);
 
       // return async directly with DI causes an exception that will fail the socket pipeline.
       return ProcessLineAsync(str).GetAwaiter().GetResult();
@@ -83,7 +83,7 @@ namespace SMEIoT.Infrastructure.Mosquitto
           var builder = ProcessLine(encoding, line);
           builder.Append('\n');
           var resp = builder.ToString();
-          _logger.LogDebug(resp);
+          _logger.LogTrace(resp);
 
           await connection.Transport.Output.WriteAsync(new ReadOnlyMemory<byte>(encoding.GetBytes(resp)));
         }
