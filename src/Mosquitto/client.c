@@ -29,9 +29,9 @@ int mosq_init()
     mosq = mosquitto_new(NULL, 1, &delegates);
     if (mosq == NULL) {
         return errno;
-    } else {
-        return 0;
     }
+    
+    return mosquitto_threaded_set(mosq, true); // only affects write operations but let's keep it here so we don't forget
 }
 
 int mosq_set_tls_psk(char* psk, char* identity, char* ciphers)

@@ -58,13 +58,19 @@ namespace SMEIoT.Core.EventHandlers
     public void Update(MqttMessage message)
     {
       var topic = message.Topic;
-      Console.WriteLine(message.Payload);
+      Console.WriteLine($"{topic} = {message.Payload}");
 
       if (topic.StartsWith(SensorTopicPrefix))
       {
         var parsed = topic.AsSpan();
         parsed = parsed.Slice(SensorTopicPrefix.Length);
         var splitP = parsed.IndexOf('/');
+        if (splitP != -1) {
+          Console.WriteLine($"{parsed.Slice(0, splitP).ToString()}:{parsed.Slice(splitP).ToString()}");
+        } else {
+                   Console.WriteLine(parsed.ToString());
+        }
+
         if (splitP != -1) {
           var deviceName = parsed.Slice(0, splitP).ToString();
           if (!_mqttService.RegisterDeviceName(deviceName))

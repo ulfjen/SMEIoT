@@ -11,6 +11,7 @@ namespace SMEIoT.Infrastructure.MqttClient
     private readonly MosquittoClient _client;
     private Timer? _timer;
     private ILogger<BackgroundMqttClientHostedService> _logger;
+    private readonly int _delay = 100;
     private bool _reconnect;
 
     public BackgroundMqttClientHostedService(MosquittoClient client, ILogger<BackgroundMqttClientHostedService> logger)
@@ -31,30 +32,36 @@ namespace SMEIoT.Infrastructure.MqttClient
       _logger.LogInformation("Start to connect MQTT client with the Mosquitto broker.");
 
       _client.Connect();
-      // defaults to 10s
       _reconnect = false;
-      _timer = new Timer(ExecuteRunLoop, null, 0, _client.Timeout == -1 ? 10000 : _client.Timeout);
+      _timer = new Timer(ExecuteRunLoop, null, 0, _delay);
     }
 
     private void ExecuteRunLoop(object state)
     {
-      if (_reconnect) {
-        var ret = _client.Reconnect();
-        _logger.LogInformation($"MQTT client failed, trying to reconnect. got status: {ret}");
- 
-        if (ret == 0) {
-          _reconnect = false;
-        }
-      } else {
-        var ret = _client.RunLoop();
-        _logger.LogDebug($"runloop returned: {ret}");
+      try
+      {
+        if (_reconnect) {
+          var ret = _client.Reconnect();
+          _logger.LogInformation($"MQTT client failed, trying to reconnect. got status: {ret}");
+  
+          if (ret == 0) {
+            _reconnect = false;
+          }
+        } else {
+          var ret = _client.RunLoop();
+          _logger.LogDebug($"runloop returned: {ret}");
 
-        if (ret == 5) { // connection refused.
-          throw new SystemException("We can't connect with the broker. Socket error.");
-        }
-        if (ret != 0) { // try to reconnect next time
-          _reconnect = true;
-        }
+          if (ret == 5) { // connection refused.
+            throw new SystemException("We can't connect with the broker. Socket error.");
+          }
+          if (ret != 0) { // try to reconnect next time
+            _reconnect = true;
+          }
+        } 
+      }
+      finally
+      {
+        _timer.Change(_delay, Timeout.Infinite);
       }
     }
     
