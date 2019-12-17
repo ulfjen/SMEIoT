@@ -1,0 +1,19 @@
+pid_file /var/run/smeiot.mosquitto.pid
+
+persistence true
+persistence_location /var/lib/mosquitto/
+
+log_dest stdout
+#file /var/log/mosquitto/mosquitto.log
+#
+include_dir /etc/mosquitto/conf.d
+#
+## PSK listener
+listener 8884
+## TLS 1.2 1.1 is disabled
+##tls_version tlsv1.2
+psk_hint "vinnovabroker"
+use_identity_as_username true
+auth_plugin /var/SMEIoT/out/src/MosquittoPlugin/libmosqauth.so
+allow_anonymous true
+sys_interval 5
