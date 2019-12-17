@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using SMEIoT.Core.Entities;
 using SMEIoT.Core.Exceptions;
 using SMEIoT.Core.Interfaces;
+using NodaTime;
 
 namespace SMEIoT.Core.Services
 {
@@ -63,6 +64,31 @@ namespace SMEIoT.Core.Services
       await foreach (var device in _dbContext.Devices.OrderBy(u => u.Id).Skip(start-1).Take(limit).AsAsyncEnumerable())
       {
         yield return device;
+      }
+    }
+
+    public async Task CreateSensorByDeviceAndNameAsync(Device device, string sensorName)
+    {
+      _dbContext.Sensors.Add(new Sensor { Name = sensorName, NormalizedName = Sensor.NormalizeName(sensorName), DeviceId = device.Id });
+      await _dbContext.SaveChangesAsync();
+    }
+
+    public async Task<Sensor> GetSensorByDeviceAndNameAsync(Device device, string sensorName)
+    {
+      var sensor = await _dbContext.Sensors.Where(s => s.NormalizedName == Sensor.NormalizeName(sensorName) && s.DeviceId == device.Id).FirstOrDefaultAsync();
+      if (sensor == null)
+      {
+        throw new EntityNotFoundException("cannot find the sensor.", "sensorName");
+      }
+
+      return sensor;
+    }
+
+    public async IAsyncEnumerable<double> GetSensorValuesByDeviceAndSensorAsync(Device device, Sensor sensor, Instant startedAt, Duration duration)
+    {
+      foreach (var d in new[] { 32.4, 72.0, 32.1, 72, 32.1, 72.0 })
+      {
+        yield return d;
       }
     }
   }

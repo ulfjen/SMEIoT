@@ -8,6 +8,7 @@ using Xunit;
 
 namespace SMEIoT.Tests.Core.Services
 {
+  #if false
   public class SensorServiceTest
   {
     private static async Task<(SensorService, ApplicationDbContext)> BuildService()
@@ -57,4 +58,5 @@ namespace SMEIoT.Tests.Core.Services
     }
 
   }
+  #endif
 }

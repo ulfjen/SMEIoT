@@ -13,6 +13,7 @@ namespace SMEIoT.Infrastructure.MqttClient
     private ILogger<BackgroundMqttClientHostedService> _logger;
     private readonly int _delay = 100;
     private bool _reconnect;
+    private bool _stoppedTimer;
 
     public BackgroundMqttClientHostedService(MosquittoClient client, ILogger<BackgroundMqttClientHostedService> logger)
     {
@@ -33,6 +34,7 @@ namespace SMEIoT.Infrastructure.MqttClient
 
       _client.Connect();
       _reconnect = false;
+      _stoppedTimer = false;
       _timer = new Timer(ExecuteRunLoop, null, 0, _delay);
     }
 
@@ -61,13 +63,19 @@ namespace SMEIoT.Infrastructure.MqttClient
       }
       finally
       {
-        _timer.Change(_delay, Timeout.Infinite);
+        if (!_stoppedTimer) {
+          _timer.Change(_delay, Timeout.Infinite);
+        } else {
+          _timer.Change(Timeout.Infinite, Timeout.Infinite);
+        }
       }
     }
     
     public Task StopAsync(CancellationToken cancellationToken)
     {
-      _timer?.Change(Timeout.Infinite, 0);
+      // timer may still run a few times but that's fine
+      _stoppedTimer = true;
+      _timer?.Change(Timeout.Infinite, Timeout.Infinite);
 
       return Task.CompletedTask;
     }

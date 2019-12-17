@@ -15,25 +15,26 @@ namespace SMEIoT.Web.Api.V1
   public class SensorsController : BaseController 
   {
     private readonly ILogger<SensorsController> _logger;
-    private readonly ISensorService _service;
+    private readonly IDeviceService _service;
     private readonly IMqttIdentifierService _mqttService;
 
 
-    public SensorsController(ILogger<SensorsController> logger, ISensorService service, IMqttIdentifierService mqttService)
+    public SensorsController(ILogger<SensorsController> logger, IDeviceService service, IMqttIdentifierService mqttService)
     {
       _logger = logger;
       _service = service;
       _mqttService = mqttService;
     }
 
-    [HttpGet("{name}")]
+    [HttpGet("{deviceName}/{sensorName}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<SensorDetailsApiModel>> Show(string name)
+    public async Task<ActionResult<SensorDetailsApiModel>> Show(string deviceName, string sensorName)
     {
-      var sensor = await _service.GetSensorByName(name);
+      var device = await _service.GetDeviceByNameAsync(deviceName);
+      var sensor = await _service.GetSensorByDeviceAndNameAsync(device, sensorName);   
       var values = new List<double>();
-      await foreach (var val in _service.GetSensorValues(sensor.Name, SystemClock.Instance.GetCurrentInstant(), Duration.FromSeconds(5)))
+      await foreach (var val in _service.GetSensorValuesByDeviceAndSensorAsync(device, sensor, SystemClock.Instance.GetCurrentInstant(), Duration.FromSeconds(5)))
       {
         values.Add(val);
       }
@@ -48,8 +49,9 @@ namespace SMEIoT.Web.Api.V1
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<BasicSensorApiModel>> Create(SensorLocatorBindingModel view)
     {
-      await _service.CreateSensor(view.Name);
-      var sensor = await _service.GetSensorByName(view.Name);
+      var device = await _service.GetDeviceByNameAsync(view.DeviceName);
+      await _service.CreateSensorByDeviceAndNameAsync(device, view.Name);
+      var sensor = await _service.GetSensorByDeviceAndNameAsync(device, view.Name);
       var res = new BasicSensorApiModel(sensor);
       return CreatedAtAction(nameof(Create), res);
     }

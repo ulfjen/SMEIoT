@@ -701,14 +701,22 @@
         }
       }
     },
-    "/api/sensors/{name}": {
+    "/api/sensors/{deviceName}/{sensorName}": {
       "get": {
         "tags": [
           "Sensors"
         ],
         "parameters": [
           {
-            "name": "name",
+            "name": "deviceName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sensorName",
             "in": "path",
             "required": true,
             "schema": {
@@ -1277,6 +1285,9 @@
       "SensorLocatorBindingModel": {
         "type": "object",
         "properties": {
+          "deviceName": {
+            "type": "string"
+          },
           "name": {
             "type": "string"
           }

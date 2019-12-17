@@ -29,8 +29,9 @@ import {
     SensorLocatorBindingModelToJSON,
 } from '../models';
 
-export interface SensorsApiApiSensorsNameGetRequest {
-    name: string;
+export interface SensorsApiApiSensorsDeviceNameSensorNameGetRequest {
+    deviceName: string;
+    sensorName: string;
 }
 
 export interface SensorsApiApiSensorsPostRequest {
@@ -44,9 +45,13 @@ export class SensorsApi extends runtime.BaseAPI {
 
     /**
      */
-    async apiSensorsNameGetRaw(requestParameters: SensorsApiApiSensorsNameGetRequest): Promise<runtime.ApiResponse<SensorDetailsApiModel>> {
-        if (requestParameters.name === null || requestParameters.name === undefined) {
-            throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling apiSensorsNameGet.');
+    async apiSensorsDeviceNameSensorNameGetRaw(requestParameters: SensorsApiApiSensorsDeviceNameSensorNameGetRequest): Promise<runtime.ApiResponse<SensorDetailsApiModel>> {
+        if (requestParameters.deviceName === null || requestParameters.deviceName === undefined) {
+            throw new runtime.RequiredError('deviceName','Required parameter requestParameters.deviceName was null or undefined when calling apiSensorsDeviceNameSensorNameGet.');
+        }
+
+        if (requestParameters.sensorName === null || requestParameters.sensorName === undefined) {
+            throw new runtime.RequiredError('sensorName','Required parameter requestParameters.sensorName was null or undefined when calling apiSensorsDeviceNameSensorNameGet.');
         }
 
         const queryParameters: runtime.HTTPQuery = {};
@@ -54,7 +59,7 @@ export class SensorsApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/api/sensors/{name}`.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters.name))),
+            path: `/api/sensors/{deviceName}/{sensorName}`.replace(`{${"deviceName"}}`, encodeURIComponent(String(requestParameters.deviceName))).replace(`{${"sensorName"}}`, encodeURIComponent(String(requestParameters.sensorName))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -65,8 +70,8 @@ export class SensorsApi extends runtime.BaseAPI {
 
     /**
      */
-    async apiSensorsNameGet(requestParameters: SensorsApiApiSensorsNameGetRequest): Promise<SensorDetailsApiModel> {
-        const response = await this.apiSensorsNameGetRaw(requestParameters);
+    async apiSensorsDeviceNameSensorNameGet(requestParameters: SensorsApiApiSensorsDeviceNameSensorNameGetRequest): Promise<SensorDetailsApiModel> {
+        const response = await this.apiSensorsDeviceNameSensorNameGetRaw(requestParameters);
         return await response.value();
     }
 

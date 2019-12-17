@@ -5,6 +5,7 @@ using System.Text;
 using NodaTime;
 using SMEIoT.Core.Entities;
 using SMEIoT.Core.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace SMEIoT.Core.EventHandlers
 {
@@ -18,12 +19,18 @@ namespace SMEIoT.Core.EventHandlers
     private readonly IClock _clock;
     private readonly IMqttIdentifierService _mqttService;
     private readonly IMosquittoBrokerService _brokerService;
+    private readonly ILogger<MosquittoMessageHandler> _logger;
 
-    public MosquittoMessageHandler(IClock clock, IMqttIdentifierService mqttService, IMosquittoBrokerService brokerService)
+    public MosquittoMessageHandler(
+        IClock clock,
+        IMqttIdentifierService mqttService, 
+        IMosquittoBrokerService brokerService,
+        ILogger<MosquittoMessageHandler> logger)
     {
       _clock = clock;
       _mqttService = mqttService;
       _brokerService = brokerService;
+      _logger = logger;
       Attach(this);
     }
 
@@ -55,54 +62,62 @@ namespace SMEIoT.Core.EventHandlers
       Notify(message);
     }
 
-    public void Update(MqttMessage message)
+    private void ProcessSensorTopic(MqttMessage message)
     {
-      var topic = message.Topic;
-      Console.WriteLine($"{topic} = {message.Payload}");
-
-      if (topic.StartsWith(SensorTopicPrefix))
-      {
-        var parsed = topic.AsSpan();
-        parsed = parsed.Slice(SensorTopicPrefix.Length);
-        var splitP = parsed.IndexOf('/');
-        if (splitP != -1) {
-          Console.WriteLine($"{parsed.Slice(0, splitP).ToString()}:{parsed.Slice(splitP).ToString()}");
-        } else {
-                   Console.WriteLine(parsed.ToString());
-        }
-
-        if (splitP != -1) {
-          var deviceName = parsed.Slice(0, splitP).ToString();
-          if (!_mqttService.RegisterDeviceName(deviceName))
-          {
-            // TODO: report device registeration failed
-          } else
-          {
-            var sensorName = parsed.Slice(splitP).ToString();
-             if (!_mqttService.RegisterSensorNameWithDeviceName(sensorName, deviceName))
-            {
-              // TODO: report sensor registeration failed
-            }
-          }
-        } else
-        {
-          // TODO: generates parsed error
-        }
-      } else if (topic.StartsWith(BrokerTopicPrefix)) {
-        var parsed = topic.AsSpan();
-        parsed = parsed.Slice(BrokerTopicPrefix.Length);
-        var value = message.Payload.AsSpan();
-
-        if (value.EndsWith(SecondsPostfix)) {
-          value = value.Slice(0, value.Length - SecondsPostfix.Length).TrimEnd();
-        }
-        _brokerService.RegisterBrokerStatistics(parsed.ToString(), value.ToString());
-
-        _brokerService.BrokerRunning = true;
-        _brokerService.BrokerLastUpdatedAt = message.ReceivedAt;
+      var parsed = message.Topic.AsSpan();
+      parsed = parsed.Slice(SensorTopicPrefix.Length);
+      var splitP = parsed.IndexOf('/');
+      if (splitP != -1) {
+        _logger.LogDebug($"{parsed.Slice(0, splitP).ToString()}:{parsed.Slice(splitP+1).ToString()}");
+      } else {
+        _logger.LogDebug(parsed.ToString());
       }
 
+      if (splitP != -1) {
+        var deviceName = parsed.Slice(0, splitP).ToString();
+        if (!_mqttService.RegisterDeviceName(deviceName))
+        {
+          // TODO: report device registeration failed
+        } 
+        var sensorName = parsed.Slice(splitP+1).ToString();
+        if (!_mqttService.RegisterSensorNameWithDeviceName(sensorName, deviceName))
+        {
+          // TODO: report sensor registeration failed
+        }
+      } else
+      {
+        // TODO: generates parsed error
+      }
       // TODO: Sends a job into dispatch for storage
+    }
+
+    private void ProcessBrokerTopic(MqttMessage message)
+    {
+      var parsed = message.Topic.AsSpan();
+      parsed = parsed.Slice(BrokerTopicPrefix.Length);
+      var value = message.Payload.AsSpan();
+
+      if (value.EndsWith(SecondsPostfix)) {
+        value = value.Slice(0, value.Length - SecondsPostfix.Length).TrimEnd();
+      }
+      _brokerService.RegisterBrokerStatistics(parsed.ToString(), value.ToString());
+
+      _brokerService.BrokerRunning = true;
+      _brokerService.BrokerLastUpdatedAt = message.ReceivedAt;
+    }
+
+    public void Update(MqttMessage message)
+    {
+      _logger.LogDebug($"{message.Topic} = {message.Payload}");
+
+      if (message.Topic.StartsWith(SensorTopicPrefix))
+      {
+        ProcessSensorTopic(message);
+      }
+      else if (message.Topic.StartsWith(BrokerTopicPrefix))
+      {
+        ProcessBrokerTopic(message);
+      }
     }
   }
 }

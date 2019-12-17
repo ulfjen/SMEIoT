@@ -24,6 +24,12 @@ export interface SensorLocatorBindingModel {
      * @type {string}
      * @memberof SensorLocatorBindingModel
      */
+    deviceName?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SensorLocatorBindingModel
+     */
     name?: string;
 }
 
@@ -37,6 +43,7 @@ export function SensorLocatorBindingModelFromJSONTyped(json: any, ignoreDiscrimi
     }
     return {
         
+        'deviceName': !exists(json, 'deviceName') ? undefined : json['deviceName'],
         'name': !exists(json, 'name') ? undefined : json['name'],
     };
 }
@@ -50,6 +57,7 @@ export function SensorLocatorBindingModelToJSON(value?: SensorLocatorBindingMode
     }
     return {
         
+        'deviceName': value.deviceName,
         'name': value.name,
     };
 }

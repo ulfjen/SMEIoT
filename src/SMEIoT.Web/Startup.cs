@@ -56,7 +56,6 @@ namespace SMEIoT.Web
       });
 
       services.AddScoped<ISensorAssignmentService, SensorAssignmentService>();
-      services.AddScoped<ISensorService, SensorService>();
       services.AddScoped<IUserManagementService, UserManagementService>();
       services.AddScoped<IUserProfileService, UserProfileService>();
       services.AddScoped<IDeviceService, DeviceService>();
