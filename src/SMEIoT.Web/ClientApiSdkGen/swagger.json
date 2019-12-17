@@ -110,17 +110,17 @@
         ],
         "requestBody": {
           "content": {
-            "application/json; v=1.0": {
+            "application/json; v=1.0; v=1.0": {
               "schema": {
                 "$ref": "#/components/schemas/UserRolesBindingModel"
               }
             },
-            "text/json; v=1.0": {
+            "text/json; v=1.0; v=1.0": {
               "schema": {
                 "$ref": "#/components/schemas/UserRolesBindingModel"
               }
             },
-            "application/*+json; v=1.0": {
+            "application/*+json; v=1.0; v=1.0": {
               "schema": {
                 "$ref": "#/components/schemas/UserRolesBindingModel"
               }
@@ -216,17 +216,17 @@
         ],
         "requestBody": {
           "content": {
-            "application/json; v=1.0": {
+            "application/json; v=1.0; v=1.0": {
               "schema": {
                 "$ref": "#/components/schemas/DeviceConfigBindingModel"
               }
             },
-            "text/json; v=1.0": {
+            "text/json; v=1.0; v=1.0": {
               "schema": {
                 "$ref": "#/components/schemas/DeviceConfigBindingModel"
               }
             },
-            "application/*+json; v=1.0": {
+            "application/*+json; v=1.0; v=1.0": {
               "schema": {
                 "$ref": "#/components/schemas/DeviceConfigBindingModel"
               }
@@ -274,17 +274,17 @@
         ],
         "requestBody": {
           "content": {
-            "application/json; v=1.0": {
+            "application/json; v=1.0; v=1.0": {
               "schema": {
                 "$ref": "#/components/schemas/DeviceConfigBindingModel"
               }
             },
-            "text/json; v=1.0": {
+            "text/json; v=1.0; v=1.0": {
               "schema": {
                 "$ref": "#/components/schemas/DeviceConfigBindingModel"
               }
             },
-            "application/*+json; v=1.0": {
+            "application/*+json; v=1.0; v=1.0": {
               "schema": {
                 "$ref": "#/components/schemas/DeviceConfigBindingModel"
               }
@@ -352,10 +352,59 @@
         }
       }
     },
-    "/api/devices/config_suggest/sensor_candidates": {
+    "/api/devices/{name}/psk": {
       "get": {
         "tags": [
           "Devices"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/devices/{name}/sensor_candidates": {
+      "get": {
+        "tags": [
+          "Devices"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "responses": {
           "200": {
@@ -504,17 +553,17 @@
         ],
         "requestBody": {
           "content": {
-            "application/json; v=1.0": {
+            "application/json; v=1.0; v=1.0": {
               "schema": {
                 "$ref": "#/components/schemas/AssignUserSensorBindingModel"
               }
             },
-            "text/json; v=1.0": {
+            "text/json; v=1.0; v=1.0": {
               "schema": {
                 "$ref": "#/components/schemas/AssignUserSensorBindingModel"
               }
             },
-            "application/*+json; v=1.0": {
+            "application/*+json; v=1.0; v=1.0": {
               "schema": {
                 "$ref": "#/components/schemas/AssignUserSensorBindingModel"
               }
@@ -652,28 +701,6 @@
         }
       }
     },
-    "/sensors/{name}": {
-      "get": {
-        "tags": [
-          "Sensors"
-        ],
-        "parameters": [
-          {
-            "name": "name",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        }
-      }
-    },
     "/api/sensors/{name}": {
       "get": {
         "tags": [
@@ -720,17 +747,17 @@
         ],
         "requestBody": {
           "content": {
-            "application/json; v=1.0": {
+            "application/json; v=1.0; v=1.0": {
               "schema": {
                 "$ref": "#/components/schemas/SensorLocatorBindingModel"
               }
             },
-            "text/json; v=1.0": {
+            "text/json; v=1.0; v=1.0": {
               "schema": {
                 "$ref": "#/components/schemas/SensorLocatorBindingModel"
               }
             },
-            "application/*+json; v=1.0": {
+            "application/*+json; v=1.0; v=1.0": {
               "schema": {
                 "$ref": "#/components/schemas/SensorLocatorBindingModel"
               }
@@ -768,17 +795,17 @@
         ],
         "requestBody": {
           "content": {
-            "application/json; v=1.0": {
+            "application/json; v=1.0; v=1.0": {
               "schema": {
                 "$ref": "#/components/schemas/LoginBindingModel"
               }
             },
-            "text/json; v=1.0": {
+            "text/json; v=1.0; v=1.0": {
               "schema": {
                 "$ref": "#/components/schemas/LoginBindingModel"
               }
             },
-            "application/*+json; v=1.0": {
+            "application/*+json; v=1.0; v=1.0": {
               "schema": {
                 "$ref": "#/components/schemas/LoginBindingModel"
               }
@@ -786,12 +813,12 @@
           }
         },
         "responses": {
-          "default": {
-            "description": "Error",
+          "201": {
+            "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/LoginedApiModel"
                 }
               }
             }
@@ -802,16 +829,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "201": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LoginedApiModel"
                 }
               }
             }
@@ -826,7 +843,7 @@
         ],
         "requestBody": {
           "content": {
-            "application/json; v=1.0": {
+            "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/ValidatedUserCredentialsBindingModel"
               }
@@ -874,17 +891,17 @@
         ],
         "requestBody": {
           "content": {
-            "application/json; v=1.0": {
+            "application/json; v=1.0; v=1.0": {
               "schema": {
                 "$ref": "#/components/schemas/ConfirmedUserCredentialsUpdateBindingModel"
               }
             },
-            "text/json; v=1.0": {
+            "text/json; v=1.0; v=1.0": {
               "schema": {
                 "$ref": "#/components/schemas/ConfirmedUserCredentialsUpdateBindingModel"
               }
             },
-            "application/*+json; v=1.0": {
+            "application/*+json; v=1.0; v=1.0": {
               "schema": {
                 "$ref": "#/components/schemas/ConfirmedUserCredentialsUpdateBindingModel"
               }

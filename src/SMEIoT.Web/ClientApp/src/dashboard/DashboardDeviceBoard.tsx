@@ -151,7 +151,7 @@ const _DashboardDeviceBoard: React.FunctionComponent<IDashboardDeviceBoard> = ({
       >
         <MenuItem
           button
-          to={`/dashboard/device/${anchoredDeviceName}/edit`}
+          to={`/dashboard/devices/${anchoredDeviceName}/edit`}
           component={ReachLink}
           onClick={handleClose}
         >

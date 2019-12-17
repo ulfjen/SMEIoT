@@ -14,6 +14,7 @@ import DashboardIndex from "./dashboard/DashboardIndex";
 import DashboardMqttLogs from "./dashboard/DashboardMqttLogs";
 import DashboardNewSensor from "./dashboard/DashboardNewSensor";
 import DashboardNewDevice from "./dashboard/DashboardNewDevice";
+import DashboardDeviceEdit from "./dashboard/DashboardDeviceEdit";
 import DashboardNewDeviceConnect from "./dashboard/DashboardNewDeviceConnect";
 import DashboardNewDeviceConnectSensors from "./dashboard/DashboardNewDeviceConnectSensors";
 import DashboardBrokerStatistics from "./dashboard/DashboardBrokerStatistics";
@@ -55,6 +56,7 @@ const DashboardApp: React.FunctionComponent<IDashboardApp> = ({
         <DashboardNewDevice path="devices/new" />
         <DashboardNewDeviceConnect path="devices/new/connect" />
         <DashboardNewDeviceConnectSensors path="devices/new/connect_sensors" />
+        <DashboardDeviceEdit path="devices/:deviceName/edit" />
         <DashboardSensors path="sensors" />
         <DashboardNewSensor path="sensors/new" />
         <DashboardMqttLogs path="broker/logs" />

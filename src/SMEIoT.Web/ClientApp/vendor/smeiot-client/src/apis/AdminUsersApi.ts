@@ -122,7 +122,7 @@ export class AdminUsersApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        headerParameters['Content-Type'] = 'application/json; v=1.0';
+        headerParameters['Content-Type'] = 'application/json; v=1.0; v=1.0';
 
         const response = await this.request({
             path: `/api/admin/users/{username}/roles`.replace(`{${"username"}}`, encodeURIComponent(String(requestParameters.username))),

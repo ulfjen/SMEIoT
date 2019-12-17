@@ -5,7 +5,6 @@ import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import TextField from "@material-ui/core/TextField";
 import Divider from "@material-ui/core/Divider";
-import CircularProgress from "@material-ui/core/CircularProgress";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import ProgressButton from "./ProgressButton";
 import { FormattedMessage } from "react-intl";
@@ -30,7 +29,7 @@ const styles = ({ palette, spacing }: Theme) =>
 
 export interface ISuggestTextFieldProps extends WithStyles<typeof styles> {
   label: string;
-  value?: string | null | undefined;
+  value?: string;
   onChange: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
   onSuggest: React.MouseEventHandler<HTMLButtonElement>;
   suggesting: boolean;

@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using SMEIoT.Core.Entities;
 using SMEIoT.Web.ApiModels;
@@ -25,6 +26,8 @@ namespace SMEIoT.Web.Api.V1
     [AllowAnonymous]
 //    [ValidateAntiForgeryToken]
     [HttpPost("")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<LoginedApiModel>> Create(LoginBindingModel model)
     {
 //      ViewData["ReturnUrl"] = model.ReturnUrl;

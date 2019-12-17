@@ -48,9 +48,17 @@ export interface DevicesApiApiDevicesNameGetRequest {
     name: string;
 }
 
+export interface DevicesApiApiDevicesNamePskGetRequest {
+    name: string;
+}
+
 export interface DevicesApiApiDevicesNamePutRequest {
     name: string;
     deviceConfigBindingModel?: DeviceConfigBindingModel;
+}
+
+export interface DevicesApiApiDevicesNameSensorCandidatesGetRequest {
+    name: string;
 }
 
 /**
@@ -65,7 +73,7 @@ export class DevicesApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        headerParameters['Content-Type'] = 'application/json; v=1.0';
+        headerParameters['Content-Type'] = 'application/json; v=1.0; v=1.0';
 
         const response = await this.request({
             path: `/api/devices/bootstrap`,
@@ -159,30 +167,6 @@ export class DevicesApi extends runtime.BaseAPI {
 
     /**
      */
-    async apiDevicesConfigSuggestSensorCandidatesGetRaw(): Promise<runtime.ApiResponse<SensorCandidatesApiModel>> {
-        const queryParameters: runtime.HTTPQuery = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/api/devices/config_suggest/sensor_candidates`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        });
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => SensorCandidatesApiModelFromJSON(jsonValue));
-    }
-
-    /**
-     */
-    async apiDevicesConfigSuggestSensorCandidatesGet(): Promise<SensorCandidatesApiModel> {
-        const response = await this.apiDevicesConfigSuggestSensorCandidatesGetRaw();
-        return await response.value();
-    }
-
-    /**
-     */
     async apiDevicesGetRaw(requestParameters: DevicesApiApiDevicesGetRequest): Promise<runtime.ApiResponse<DeviceApiModelList>> {
         const queryParameters: runtime.HTTPQuery = {};
 
@@ -243,6 +227,34 @@ export class DevicesApi extends runtime.BaseAPI {
 
     /**
      */
+    async apiDevicesNamePskGetRaw(requestParameters: DevicesApiApiDevicesNamePskGetRequest): Promise<runtime.ApiResponse<string>> {
+        if (requestParameters.name === null || requestParameters.name === undefined) {
+            throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling apiDevicesNamePskGet.');
+        }
+
+        const queryParameters: runtime.HTTPQuery = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/devices/{name}/psk`.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters.name))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.TextApiResponse(response) as any;
+    }
+
+    /**
+     */
+    async apiDevicesNamePskGet(requestParameters: DevicesApiApiDevicesNamePskGetRequest): Promise<string> {
+        const response = await this.apiDevicesNamePskGetRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
+     */
     async apiDevicesNamePutRaw(requestParameters: DevicesApiApiDevicesNamePutRequest): Promise<runtime.ApiResponse<DeviceApiModel>> {
         if (requestParameters.name === null || requestParameters.name === undefined) {
             throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling apiDevicesNamePut.');
@@ -252,7 +264,7 @@ export class DevicesApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        headerParameters['Content-Type'] = 'application/json; v=1.0';
+        headerParameters['Content-Type'] = 'application/json; v=1.0; v=1.0';
 
         const response = await this.request({
             path: `/api/devices/{name}`.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters.name))),
@@ -269,6 +281,34 @@ export class DevicesApi extends runtime.BaseAPI {
      */
     async apiDevicesNamePut(requestParameters: DevicesApiApiDevicesNamePutRequest): Promise<DeviceApiModel> {
         const response = await this.apiDevicesNamePutRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiDevicesNameSensorCandidatesGetRaw(requestParameters: DevicesApiApiDevicesNameSensorCandidatesGetRequest): Promise<runtime.ApiResponse<SensorCandidatesApiModel>> {
+        if (requestParameters.name === null || requestParameters.name === undefined) {
+            throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling apiDevicesNameSensorCandidatesGet.');
+        }
+
+        const queryParameters: runtime.HTTPQuery = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/devices/{name}/sensor_candidates`.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters.name))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => SensorCandidatesApiModelFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiDevicesNameSensorCandidatesGet(requestParameters: DevicesApiApiDevicesNameSensorCandidatesGetRequest): Promise<SensorCandidatesApiModel> {
+        const response = await this.apiDevicesNameSensorCandidatesGetRaw(requestParameters);
         return await response.value();
     }
 

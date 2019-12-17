@@ -20,16 +20,19 @@ namespace SMEIoT.Web.Api.V1
     private readonly IDeviceService _service;
     private readonly IDeviceSensorIdentifierSuggestService _identifierSuggestService;
     private readonly ISecureKeySuggestService _secureKeySuggestService;
+    private readonly IMqttIdentifierService _mqttService;
     private const int DefaultDeviceNameSuggestWordLength = 2;
 
     public DevicesController(
       ILogger<DevicesController> logger,
       IDeviceService service,
       IDeviceSensorIdentifierSuggestService identifierSuggestService,
+      IMqttIdentifierService mqttService,
       ISecureKeySuggestService secureKeySuggestService)
     {
       _logger = logger;
       _service = service;
+      _mqttService = mqttService;
       _identifierSuggestService = identifierSuggestService;
       _secureKeySuggestService = secureKeySuggestService;
     }
@@ -82,15 +85,14 @@ namespace SMEIoT.Web.Api.V1
       return Ok(res);
     }
 
-    [HttpGet("config_suggest/sensor_candidates")]
+    [HttpGet("{name}/sensor_candidates")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<SensorCandidatesApiModel>> ListSensorCandidates()
+    public async Task<ActionResult<SensorCandidatesApiModel>> ListSensorCandidates(string name)
     {
-      throw new NotImplementedException();
-      // var sensor = _mqttService.ListSensorNames("dummy");
-      return Ok(new SensorCandidatesApiModel(new[]{"name1", "name2"}));
+      var suggestSensorNames = _mqttService.ListSensorNamesByDeviceName(name);
+      return Ok(new SensorCandidatesApiModel(suggestSensorNames));
     }
 
     [HttpGet("config_suggest/bootstrap")]

@@ -73,7 +73,8 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
 }) => {
   const intl = useIntl();
 
-  const [device, setDevice] = React.useState<DeviceConfigBindingModel>({});
+  const [device, setDevice] = React.useState<DeviceConfigBindingModel>({name: "", key: ""});
+  const [deviceName, setDeviceName] = React.useState<string>("");
   const [handlingNext, setHandlingNext] = React.useState<boolean>(false);
   const [loading, setLoading] = React.useState<boolean>(true);
   const [unconnectedDeviceName, setUnconnectedDeviceName] = React.useState<
@@ -116,6 +117,7 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
   > = event => {
     device.name = event.target.value;
     setDevice(device);
+    setDeviceName(event.target.value);
   };
 
   const [suggestingKey, setSuggestKey] = React.useState<boolean>(false);
@@ -135,6 +137,7 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
     HTMLInputElement | HTMLTextAreaElement
   > = event => {
     device.key = event.target.value;
+    console.log(device, event.target.value);
     setDevice(device);
   };
 
@@ -151,6 +154,7 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
       var res = await api.apiDevicesConfigSuggestBootstrapGet();
       if (res.deviceName) {
         device.name = res.deviceName;
+        setDeviceName(res.deviceName);
       }
       if (res.key) {
         device.key = res.key;
@@ -203,8 +207,8 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
               </p>
               <SuggestTextField
                 label={intl.formatMessage(messages.nameLabel)}
-                // autoFocus
-                value={device.name}
+                autoFocus
+                value={deviceName}
                 onChange={onDeviceNameChange}
                 onSuggest={onSuggestDeviceName}
                 suggesting={suggestingDeviceName}

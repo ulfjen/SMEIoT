@@ -37,10 +37,6 @@ export interface SensorsApiApiSensorsPostRequest {
     sensorLocatorBindingModel?: SensorLocatorBindingModel;
 }
 
-export interface SensorsApiSensorsNameGetRequest {
-    name: string;
-}
-
 /**
  * no description
  */
@@ -81,7 +77,7 @@ export class SensorsApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        headerParameters['Content-Type'] = 'application/json; v=1.0';
+        headerParameters['Content-Type'] = 'application/json; v=1.0; v=1.0';
 
         const response = await this.request({
             path: `/api/sensors`,
@@ -99,33 +95,6 @@ export class SensorsApi extends runtime.BaseAPI {
     async apiSensorsPost(requestParameters: SensorsApiApiSensorsPostRequest): Promise<BasicSensorApiModel> {
         const response = await this.apiSensorsPostRaw(requestParameters);
         return await response.value();
-    }
-
-    /**
-     */
-    async sensorsNameGetRaw(requestParameters: SensorsApiSensorsNameGetRequest): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters.name === null || requestParameters.name === undefined) {
-            throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling sensorsNameGet.');
-        }
-
-        const queryParameters: runtime.HTTPQuery = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/sensors/{name}`.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters.name))),
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        });
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     */
-    async sensorsNameGet(requestParameters: SensorsApiSensorsNameGetRequest): Promise<void> {
-        await this.sensorsNameGetRaw(requestParameters);
     }
 
 }
