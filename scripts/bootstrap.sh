@@ -58,7 +58,7 @@ function build_mosquitto {
 # We have custom plugins that needed to be configured, but after mosquitto is built and installed
 function build_mosquitto_plugins {
   cd /tmp && sudo tar xf smeiot-mosquitto-plugins.tar.gz -C $TMP_BOOTSTRAP_DIR
-  mkdir -p $TMP_BOOTSTRAP_DIR/out && cd $TMP_BOOTSTRAP_DIR/out && cmake .. && make -j$(nproc)  && make install
+  mkdir -p $TMP_BOOTSTRAP_DIR/out && cd $TMP_BOOTSTRAP_DIR/out && cmake .. -DCMAKE_BUILD_TYPE=Release && make -j$(nproc)  && sudo make install
 }
 
 # we rely on Self-contained deployment that contains .NET itself with us
@@ -89,10 +89,6 @@ function prepare_smeiot_migration_script {
       dotnet ef migrations script > $BUILD_DIR/db_migrate.sql
 }
 
-function package_smeiot {
-  cd $BUILD_DIR && tar caf smeiot.tar.gz *
-}
-
 function setup_db {
   cd $SMEIOT_ROOT
   sudo systemdctl start postgresql && sudo systemdctl enable postgresql
@@ -107,11 +103,9 @@ function setup_smeiot_with_tar {
   sudo chmod -R smeiot:smeiot $SMEIOT_ROOT
 }
 
-function package_config_files {
+function package_tars {
+  cd $BUILD_DIR && tar caf smeiot.tar.gz *
   cd $REPO_ROOT/samples && tar caf smeiot-config.tar.gz *.sample $REPO_ROOT/scripts/bootstrap.sh && mv smeiot-config.tar.gz $BUILD_DIR
-}
-
-function package_mosquitto_plugins {
   cd $REPO_ROOT && tar caf smeiot-mosquitto-plugins.tar.gz src/Mosquitto* CMake* && mv smeiot-mosquitto-plugins.tar.gz $BUILD_DIR
 }
 
@@ -135,10 +129,6 @@ function configure_system {
   sudo systemctl enable mosquitto
 }
 
-function delete_remote_tmp {
-  sudo rm -rf $TMP_BOOTSTRAP_DIR
-}
-
 function build_smeiot_with_remote_tars {
   sudo mkdir -p $TMP_BOOTSTRAP_DIR
   create_user()
@@ -148,5 +138,5 @@ function build_smeiot_with_remote_tars {
   build_mosquitto_plugins()
   setup_db()
   configure_system()
-  delete_remote_tmp()
+  sudo rm -rf $TMP_BOOTSTRAP_DIR
 }

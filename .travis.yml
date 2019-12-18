@@ -3,25 +3,19 @@ arch:
   - amd64
   - arm64
 os: linux
-sudo: required
 dist: bionic
 language: csharp
 mono: none
-dotnet: 3.0.100
+dotnet: 3.1.100
 solution: SMEIoT.sln
 
 before_script:
-    - mkdir -p out && cd out
-    - sudo apt-get install libmosquitto-dev
-    - cmake ..
-    - make -j8 && ls src && ls src/Mosquitto
-    - cd ..
+    - sh -c scripts/travis.sh
 script:
     - dotnet --version
     - dotnet restore
     - dotnet build
-    - cp out/src/Mosquitto/*.so test/SMEIoT.IntegrationTests/bin/Debug/netcoreapp3.0
     - dotnet test
-global:
+env:
     - DOTNET_SKIP_FIRST_TIME_EXPERIENCE=true
     - DOTNET_CLI_TELEMETRY_OPTOUT=1
