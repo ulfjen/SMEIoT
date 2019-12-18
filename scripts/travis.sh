@@ -8,6 +8,8 @@ cd $REPO_ROOT && echo "Operating at root dir: $REPO_ROOT"
 source scripts/bootstrap.sh
 
 mkdir -p $TMP_BOOTSTRAP_DIR
-prepare_syslibs
+sudo apt-get install -y build-essential \
+    libc-ares-dev \
+    cmake
 build_mosquitto
 mkdir -p out && cd out && cmake .. -DCMAKE_BUILD_TYPE=Debug && make -j$(nproc)  && sudo make install
