@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using NodaTime;
 using SMEIoT.Core.Entities;
 using SMEIoT.Core.Interfaces;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace SMEIoT.Core.Services
 {
@@ -11,10 +12,12 @@ namespace SMEIoT.Core.Services
     private readonly AutoExpiredSet<string> _deviceNames = new AutoExpiredSet<string>();
     private readonly ConcurrentDictionary<string, AutoExpiredSet<string>> _sensorNames = new ConcurrentDictionary<string, AutoExpiredSet<string>>();
     private readonly IClock _clock;
+    private readonly IMemoryCache _cache;
 
-    public MqttIdentifierService(IClock clock)
+    public MqttIdentifierService(IClock clock, IMemoryCache cache)
     {
       _clock = clock;
+      _cache = cache;
     }
 
     public bool RegisterDeviceName(string name)
