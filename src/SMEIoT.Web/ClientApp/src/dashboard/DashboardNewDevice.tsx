@@ -74,7 +74,6 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
   const intl = useIntl();
 
   const [device, setDevice] = React.useState<DeviceConfigBindingModel>({name: "", key: ""});
-  const [deviceName, setDeviceName] = React.useState<string>("");
   const [handlingNext, setHandlingNext] = React.useState<boolean>(false);
   const [loading, setLoading] = React.useState<boolean>(true);
   const [unconnectedDeviceName, setUnconnectedDeviceName] = React.useState<
@@ -89,9 +88,8 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
       deviceConfigBindingModel: device
     });
     if (res !== null) {
-      setDevice(res);
       if (navigate) {
-        navigate(`connect?name=${device.name}`);
+        navigate(`connect?name=${res.name}`);
       }
     }
   };
@@ -105,8 +103,7 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
     const res = await api.apiDevicesConfigSuggestDeviceNameGet();
 
     if (res.deviceName !== null) {
-      device.name = res.deviceName;
-      setDevice(device);
+      setDevice({ ...device, name: res.deviceName });
     }
 
     setSuggestDeviceName(false);
@@ -115,9 +112,7 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
   const onDeviceNameChange: React.ChangeEventHandler<
     HTMLInputElement | HTMLTextAreaElement
   > = event => {
-    device.name = event.target.value;
-    setDevice(device);
-    setDeviceName(event.target.value);
+    setDevice({ ...device, name: event.target.value });
   };
 
   const [suggestingKey, setSuggestKey] = React.useState<boolean>(false);
@@ -127,7 +122,7 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
     const res = await api.apiDevicesConfigSuggestKeyGet();
 
     if (res.key !== null) {
-      device.key = res.key;
+      setDevice({ ...device, key: res.key });
     }
 
     setSuggestKey(false);
@@ -136,9 +131,7 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
   const onKeyChange: React.ChangeEventHandler<
     HTMLInputElement | HTMLTextAreaElement
   > = event => {
-    device.key = event.target.value;
-    console.log(device, event.target.value);
-    setDevice(device);
+    setDevice({ ...device, key: event.target.value });
   };
 
   const onBannerClick = async (
@@ -151,15 +144,8 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
 
   React.useEffect(() => {
     (async () => {
-      var res = await api.apiDevicesConfigSuggestBootstrapGet();
-      if (res.deviceName) {
-        device.name = res.deviceName;
-        setDeviceName(res.deviceName);
-      }
-      if (res.key) {
-        device.key = res.key;
-      }
-      setDevice(device);
+      let res = await api.apiDevicesConfigSuggestBootstrapGet();
+      setDevice({ ...device, name: res.deviceName || undefined, key: res.key || undefined });
       if (res.continuedConfigurationDevice) {
         setUnconnectedDeviceName(res.continuedConfigurationDevice);
       }
@@ -208,7 +194,7 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
               <SuggestTextField
                 label={intl.formatMessage(messages.nameLabel)}
                 autoFocus
-                value={deviceName}
+                value={device.name}
                 onChange={onDeviceNameChange}
                 onSuggest={onSuggestDeviceName}
                 suggesting={suggestingDeviceName}
