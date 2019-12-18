@@ -19,11 +19,11 @@ namespace SMEIoT.Tests.Core.Services
       var service = BuildService();
 
       // act
-      var key = service.GenerateSecureKeyWithByteLength(128);
+      var key = service.GenerateSecureKeyWithByteLength(SecureKeySuggestService.ByteLengthUpperBound);
 
       // assert
       Assert.NotNull(key);
-      Assert.Equal(256, key.Length);
+      Assert.Equal(SecureKeySuggestService.ByteLengthUpperBound*2, key.Length);
     }
 
     [Fact]
@@ -31,7 +31,7 @@ namespace SMEIoT.Tests.Core.Services
     {
       var service = BuildService();
 
-      var action = () => service.GenerateSecureKeyWithByteLength(SecureKeySuggestService.ByteLengthUpperBound+1);
+      Action action = () => service.GenerateSecureKeyWithByteLength(SecureKeySuggestService.ByteLengthUpperBound+1);
 
       Assert.Throws<ArgumentOutOfRangeException>(action);
     }
@@ -41,7 +41,7 @@ namespace SMEIoT.Tests.Core.Services
     {
       var service = BuildService();
 
-      var action = () => service.GenerateSecureKeyWithByteLength(SecureKeySuggestService.ByteLengthLowerBound-1);
+      Action action = () => service.GenerateSecureKeyWithByteLength(SecureKeySuggestService.ByteLengthLowerBound-1);
 
       Assert.Throws<ArgumentOutOfRangeException>(action);
     }

@@ -3,10 +3,13 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using SMEIoT.Core.Entities;
 using SMEIoT.Infrastructure.Data;
 using SMEIoT.IntegrationsTests.Helpers;
+using SMEIoT.Infrastructure.MqttClient;
+using Moq;
 
 namespace SMEIoT.IntegrationTests
 {
@@ -18,14 +21,18 @@ namespace SMEIoT.IntegrationTests
           base.ConfigureWebHost(builder);
             builder.ConfigureServices(services =>
             {
+                var clientService = new Mock<BackgroundMqttClientHostedService>();
+                services.AddHostedService<BackgroundMqttClientHostedService>(_ => clientService.Object);
+                
                 var sp = services.BuildServiceProvider();
+                
 
                 // Create a scope to obtain a reference to the database
                 // context (ApplicationDbContext).
                 using (var scope = sp.CreateScope())
                 {
                     var scopedServices = scope.ServiceProvider;
-                    var db = scopedServices.GetRequiredService<ApplicationDbContext>();
+                    var db = scopedServices.GetService<ApplicationDbContext>();
                     var logger = scopedServices
                         .GetRequiredService<ILogger<SeedWebApplicationFactory<TStartup>>>();
 

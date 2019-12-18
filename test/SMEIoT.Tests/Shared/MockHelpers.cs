@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using SMEIoT.Core.Entities;
 using SMEIoT.Core.Interfaces;
+using SMEIoT.Web;
 
 namespace SMEIoT.Tests.Shared
 {
@@ -15,7 +16,7 @@ namespace SMEIoT.Tests.Shared
       var options = new Mock<IOptions<IdentityOptions>>();
       var idOptions = new IdentityOptions();
 
-      StartupConfigureIdentityOptions.Configure(idOptions);
+      StartupConfigureIdentity.ConfigureIdentityOptions(idOptions);
 
       options.Setup(o => o.Value).Returns(idOptions);
       var userValidators = new List<IUserValidator<User>>();

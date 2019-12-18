@@ -43,7 +43,7 @@ namespace SMEIoT.Web
 
     }
     
-    private static void ConfigureIdentityOptions(IdentityOptions options)
+    public static void ConfigureIdentityOptions(IdentityOptions options)
     {
       // Password settings.
       options.Password.RequireDigit = false;

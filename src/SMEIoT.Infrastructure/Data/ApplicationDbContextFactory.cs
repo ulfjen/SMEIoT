@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 using NodaTime;
+using Npgsql;
 
 namespace SMEIoT.Infrastructure.Data
 {
@@ -25,8 +26,15 @@ namespace SMEIoT.Infrastructure.Data
         .AddEnvironmentVariables()
         .Build();
       
+
+      var conn = new NpgsqlConnection(config.BuildConnectionString());
+      conn.Open();
+      conn.TypeMapper.UseNodaTime();
+      
       var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
-      optionsBuilder.UseNpgsql(config.BuildConnectionString(), opts => opts.UseNodaTime());
+      optionsBuilder.UseNpgsql(conn, optionsBuilder => {
+        optionsBuilder.UseCustomNodaTime();
+      });
 
       return new ApplicationDbContext(optionsBuilder.Options, SystemClock.Instance);
     }
