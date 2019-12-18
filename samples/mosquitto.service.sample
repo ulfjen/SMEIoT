@@ -1,21 +1,13 @@
 [Unit]
 Description=Mosquitto Broker
 Documentation=The mosuqitto broker is configured by the SMEIoT setup script.
-After=smeiot.service.target auditd.service
-ConditionPathExists=!/etc/ssh/sshd_not_to_be_run
-
-[Unit]
-Description=SMEIoT Web Server
-Documentation=SMEIoT Web server responds to the user requests over internet and manages the Mosquitto broker.
-After=network-online.target
-Wants=network-online.target
+After=smeiot.service.target
 
 [Service]
 Type=exec
-ExecStart=mosquitto
+ExecStart=/usr/local/sbin/mosquitto -c /etc/mosquitto/mosquitto.conf
 User=smeiot
 Group=smeiot
-LimitNOFILE=150000
 ProtectSystem=full
 ProtectHome=tmpfs
 KillMode=process
