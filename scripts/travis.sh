@@ -8,5 +8,6 @@ cd $REPO_ROOT && echo "Operating at root dir: $REPO_ROOT"
 source scripts/bootstrap.sh
 
 mkdir -p $TMP_BOOTSTRAP_DIR
+prepare_syslibs
 build_mosquitto
 mkdir -p out && cd out && cmake .. -DCMAKE_BUILD_TYPE=Debug && make -j$(nproc)  && sudo make install
