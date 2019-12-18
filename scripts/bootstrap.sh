@@ -131,12 +131,12 @@ function configure_system {
 
 function build_smeiot_with_remote_tars {
   sudo mkdir -p $TMP_BOOTSTRAP_DIR
-  create_user()
-  prepare_syslibs()
-  build_mosquitto()
-  setup_smeiot_with_tar()
-  build_mosquitto_plugins()
-  setup_db()
-  configure_system()
+  create_user
+  prepare_syslibs
+  build_mosquitto
+  setup_smeiot_with_tar
+  build_mosquitto_plugins
+  setup_db
+  configure_system
   sudo rm -rf $TMP_BOOTSTRAP_DIR
 }

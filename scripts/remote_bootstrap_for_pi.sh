@@ -10,9 +10,9 @@ REMOTE_USER=root
 cd $REPO_ROOT && echo "Operating at root dir: $REPO_ROOT"
 source scripts/bootstrap.sh
 
-build_smeiot()
-prepare_smeiot_migration_script()
-package_tars()
+build_smeiot
+prepare_smeiot_migration_script
+package_tars
 
 echo << EOF
 Do the following:
