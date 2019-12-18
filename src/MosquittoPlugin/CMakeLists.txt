@@ -14,3 +14,12 @@ endif()
 target_link_libraries(mosqauth PRIVATE ${MOSQUITTO_LIBRARY})
 target_compile_definitions(mosqauth PRIVATE LIBRARY_EXPORTS=1)
 
+if (CMAKE_BUILD_TYPE MATCHES Debug)
+  install(TARGETS mosqauth
+          LIBRARY DESTINATION ${CMAKE_BINARY_DIR}
+          )
+elseif(CMAKE_BUILD_TYPE MATCHES Release)
+  install(TARGETS mosqauth
+          LIBRARY DESTINATION /var/mosquitto
+          )
+endif ()

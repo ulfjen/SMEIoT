@@ -14,3 +14,15 @@ endif()
 target_link_libraries(mosq PRIVATE ${MOSQUITTO_LIBRARY})
 target_compile_definitions(mosq PRIVATE LIBRARY_EXPORTS=1)
 
+if (CMAKE_BUILD_TYPE MATCHES Debug)
+  install(TARGETS mosq
+          LIBRARY DESTINATION ${CMAKE_SOURCE_DIR}/src/SMEIoT.Infrastructure/bin/Debug/netcoreapp3.1
+          )
+  install(TARGETS mosq
+          LIBRARY DESTINATION ${CMAKE_SOURCE_DIR}/src/SMEIoT.Web/bin/Debug/netcoreapp3.1
+          )
+elseif(CMAKE_BUILD_TYPE MATCHES Release)
+  install(TARGETS mosq
+          LIBRARY DESTINATION ${CMAKE_SOURCE_DIR}/src/SMEIoT.Web/bin/Release/netcoreapp3.1/linux-arm/publish
+          )
+endif ()
