@@ -11,6 +11,7 @@ namespace SMEIoT.Core.Interfaces
   {
     DbSet<User> Users { get; set; }
     DbSet<Sensor> Sensors { get; set; }
+    DbSet<SensorValue> SensorValues { get; set; }
     DbSet<UserSensor> UserSensors { get; set; }
     DbSet<IdentityUserRole<long>> UserRoles { get; set; }
     DbSet<Device> Devices { get; set; }

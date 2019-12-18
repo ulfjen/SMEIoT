@@ -34,13 +34,12 @@ namespace SMEIoT.Web.Api.V1
       var list = new List<SensorDetailsApiModel>();
       await foreach (var sensor in _service.ListSensorsAsync(start, limit))
       {
-        var vals = new List<double>();
-        await foreach (var v in _service.GetSensorValuesByDeviceAndSensorAsync(sensor.Device, sensor, SystemClock.Instance.GetCurrentInstant()-Duration.FromSeconds(5), Duration.FromSeconds(5)))
+        var vals = new List<(double, Instant)>();
+        await foreach (var v in _service.GetNumberTimeSeriesByDeviceAndSensorAsync(sensor.Device, sensor, SystemClock.Instance.GetCurrentInstant()-Duration.FromSeconds(3600), Duration.FromSeconds(3600)))
         {
           vals.Add(v);
         }
-        var values = new SensorValuesApiModel(vals, SystemClock.Instance.GetCurrentInstant()-Duration.FromSeconds(5), Duration.FromSeconds(5));
-        list.Add(new SensorDetailsApiModel(sensor, values));
+        list.Add(new SensorDetailsApiModel(sensor, vals));
       }
 
       return Ok(new SensorDetailsApiModelList(list));
@@ -53,19 +52,14 @@ namespace SMEIoT.Web.Api.V1
     {
       var device = await _service.GetDeviceByNameAsync(deviceName);
       var sensor = await _service.GetSensorByDeviceAndNameAsync(device, sensorName);   
-      var values = new List<double>();
-      values.Add(1.0);
-      values.Add(2.0);
-      values.Add(3.0);
-      values.Add(4.0);
-      values.Add(5.0);
+      var values = new List<(double, Instant)>();
 
-      await foreach (var val in _service.GetSensorValuesByDeviceAndSensorAsync(device, sensor, SystemClock.Instance.GetCurrentInstant(), Duration.FromSeconds(5)))
+      await foreach (var val in _service.GetNumberTimeSeriesByDeviceAndSensorAsync(device, sensor, SystemClock.Instance.GetCurrentInstant()-Duration.FromSeconds(3600), Duration.FromSeconds(3600)))
       {
         _logger.LogTrace($"add into list {val}");
         values.Add(val);
       }
-      var res = new SensorDetailsApiModel(sensor, new SensorValuesApiModel(values, SystemClock.Instance.GetCurrentInstant(), Duration.FromSeconds(5)));
+      var res = new SensorDetailsApiModel(sensor, values);
 
       return Ok(res);
     }

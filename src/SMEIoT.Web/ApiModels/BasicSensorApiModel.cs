@@ -8,9 +8,13 @@ namespace SMEIoT.Web.ApiModels
     [JsonProperty(Required = Required.DisallowNull)]
     public string SensorName { get; set; }
 
+    [JsonProperty(Required = Required.DisallowNull)]
+    public string DeviceName { get; set; }
+
     public BasicSensorApiModel(Sensor sensor)
     {
       SensorName = sensor.Name;
+      DeviceName = sensor.Device.Name;
     }
   }
 }

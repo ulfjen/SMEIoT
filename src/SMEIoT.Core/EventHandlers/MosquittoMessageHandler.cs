@@ -6,6 +6,7 @@ using NodaTime;
 using SMEIoT.Core.Entities;
 using SMEIoT.Core.Interfaces;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace SMEIoT.Core.EventHandlers
 {
@@ -19,17 +20,20 @@ namespace SMEIoT.Core.EventHandlers
     private readonly IClock _clock;
     private readonly IMqttIdentifierService _mqttService;
     private readonly IMosquittoBrokerService _brokerService;
-    private readonly ILogger<MosquittoMessageHandler> _logger;
+    private readonly IServiceScopeFactory _scopeFactory;
+    private readonly ILogger _logger;
 
     public MosquittoMessageHandler(
         IClock clock,
         IMqttIdentifierService mqttService, 
         IMosquittoBrokerService brokerService,
+        IServiceScopeFactory scopeFactory,
         ILogger<MosquittoMessageHandler> logger)
     {
       _clock = clock;
       _mqttService = mqttService;
       _brokerService = brokerService;
+      _scopeFactory = scopeFactory;
       _logger = logger;
       Attach(this);
     }
@@ -68,9 +72,9 @@ namespace SMEIoT.Core.EventHandlers
       parsed = parsed.Slice(SensorTopicPrefix.Length);
       var splitP = parsed.IndexOf('/');
       if (splitP != -1) {
-        _logger.LogDebug($"{parsed.Slice(0, splitP).ToString()}:{parsed.Slice(splitP+1).ToString()}");
+        _logger.LogTrace($"{parsed.Slice(0, splitP).ToString()}:{parsed.Slice(splitP+1).ToString()}");
       } else {
-        _logger.LogDebug(parsed.ToString());
+        _logger.LogTrace(parsed.ToString());
       }
 
       if (splitP != -1) {
@@ -83,6 +87,21 @@ namespace SMEIoT.Core.EventHandlers
         if (!_mqttService.RegisterSensorNameWithDeviceName(sensorName, deviceName))
         {
           // TODO: report sensor registeration failed
+        }
+        using (var scope = _scopeFactory.CreateScope())
+        {
+          var service = scope.ServiceProvider.GetService<IDeviceService>();
+          var valueService = scope.ServiceProvider.GetService<ISensorValueService>();
+
+          // try {
+            var device = service.GetDeviceByNameAsync(deviceName).GetAwaiter().GetResult();
+            var sensor = service.GetSensorByDeviceAndNameAsync(device, sensorName).GetAwaiter().GetResult();
+            _logger.LogTrace($"{sensor.Name} << {double.Parse(message.Payload).ToString()} at {message.ReceivedAt}");
+            valueService.AddSensorValueAsync(sensor, double.Parse(message.Payload), message.ReceivedAt).GetAwaiter().GetResult();
+            _logger.LogTrace(message.Payload);
+          // } catch {
+            // catch saving errors or finding
+          // }
         }
       } else
       {
@@ -108,7 +127,7 @@ namespace SMEIoT.Core.EventHandlers
 
     public void Update(MqttMessage message)
     {
-      _logger.LogDebug($"{message.Topic} = {message.Payload}");
+      _logger.LogTrace($"{message.Topic} = {message.Payload}");
 
       if (message.Topic.StartsWith(SensorTopicPrefix))
       {

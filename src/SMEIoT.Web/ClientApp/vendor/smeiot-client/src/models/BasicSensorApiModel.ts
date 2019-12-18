@@ -25,6 +25,12 @@ export interface BasicSensorApiModel {
      * @memberof BasicSensorApiModel
      */
     sensorName?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof BasicSensorApiModel
+     */
+    deviceName?: string;
 }
 
 export function BasicSensorApiModelFromJSON(json: any): BasicSensorApiModel {
@@ -38,6 +44,7 @@ export function BasicSensorApiModelFromJSONTyped(json: any, ignoreDiscriminator:
     return {
         
         'sensorName': !exists(json, 'sensorName') ? undefined : json['sensorName'],
+        'deviceName': !exists(json, 'deviceName') ? undefined : json['deviceName'],
     };
 }
 
@@ -51,6 +58,7 @@ export function BasicSensorApiModelToJSON(value?: BasicSensorApiModel | null): a
     return {
         
         'sensorName': value.sensorName,
+        'deviceName': value.deviceName,
     };
 }
 

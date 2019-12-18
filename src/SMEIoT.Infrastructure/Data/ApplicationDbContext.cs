@@ -26,6 +26,7 @@ namespace SMEIoT.Infrastructure.Data
     private IClock _clock;
     // inherited Users, UserRoles DbSet
     public DbSet<Sensor> Sensors { get; set; } = null!;
+    public DbSet<SensorValue> SensorValues { get; set; } = null!;
     public DbSet<Device> Devices { get; set; } = null!;
 
     public DbSet<UserSensor> UserSensors { get; set; } = null!;
@@ -140,6 +141,14 @@ namespace SMEIoT.Infrastructure.Data
 
       modelBuilder.Entity<Sensor>()
         .HasIndex(s => new { s.NormalizedName, s.DeviceId });
+
+      modelBuilder.Entity<SensorValue>()
+        .HasOne(s => s.Sensor)
+        .WithMany(s => s.SensorValues)
+        .HasForeignKey(s => s.SensorId);
+
+      modelBuilder.Entity<SensorValue>()
+        .HasIndex(s => s.CreatedAt);
     }
   }
 }

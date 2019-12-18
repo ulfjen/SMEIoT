@@ -13,6 +13,13 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import {
+    NumberTimeSeriesApiModel,
+    NumberTimeSeriesApiModelFromJSON,
+    NumberTimeSeriesApiModelFromJSONTyped,
+    NumberTimeSeriesApiModelToJSON,
+} from './';
+
 /**
  * 
  * @export
@@ -21,10 +28,10 @@ import { exists, mapValues } from '../runtime';
 export interface SensorDetailsApiModel {
     /**
      * 
-     * @type {Array<number>}
+     * @type {Array<NumberTimeSeriesApiModel>}
      * @memberof SensorDetailsApiModel
      */
-    values?: Array<number>;
+    data?: Array<NumberTimeSeriesApiModel>;
     /**
      * 
      * @type {string}
@@ -36,13 +43,13 @@ export interface SensorDetailsApiModel {
      * @type {string}
      * @memberof SensorDetailsApiModel
      */
-    interval?: string;
+    sensorName?: string;
     /**
      * 
      * @type {string}
      * @memberof SensorDetailsApiModel
      */
-    sensorName?: string;
+    deviceName?: string;
 }
 
 export function SensorDetailsApiModelFromJSON(json: any): SensorDetailsApiModel {
@@ -55,10 +62,10 @@ export function SensorDetailsApiModelFromJSONTyped(json: any, ignoreDiscriminato
     }
     return {
         
-        'values': !exists(json, 'values') ? undefined : json['values'],
+        'data': !exists(json, 'data') ? undefined : ((json['data'] as Array<any>).map(NumberTimeSeriesApiModelFromJSON)),
         'startedAt': !exists(json, 'startedAt') ? undefined : json['startedAt'],
-        'interval': !exists(json, 'interval') ? undefined : json['interval'],
         'sensorName': !exists(json, 'sensorName') ? undefined : json['sensorName'],
+        'deviceName': !exists(json, 'deviceName') ? undefined : json['deviceName'],
     };
 }
 
@@ -71,10 +78,10 @@ export function SensorDetailsApiModelToJSON(value?: SensorDetailsApiModel | null
     }
     return {
         
-        'values': value.values,
+        'data': value.data === undefined ? undefined : ((value.data as Array<any>).map(NumberTimeSeriesApiModelToJSON)),
         'startedAt': value.startedAt,
-        'interval': value.interval,
         'sensorName': value.sensorName,
+        'deviceName': value.deviceName,
     };
 }
 

@@ -1298,23 +1298,35 @@
         "type": "object",
         "additionalProperties": false
       },
+      "NumberTimeSeriesApiModel": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "number",
+            "format": "double"
+          },
+          "createdAt": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "SensorDetailsApiModel": {
         "type": "object",
         "properties": {
-          "values": {
+          "data": {
             "type": "array",
             "items": {
-              "type": "number",
-              "format": "double"
+              "$ref": "#/components/schemas/NumberTimeSeriesApiModel"
             }
           },
           "startedAt": {
             "type": "string"
           },
-          "interval": {
+          "sensorName": {
             "type": "string"
           },
-          "sensorName": {
+          "deviceName": {
             "type": "string"
           }
         },
@@ -1348,6 +1360,9 @@
         "type": "object",
         "properties": {
           "sensorName": {
+            "type": "string"
+          },
+          "deviceName": {
             "type": "string"
           }
         },

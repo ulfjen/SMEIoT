@@ -7,23 +7,20 @@ namespace SMEIoT.Web.ApiModels
 {
   public class SensorDetailsApiModel : BasicSensorApiModel
   {
-    // [JsonProperty(Required = Required.DisallowNull)]
-    // SensorValuesApiModel Values { get; set; } = null!;
-
     [JsonProperty(Required = Required.DisallowNull)]
-    public IEnumerable<double> Values { get; set; }
+    public IEnumerable<NumberTimeSeriesApiModel> Data { get; set; }
     
     [JsonProperty(Required = Required.DisallowNull)]
     public Instant StartedAt { get; set; }
-    
-    [JsonProperty(Required = Required.DisallowNull)]
-    public Duration Interval { get; set; }
 
-    public SensorDetailsApiModel(Sensor sensor, SensorValuesApiModel value) : base(sensor)
+    public SensorDetailsApiModel(Sensor sensor, IEnumerable<(double, Instant)> values) : base(sensor)
     {
-      Values = value.Values;
-      StartedAt = value.StartedAt;
-      Interval = value.Interval;
+      var intermediate = new List<NumberTimeSeriesApiModel>();
+      foreach (var item in values)
+      {
+        intermediate.Add(new NumberTimeSeriesApiModel(item));
+      }
+      Data = intermediate;
     }
   }
 }

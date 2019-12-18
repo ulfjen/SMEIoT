@@ -100,11 +100,14 @@ namespace SMEIoT.Core.Services
       return sensor;
     }
 
-    public async IAsyncEnumerable<double> GetSensorValuesByDeviceAndSensorAsync(Device device, Sensor sensor, Instant startedAt, Duration duration)
+    public async IAsyncEnumerable<(double value, Instant createdAt)> GetNumberTimeSeriesByDeviceAndSensorAsync(Device device, Sensor sensor, Instant startedAt, Duration duration)
     {
-      foreach (var d in new[] { 32.4, 72.0, 32.1, 72, 32.1, 72.0 })
-      {
-        yield return d;
+      var query = from sv in _dbContext.SensorValues
+                  where sv.SensorId == sensor.Id && sv.CreatedAt >= startedAt && sv.CreatedAt < startedAt + duration
+                  select sv;
+      foreach (var sv in query) {
+        // throw new SystemException($"sv {sv.Value} {sv.CreatedAt}");
+        yield return (sv.Value, sv.CreatedAt);
       }
     }
   }

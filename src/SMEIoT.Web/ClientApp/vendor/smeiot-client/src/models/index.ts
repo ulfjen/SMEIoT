@@ -13,6 +13,7 @@ export * from './DeviceConfigBindingModel';
 export * from './DeviceConfigSuggestApiModel';
 export * from './LoginBindingModel';
 export * from './LoginedApiModel';
+export * from './NumberTimeSeriesApiModel';
 export * from './ProblemDetails';
 export * from './SensorAssignmentApiModel';
 export * from './SensorCandidatesApiModel';

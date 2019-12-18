@@ -16,6 +16,8 @@ namespace SMEIoT.Core.Entities
     public long DeviceId { get; set; }
     public Device Device { get; set; } = null!;
     public List<UserSensor> UserSensors { get; set; } = null!;
+
+    public List<SensorValue> SensorValues { get; set; } = null!;
     
     public Instant CreatedAt { get; set; }
     public Instant UpdatedAt { get; set; }

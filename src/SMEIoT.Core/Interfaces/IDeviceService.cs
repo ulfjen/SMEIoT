@@ -16,6 +16,6 @@ namespace SMEIoT.Core.Interfaces
 
     Task CreateSensorByDeviceAndNameAsync(Device device, string sensorName);
     Task<Sensor> GetSensorByDeviceAndNameAsync(Device device, string sensorName);
-    IAsyncEnumerable<double> GetSensorValuesByDeviceAndSensorAsync(Device device, Sensor sensor, Instant startedAt, Duration duration);
+    IAsyncEnumerable<(double value, Instant createdAt)> GetNumberTimeSeriesByDeviceAndSensorAsync(Device device, Sensor sensor, Instant startedAt, Duration duration);
   }
 }

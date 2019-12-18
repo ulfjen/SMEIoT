@@ -12,10 +12,11 @@ import withStyles from "@material-ui/core/styles/withStyles";
 import Frame from "./Frame";
 import clsx from "clsx";
 import DashboardSensorBoard from "./DashboardSensorBoard";
+import NumberGraph from "../components/NumberGraph";
 import { defineMessages, useIntl, FormattedMessage } from "react-intl";
 import { Link, RouteComponentProps } from "@reach/router";
 import { Helmet } from "react-helmet";
-import { SensorsApi } from "smeiot-client";
+import { SensorsApi, NumberTimeSeriesApiModel } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
 
 const styles = ({
@@ -76,7 +77,7 @@ const _DashboardSensorDetails: React.FunctionComponent<IDashboardSensorDetails> 
 }) => {
   const intl = useIntl();
 
-  const [value, setValues] = React.useState<number[] | undefined>();
+  const [values, setValues] = React.useState<NumberTimeSeriesApiModel[]>([]);
 
   React.useEffect(() => {
     (async () => {
@@ -87,13 +88,18 @@ const _DashboardSensorDetails: React.FunctionComponent<IDashboardSensorDetails> 
         deviceName, sensorName
       });
       if (res !== null) {
-        setValues(res.values);
+        console.log(res);
+        setValues(res.data || []);
       }
       // setLoading(false);
     })();
   }, []);
 
-  const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
+  const data = values.map(v => {
+    console.log(new Date(Date.parse(v.createdAt||"")).getTime());
+    return {x: new Date(Date.parse(v.createdAt||"")).getTime(), y: v.value}
+  });
+
   return (
     <Frame
       title="Sensors"
@@ -104,7 +110,12 @@ const _DashboardSensorDetails: React.FunctionComponent<IDashboardSensorDetails> 
             <title>{intl.formatMessage(messages.title)}</title>
           </Helmet>
           <Grid container spacing={3}>
-            {value !== undefined && value ? value.map(v => <p key={v}>{v}</p>) : null}
+            {/* {value !== undefined && value ? value.map(v => <p>{v.value}</p>) : null} */}
+            <Grid item xs={12}>
+              <Paper>
+                <NumberGraph data={data}/>
+              </Paper>
+            </Grid>
           </Grid>
         </Container>
       }
