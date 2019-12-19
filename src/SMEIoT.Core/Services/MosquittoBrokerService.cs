@@ -1,25 +1,78 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System;
+using System.IO;
 using System.Linq;
 using NodaTime;
 using SMEIoT.Core.Entities;
 using SMEIoT.Core.Interfaces;
+using Microsoft.Extensions.Logging;
+using Mono.Posix;
 
 namespace SMEIoT.Core.Services
 {
   public class MosquittoBrokerService : IMosquittoBrokerService
   {
     private readonly ConcurrentDictionary<string, string> _values = new ConcurrentDictionary<string, string>();
-    public bool BrokerRunning { get; set; } = false;
+    private readonly IClock _clock;
+    private readonly ILogger _logger;
+
+    public bool BrokerRunning {
+      get {
+        var brokerSendingMessage = BrokerLastUpdatedAt != null && _clock.GetCurrentInstant() - BrokerLastUpdatedAt <= Duration.FromSeconds(45);
+        var brokerExist = BrokerPid != null && BrokerPid == BrokerPidFromAuthPlugin;
+        // ensure we are talking with the same process
+        return brokerSendingMessage && brokerExist;
+      }
+    }
+
     public Instant? BrokerLastUpdatedAt { get; set; }
     public int? BrokerPidFromAuthPlugin { get; set; }
+
+    public int? BrokerPid => GetBrokerPidFromPidFile("/var/run/smeiot.mosquitto.pid");
+
     private const string ByteLoadReceived1Min = "load/bytes/received/1min";
     private const string ByteLoadReceived5Min = "load/bytes/received/5min";
     private const string ByteLoadReceived15Min = "load/bytes/received/15min";
     private const string ByteLoadSent1Min = "load/bytes/sent/1min";
     private const string ByteLoadSent5Min = "load/bytes/sent/5min";
     private const string ByteLoadSent15Min = "load/bytes/sent/15min";
+
+    public MosquittoBrokerService(IClock clock, ILogger<MosquittoBrokerService> logger)
+    {
+      _clock = clock;
+      _logger = logger;
+    }
+
+    public int? GetBrokerPidFromPidFile(string path)
+    {
+      try {
+        var txt = File.ReadAllText(path);
+        return int.Parse(txt);
+      } catch {
+        return null;
+      }
+    }
+
+    private Task SendSignalAsync(int signal, bool ignoreAuthPluginPid)
+    {
+      if (BrokerPid == null || (!ignoreAuthPluginPid && BrokerPidFromAuthPlugin == null)) {
+        return Task.FromException(new ArgumentException($"The broker is not running correctly. We get pid from the broker as {BrokerPid}. And the auth plugin says {BrokerPidFromAuthPlugin}."));
+      }
+      try {
+        _logger.LogInformation($"We are sending a signal {signal} to {BrokerPid}");
+        Syscall.kill(BrokerPid.Value, signal);
+        return Task.CompletedTask;
+      } catch (Exception ex) {
+        return Task.FromException(ex);
+      }
+    }
+
+    public Task ReloadBrokerBySignalAsync(bool ignoreAuthPluginPid = false) => SendSignalAsync((int) Signals.SIGHUP, ignoreAuthPluginPid);
+
+    // do it by kill it and wait for systemd to bring the service online
+    public Task RestartBrokerBySignalAsync(bool ignoreAuthPluginPid = false) => SendSignalAsync((int) Signals.SIGKILL, ignoreAuthPluginPid);
 
     public bool RegisterBrokerStatistics(string name, string value)
     {

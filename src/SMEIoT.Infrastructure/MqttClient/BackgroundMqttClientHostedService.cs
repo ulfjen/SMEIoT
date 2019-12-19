@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using SMEIoT.Core.Interfaces;
 
 namespace SMEIoT.Infrastructure.MqttClient
 {
@@ -10,15 +11,17 @@ namespace SMEIoT.Infrastructure.MqttClient
   {
     private readonly MosquittoClient _client;
     private Timer? _timer;
-    private ILogger<BackgroundMqttClientHostedService> _logger;
+    private ILogger _logger;
+    private readonly IMosquittoBrokerService _brokerService;
     private readonly int _delay = 100;
     private bool _reconnect;
     private bool _stoppedTimer;
 
-    public BackgroundMqttClientHostedService(MosquittoClient client, ILogger<BackgroundMqttClientHostedService> logger)
+    public BackgroundMqttClientHostedService(MosquittoClient client, ILogger<BackgroundMqttClientHostedService> logger, IMosquittoBrokerService brokerService)
     {
       _client = client;
       _logger = logger;
+      _brokerService = brokerService;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
@@ -37,10 +40,22 @@ namespace SMEIoT.Infrastructure.MqttClient
     {
       _logger.LogInformation("Start to connect MQTT client with the Mosquitto broker.");
 
+      ReloadBrokerIfBrokerWasRogue(false);
       _client.Connect();
+
       _reconnect = false;
       _stoppedTimer = false;
       _timer = new Timer(ExecuteRunLoop, null, 0, _delay);
+    }
+
+    private void ReloadBrokerIfBrokerWasRogue(bool ignoreAuthPluginPid)
+    {
+      // broker runs but not the same
+      _logger.LogTrace($"Broker pid = {_brokerService.BrokerPid}; auth plugin reports = {_brokerService.BrokerPidFromAuthPlugin} ");
+      if (_brokerService.BrokerPid != null && (_brokerService.BrokerPidFromAuthPlugin == null || _brokerService.BrokerPid.Value != _brokerService.BrokerPidFromAuthPlugin.Value)) { 
+        _brokerService.ReloadBrokerBySignalAsync(true).GetAwaiter().GetResult();
+        Thread.Sleep(TimeSpan.FromSeconds(5)); // waiting the broker to be set up. 
+      }
     }
 
     private void ExecuteRunLoop(object state)

@@ -56,6 +56,7 @@ namespace SMEIoT.Infrastructure
       services.AddHostedService<BackgroundMqttClientHostedService>(provider =>
       {
         var auth = provider.GetService<IMosquittoClientAuthenticationService>();
+        var broker = provider.GetService<IMosquittoBrokerService>();
 
         var builder = new MosquittoClientBuilder()
           .SetPskTls(auth.ClientPsk, auth.ClientName)
@@ -67,7 +68,7 @@ namespace SMEIoT.Infrastructure
 
         var handler = provider.GetService<MosquittoMessageHandler>();
         builder.SetMessageCallback(handler.HandleMessage);
-        return new BackgroundMqttClientHostedService(builder.Client, provider.GetService<ILogger<BackgroundMqttClientHostedService>>());
+        return new BackgroundMqttClientHostedService(builder.Client, provider.GetService<ILogger<BackgroundMqttClientHostedService>>(), broker);
       });
     }
 

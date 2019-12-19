@@ -121,7 +121,6 @@ namespace SMEIoT.Core.EventHandlers
       }
       _brokerService.RegisterBrokerStatistics(parsed.ToString(), value.ToString());
 
-      _brokerService.BrokerRunning = true;
       _brokerService.BrokerLastUpdatedAt = message.ReceivedAt;
     }
 

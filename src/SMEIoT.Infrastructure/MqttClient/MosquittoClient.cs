@@ -47,7 +47,7 @@ namespace SMEIoT.Infrastructure.MqttClient
       res = MosquittoWrapper.mosq_connect(Host!, Port, KeepAlive);
       if (res != 0)
       {
-        throw new ArgumentException($"Mosquitto mosq_connect returned {res}");
+        throw new TimeoutException($"Mosquitto mosq_connect returned {res}");
       }
 
       var res_list = Topics.Select(t => MosquittoWrapper.mosq_subscribe_topic(t));
