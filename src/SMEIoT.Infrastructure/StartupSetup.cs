@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using NodaTime;
+using System;
 using SMEIoT.Core.Interfaces;
 using SMEIoT.Infrastructure.Data;
 using Hangfire;
@@ -57,10 +58,15 @@ namespace SMEIoT.Infrastructure
       {
         var auth = provider.GetService<IMosquittoClientAuthenticationService>();
         var broker = provider.GetService<IMosquittoBrokerService>();
+        int port;
+        var portStr = configuration.GetConnectionString("MqttPort");
+        if (!int.TryParse(portStr, out port)) {
+          throw new InvalidOperationException($"MqttPort is not set to a correct value. Got {portStr} but expect a number");
+        }
 
         var builder = new MosquittoClientBuilder()
           .SetPskTls(auth.ClientPsk, auth.ClientName)
-          .SetConnectionInfo(configuration.GetConnectionString("MqttHost"), int.Parse(configuration.GetConnectionString("MqttPort")))
+          .SetConnectionInfo(configuration.GetConnectionString("MqttHost"), port)
           .SetKeepAlive(60)
           .SetRunLoopInfo(-1, 10)
           .SubscribeTopic(MosquittoClientBuilder.BrokerTopic)
