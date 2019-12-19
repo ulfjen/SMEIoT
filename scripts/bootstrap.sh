@@ -50,7 +50,7 @@ function build_mosquitto {
   cd $TMP_BOOTSTRAP_DIR && sudo curl -O -L -C - https://mosquitto.org/files/source/mosquitto-$MOSQUITTO_VER.tar.gz
   cd $TMP_BOOTSTRAP_DIR && echo "$MOSQUITTO_SHA256 mosquitto-$MOSQUITTO_VER.tar.gz" | sha256sum -c - && echo "verified mosquitto source package."
   sudo tar xf mosquitto-$MOSQUITTO_VER.tar.gz && cd mosquitto-$MOSQUITTO_VER
-  make -j$(nproc) WITH_SRV=yes WITH_WEBSOCKETS=no WITH_DOCS=no
+  sudo make -j$(nproc) WITH_SRV=yes WITH_WEBSOCKETS=no WITH_DOCS=no
   sudo make install
 }
 

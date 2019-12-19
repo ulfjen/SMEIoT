@@ -15,7 +15,7 @@ package_tars
 
 echo "==============
 Do the following:
-  scp $BUILD_DIR/*.tar.gz <remote>:/tmp/
+  rsync --info=progress2 $BUILD_DIR/*.tar.gz <remote>:/tmp/
 
 Then ssh into the <remote> for deployment, do:
 
