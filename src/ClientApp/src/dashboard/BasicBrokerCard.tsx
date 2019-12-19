@@ -14,28 +14,16 @@ import {
   LinkProps as ReachLinkProps,
   RouteComponentProps
 } from "@reach/router";
-import StatusBadge from "../components/StatusBadge";
 import useInterval from "../helpers/useInterval";
+import BrokerCardHeader from "./BrokerCardHeader";
 import { BrokerApi } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
-import { ReactComponent as Broker } from "../images/broker.svg";
 import LoadFactors from "../components/LoadFactors";
 
 const styles = ({ transitions, spacing }: Theme) =>
   createStyles({
     root: {
-      padding: spacing(2),
-    },
-    container: {
-      display: 'flex',
-      alignItems: "baseline",
-    },
-    media: {
-      height: "60%",
-      filter: "brightness(0) invert(1)"
-    },
-    status: {
-      marginLeft: "auto",
+      padding: 16,
     }
   });
 
@@ -65,44 +53,30 @@ const _BasicBrokerCard: React.FunctionComponent<IBasicBrokerCard> = ({ classes }
       min5: details.min5,
       min15: details.min15
     });
-  }
+  };
 
+  // const loading = useLoading(updateBroker, 400, 10000);
   useInterval(updateBroker, 10000);
-  React.useEffect(() => { updateBroker() }, []);
 
-  return (
-    <Card>
-      <CardActionArea className={classes.root} component={ReachLink} to={"/dashboard/devices"}>
-        <Avatar>
-          <Broker className={classes.media} />
-        </Avatar>
-        <div className={classes.container}>
-          <Typography component="span" variant="h5" display="block">
-            <FormattedMessage
-              id="dashboard.components.basic_broker_card.title"
-              description="Title on the broker card"
-              defaultMessage="Broker"
+  return <Card>
+    <CardActionArea className={classes.root} component={ReachLink} to={"/dashboard/devices"}>
+      <BrokerCardHeader running={broker.running} />
+      <LoadFactors min1={broker.min1} min5={broker.min5} min15={broker.min15} />
+      <Typography color="textSecondary">
+        {
+          broker.running ? <FormattedMessage
+            id="dashboard.components.basic_broker_card.instruct_running"
+            description="Running instruction on the broker card when the broker runs normally."
+            defaultMessage="The broker is operating."
+          /> : <FormattedMessage
+              id="dashboard.components.basic_broker_card.instruct_stopped"
+              description="Running instruction on the broker card when the broker stopped."
+              defaultMessage="The broker is stopped. Please wait a few seconds."
             />
-          </Typography>
-          <StatusBadge className={classes.status} status={broker.running ? "running" : "stopped"} />
-        </div>
-        <LoadFactors min1={broker.min1} min5={broker.min5} min15={broker.min15}/>
-        <Typography color="textSecondary">
-          {
-            broker.running ? <FormattedMessage
-              id="dashboard.components.basic_broker_card.instruct_running"
-              description="Running instruction on the broker card when the broker runs normally."
-              defaultMessage="The broker is operating."
-            /> : <FormattedMessage
-                id="dashboard.components.basic_broker_card.instruct_stopped"
-                description="Running instruction on the broker card when the broker stopped."
-                defaultMessage="The broker is stopped. Please wait a few seconds."
-              />
-          }
-        </Typography>
-      </CardActionArea>
-    </Card>
-  );
+        }
+      </Typography>
+    </CardActionArea>
+  </Card>;
 };
 
 const BasicBrokerCard = withStyles(styles)(_BasicBrokerCard);

@@ -21,21 +21,24 @@ import {
   LinkProps as ReachLinkProps,
   RouteComponentProps
 } from "@reach/router";
+import BrokerCardHeader from "./BrokerCardHeader";
 import StatusBadge from "../components/StatusBadge";
 import useInterval from "../helpers/useInterval";
 import { BrokerApi } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
 
-const styles = ({ transitions }: Theme) =>
-  createStyles({
-    expand: {
-      transform: "rotate(0deg)",
-      marginLeft: "auto",
-      transition: transitions.create("transform", {
-        duration: transitions.duration.shortest
-      })
-    }
-  });
+const styles = ({ spacing, transitions }: Theme) => createStyles({
+  expand: {
+    transform: "rotate(0deg)",
+    marginLeft: "auto",
+    transition: transitions.create("transform", {
+      duration: transitions.duration.shortest
+    })
+  },
+  header: {
+    padding: 16
+  },
+});
 
 export interface IBrokerCard extends WithStyles<typeof styles> { }
 
@@ -107,11 +110,12 @@ const _BrokerCard: React.FunctionComponent<IBrokerCard> = ({ classes }) => {
   }
 
   useInterval(updateBroker, 10000);
-  React.useEffect(() => { updateBroker() }, []);
 
   return (
     <Card>
-      <CardHeader
+      <BrokerCardHeader 
+        className={classes.header}
+        running={running}
         action={
           <IconButton
             aria-label={intl.formatMessage(messages.more)}
@@ -120,8 +124,6 @@ const _BrokerCard: React.FunctionComponent<IBrokerCard> = ({ classes }) => {
             <MoreVertIcon />
           </IconButton>
         }
-        title={intl.formatMessage(messages.broker)}
-        subheader={<StatusBadge status={running ? "running" : "stopped"}/>}
       />
       <CardContent>
         {/* <Typography variant="body2" color="textSecondary" component="p"> */}
