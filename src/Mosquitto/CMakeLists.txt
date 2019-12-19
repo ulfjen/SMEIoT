@@ -23,6 +23,6 @@ if (CMAKE_BUILD_TYPE MATCHES Debug)
           )
 elseif(CMAKE_BUILD_TYPE MATCHES Release)
   install(TARGETS mosq
-          LIBRARY DESTINATION ${CMAKE_SOURCE_DIR}/src/SMEIoT.Web/bin/Release/netcoreapp3.1/linux-arm/publish
+          LIBRARY DESTINATION /var/SMEIoT
           )
 endif ()

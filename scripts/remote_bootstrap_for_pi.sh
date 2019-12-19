@@ -19,8 +19,6 @@ Do the following:
 
 Then ssh into the <remote> for deployment, do:
 
-  cd /tmp
-  sudo mkdir -p /tmp/smeiot_build
-  sudo tar xf /tmp/smeiot-config.tar.gz -C /tmp/smeiot_build
+  cd /tmp && sudo mkdir -p /tmp/smeiot_build && sudo tar xf /tmp/smeiot-config.tar.gz -C /tmp/smeiot_build
   bash -c 'source /tmp/smeiot_build/scripts/bootstrap.sh; build_smeiot_with_remote_tars'
 "

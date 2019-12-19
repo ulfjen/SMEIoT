@@ -1,6 +1,8 @@
 [Unit]
+# SMEIoT Web server responds to the user requests over internet and manages the Mosquitto broker.
+# It runs after the server is up and running.
 Description=SMEIoT Web Server
-Documentation=SMEIoT Web server responds to the user requests over internet and manages the Mosquitto broker. It runs after the server is up and running.
+Documentation=https://github.com/ulfjen/SMEIoT/blob/master/samples/smeiot.service.sample
 After=network-online.target postgresql.service
 Wants=network-online.target postgresql.service
 
@@ -15,6 +17,8 @@ ProtectSystem=full
 ProtectHome=tmpfs
 KillMode=process
 Restart=on-failure
+PrivateTmp=true
+RestartSec=1
 
 [Install]
 WantedBy=multi-user.target

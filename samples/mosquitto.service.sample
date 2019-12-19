@@ -1,7 +1,9 @@
 [Unit]
 Description=Mosquitto Broker
-Documentation=The mosuqitto broker is configured by the SMEIoT setup script.
-After=smeiot.service.target
+# The mosuqitto broker is configured by the SMEIoT setup script.
+Documentation=https://github.com/ulfjen/SMEIoT/blob/master/samples/mosquitto.service.sample
+After=smeiot.service
+JoinsNamespaceOf=smeiot.service
 
 [Service]
 Type=exec
@@ -12,6 +14,7 @@ ProtectSystem=full
 ProtectHome=tmpfs
 KillMode=process
 Restart=on-failure
+RestartSec=3
 
 [Install]
 WantedBy=multi-user.target

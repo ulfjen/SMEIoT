@@ -57,7 +57,7 @@ function build_mosquitto {
 # We have custom plugins that needed to be configured, but after mosquitto is built and installed
 function build_mosquitto_plugins {
   cd /tmp && sudo tar xf smeiot-mosquitto-plugins.tar.gz -C $TMP_BOOTSTRAP_DIR
-  sudo mkdir -p $TMP_BOOTSTRAP_DIR/out && cd $TMP_BOOTSTRAP_DIR/out && sudo cmake .. -DCMAKE_BUILD_TYPE=Release && make -j$(nproc)  && sudo make install
+  sudo mkdir -p $TMP_BOOTSTRAP_DIR/out && cd $TMP_BOOTSTRAP_DIR/out && sudo cmake .. -DCMAKE_BUILD_TYPE=Release && sudo make -j$(nproc) && sudo make install
 }
 
 # we rely on Self-contained deployment that contains .NET itself with us
@@ -89,31 +89,33 @@ function build_smeiot {
 
 function setup_db {
   PG_CONF_DIRS=$(find /etc/postgresql -name postgresql.conf)
-  PG_CONF_DIR="${PG_CONF_DIRS##*$'\n'}"
+  PG_CONF_PATH="${PG_CONF_DIRS##*$'\n'}"
 
-  sudo mv $TMP_BOOTSTRAP_DIR/postgresql.conf.sample $PG_CONF_DIR/postgresql.conf
+  sudo mv $TMP_BOOTSTRAP_DIR/postgresql.conf.sample $PG_CONF_PATH
 
   cd $SMEIOT_ROOT
   sudo systemctl start postgresql && sudo systemctl enable postgresql
   sudo su postgres -c 'dropdb smeiot --if-exists'
+  sudo su postgres -c 'dropuser smeiot --if-exists'
   echo "* * * * * * * * * * * * * * * * * * * *"
   echo "You must remember the database password for futher configuration and data export."
   echo "* * * * * * * * * * * * * * * * * * * *"
   sudo su postgres -c 'createuser smeiot -P'
   sudo su postgres -c 'createdb smeiot -T template1 -O smeiot'
-  sudo su postgres -c 'psql smeiot < $SMEIOT_ROOT/db_migrate.sql'
+  sudo su postgres -c "psql smeiot < $SMEIOT_ROOT/db_migrate.sql"
 
   echo "* * * * * * * * * * * * * * * * * * * *"
   echo "The database is congfigured. Now we want to store your password locally to start the server."
+  echo "Appending $SMEIOT_ROOT/server_env"
   echo "* * * * * * * * * * * * * * * * * * * *"
-  echo "-n Password:" 
+  echo "Enter Your database password:" 
   read -s password
   echo
-  echo 'ConnectionStrings__Password = $password' >> $SMEIOT_ROOT/server_env
+  echo 'ConnectionStrings__Password = $password' | sudo tee -a $SMEIOT_ROOT/server_env
 }
 
 function setup_smeiot_with_tar {
-  sudo mkdir -p $SMEIOT_ROOT
+  sudo rm -rf $SMEIOT_ROOT && sudo mkdir -p $SMEIOT_ROOT
   sudo tar xf /tmp/smeiot.tar.gz -C $SMEIOT_ROOT
   sudo chown -R smeiot:smeiot $SMEIOT_ROOT
 }
@@ -153,5 +155,14 @@ function build_smeiot_with_remote_tars {
   build_mosquitto_plugins
   setup_db
   configure_system
-  sudo rm -rf $TMP_BOOTSTRAP_DIR && sudo rm -rf /tmp/smeiot-*.tar.gz
+  sudo rm -rf $TMP_BOOTSTRAP_DIR && sudo rm -rf /tmp/smeiot*.tar.gz && echo "SMEIoT is up." && cd $SMEIOT_ROOT
+}
+
+function nuke_smeiot {
+  sudo systemctl disable mosquitto && \
+  sudo systemctl disable smeiot && \
+  sudo systemctl stop mosquitto && \
+  sudo systemctl stop smeiot && \
+  sudo rm -rf $SMEIOT_ROOT && \
+  sudo userdel smeiot
 }

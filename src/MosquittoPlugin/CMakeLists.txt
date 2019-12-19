@@ -20,6 +20,6 @@ if (CMAKE_BUILD_TYPE MATCHES Debug)
           )
 elseif(CMAKE_BUILD_TYPE MATCHES Release)
   install(TARGETS mosqauth
-          LIBRARY DESTINATION /var/mosquitto
+          LIBRARY DESTINATION /var/SMEIoT
           )
 endif ()
