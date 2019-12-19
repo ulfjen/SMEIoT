@@ -40,7 +40,7 @@ namespace SMEIoT.Infrastructure.MqttClient
     {
       _logger.LogInformation("Start to connect MQTT client with the Mosquitto broker.");
 
-      ReloadBrokerIfBrokerWasRogue(false);
+      RestartBrokerIfBrokerWasRogue(false);
       _client.Connect();
 
       _reconnect = false;
@@ -48,13 +48,24 @@ namespace SMEIoT.Infrastructure.MqttClient
       _timer = new Timer(ExecuteRunLoop, null, 0, _delay);
     }
 
-    private void ReloadBrokerIfBrokerWasRogue(bool ignoreAuthPluginPid)
+    private void RestartBrokerIfBrokerWasRogue(bool ignoreAuthPluginPid)
     {
       // broker runs but not the same
-      _logger.LogTrace($"Broker pid = {_brokerService.BrokerPid}; auth plugin reports = {_brokerService.BrokerPidFromAuthPlugin} ");
+      _logger.LogDebug($"Broker pid = {_brokerService.BrokerPid}; auth plugin reports = {_brokerService.BrokerPidFromAuthPlugin} ");
       if (_brokerService.BrokerPid != null && (_brokerService.BrokerPidFromAuthPlugin == null || _brokerService.BrokerPid.Value != _brokerService.BrokerPidFromAuthPlugin.Value)) { 
-        _brokerService.ReloadBrokerBySignalAsync(true).GetAwaiter().GetResult();
-        Thread.Sleep(TimeSpan.FromSeconds(5)); // waiting the broker to be set up. 
+        _brokerService.RestartBrokerBySignalAsync(true).GetAwaiter().GetResult();
+        int waitingTurn = 5;
+        while (waitingTurn-- > 0) {
+          if (_brokerService.BrokerPidFromAuthPlugin == null) {
+            Thread.Sleep(TimeSpan.FromSeconds(5)); // waiting the broker to be set up. 
+          } else {
+            break;
+          }
+        }
+        _logger.LogDebug($"Broker pid = {_brokerService.BrokerPid}; auth plugin reports = {_brokerService.BrokerPidFromAuthPlugin} ");
+        if (_brokerService.BrokerPidFromAuthPlugin == null) {
+          throw new OperationCanceledException("Broker is not responding with our reload.");
+        }
       }
     }
 

@@ -121,7 +121,7 @@ namespace SMEIoT.Core.EventHandlers
       }
       _brokerService.RegisterBrokerStatistics(parsed.ToString(), value.ToString());
 
-      _brokerService.BrokerLastUpdatedAt = message.ReceivedAt;
+      _brokerService.BrokerLastMessageAt = message.ReceivedAt;
     }
 
     public void Update(MqttMessage message)

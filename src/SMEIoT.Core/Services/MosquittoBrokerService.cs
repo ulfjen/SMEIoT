@@ -20,14 +20,14 @@ namespace SMEIoT.Core.Services
 
     public bool BrokerRunning {
       get {
-        var brokerSendingMessage = BrokerLastUpdatedAt != null && _clock.GetCurrentInstant() - BrokerLastUpdatedAt <= Duration.FromSeconds(45);
+        var brokerSendingMessage = BrokerLastMessageAt != null && _clock.GetCurrentInstant() - BrokerLastMessageAt <= Duration.FromSeconds(45);
         var brokerExist = BrokerPid != null && BrokerPid == BrokerPidFromAuthPlugin;
         // ensure we are talking with the same process
         return brokerSendingMessage && brokerExist;
       }
     }
 
-    public Instant? BrokerLastUpdatedAt { get; set; }
+    public Instant? BrokerLastMessageAt { get; set; }
     public int? BrokerPidFromAuthPlugin { get; set; }
 
     public int? BrokerPid => GetBrokerPidFromPidFile("/var/run/smeiot.mosquitto.pid");

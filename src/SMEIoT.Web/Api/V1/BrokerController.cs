@@ -33,7 +33,7 @@ namespace SMEIoT.Web.Api.V1
     public async Task<ActionResult<BasicBrokerApiModel>> ShowBasic()
     {
       var loads = _service.GetBrokerLoads();
-      var res = new BasicBrokerApiModel(_service.BrokerRunning, _service.BrokerLastUpdatedAt, loads);
+      var res = new BasicBrokerApiModel(_service.BrokerRunning, _service.BrokerLastMessageAt, loads);
       return Ok(res);
     }
 

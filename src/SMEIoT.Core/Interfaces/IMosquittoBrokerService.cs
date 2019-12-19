@@ -18,6 +18,6 @@ namespace SMEIoT.Core.Interfaces
     bool BrokerRunning { get; }
     int? BrokerPid { get; }
     int? BrokerPidFromAuthPlugin { get; set; }
-    Instant? BrokerLastUpdatedAt { get; set; }
+    Instant? BrokerLastMessageAt { get; set; }
   }
 }
