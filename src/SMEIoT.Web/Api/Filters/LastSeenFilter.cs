@@ -28,7 +28,7 @@ namespace SMEIoT.Web.Api.Filters
       var user = await _userManager.GetUserAsync(context.HttpContext.User);
       if (user != null)
       {
-        BackgroundJob.Enqueue<IUserProfileService>(service => service.UpdateUserLastSeenAsync(user.Id, DateTime.UtcNow));
+        BackgroundJob.Enqueue<IUserProfileService>(service => service.UpdateUserLastSeenAsync(user.Id, _clock.GetCurrentInstant().ToDateTimeUtc()));
       }
       await next();
     }

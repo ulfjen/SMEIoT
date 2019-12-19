@@ -6,14 +6,11 @@ using System;
 using SMEIoT.Core.Interfaces;
 using SMEIoT.Infrastructure.Data;
 using Hangfire;
-using Hangfire.PostgreSql;
+using Hangfire.LiteDB;
 using SMEIoT.Infrastructure.MqttClient;
 using SMEIoT.Core.EventHandlers;
 using SMEIoT.Core.Services;
 using Npgsql;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure.Internal;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Utilities;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -25,13 +22,8 @@ namespace SMEIoT.Infrastructure
   {
     public static void AddDbContext(this IServiceCollection services, IConfiguration configuration)
     {
-      var conn = new NpgsqlConnection(configuration.BuildConnectionString());
-      conn.Open();
-      conn.TypeMapper.UseNodaTime();
       services.AddDbContext<ApplicationDbContext>(options => {
-        options.UseNpgsql(conn, optionsBuilder => {
-          optionsBuilder.UseCustomNodaTime();
-        });
+        options.UseNpgsql(configuration.BuildConnectionString(), optionsBuilder => optionsBuilder.UseNodaTime());
       });
 
       services.AddTransient<IApplicationDbConnection>(provider =>
@@ -47,8 +39,7 @@ namespace SMEIoT.Infrastructure
         .UseRecommendedSerializerSettings()
         // we want less dependencies.
         // and hangfire PostgreSql can't store Nodatime.
-        .UsePostgreSqlStorage(configuration.BuildConnectionString());
-        // .UseRedisStorage(Redis);
+        .UseLiteDbStorage("Filename=Hangfire.db; Mode=Exclusive");
 
     public static void ConfigureMqttClient(this IServiceCollection services, IConfiguration configuration)
     {

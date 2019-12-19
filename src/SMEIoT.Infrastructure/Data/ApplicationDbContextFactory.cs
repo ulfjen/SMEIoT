@@ -26,14 +26,9 @@ namespace SMEIoT.Infrastructure.Data
         .AddEnvironmentVariables()
         .Build();
       
-
-      var conn = new NpgsqlConnection(config.BuildConnectionString());
-      conn.Open();
-      conn.TypeMapper.UseNodaTime();
-      
       var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
-      optionsBuilder.UseNpgsql(conn, optionsBuilder => {
-        optionsBuilder.UseCustomNodaTime();
+      optionsBuilder.UseNpgsql(config.BuildConnectionString(), optionsBuilder => {
+        optionsBuilder.UseNodaTime();
       });
 
       return new ApplicationDbContext(optionsBuilder.Options, SystemClock.Instance);

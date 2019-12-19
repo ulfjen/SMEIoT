@@ -1,21 +1,38 @@
 import "./styles/site.scss";
 import * as React from "react";
-import { Router, RouteComponentProps } from "@reach/router";
 import { IntlProvider } from "react-intl";
 import ThemeProvider from "@material-ui/styles/ThemeProvider";
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import createMuiTheme from "@material-ui/core/styles/createMuiTheme";
 import palette from "./theme";
-import RootApp from "./RootApp";
+import { Router, RouteComponentProps } from "@reach/router";
 import EnMessages from "./locales/en.json";
-import DashboardApp from "./DashboardApp";
+import NewSession from "./NewSession";
+import NewUser from "./NewUser";
 
-export interface ISMEIoTApp {
+function GetXsrfTokenFromDom()
+{
+  var token = "";
+  try {
+    const ele = document.getElementById("RequestVerificationToken");
+    const raw = ele !== null ? ele.getAttribute("value") : "";
+    token = raw !== null ? raw : "";
+  } catch {
+    token = "";
+  }
+  return token;
 }
 
-const SMEIoTApp: React.FunctionComponent<ISMEIoTApp> = ({
+export interface IRootApp extends RouteComponentProps {
+  locale?: string
+}
+
+const RootApp: React.FunctionComponent<IRootApp> = ({
+  locale
 }) => {
-  let locale = "en";
+  if (locale === undefined) {
+    locale = "en";
+  }
   let messages: Record<string, string>;
   switch (locale) {
     case "en":
@@ -35,15 +52,14 @@ const SMEIoTApp: React.FunctionComponent<ISMEIoTApp> = ({
     [prefersDarkMode],
   );
 
-
   return <IntlProvider locale={locale} messages={messages}>
     <ThemeProvider theme={theme}>
       <Router>
-        <DashboardApp path="/dashboard/*" locale={locale} />
-        <RootApp path="/*" locale={locale} />
+        <NewSession path="/login" csrfToken={GetXsrfTokenFromDom()}/>
+        <NewUser path="/signup" csrfToken={GetXsrfTokenFromDom()}/>
       </Router>
     </ThemeProvider>
   </IntlProvider>;
 };
 
-export default SMEIoTApp;
+export default RootApp;

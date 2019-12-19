@@ -119,6 +119,7 @@ namespace SMEIoT.Web
       {
         app.UseDeveloperExceptionPage();
         app.UseDatabaseErrorPage();
+        app.UseHangfireDashboard();
       }
       else
       {

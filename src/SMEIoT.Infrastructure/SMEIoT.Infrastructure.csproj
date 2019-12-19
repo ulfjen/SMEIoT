@@ -5,7 +5,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="Hangfire.Postgresql" Version="1.6.3" />
+    <PackageReference Include="Hangfire.LiteDB" Version="0.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Connections.Abstractions" Version="3.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.0" />
@@ -21,7 +21,6 @@
     <PackageReference Include="NodaTime" Version="3.0.0-beta01" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.1.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.NodaTime" Version="3.1.0" />
-    <PackageReference Include="Npgsql.NodaTime" Version="4.1.2" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Migrations" />
