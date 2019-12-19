@@ -5,7 +5,7 @@ set -e
 ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." >/dev/null 2>&1 && pwd )"
 echo "Starting at ROOT: $ROOT"
 
-JSROOT="$( cd "$ROOT/src/SMEIoT.Web/ClientApp" >/dev/null 2>&1 && pwd )"
+JSROOT="$( cd "$ROOT/src/ClientApp" >/dev/null 2>&1 && pwd )"
 echo "Setting JSROOT: $JSROOT"
 
 APIDOCDIR="$( cd "$JSROOT/../ClientApiSdkGen" >/dev/null 2>&1 && pwd )"

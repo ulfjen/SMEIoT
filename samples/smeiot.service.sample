@@ -7,6 +7,7 @@ Wants=network-online.target postgresql.service
 [Service]
 Type=exec
 WorkingDirectory=/var/SMEIoT
+EnvironmentFile=/var/SMEIoT/server_env
 ExecStart=/var/SMEIoT/SMEIoT.Web
 User=smeiot
 Group=smeiot

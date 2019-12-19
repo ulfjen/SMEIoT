@@ -14,13 +14,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="ClientApiSdkGen\**" />
-    <Content Remove="ClientApiSdkGen\**" />
-    <EmbeddedResource Remove="ClientApiSdkGen\**" />
-    <None Remove="ClientApiSdkGen\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Reference Include="mosq">
       <HintPath>mosq.dll</HintPath>
     </Reference>
@@ -38,33 +31,6 @@
     <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0-rc4" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <TypeScriptCompile Include="ClientApp\src\components\ListItemLine.tsx" />
-    <TypeScriptCompile Include="ClientApp\src\components\ListItemRoutedLink.tsx" />
-    <TypeScriptCompile Include="ClientApp\src\components\ListItemLink.tsx" />
-    <TypeScriptCompile Include="ClientApp\src\components\LoginForm.tsx" />
-    <TypeScriptCompile Include="ClientApp\src\components\PasswordField.tsx" />
-    <TypeScriptCompile Include="ClientApp\src\components\SensorCard.tsx" />
-    <TypeScriptCompile Include="ClientApp\src\components\UserListItem.tsx" />
-    <TypeScriptCompile Include="ClientApp\src\components\UserPasswordForm.tsx" />
-    <TypeScriptCompile Include="ClientApp\src\components\useUserCredentials.ts" />
-    <TypeScriptCompile Include="ClientApp\src\dashboard\DashboardNewSensor.tsx" />
-    <TypeScriptCompile Include="ClientApp\src\dashboard\DashboardIndex.tsx" />
-    <TypeScriptCompile Include="ClientApp\src\dashboard\DashboardEditUser.tsx" />
-    <TypeScriptCompile Include="ClientApp\src\dashboard\DashboardMqttLineRenderer.tsx">
-      <SubType>Code</SubType>
-    </TypeScriptCompile>
-    <TypeScriptCompile Include="ClientApp\src\dashboard\DashboardSensors.tsx" />
-    <TypeScriptCompile Include="ClientApp\src\dashboard\DashboardUsers.tsx" />
-    <TypeScriptCompile Include="ClientApp\src\dashboard\DashboardMqtt.tsx" />
-    <TypeScriptCompile Include="ClientApp\src\index.tsx" />
-    <TypeScriptCompile Include="ClientApp\src\avatars.tsx" />
-    <TypeScriptCompile Include="ClientApp\src\routes.tsx" />
-    <TypeScriptCompile Include="ClientApp\src\SensorDetails.tsx" />
-    <TypeScriptCompile Include="ClientApp\src\theme.ts" />
-    <TypeScriptCompile Include="ClientApp\typings\react-vis.d.ts" />
   </ItemGroup>
 
   <ItemGroup>

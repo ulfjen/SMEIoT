@@ -1,0 +1,11 @@
+{
+  "sortParamsByRequiredFlag": true,
+  "ensureUniqueParams": true,
+  "allowUnicodeIdentifiers": false,
+  "modelPropertyNaming": "camelCase",
+  "npmName": "smeiot-client",
+  "npmVersion": "1.0.0",
+  "useSingleRequestParameter": true,
+  "prefixParameterInterfaces": true,
+  "typescriptThreePlus": true
+}

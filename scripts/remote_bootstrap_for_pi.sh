@@ -11,17 +11,16 @@ cd $REPO_ROOT && echo "Operating at root dir: $REPO_ROOT"
 source scripts/bootstrap.sh
 
 build_smeiot
-prepare_smeiot_migration_script
 package_tars
 
-echo << EOF
+echo "==============
 Do the following:
   scp $BUILD_DIR/*.tar.gz <remote>:/tmp/
 
-Then ssh into the <remote>, do:
+Then ssh into the <remote> for deployment, do:
 
   cd /tmp
   sudo mkdir -p /tmp/smeiot_build
   sudo tar xf /tmp/smeiot-config.tar.gz -C /tmp/smeiot_build
-  sh -c 'source /tmp/smeiot_build/bootstrap.sh; build_smeiot_with_remote_tars()'
-EOF
+  bash -c 'source /tmp/smeiot_build/scripts/bootstrap.sh; build_smeiot_with_remote_tars'
+"
