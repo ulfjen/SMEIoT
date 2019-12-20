@@ -26,6 +26,7 @@ namespace SMEIoT.Web.Services
     public override async Task SignOutAsync()
     {
       await Context.SignOutAsync(IdentityConstants.ApplicationScheme);
+      await Context.SignOutAsync(IdentityConstants.ApplicationScheme);
     }
 
   }

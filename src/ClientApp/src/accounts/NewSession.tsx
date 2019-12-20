@@ -14,6 +14,7 @@ import Container from '@material-ui/core/Container';
 import { Router, RouteComponentProps } from "@reach/router";
 import UserPasswordForm from "../components/UserPasswordForm";
 import useUserCredentials from "../components/useUserCredentials";
+import { useAppCookie } from "../helpers/useCookie";
 import {SessionsApi} from "smeiot-client";
 import {GetDefaultApiConfig} from "../index";
 
@@ -53,6 +54,7 @@ const _NewSession: React.FunctionComponent<INewSessionProps & WithStyles<typeof 
     usernameErrors, setUsernameErrors,
     passwordErrors, setPasswordErrors
   } = useUserCredentials();
+  const cookie = useAppCookie();
 
   var errorPrompt: string | undefined = undefined;
   // @ts-ignore

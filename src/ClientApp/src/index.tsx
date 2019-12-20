@@ -1,3 +1,4 @@
+import 'react-app-polyfill/stable';
 import '@fortawesome/fontawesome-free/css/all.css';
 import './styles/site.scss';
 import {Configuration} from "smeiot-client";

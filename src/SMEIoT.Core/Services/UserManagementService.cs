@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using SMEIoT.Core.Entities;
 using SMEIoT.Core.Exceptions;
 using SMEIoT.Core.Interfaces;
+using System.Security.Claims;
 
 namespace SMEIoT.Core.Services
 {
@@ -35,6 +36,18 @@ namespace SMEIoT.Core.Services
       if (user == null)
       {
         throw new EntityNotFoundException($"cannot find the user {username}.", "userName");
+      }
+
+      var roles = await _userManager.GetRolesAsync(user);
+      return (user, roles);
+    }
+
+    public async Task<(User, IList<string>)> GetUserAndRoleByPrincipal(ClaimsPrincipal principal)
+    {
+      var user = await _userManager.GetUserAsync(principal);
+      if (user == null)
+      {
+        throw new EntityNotFoundException($"cannot find the user.", "principal");
       }
 
       var roles = await _userManager.GetRolesAsync(user);
@@ -148,5 +161,11 @@ namespace SMEIoT.Core.Services
         yield return (user, roles);
       }
     }
+
+    public Task<bool> IsAdmin(IEnumerable<string> roles)
+    {
+      return Task.FromResult(roles.Contains("Admin"));
+    }
   }
+
 }

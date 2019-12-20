@@ -37,7 +37,7 @@ namespace SMEIoT.Web
         options.ExpireTimeSpan = TimeSpan.FromDays(99999);
 
         options.LoginPath = "/login";
-        options.AccessDeniedPath = "/login";
+        options.AccessDeniedPath = "/denied";
         options.SlidingExpiration = false;
       });
 
@@ -68,53 +68,55 @@ namespace SMEIoT.Web
       options.SignIn.RequireConfirmedAccount = false;
     }
 
-  // changed from Identity/Core/src/IdentityServiceCollectionExtensions.cs
-  private static IdentityBuilder AddCustomedIdentity<TUser, TRole>(
-            IServiceCollection services,
-            Action<IdentityOptions> setupAction)
-            where TUser : class
-            where TRole : class
+    // changed from Identity/Core/src/IdentityServiceCollectionExtensions.cs
+    private static IdentityBuilder AddCustomedIdentity<TUser, TRole>(
+              IServiceCollection services,
+              Action<IdentityOptions> setupAction)
+              where TUser : class
+              where TRole : class
+    {
+      // Services used by identity
+      services.AddAuthentication(options =>
+      {
+        options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
+        options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
+      })
+      .AddCookie(IdentityConstants.ApplicationScheme, o =>
+      {
+        o.LoginPath = new PathString("/login");
+        o.Events = new CookieAuthenticationEvents
         {
-            // Services used by identity
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
-                options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
-            })
-            .AddCookie(IdentityConstants.ApplicationScheme, o =>
-            {
-                o.LoginPath = new PathString("/login");
-                o.Events = new CookieAuthenticationEvents
-                {
-                    OnValidatePrincipal = SecurityStampValidator.ValidatePrincipalAsync
-                };
-            });
+          OnValidatePrincipal = SecurityStampValidator.ValidatePrincipalAsync,
+          OnSignedIn = UserCookieManagementService.UserSignedInAsync,
+          OnSigningOut = UserCookieManagementService.UserSigningOutAsync
+        };
+      });
 
-            // Hosting doesn't add IHttpContextAccessor by default
-            services.AddHttpContextAccessor();
-            // Identity services
-            services.TryAddScoped<IUserValidator<TUser>, UserValidator<TUser>>();
-            services.TryAddScoped<IPasswordValidator<TUser>, PasswordValidator<TUser>>();
-            services.TryAddScoped<IPasswordHasher<TUser>, PasswordHasher<TUser>>();
-            services.TryAddScoped<ILookupNormalizer, UpperInvariantLookupNormalizer>();
-            services.TryAddScoped<IRoleValidator<TRole>, RoleValidator<TRole>>();
-            // No interface for the error describer so we can add errors without rev'ing the interface
-            services.TryAddScoped<IdentityErrorDescriber>();
-            services.TryAddScoped<ISecurityStampValidator, SecurityStampValidator<TUser>>();
-            // services.TryAddScoped<ITwoFactorSecurityStampValidator, TwoFactorSecurityStampValidator<TUser>>();
-            services.TryAddScoped<IUserClaimsPrincipalFactory<TUser>, UserClaimsPrincipalFactory<TUser, TRole>>();
-            services.TryAddScoped<IUserConfirmation<TUser>, DefaultUserConfirmation<TUser>>();
-            services.TryAddScoped<UserManager<TUser>>();
-            // services.TryAddScoped<SignInManager<TUser>>();
-            services.TryAddScoped<RoleManager<TRole>>();
+      // Hosting doesn't add IHttpContextAccessor by default
+      services.AddHttpContextAccessor();
+      // Identity services
+      services.TryAddScoped<IUserValidator<TUser>, UserValidator<TUser>>();
+      services.TryAddScoped<IPasswordValidator<TUser>, PasswordValidator<TUser>>();
+      services.TryAddScoped<IPasswordHasher<TUser>, PasswordHasher<TUser>>();
+      services.TryAddScoped<ILookupNormalizer, UpperInvariantLookupNormalizer>();
+      services.TryAddScoped<IRoleValidator<TRole>, RoleValidator<TRole>>();
+      // No interface for the error describer so we can add errors without rev'ing the interface
+      services.TryAddScoped<IdentityErrorDescriber>();
+      services.TryAddScoped<ISecurityStampValidator, SecurityStampValidator<TUser>>();
+      // services.TryAddScoped<ITwoFactorSecurityStampValidator, TwoFactorSecurityStampValidator<TUser>>();
+      services.TryAddScoped<IUserClaimsPrincipalFactory<TUser>, UserClaimsPrincipalFactory<TUser, TRole>>();
+      services.TryAddScoped<IUserConfirmation<TUser>, DefaultUserConfirmation<TUser>>();
+      services.TryAddScoped<UserManager<TUser>>();
+      // services.TryAddScoped<SignInManager<TUser>>();
+      services.TryAddScoped<RoleManager<TRole>>();
 
-            if (setupAction != null)
-            {
-                services.Configure(setupAction);
-            }
+      if (setupAction != null)
+      {
+        services.Configure(setupAction);
+      }
 
-            return new IdentityBuilder(typeof(TUser), typeof(TRole), services);
-        }
+      return new IdentityBuilder(typeof(TUser), typeof(TRole), services);
+    }
   }
 
 }
