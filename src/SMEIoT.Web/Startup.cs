@@ -92,11 +92,13 @@ namespace SMEIoT.Web
         options.ConstraintMap["slugify"] = typeof(SlugifyParameterTransformer);
       });
 
-      services.AddSwaggerGen(c =>
-      {
-        c.OperationFilter<SwaggerDefaultValues>();
-        c.SwaggerDoc("v1", new OpenApiInfo { Title = "SMEIoT API", Version = "v1" });
-      });
+      if (_env.IsDevelopment()) {
+        services.AddSwaggerGen(c =>
+        {
+          c.OperationFilter<SwaggerDefaultValues>();
+          c.SwaggerDoc("v1", new OpenApiInfo { Title = "SMEIoT API", Version = "v1" });
+        });
+      }
       services.AddRazorPages();
       services.AddSignalR();
       services.AddSingleton<MqttMessageHubDeliveryService>(provider =>

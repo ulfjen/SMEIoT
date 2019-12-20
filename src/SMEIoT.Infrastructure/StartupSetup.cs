@@ -49,6 +49,7 @@ namespace SMEIoT.Infrastructure
       {
         var auth = provider.GetService<IMosquittoClientAuthenticationService>();
         var broker = provider.GetService<IMosquittoBrokerService>();
+        var env = provider.GetService<IHostEnvironment>();
         int port;
         var portStr = configuration.GetConnectionString("MqttPort");
         if (!int.TryParse(portStr, out port)) {
@@ -65,13 +66,17 @@ namespace SMEIoT.Infrastructure
 
         var handler = provider.GetService<MosquittoMessageHandler>();
         builder.SetMessageCallback(handler.HandleMessage);
-        return new BackgroundMqttClientHostedService(builder.Client, provider.GetService<ILogger<BackgroundMqttClientHostedService>>(), broker);
+        return new BackgroundMqttClientHostedService(builder.Client, provider.GetService<ILogger<BackgroundMqttClientHostedService>>(), broker, env);
       });
     }
 
     public static void AddInfrastructureServices(this IServiceCollection services, IHostEnvironment env)
     {
       services.AddSingleton<IClock>(SystemClock.Instance);
+      if (env.IsProduction() || env.IsStaging())
+      {
+        services.AddLetsEncrypt();
+      }
       services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
       services.AddSingleton<IMqttIdentifierService, MqttIdentifierService>();
       services.AddSingleton<IMosquittoBrokerService, MosquittoBrokerService>();

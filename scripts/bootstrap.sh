@@ -103,7 +103,9 @@ function setup_db {
   sudo su postgres -c 'createuser smeiot -P'
   sudo su postgres -c 'createdb smeiot -T template1 -O smeiot'
   sudo su postgres -c "psql smeiot < $SMEIOT_ROOT/db_migrate.sql"
+}
 
+function setup_server_config {
   echo "* * * * * * * * * * * * * * * * * * * *"
   echo "The database is congfigured. Now we want to store your password locally to start the server."
   echo "Appending $SMEIOT_ROOT/server_env"
@@ -112,6 +114,27 @@ function setup_db {
   read -s password
   echo
   echo 'ConnectionStrings__Password = $password' | sudo tee -a $SMEIOT_ROOT/server_env
+  echo 
+  if [ -z "$ASPNETCORE_ENVIRONMENT" ]; then
+    echo "ASPNETCORE_ENVIRONMENT=$ASPNETCORE_ENVIRONMENT" | sudo tee -a $SMEIOT_ROOT/server_env
+  else
+    echo "ASPNETCORE_ENVIRONMENT=Production" | sudo tee -a $SMEIOT_ROOT/server_env
+  fi
+  echo "* * * * * * * * * * * * * * * * * * * *"
+  echo "We use LetsEncrypt (https://letsencrypt.org/) to make sure your server is safe."
+  echo "But we need your hostname as where you want the server responds from browsers and an email."
+  echo "* * * * * * * * * * * * * * * * * * * *"
+  echo "Enter your hostname (e.g. google.com):"
+  read smeiot_server_hostname
+  echo 
+  echo "LetsEncrypt__DomainNames__0=$smeiot_server_hostname" | sudo tee -a $SMEIOT_ROOT/server_env
+  echo "AllowedHosts=$smeiot_server_hostname" | sudo tee -a $SMEIOT_ROOT/server_env
+  echo "Enter your email for letsencrypt:"
+  read smeiot_letsencrypt_email
+  echo 
+  echo "LetsEncrypt__EmailAddress__0=$smeiot_letsencrypt_email" | sudo tee -a $SMEIOT_ROOT/server_env
+  echo 
+  echo "We generated the server config based on what you provided."
 }
 
 function setup_smeiot_with_tar {
@@ -154,6 +177,7 @@ function build_smeiot_with_remote_tars {
   setup_smeiot_with_tar
   build_mosquitto_plugins
   setup_db
+  setup_server_config
   configure_system
   sudo rm -rf $TMP_BOOTSTRAP_DIR && sudo rm -rf /tmp/smeiot*.tar.gz && echo "SMEIoT is up." && cd $SMEIOT_ROOT
 }

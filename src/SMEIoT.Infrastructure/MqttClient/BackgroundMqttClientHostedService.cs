@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Hosting;
 using SMEIoT.Core.Interfaces;
 
 namespace SMEIoT.Infrastructure.MqttClient
@@ -13,15 +14,21 @@ namespace SMEIoT.Infrastructure.MqttClient
     private Timer? _timer;
     private ILogger _logger;
     private readonly IMosquittoBrokerService _brokerService;
+    private readonly IHostEnvironment _env;
     private readonly int _delay = 100;
     private bool _reconnect;
     private bool _stoppedTimer;
 
-    public BackgroundMqttClientHostedService(MosquittoClient client, ILogger<BackgroundMqttClientHostedService> logger, IMosquittoBrokerService brokerService)
+    public BackgroundMqttClientHostedService(
+      MosquittoClient client,
+      ILogger<BackgroundMqttClientHostedService> logger,
+      IMosquittoBrokerService brokerService,
+      IHostEnvironment env)
     {
       _client = client;
       _logger = logger;
       _brokerService = brokerService;
+      _env = env;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
@@ -63,8 +70,8 @@ namespace SMEIoT.Infrastructure.MqttClient
           }
         }
         _logger.LogDebug($"Broker pid = {_brokerService.BrokerPid}; auth plugin reports = {_brokerService.BrokerPidFromAuthPlugin} ");
-        if (_brokerService.BrokerPidFromAuthPlugin == null) {
-          throw new OperationCanceledException("Broker is not responding with our reload.");
+        if (_brokerService.BrokerPidFromAuthPlugin == null && !_env.IsProduction()) {
+          throw new OperationCanceledException("Broker is not responding with our restart.");
         }
       }
     }

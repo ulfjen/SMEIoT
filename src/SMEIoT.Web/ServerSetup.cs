@@ -22,9 +22,9 @@ namespace SMEIoT.Web
         builder.UseConnectionHandler<MosquittoBrokerAuthHandler>();
       });
       // options.ListenLocalhost(5000);
-      options.ListenLocalhost(5001, builder => {
-        builder.UseHttps();
-      });
+      // options.ListenLocalhost(5001, builder => {
+      //   builder.UseHttps();
+      // });
     }
   }
 }
