@@ -153,7 +153,6 @@ namespace SMEIoT.Web
         }
       });
 
-      app.UseCookiePolicy();
       app.UseRouting();
 
       app.UseAuthentication();
