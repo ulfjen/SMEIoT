@@ -132,7 +132,7 @@ function setup_server_config {
   echo "Enter your email for letsencrypt:"
   read smeiot_letsencrypt_email
   echo 
-  echo "LetsEncrypt__EmailAddress__0=$smeiot_letsencrypt_email" | sudo tee -a $SMEIOT_ROOT/server_env
+  echo "LetsEncrypt__EmailAddress=$smeiot_letsencrypt_email" | sudo tee -a $SMEIOT_ROOT/server_env
   echo 
   echo "We generated the server config based on what you provided."
 }
