@@ -34,12 +34,12 @@ const styles = ({ transitions, spacing }: Theme) => createStyles({
 });
 
 export interface IBrokerCardHeader extends WithStyles<typeof styles> {
-  running: boolean;
   className?: string;
-  action?: React.ReactFragment;
+  action?: React.ReactNode;
+  status?: React.ReactNode;
 }
 
-const _BrokerCardHeader: React.FunctionComponent<IBrokerCardHeader> = ({ classes, className, running, action }) => {
+const _BrokerCardHeader: React.FunctionComponent<IBrokerCardHeader> = ({ classes, className, action, status }) => {
   return <div className={clsx(classes.root, className)}>
     <div className={classes.head}>
       <Avatar>
@@ -55,7 +55,7 @@ const _BrokerCardHeader: React.FunctionComponent<IBrokerCardHeader> = ({ classes
           defaultMessage="Broker"
         />
       </Typography>
-      <StatusBadge className={classes.status} status={running ? "running" : "stopped"} />
+      {status && <div className={classes.status}>{status}</div>}
     </div>
   </div>;
 };

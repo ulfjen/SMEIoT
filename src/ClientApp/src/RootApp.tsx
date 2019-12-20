@@ -7,8 +7,9 @@ import createMuiTheme from "@material-ui/core/styles/createMuiTheme";
 import palette from "./theme";
 import { Router, RouteComponentProps } from "@reach/router";
 import EnMessages from "./locales/en.json";
-import NewSession from "./NewSession";
-import NewUser from "./NewUser";
+import NewSession from "./accounts/NewSession";
+import NewUser from "./accounts/NewUser";
+import EditUser from "./accounts/EditUser";
 
 function GetXsrfTokenFromDom()
 {
@@ -57,6 +58,7 @@ const RootApp: React.FunctionComponent<IRootApp> = ({
       <Router>
         <NewSession path="/login" csrfToken={GetXsrfTokenFromDom()}/>
         <NewUser path="/signup" csrfToken={GetXsrfTokenFromDom()}/>
+        <EditUser path="/account" csrfToken={GetXsrfTokenFromDom()}/>
       </Router>
     </ThemeProvider>
   </IntlProvider>;

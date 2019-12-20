@@ -12,16 +12,17 @@ import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CardHeader from '@material-ui/core/CardHeader';
 import BuildIcon from '@material-ui/icons/Build';
-import PasswordField from "./components/PasswordField";
+import PasswordField from "../components/PasswordField";
 
 import {
   Configuration, SessionsApi,
   UsersApi,
   BasicUserApiModel,
 } from "smeiot-client";
-import { GetDefaultApiConfig } from "./index";
+import { GetDefaultApiConfig } from "../index";
 import moment from "moment";
-import useUserCredentials from "./components/useUserCredentials";
+import useUserCredentials from "../components/useUserCredentials";
+import { RouteComponentProps } from "@reach/router";
 
 const styles = ({ palette, spacing }: Theme) => createStyles({
   '@global': {
@@ -52,7 +53,7 @@ const styles = ({ palette, spacing }: Theme) => createStyles({
   }
 });
 
-export interface IEditUserProps extends WithStyles<typeof styles> {
+export interface IEditUserProps extends RouteComponentProps, WithStyles<typeof styles> {
   csrfToken: string
 }
 

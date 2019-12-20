@@ -15,6 +15,7 @@ import Button from "@material-ui/core/Button";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import AssessmentIcon from "@material-ui/icons/Assessment";
 import NotesIcon from "@material-ui/icons/Notes";
+import Skeleton from "@material-ui/lab/Skeleton";
 import { defineMessages, useIntl, FormattedMessage } from "react-intl";
 import {
   Link as ReachLink,
@@ -98,15 +99,18 @@ const _BrokerCard: React.FunctionComponent<IBrokerCard> = ({ classes }) => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+  const [loading, setLoading] = React.useState<boolean>(false);
 
   const api = new BrokerApi(GetDefaultApiConfig());
   const updateBroker = async () => {
+    setLoading(true);
     let details = await api.apiBrokerBasicGet();
     if (details === null) { return; }
     setRunning(details.running || false);
     setStatistics({
       receivedMessages: ""
     });
+    setLoading(false);
   }
 
   useInterval(updateBroker, 10000);
@@ -115,7 +119,6 @@ const _BrokerCard: React.FunctionComponent<IBrokerCard> = ({ classes }) => {
     <Card>
       <BrokerCardHeader 
         className={classes.header}
-        running={running}
         action={
           <IconButton
             aria-label={intl.formatMessage(messages.more)}
@@ -124,6 +127,7 @@ const _BrokerCard: React.FunctionComponent<IBrokerCard> = ({ classes }) => {
             <MoreVertIcon />
           </IconButton>
         }
+        status={loading ? <Skeleton variant="rect" width={70} height={20} /> : <StatusBadge status={running ? "running" : "stopped"} />}
       />
       <CardContent>
         {/* <Typography variant="body2" color="textSecondary" component="p"> */}

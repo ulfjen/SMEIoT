@@ -8,6 +8,7 @@ import CardActionArea from "@material-ui/core/CardActionArea";
 import Avatar from "@material-ui/core/Avatar";
 import IconButton from "@material-ui/core/IconButton";
 import Typography from "@material-ui/core/Typography";
+import Skeleton from "@material-ui/lab/Skeleton";
 import { defineMessages, useIntl, FormattedMessage } from "react-intl";
 import {
   Link as ReachLink,
@@ -19,6 +20,7 @@ import BrokerCardHeader from "./BrokerCardHeader";
 import { BrokerApi } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
 import LoadFactors from "../components/LoadFactors";
+import StatusBadge from "../components/StatusBadge";
 
 const styles = ({ transitions, spacing }: Theme) =>
   createStyles({
@@ -42,9 +44,11 @@ const _BasicBrokerCard: React.FunctionComponent<IBasicBrokerCard> = ({ classes }
   const [broker, setBroker] = React.useState<BasicBroker>({
     running: false
   });
+  const [loading, setLoading] = React.useState<boolean>(false);
 
   const api = new BrokerApi(GetDefaultApiConfig());
   const updateBroker = async () => {
+    setLoading(true);
     let details = await api.apiBrokerBasicGet();
     if (details === null) { return; }
     setBroker({
@@ -53,6 +57,7 @@ const _BasicBrokerCard: React.FunctionComponent<IBasicBrokerCard> = ({ classes }
       min5: details.min5,
       min15: details.min15
     });
+    setLoading(false);
   };
 
   // const loading = useLoading(updateBroker, 400, 10000);
@@ -60,7 +65,9 @@ const _BasicBrokerCard: React.FunctionComponent<IBasicBrokerCard> = ({ classes }
 
   return <Card>
     <CardActionArea className={classes.root} component={ReachLink} to={"/dashboard/devices"}>
-      <BrokerCardHeader running={broker.running} />
+      <BrokerCardHeader
+        status={loading ? <Skeleton variant="rect" width={70} height={20} /> : <StatusBadge status={broker.running ? "running" : "stopped"} />}
+      />
       <LoadFactors min1={broker.min1} min5={broker.min5} min15={broker.min15} />
       <Typography color="textSecondary">
         {

@@ -120,6 +120,14 @@ namespace SMEIoT.Web
         app.UseDeveloperExceptionPage();
         app.UseDatabaseErrorPage();
         app.UseHangfireDashboard();
+        app.UseSwagger();
+
+        app.UseSwaggerUI(c =>
+        {
+          var swaggerJsonBasePath = string.IsNullOrWhiteSpace(c.RoutePrefix) ? "." : "..";
+          c.SwaggerEndpoint("/swagger/v1/swagger.json", "SMEIoT API V1");
+        });
+
       }
       else
       {
@@ -141,14 +149,6 @@ namespace SMEIoT.Web
           ctx.Context.Response.Headers[HeaderNames.CacheControl] =
             $"public,max-age={durationInSeconds}";
         }
-      });
-
-      app.UseSwagger();
-
-      app.UseSwaggerUI(c =>
-      {
-        var swaggerJsonBasePath = string.IsNullOrWhiteSpace(c.RoutePrefix) ? "." : "..";
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "SMEIoT API V1");
       });
 
       app.UseCookiePolicy();

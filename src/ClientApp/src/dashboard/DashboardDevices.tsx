@@ -11,6 +11,7 @@ import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Frame from "./Frame";
 import { Helmet } from "react-helmet";
+import ErrorBoundary from "../components/ErrorBoundary";
 import BrokerCard from "./BrokerCard";
 import DashboardDeviceBoard from "./DashboardDeviceBoard";
 import {
@@ -104,25 +105,27 @@ const _DashboardDevices: React.FunctionComponent<IDashboardDevices> = ({
           <Helmet>
             <title>{intl.formatMessage(messages.title)}</title>
           </Helmet>
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <BrokerCard />
+          <ErrorBoundary>
+            <Grid container spacing={3}>
+              <Grid item xs={12}>
+                <BrokerCard />
+              </Grid>
+              <DashboardDeviceBoard />
             </Grid>
-            <DashboardDeviceBoard />
-          </Grid>
-          <Tooltip
-            title={intl.formatMessage(messages.fabTooltip)}
-            aria-label={intl.formatMessage(messages.fabTooltip)}
-          >
-            <Fab
-              color="secondary"
-              className={classes.absolute}
-              to={"/dashboard/devices/new"}
-              component={ReachLink}
+            <Tooltip
+              title={intl.formatMessage(messages.fabTooltip)}
+              aria-label={intl.formatMessage(messages.fabTooltip)}
             >
-              <AddIcon />
-            </Fab>
-          </Tooltip>
+              <Fab
+                color="secondary"
+                className={classes.absolute}
+                to={"/dashboard/devices/new"}
+                component={ReachLink}
+              >
+                <AddIcon />
+              </Fab>
+            </Tooltip>
+          </ErrorBoundary>
         </Container>
       }
     />

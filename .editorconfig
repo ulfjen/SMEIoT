@@ -23,11 +23,16 @@ indent_style = space
 indent_size = 2
 
 # Code files
-[*.{cs,csx,vb,vbx,cpp,h}]
+[*.{cs,csx,vb,vbx,cpp,h,cshtml}]
 indent_size = 2
 insert_final_newline = true
 charset = utf-8
 continuation_indent_size = 4
+
+# Unix-style newlines with a newline ending every file
+[*.{js,ts,jsx,tsx,json,scss,css,html}]
+indent_size = 2
+charset = utf-8
 
 # Xml project files
 [*.{csproj,vbproj,vcxproj,vcxproj.filters,proj,projitems,shproj}]

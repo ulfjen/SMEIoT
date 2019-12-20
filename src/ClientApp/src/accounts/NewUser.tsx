@@ -12,13 +12,13 @@ import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Container from '@material-ui/core/Container';
 import { Router, RouteComponentProps } from "@reach/router";
-import UserPasswordForm from "./components/UserPasswordForm";
-import useUserCredentials from "./components/useUserCredentials";
+import UserPasswordForm from "../components/UserPasswordForm";
+import useUserCredentials from "../components/useUserCredentials";
 import {
   Configuration, SessionsApi,
   UsersApi,
 } from "smeiot-client";
-import {GetDefaultApiConfig} from "./index";
+import {GetDefaultApiConfig} from "../index";
 
 const styles = ({palette, spacing}: Theme) => createStyles({
   '@global': {

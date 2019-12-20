@@ -96,7 +96,7 @@ const _DashboardDeviceBoard: React.FunctionComponent<IDashboardDeviceBoard> = ({
 
   const renderDevices = () => {
     return devices.map((d: DeviceApiModel) => (
-      <Grid item key={d.name} xs={6} sm={4}>
+      <Grid item key={d.name} xs={4} sm={6}>
         <DeviceCard device={d} onMoreClick={handleMoreClicked} />
       </Grid>
     ));
@@ -110,6 +110,8 @@ const _DashboardDeviceBoard: React.FunctionComponent<IDashboardDeviceBoard> = ({
 
   React.useEffect(() => {
     (async () => {
+      setLoading(true);
+      await new Promise(resolve => setTimeout(resolve, 5000));
       const api = new DevicesApi(GetDefaultApiConfig());
       var res = await api.apiDevicesGet({
         // start, limit
@@ -142,7 +144,7 @@ const _DashboardDeviceBoard: React.FunctionComponent<IDashboardDeviceBoard> = ({
           </BannerNotice>
         </Grid>
       )}
-      {loading ? <Skeleton variant="rect" height={4} /> : renderDevices()}
+      {loading ? <Grid item xs={6}><Skeleton variant="rect" height={185} /></Grid> : renderDevices()}
       <Menu
         anchorEl={anchorEl}
         keepMounted
