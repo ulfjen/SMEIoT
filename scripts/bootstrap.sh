@@ -113,12 +113,15 @@ function setup_server_config {
   echo "Enter Your database password:" 
   read -s password
   echo
-  echo 'ConnectionStrings__Password = $password' | sudo tee -a $SMEIOT_ROOT/server_env
+  echo "connectionStrings__Password = $password" | sudo tee -a $SMEIOT_ROOT/server_env
   echo 
-  if [ -z "$ASPNETCORE_ENVIRONMENT" ]; then
-    echo "ASPNETCORE_ENVIRONMENT=$ASPNETCORE_ENVIRONMENT" | sudo tee -a $SMEIOT_ROOT/server_env
-  else
+  echo "Production or Staging? [Production]"
+  read build_env
+  echo
+  if [[ $build_env != 'Staging' ]]; then
     echo "ASPNETCORE_ENVIRONMENT=Production" | sudo tee -a $SMEIOT_ROOT/server_env
+  else
+    echo "ASPNETCORE_ENVIRONMENT=Staging" | sudo tee -a $SMEIOT_ROOT/server_env
   fi
   echo "* * * * * * * * * * * * * * * * * * * *"
   echo "We use LetsEncrypt (https://letsencrypt.org/) to make sure your server is safe."

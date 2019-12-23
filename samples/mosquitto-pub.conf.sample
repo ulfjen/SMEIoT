@@ -1,0 +1,14 @@
+[Unit]
+Description = Mosquitto client for sending mqtt messages
+After = network.target
+StartLimitBurst=5
+StartLimitIntervalSec=33
+
+[Service]
+Restart=always
+RestartSec=5
+ExecStart=/var/pub
+StandardOutput=journal
+
+[Install]
+WantedBy = multi-user.target

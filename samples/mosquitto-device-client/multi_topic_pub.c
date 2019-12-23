@@ -1,7 +1,5 @@
-
 /*
 * Libmosquitto TLS-PSK example
-*
 * 
 * Compile:
 * gcc pi.c -o pi -lmosquitto

@@ -10,6 +10,7 @@ using Hangfire.LiteDB;
 using SMEIoT.Infrastructure.MqttClient;
 using SMEIoT.Core.EventHandlers;
 using SMEIoT.Core.Services;
+using SMEIoT.Infrastructure.Services;
 using Npgsql;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
@@ -18,7 +19,7 @@ using System.Data;
 
 namespace SMEIoT.Infrastructure
 {
-  public static class StartupSetup
+  public static class InfrastructureSetup
   {
     public static void AddDbContext(this IServiceCollection services, IConfiguration configuration)
     {
@@ -32,42 +33,22 @@ namespace SMEIoT.Infrastructure
       });
     }
 
-    public static void ConfigureHangfire(this IServiceCollection services, IConfiguration configuration) =>
+    public static void ConfigureHangfire(this IServiceCollection services, IConfiguration configuration)
+    {
       Hangfire.GlobalConfiguration.Configuration
         .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
         .UseSimpleAssemblyNameTypeSerializer()
         .UseRecommendedSerializerSettings()
         // we want less dependencies.
         // and hangfire PostgreSql can't store Nodatime.
-        .UseLiteDbStorage("Filename=Hangfire.db; Mode=Exclusive");
+        .UseLiteDbStorage($"Filename=Hangfire.db; Mode=Shared; Cache Size=5000");
+    }
 
     public static void ConfigureMqttClient(this IServiceCollection services, IConfiguration configuration)
     {
       services.AddSingleton<MosquittoMessageHandler>();
-
-      services.AddHostedService<BackgroundMqttClientHostedService>(provider =>
-      {
-        var auth = provider.GetService<IMosquittoClientAuthenticationService>();
-        var broker = provider.GetService<IMosquittoBrokerService>();
-        var env = provider.GetService<IHostEnvironment>();
-        int port;
-        var portStr = configuration.GetConnectionString("MqttPort");
-        if (!int.TryParse(portStr, out port)) {
-          throw new InvalidOperationException($"MqttPort is not set to a correct value. Got {portStr} but expect a number");
-        }
-
-        var builder = new MosquittoClientBuilder()
-          .SetPskTls(auth.ClientPsk, auth.ClientName)
-          .SetConnectionInfo(configuration.GetConnectionString("MqttHost"), port)
-          .SetKeepAlive(60)
-          .SetRunLoopInfo(-1, 10)
-          .SubscribeTopic(MosquittoClientBuilder.BrokerTopic)
-          .SubscribeTopic(MosquittoClientBuilder.SensorTopic);
-
-        var handler = provider.GetService<MosquittoMessageHandler>();
-        builder.SetMessageCallback(handler.HandleMessage);
-        return new BackgroundMqttClientHostedService(builder.Client, provider.GetService<ILogger<BackgroundMqttClientHostedService>>(), broker, env);
-      });
+      services.AddTransient<IMosquittoClientService, MosquittoClientService>();
+      services.AddHostedService<BackgroundMqttClientHostedService>();
     }
 
     public static void AddInfrastructureServices(this IServiceCollection services, IHostEnvironment env)

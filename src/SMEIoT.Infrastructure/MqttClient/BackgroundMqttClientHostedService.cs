@@ -10,7 +10,7 @@ namespace SMEIoT.Infrastructure.MqttClient
 {
   public class BackgroundMqttClientHostedService : IHostedService, IDisposable
   {
-    private readonly MosquittoClient _client;
+    private readonly IMosquittoClientService _client;
     private Timer? _timer;
     private ILogger _logger;
     private readonly IMosquittoBrokerService _brokerService;
@@ -20,7 +20,7 @@ namespace SMEIoT.Infrastructure.MqttClient
     private bool _stoppedTimer;
 
     public BackgroundMqttClientHostedService(
-      MosquittoClient client,
+      IMosquittoClientService client,
       ILogger<BackgroundMqttClientHostedService> logger,
       IMosquittoBrokerService brokerService,
       IHostEnvironment env)

@@ -23,7 +23,5 @@ Then ssh into the <remote> for deployment, do:
   bash -c 'source /tmp/smeiot_build/scripts/bootstrap.sh; build_smeiot_with_remote_tars'
 "
 
-# export ASPNETCORE_ENVIRONMENT=Staging before the function call to build a staging environment
-# bash -c 'source /tmp/smeiot_build/scripts/bootstrap.sh; export ASPNETCORE_ENVIRONMENT=Staging; build_smeiot_with_remote_tars'
 # To clear the existing project
-# bash -c 'source /tmp/smeiot_build/scripts/bootstrap.sh; nuke_smeiot'
+#   bash -c 'source /tmp/smeiot_build/scripts/bootstrap.sh; nuke_smeiot'
