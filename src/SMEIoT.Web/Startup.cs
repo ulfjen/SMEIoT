@@ -26,6 +26,7 @@ using Hangfire;
 using Microsoft.Extensions.Logging;
 using SMEIoT.Web.Hubs;
 using SMEIoT.Web.Services;
+using SMEIoT.Web.Middlewares;
 
 namespace SMEIoT.Web
 {
@@ -119,6 +120,8 @@ namespace SMEIoT.Web
     {
       if (env.IsDevelopment())
       {
+        app.UseMiddleware<DevThrottleMiddleware>();
+
         app.UseDeveloperExceptionPage();
         app.UseDatabaseErrorPage();
         app.UseHangfireDashboard();

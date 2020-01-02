@@ -49,6 +49,7 @@
     "react-dom": "^16.10.2",
     "react-helmet": "^6.0.0-beta",
     "react-intl": "^3.9.2",
+    "react-use": "^13.13.0",
     "react-vis": "^1.11.7",
     "react-window": "^1.8.5",
     "smeiot-client": "file:vendor/smeiot-client"

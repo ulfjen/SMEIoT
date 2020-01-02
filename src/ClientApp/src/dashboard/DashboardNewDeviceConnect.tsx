@@ -18,11 +18,13 @@ import DashboardNewDeviceFrame from "./DashboardNewDeviceFrame";
 import extractParamFromQuery from "../helpers/extractParamFromQuery";
 import BlockCode from "../components/BlockCode";
 import LineCode from "../components/LineCode";
+import {useAsync} from 'react-use';
 import {
   defineMessages,
   useIntl,
   FormattedMessage
 } from "react-intl";
+import { DeviceApiModelFromJSON } from "smeiot-client";
 
 const styles = ({ spacing }: Theme) =>
   createStyles({
@@ -60,9 +62,6 @@ const _DashboardNewDeviceConnect: React.FunctionComponent<IDashboardNewDeviceCon
 }) => {
   const intl = useIntl();
 
-  const [loading, setLoading] = React.useState<boolean>(true);
-  const [loadingError, setLoadingError] = React.useState<boolean>(false);
-  const [device, setDevice] = React.useState<DeviceApiModel>({});
   const [deviceConnected, setDeviceConnected] = React.useState<boolean>(false);
 
   const handleNext = async () => {
@@ -70,28 +69,22 @@ const _DashboardNewDeviceConnect: React.FunctionComponent<IDashboardNewDeviceCon
       navigate(`connect_sensors?name=${device.name}`);
     }
   };
+  const api = new DevicesApi(GetDefaultApiConfig());
+  const name = extractParamFromQuery(location);
+  if (name === null) {
+    throw new Error("Device name is required.");
+  }
 
-  React.useEffect(() => {
-    (async () => {
-      const name = extractParamFromQuery(location);
-      if (name === null) {
-        setLoadingError(true);
-        return;
-      }
+  const state = useAsync(async () => {
+    let res = await api.apiDevicesNameGet({
+      name
+    });
+    return res;
+  }, [name]);
 
-      setLoading(true);
-      const api = new DevicesApi(GetDefaultApiConfig());
-      var res = await api.apiDevicesNameGet({
-        name
-      });
-      if (res !== null) {
-        setDevice(res);
-      } else {
-        setLoadingError(true);
-      }
-      setLoading(false);
-    })();
-  }, []);
+  const loading = state.loading;
+  const loadingError = state.error;
+  const device = state.value || DeviceApiModelFromJSON({});
 
   return (
     <DashboardNewDeviceFrame activeStep={1}>
@@ -122,21 +115,19 @@ const _DashboardNewDeviceConnect: React.FunctionComponent<IDashboardNewDeviceCon
                 }}
               />)
              : 
-             <div>
               <FormattedMessage
                 id="dashboard.devices.new.step2.notice"
                 description="Notice related when we wait for new connection"
                 defaultMessage="Now you can copy the key to your device and start to connect with the broker.
-            Once we receive a new message from the broker, we will prompt you to continue.
-            Your device's name is {name}.
-            Your device's key is shown below.
-            {code}"
+                  Once we receive a new message from the broker, we will prompt you to continue.
+                  Your device's name is {name}.
+                  Your device's key is shown below.
+                  {code}"
                 values={{
                   name: <LineCode>{device.name}</LineCode>,
                   code: <BlockCode>{device.preSharedKey}</BlockCode>
                 }}
               />
-              </div>
             }
             <div>
                 <Button
