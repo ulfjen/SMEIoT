@@ -7,7 +7,7 @@ import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
 import Skeleton from "@material-ui/lab/Skeleton";
-import { RouteComponentProps } from "@reach/router";
+import { Link as ReachLink, RouteComponentProps } from "@reach/router";
 import {
   DevicesApi,
   DeviceApiModel
@@ -24,6 +24,7 @@ import {
   FormattedMessage
 } from "react-intl";
 import { DeviceApiModelFromJSON } from "smeiot-client";
+import useInterval from "../helpers/useInterval";
 
 const styles = ({ spacing }: Theme) =>
   createStyles({
@@ -62,40 +63,44 @@ const _DashboardNewDeviceConnect: React.FunctionComponent<IDashboardNewDeviceCon
   const intl = useIntl();
   useTitle(intl.formatMessage(messages.title));
 
-  const [deviceConnected, setDeviceConnected] = React.useState<boolean>(false);
-
-  const handleNext = async () => {
-    if (navigate) {
-      navigate(`connect_sensors?name=${device.name}`);
-    }
-  };
   const api = new DevicesApi(GetDefaultApiConfig());
   const name = extractParamFromQuery(location);
   if (name === null) {
     throw new Error("Device name is required.");
   }
+  const [connected, setConnected] = React.useState<boolean>(false);
 
   const state = useAsync(async () => {
     let res = await api.apiDevicesNameGet({
       name
     });
+    setConnected(res.connected || false);
+
     return res;
   }, [name]);
 
-  const loading = state.loading;
-  const loadingError = state.error;
   const device = state.value || DeviceApiModelFromJSON({});
+  
+  useInterval(async () => {
+    if (!state.loading && state.error === undefined) {
+
+      let res = await api.apiDevicesNameGet({
+        name
+      });
+      setConnected(res.connected || false);
+    }
+  }, 3000);
 
   return (
     <DashboardNewDeviceFrame activeStep={1}>
       <Grid item xs={12}>
         <Paper className={classes.paper}>
-        {loading ? (
+        {state.loading ? (
             <Skeleton variant="rect" className={classes.loadingPanel} />
           ) : (
             <div>
 
-            {loadingError ?
+            {state.error ?
               (device.name ? 
               <FormattedMessage
                 id="dashboard.devices.new.errors.loading_error_without_name"
@@ -126,19 +131,20 @@ const _DashboardNewDeviceConnect: React.FunctionComponent<IDashboardNewDeviceCon
               />
             }
             <div>
-                <Button
-                  onClick={handleNext}
-                  variant="contained"
-                  color="primary"
-                  disabled={!deviceConnected}
-                >
-                  <FormattedMessage
-                    id="dashboard.devices.new.control.next"
-                    description="The button text for going to next page"
-                    defaultMessage="Next"
-                  />
-                </Button>
-              </div>
+              <Button
+                component={ReachLink}
+                to={`sensors?name=${device.name}`}
+                variant="contained"
+                color="primary"
+                disabled={!connected}
+              >
+                <FormattedMessage
+                  id="dashboard.devices.new.control.next"
+                  description="The button text for going to next page"
+                  defaultMessage="Next"
+                />
+              </Button>
+            </div>
           </div>
           )}
 
