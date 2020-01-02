@@ -9,7 +9,7 @@ import Paper from "@material-ui/core/Paper";
 import Skeleton from "@material-ui/lab/Skeleton";
 import Typography from "@material-ui/core/Typography";
 import { Link as ReachLink, RouteComponentProps } from "@reach/router";
-import { Helmet } from "react-helmet";
+import { useTitle } from 'react-use';
 import {
   defineMessages,
   useIntl,
@@ -72,6 +72,7 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
   navigate
 }) => {
   const intl = useIntl();
+  useTitle(intl.formatMessage(messages.title));
 
   const [device, setDevice] = React.useState<DeviceConfigBindingModel>({name: "", key: ""});
   const [handlingNext, setHandlingNext] = React.useState<boolean>(false);
@@ -155,9 +156,6 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
 
   return (
     <DashboardNewDeviceFrame activeStep={0}>
-      <Helmet>
-        <title>{intl.formatMessage(messages.title)}</title>
-      </Helmet>
       {!loading && unconnectedDeviceName && (
         <Grid item xs={12}>
           <BannerNotice onClick={onBannerClick}>

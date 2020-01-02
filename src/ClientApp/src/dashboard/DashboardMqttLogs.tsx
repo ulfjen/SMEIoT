@@ -8,7 +8,7 @@ import Container from "@material-ui/core/Container";
 import Paper from "@material-ui/core/Paper";
 import ListItemLine from "../components/ListItemLine";
 import Grid from "@material-ui/core/Grid";
-import { Helmet } from "react-helmet";
+import { useTitle } from 'react-use';
 import { Link, RouteComponentProps } from '@reach/router';
 import * as SignalR from "@microsoft/signalr";
 import { FixedSizeList, areEqual, ListChildComponentProps } from 'react-window';

@@ -13,7 +13,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Paper from '@material-ui/core/Paper';
 import CloseIcon from "@material-ui/icons/Close";
 import Frame from "./Frame";
-import { Helmet } from "react-helmet";
+import { useTitle } from 'react-use';
 import BasicBrokerCard from "./BasicBrokerCard";
 import useInterval from "../helpers/useInterval";
 import { BrokerApi } from "smeiot-client";

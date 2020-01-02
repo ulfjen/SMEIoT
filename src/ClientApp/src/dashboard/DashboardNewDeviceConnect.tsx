@@ -8,7 +8,6 @@ import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
 import Skeleton from "@material-ui/lab/Skeleton";
 import { RouteComponentProps } from "@reach/router";
-import { Helmet } from "react-helmet";
 import {
   DevicesApi,
   DeviceApiModel
@@ -18,7 +17,7 @@ import DashboardNewDeviceFrame from "./DashboardNewDeviceFrame";
 import extractParamFromQuery from "../helpers/extractParamFromQuery";
 import BlockCode from "../components/BlockCode";
 import LineCode from "../components/LineCode";
-import {useAsync} from 'react-use';
+import { useAsync, useTitle } from 'react-use';
 import {
   defineMessages,
   useIntl,
@@ -61,6 +60,7 @@ const _DashboardNewDeviceConnect: React.FunctionComponent<IDashboardNewDeviceCon
   navigate
 }) => {
   const intl = useIntl();
+  useTitle(intl.formatMessage(messages.title));
 
   const [deviceConnected, setDeviceConnected] = React.useState<boolean>(false);
 
@@ -88,10 +88,6 @@ const _DashboardNewDeviceConnect: React.FunctionComponent<IDashboardNewDeviceCon
 
   return (
     <DashboardNewDeviceFrame activeStep={1}>
-      <Helmet>
-        <title>{intl.formatMessage(messages.title)}</title>
-      </Helmet>
-
       <Grid item xs={12}>
         <Paper className={classes.paper}>
         {loading ? (

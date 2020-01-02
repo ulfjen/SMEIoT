@@ -14,7 +14,7 @@ import clsx from "clsx";
 import DashboardSensorBoard from "./DashboardSensorBoard";
 import { defineMessages, useIntl, FormattedMessage } from "react-intl";
 import { Link, RouteComponentProps } from "@reach/router";
-import { Helmet } from "react-helmet";
+import { useTitle } from 'react-use';
 
 const styles = ({
   palette,
@@ -66,6 +66,7 @@ const _DashboardSensors: React.FunctionComponent<IDashboardSensors> = ({
   classes
 }) => {
   const intl = useIntl();
+  useTitle(intl.formatMessage(messages.title));
 
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
   return (
@@ -74,9 +75,6 @@ const _DashboardSensors: React.FunctionComponent<IDashboardSensors> = ({
       direction="ltr"
       content={
         <Container maxWidth="lg" className={classes.container}>
-          <Helmet>
-            <title>{intl.formatMessage(messages.title)}</title>
-          </Helmet>
           <Grid container spacing={3}>
             <DashboardSensorBoard />
           </Grid>

@@ -10,7 +10,7 @@ import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Frame from "./Frame";
-import { Helmet } from "react-helmet";
+import { useTitle } from 'react-use';
 import ErrorBoundary from "../components/ErrorBoundary";
 import BrokerCard from "./BrokerCard";
 import DashboardDeviceBoard from "./DashboardDeviceBoard";
@@ -92,7 +92,8 @@ const _DashboardDevices: React.FunctionComponent<IDashboardDevices> = ({
   classes
 }) => {
   const intl = useIntl();
-
+  useTitle(intl.formatMessage(messages.title));
+  
   const [loading, setLoading] = React.useState<boolean>(true);
   const [loadingError, setLoadingError] = React.useState<boolean>(false);
 
@@ -102,9 +103,6 @@ const _DashboardDevices: React.FunctionComponent<IDashboardDevices> = ({
       direction="ltr"
       content={
         <Container maxWidth="lg" className={classes.container}>
-          <Helmet>
-            <title>{intl.formatMessage(messages.title)}</title>
-          </Helmet>
           <ErrorBoundary>
             <Grid container spacing={3}>
               <Grid item xs={12}>

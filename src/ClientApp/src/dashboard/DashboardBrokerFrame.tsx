@@ -12,7 +12,7 @@ import Link from '@material-ui/core/Link';
 import CloseIcon from "@material-ui/icons/Close";
 import NavigateNextIcon from "@material-ui/icons/NavigateNext";
 import Frame from "./Frame";
-import { Helmet } from "react-helmet";
+import { useTitle } from 'react-use';
 import BasicBrokerCard from "./BasicBrokerCard";
 import { defineMessages, useIntl, FormattedMessage } from "react-intl";
 import {
@@ -47,6 +47,7 @@ const _DashboardBrokerFrame: React.FunctionComponent<IDashboardBrokerFrameProps>
   children
 }) => {
   const intl = useIntl();
+  useTitle(title);
 
   return (
     <Frame
@@ -65,9 +66,6 @@ const _DashboardBrokerFrame: React.FunctionComponent<IDashboardBrokerFrameProps>
       }
       content={
         <Container maxWidth="lg" className={classes.container}>
-          <Helmet>
-            <title>{title}</title>
-          </Helmet>
           <Grid container spacing={2}>
             <Grid item xs={12}>
             <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} aria-label="breadcrumb">

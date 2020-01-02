@@ -15,7 +15,7 @@ import DashboardSensorBoard from "./DashboardSensorBoard";
 import NumberGraph from "../components/NumberGraph";
 import { defineMessages, useIntl, FormattedMessage } from "react-intl";
 import { Link, RouteComponentProps } from "@reach/router";
-import { Helmet } from "react-helmet";
+import { useTitle } from 'react-use';
 import { SensorsApi, NumberTimeSeriesApiModel } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
 
@@ -76,6 +76,7 @@ const _DashboardSensorDetails: React.FunctionComponent<IDashboardSensorDetails> 
   sensorName
 }) => {
   const intl = useIntl();
+  useTitle(intl.formatMessage(messages.title));
 
   const [values, setValues] = React.useState<NumberTimeSeriesApiModel[]>([]);
 
@@ -106,9 +107,6 @@ const _DashboardSensorDetails: React.FunctionComponent<IDashboardSensorDetails> 
       direction="ltr"
       content={
         <Container maxWidth="lg" className={classes.container}>
-          <Helmet>
-            <title>{intl.formatMessage(messages.title)}</title>
-          </Helmet>
           <Grid container spacing={3}>
             {/* {value !== undefined && value ? value.map(v => <p>{v.value}</p>) : null} */}
             <Grid item xs={12}>

@@ -10,7 +10,7 @@ import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import clsx from "clsx";
-import { Helmet } from "react-helmet";
+import { useTitle } from 'react-use';
 import BrokerCard from "./BrokerCard";
 import DeviceCard from "./DeviceCard";
 import BannerNotice from "../components/BannerNotice";

@@ -10,7 +10,7 @@ import Skeleton from "@material-ui/lab/Skeleton";
 import Typography from "@material-ui/core/Typography";
 import AddIcon from "@material-ui/icons/Add";
 import { RouteComponentProps } from "@reach/router";
-import { Helmet } from "react-helmet";
+import { useTitle } from 'react-use';
 import {
   defineMessages,
   useIntl,
@@ -83,6 +83,7 @@ const _DashboardDeviceEdit: React.FunctionComponent<IDashboardDeviceEditProps> =
   navigate
 }) => {
   const intl = useIntl();
+  useTitle(intl.formatMessage(messages.title));
 
   const [sensorNames, setSensorNames] = React.useState<string[] | undefined>();
   // const [deviceName, setDeviceName] = React.useState<string>("");
@@ -134,9 +135,6 @@ const _DashboardDeviceEdit: React.FunctionComponent<IDashboardDeviceEditProps> =
   }, []);
 
   return <DashboardDeviceEditFrame device={undefined}>
-    <Helmet>
-      <title>{intl.formatMessage(messages.title)}</title>
-    </Helmet>
     <Grid item xs={12}>
       <Paper>{renderActionList("pupate-potteen", sensorNames || [])}</Paper>
     </Grid>
