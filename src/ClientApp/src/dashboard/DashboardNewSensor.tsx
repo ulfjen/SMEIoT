@@ -4,7 +4,7 @@ import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
-import Frame from "./Frame";
+import DashboardFrame from "./DashboardFrame";
 import Typography from "@material-ui/core/Typography";
 import Skeleton from "@material-ui/lab/Skeleton";
 import {GetDefaultApiConfig} from "../index";
@@ -80,7 +80,7 @@ const _DashboardNewSensor: React.FunctionComponent<IDashboardNewSensorProps> = (
     }
   }, []);
 
-  return <Frame title={`Create a new sensor`} direction="ltr" toolbarRight={
+  return <DashboardFrame title={`Create a new sensor`} direction="ltr" toolbarRight={
     <IconButton
       edge="end"
       color="inherit"

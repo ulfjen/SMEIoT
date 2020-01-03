@@ -44,10 +44,9 @@ const styles = ({palette, spacing}: Theme) => createStyles({
 });
 
 export interface INewSessionProps extends RouteComponentProps, WithStyles<typeof styles> {
-  csrfToken: string
 }
 
-const _NewSession: React.FunctionComponent<INewSessionProps & WithStyles<typeof styles>> = ({csrfToken, classes}) => {
+const _NewSession: React.FunctionComponent<INewSessionProps & WithStyles<typeof styles>> = ({classes}) => {
   const {
     username, setUsername,
     password, setPassword,
@@ -105,8 +104,7 @@ const _NewSession: React.FunctionComponent<INewSessionProps & WithStyles<typeof 
       <Typography component="h1" variant="h5">
         Log in
       </Typography>
-      <UserPasswordForm csrfToken={csrfToken}
-                        url={undefined}
+      <UserPasswordForm url={undefined}
                         handleSubmit={handleSubmit}
                         username={username} setUsername={setUsername}
                         password={password} setPassword={setPassword}

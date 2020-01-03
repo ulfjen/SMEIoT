@@ -35,7 +35,6 @@ const styles = ({palette, spacing}: Theme) => createStyles({
 });
 
 export interface IUserPasswordFormProps extends WithStyles<typeof styles> {
-  csrfToken: string;
   url: string | undefined;
   handleSubmit: (event: React.MouseEvent<HTMLFormElement>) => Promise<void> | undefined;
   username: string;
@@ -48,7 +47,7 @@ export interface IUserPasswordFormProps extends WithStyles<typeof styles> {
   setPasswordErrors: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const _UserPasswordForm: React.FunctionComponent<IUserPasswordFormProps & WithStyles<typeof styles>> = ({csrfToken, classes, url, children, handleSubmit, username, usernameErrors, password, passwordErrors, setUsername, setPassword, setPasswordErrors, setUsernameErrors}) => {
+const _UserPasswordForm: React.FunctionComponent<IUserPasswordFormProps & WithStyles<typeof styles>> = ({classes, url, children, handleSubmit, username, usernameErrors, password, passwordErrors, setUsername, setPassword, setPasswordErrors, setUsernameErrors}) => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   
   // @ts-ignore
@@ -62,7 +61,6 @@ const _UserPasswordForm: React.FunctionComponent<IUserPasswordFormProps & WithSt
   }
 
   return <form className={classes.form} noValidate method="POST" onSubmit={handleSubmit} action={url}>
-    <input type="hidden" name="__RequestVerificationToken" value={csrfToken}/>
     <TextField
       variant="outlined"
       margin="normal"

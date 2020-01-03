@@ -54,10 +54,9 @@ const styles = ({ palette, spacing }: Theme) => createStyles({
 });
 
 export interface IEditUserProps extends RouteComponentProps, WithStyles<typeof styles> {
-  csrfToken: string
 }
 
-const _EditUser: React.FunctionComponent<IEditUserProps & WithStyles<typeof styles>> = ({ csrfToken, classes }) => {
+const _EditUser: React.FunctionComponent<IEditUserProps & WithStyles<typeof styles>> = ({ classes }) => {
   const {
     username, setUsername,
     password, setPassword,

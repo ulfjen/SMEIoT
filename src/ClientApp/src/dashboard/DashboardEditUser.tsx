@@ -4,7 +4,7 @@ import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
-import Frame from "./Frame";
+import DashboardFrame from "./DashboardFrame";
 import Typography from "@material-ui/core/Typography";
 import Skeleton from "@material-ui/lab/Skeleton";
 import {GetDefaultApiConfig} from "../index";
@@ -123,7 +123,7 @@ const _DashboardEditUser: React.FunctionComponent<IDashboardEditUserProps> = ({ 
       requestUser();
     }
   }, []);
-  return <Frame title={`Edit ${username}`} direction="ltr" toolbarRight={
+  return <DashboardFrame title={`Edit ${username}`} direction="ltr" toolbarRight={
     <IconButton
       edge="end"
       color="inherit"

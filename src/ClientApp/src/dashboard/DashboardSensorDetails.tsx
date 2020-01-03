@@ -9,7 +9,7 @@ import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
-import Frame from "./Frame";
+import DashboardFrame from "./DashboardFrame";
 import clsx from "clsx";
 import DashboardSensorBoard from "./DashboardSensorBoard";
 import NumberGraph from "../components/NumberGraph";
@@ -18,6 +18,8 @@ import { Link, RouteComponentProps } from "@reach/router";
 import { useTitle } from 'react-use';
 import { SensorsApi, NumberTimeSeriesApiModel } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
+import { useAppCookie } from "../helpers/useCookie";
+import UserAvatarMenu from "../components/UserAvatarMenu";
 
 const styles = ({
   palette,
@@ -73,7 +75,8 @@ const messages = defineMessages({
 const _DashboardSensorDetails: React.FunctionComponent<IDashboardSensorDetails> = ({
   classes,
   deviceName,
-  sensorName
+  sensorName,
+  navigate
 }) => {
   const intl = useIntl();
   useTitle(intl.formatMessage(messages.title));
@@ -100,11 +103,13 @@ const _DashboardSensorDetails: React.FunctionComponent<IDashboardSensorDetails> 
     console.log(new Date(Date.parse(v.createdAt||"")).getTime());
     return {x: new Date(Date.parse(v.createdAt||"")).getTime(), y: v.value}
   });
+  const appCookie = useAppCookie();
 
   return (
-    <Frame
+    <DashboardFrame
       title="Sensors"
       direction="ltr"
+      toolbarRight={<UserAvatarMenu appCookie={appCookie} navigate={navigate}/>}
       content={
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={3}>

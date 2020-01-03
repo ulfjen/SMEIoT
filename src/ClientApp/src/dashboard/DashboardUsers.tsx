@@ -4,7 +4,7 @@ import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
-import Frame from "./Frame";
+import DashboardFrame from "./DashboardFrame";
 import List from "@material-ui/core/List";
 import UserListItem from "../components/UserListItem";
 import Typography from "@material-ui/core/Typography";
@@ -22,9 +22,10 @@ import DialogActions from "@material-ui/core/DialogActions";
 import Button from "@material-ui/core/Button";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import Paper from '@material-ui/core/Paper';
-import UserAvatarMenu from '../components/UserAvatarMenu';
 import moment from 'moment';
 import { Link, RouteComponentProps } from '@reach/router';
+import UserAvatarMenu from '../components/UserAvatarMenu';
+import { useAppCookie } from '../helpers/useCookie';
 
 
 const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Theme) => createStyles({
@@ -62,7 +63,7 @@ export interface IDashboardUsersProps extends RouteComponentProps, WithStyles<ty
 }
 
 
-const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({classes}) => {
+const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({classes, navigate}) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [loaded, setLoaded] = React.useState<boolean>(false);
   const [users, setUsers] = React.useState<null | Array<AdminUserApiModel>>(null);
@@ -109,55 +110,59 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({classes
   React.useEffect(() => {
     requestUsers();
   }, []);
-  return <Frame title="Users" direction="ltr" toolbarRight={null}
-                content={
-    <Container maxWidth="lg" className={classes.container}>
-      <Paper className={classes.filterBar}>
-        <Typography>Show:</Typography>
-        <Chip label="Admin"/>
-      </Paper>
-      <Card>
-        <List className={classes.list}>
-          {loaded ? (
-            renderUserLists()
-          ) : (
-            <Skeleton variant="rect" height={4}/>
-          )}
-        </List>
-      </Card>
-      <Menu
-        id="user-management-menu"
-        anchorEl={anchorEl}
-        keepMounted
-        open={Boolean(anchorEl)}
-        className={classes.usersMenu}
-        onClose={handleClose}
-      >
-        <MenuItem onClick={handleClose} to={`/dashboard/users/${focusedUsername}`} component={Link}>Edit</MenuItem>
-        <MenuItem className={classes.usersMenuDeleteItem} onClick={handleDelete}>Delete</MenuItem>
-      </Menu>
-      <Dialog
-        open={dialogOpen}
-        onClose={handleDialogClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle>Delete account {focusedUsername}?</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Delete the user will disable its access to the system and asscociated users.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDialogClose} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleDeleteClose} color="primary" autoFocus>
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Container>} />;
+
+  const appCookie = useAppCookie();
+
+  return <DashboardFrame title="Users" direction="ltr"
+    toolbarRight={<UserAvatarMenu appCookie={appCookie} navigate={navigate}/>}
+    content={
+      <Container maxWidth="lg" className={classes.container}>
+        <Paper className={classes.filterBar}>
+          <Typography>Show:</Typography>
+          <Chip label="Admin"/>
+        </Paper>
+        <Card>
+          <List className={classes.list}>
+            {loaded ? (
+              renderUserLists()
+            ) : (
+              <Skeleton variant="rect" height={4}/>
+            )}
+          </List>
+        </Card>
+        <Menu
+          id="user-management-menu"
+          anchorEl={anchorEl}
+          keepMounted
+          open={Boolean(anchorEl)}
+          className={classes.usersMenu}
+          onClose={handleClose}
+        >
+          <MenuItem onClick={handleClose} to={`/dashboard/users/${focusedUsername}`} component={Link}>Edit</MenuItem>
+          <MenuItem className={classes.usersMenuDeleteItem} onClick={handleDelete}>Delete</MenuItem>
+        </Menu>
+        <Dialog
+          open={dialogOpen}
+          onClose={handleDialogClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle>Delete account {focusedUsername}?</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Delete the user will disable its access to the system and asscociated users.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleDialogClose} color="primary">
+              Cancel
+            </Button>
+            <Button onClick={handleDeleteClose} color="primary" autoFocus>
+              Delete
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Container>} />;
 };
 
 const DashboardUsers = withStyles(styles)(_DashboardUsers);

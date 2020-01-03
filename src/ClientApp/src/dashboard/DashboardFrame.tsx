@@ -19,6 +19,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import UserAvatarMenu from "../components/UserAvatarMenu";
 import { BasicUserApiModel } from 'smeiot-client';
 import moment from 'moment';
+import { NavigateFn } from '@reach/router';
 
 const drawerWidth = 240;
 
@@ -67,29 +68,16 @@ const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Th
 
 });
 
-export interface IFrameProps extends WithStyles<typeof styles> {
+export interface IDashboardFrameProps extends WithStyles<typeof styles> {
   title: string;
   direction: string;
   content: React.ReactNode;
   toolbarRight?: React.ReactNode;
+  navigate?: NavigateFn;
 }
 
-const _Frame: React.FunctionComponent<IFrameProps> = ({classes, title, direction, content, toolbarRight}) => {
+const _DashboardFrame: React.FunctionComponent<IDashboardFrameProps> = ({classes, title, direction, content, toolbarRight}) => {
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  let currentUser: BasicUserApiModel = {
-    createdAt: moment().utc().toISOString(),
-    roles: [],
-    username: ""
-  };
-
-  // @ts-ignore
-  if (window.SMEIoTPreRendered) {
-    // @ts-ignore
-    currentUser = window.SMEIoTPreRendered["currentUser"];
-  }
-  if (toolbarRight === undefined || toolbarRight === null) {
-    toolbarRight = <UserAvatarMenu user={currentUser} />;
-  }
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -170,6 +158,6 @@ const _Frame: React.FunctionComponent<IFrameProps> = ({classes, title, direction
   </div>;
 };
 
-const Frame = withStyles(styles)(_Frame);
+const DashboardFrame = withStyles(styles)(_DashboardFrame);
 
-export default Frame;
+export default DashboardFrame;

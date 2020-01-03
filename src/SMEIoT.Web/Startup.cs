@@ -92,6 +92,10 @@ namespace SMEIoT.Web
         options.LowercaseUrls = true;
         options.ConstraintMap["slugify"] = typeof(SlugifyParameterTransformer);
       });
+      services.AddAntiforgery(options => {
+        options.HeaderName = "X-CSRF-TOKEN";
+        options.Cookie.Name = "X-CSRF-TOKEN-COOKIE";
+      });
 
       if (_env.IsDevelopment()) {
         services.AddSwaggerGen(c =>

@@ -5,12 +5,12 @@ import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import IconButton from "@material-ui/core/IconButton";
 import Avatar from "@material-ui/core/Avatar";
-import {AdminUserApiModel} from "smeiot-client";
 import Avatars from "@dicebear/avatars";
 import sprites from "@dicebear/avatars-jdenticon-sprites";
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
-
+import { AppCookie } from "../helpers/useCookie";
+import { NavigateFn } from "@reach/router";
 
 const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Theme) => createStyles({
   container: {
@@ -20,11 +20,12 @@ const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Th
 });
 
 export interface IUserAvatarMenuProps extends WithStyles<typeof styles> {
-  user: AdminUserApiModel;
+  appCookie: AppCookie;
+  navigate?: NavigateFn;
 }
 
-const _UserAvatarMenu: React.FunctionComponent<IUserAvatarMenuProps & WithStyles<typeof styles>> = ({ classes, user }) => {
-  const username = user.username || "";
+const _UserAvatarMenu: React.FunctionComponent<IUserAvatarMenuProps & WithStyles<typeof styles>> = ({ classes, appCookie, navigate }) => {
+  const username = appCookie.username || "";
   let options = {};
   let avatars = new Avatars(sprites(options));
   const avatar = avatars.create(username);
@@ -77,7 +78,7 @@ const _UserAvatarMenu: React.FunctionComponent<IUserAvatarMenuProps & WithStyles
       open={anchorEl != null}
       onClose={handleClose}
     >
-      <MenuItem onClick={() => window.location.href = "/account"}>My account</MenuItem>
+      <MenuItem onClick={() => navigate && navigate("/account")}>My account</MenuItem>
       <MenuItem onClick={handleLogout}>Log out</MenuItem>
     </Menu>
   </div>;

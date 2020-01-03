@@ -5,31 +5,19 @@ import ThemeProvider from "@material-ui/styles/ThemeProvider";
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import createMuiTheme from "@material-ui/core/styles/createMuiTheme";
 import palette from "./theme";
-import { Router, RouteComponentProps } from "@reach/router";
+import { Router, RouteComponentProps, Redirect } from "@reach/router";
 import EnMessages from "./locales/en.json";
 import NewSession from "./accounts/NewSession";
 import NewUser from "./accounts/NewUser";
 import EditUser from "./accounts/EditUser";
-
-function GetXsrfTokenFromDom()
-{
-  var token = "";
-  try {
-    const ele = document.getElementById("RequestVerificationToken");
-    const raw = ele !== null ? ele.getAttribute("value") : "";
-    token = raw !== null ? raw : "";
-  } catch {
-    token = "";
-  }
-  return token;
-}
+import { useAppCookie } from "./helpers/useCookie";
 
 export interface IRootApp extends RouteComponentProps {
   locale?: string
 }
 
 const RootApp: React.FunctionComponent<IRootApp> = ({
-  locale
+  locale, path, location
 }) => {
   if (locale === undefined) {
     locale = "en";
@@ -52,16 +40,20 @@ const RootApp: React.FunctionComponent<IRootApp> = ({
       }),
     [prefersDarkMode],
   );
+  const cookie = useAppCookie();
+  console.log(location);
 
-  return <IntlProvider locale={locale} messages={messages}>
-    <ThemeProvider theme={theme}>
-      <Router>
-        <NewSession path="/login" csrfToken={GetXsrfTokenFromDom()}/>
-        <NewUser path="/signup" csrfToken={GetXsrfTokenFromDom()}/>
-        <EditUser path="/account" csrfToken={GetXsrfTokenFromDom()}/>
-      </Router>
-    </ThemeProvider>
-  </IntlProvider>;
+  return cookie.username && location && location.pathname === "/" ? <Redirect to="/dashboard" /> :
+    <IntlProvider locale={locale} messages={messages}>
+      <ThemeProvider theme={theme}>
+        <Router>
+          <Redirect noThrow from="/" to="/login" />
+          <NewSession path="/login" />
+          <NewUser path="/signup" />
+          <EditUser path="/account" />
+        </Router>
+      </ThemeProvider>
+    </IntlProvider>;
 };
 
 export default RootApp;

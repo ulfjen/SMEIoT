@@ -11,7 +11,7 @@ import Typography from '@material-ui/core/Typography';
 import Link from '@material-ui/core/Link';
 import CloseIcon from "@material-ui/icons/Close";
 import NavigateNextIcon from "@material-ui/icons/NavigateNext";
-import Frame from "./Frame";
+import DashboardFrame from "./DashboardFrame";
 import { useTitle } from 'react-use';
 import BasicBrokerCard from "./BasicBrokerCard";
 import { defineMessages, useIntl, FormattedMessage } from "react-intl";
@@ -50,7 +50,7 @@ const _DashboardBrokerFrame: React.FunctionComponent<IDashboardBrokerFrameProps>
   useTitle(title);
 
   return (
-    <Frame
+    <DashboardFrame
       title={title}
       direction="ltr"
       toolbarRight={

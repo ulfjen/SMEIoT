@@ -8,9 +8,11 @@ import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
-import Frame from "./Frame";
+import DashboardFrame from "./DashboardFrame";
 import clsx from 'clsx';
 import { Link as ReachLink, LinkProps as ReachLinkProps, RouteComponentProps } from '@reach/router';
+import UserAvatarMenu from '../components/UserAvatarMenu';
+import { useAppCookie } from '../helpers/useCookie';
 
 const styles = ({ palette, spacing, transitions, zIndex, mixins, breakpoints }: Theme) => createStyles({
   container: {
@@ -34,60 +36,63 @@ const styles = ({ palette, spacing, transitions, zIndex, mixins, breakpoints }: 
 export interface IDashboardIndexProps extends RouteComponentProps, WithStyles<typeof styles> {
 }
 
-const _DashboardIndex: React.FunctionComponent<IDashboardIndexProps> = ({ classes }) => {
+const _DashboardIndex: React.FunctionComponent<IDashboardIndexProps> = ({ classes, navigate }) => {
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
-    return <Frame title="Dashboard" direction="ltr" toolbarRight={null}
-      content={
-        <Container maxWidth="lg" className={classes.container}>
-          <Grid container spacing={3}>
-            {/* Sensor stats */}
-            <Grid item xs={12} md={8} lg={9}>
-              <Paper className={fixedHeightPaper}>
-                <Typography component="h2" variant="h6" color="primary" gutterBottom>
-                  Sensors
+  const appCookie = useAppCookie();
+
+  return <DashboardFrame title="Dashboard" direction="ltr"
+    toolbarRight={<UserAvatarMenu appCookie={appCookie} navigate={navigate}/>}
+    content={
+      <Container maxWidth="lg" className={classes.container}>
+        <Grid container spacing={3}>
+          {/* Sensor stats */}
+          <Grid item xs={12} md={8} lg={9}>
+            <Paper className={fixedHeightPaper}>
+              <Typography component="h2" variant="h6" color="primary" gutterBottom>
+                Sensors
               </Typography>
-                <Typography component="p" variant="h4">
-                  1
+              <Typography component="p" variant="h4">
+                1
               </Typography>
-                <Typography color="textSecondary" className={classes.context}>
-                </Typography>
-                <div>
-                  <Link color="primary" to="/dashboard/sensors" component={ReachLink}>
-                    View sensors
+              <Typography color="textSecondary" className={classes.context}>
+              </Typography>
+              <div>
+                <Link color="primary" to="/dashboard/sensors" component={ReachLink}>
+                  View sensors
                   </Link>
-                </div>
-              </Paper>
-            </Grid>
-            {/* User stats */}
-            <Grid item xs={12} md={4} lg={3}>
-              <Paper className={fixedHeightPaper}>
-                <Typography component="h2" variant="h6" color="primary" gutterBottom>
-                  Users
-                </Typography>
-                <Typography component="p" variant="h4">
-                  1
-                </Typography>
-                <Typography color="textSecondary" className={classes.context}>
-                </Typography>
-                <div>
-                  <Link color="primary" to="/dashboard/sensors" component={ReachLink}>
-                    View users
-                  </Link>
-                </div>
-              </Paper>
-            </Grid>
-            {/* System stats */}
-            <Grid item xs={12}>
-              <Paper className={classes.paper}>
-                <Link color="primary" to="/dashboard/broker/logs" component={ReachLink}>
-                  View mqtt
-                  </Link>
-                <p>placeholder</p>
-              </Paper>
-            </Grid>
+              </div>
+            </Paper>
           </Grid>
-        </Container>
+          {/* User stats */}
+          <Grid item xs={12} md={4} lg={3}>
+            <Paper className={fixedHeightPaper}>
+              <Typography component="h2" variant="h6" color="primary" gutterBottom>
+                Users
+                </Typography>
+              <Typography component="p" variant="h4">
+                1
+                </Typography>
+              <Typography color="textSecondary" className={classes.context}>
+              </Typography>
+              <div>
+                <Link color="primary" to="/dashboard/sensors" component={ReachLink}>
+                  View users
+                  </Link>
+              </div>
+            </Paper>
+          </Grid>
+          {/* System stats */}
+          <Grid item xs={12}>
+            <Paper className={classes.paper}>
+              <Link color="primary" to="/dashboard/broker/logs" component={ReachLink}>
+                View mqtt
+                  </Link>
+              <p>placeholder</p>
+            </Paper>
+          </Grid>
+        </Grid>
+      </Container>
     } />;
 };
 

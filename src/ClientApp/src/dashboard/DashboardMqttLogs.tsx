@@ -3,7 +3,7 @@ import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
-import Frame from "./Frame";
+import Frame from "./DashboardFrame";
 import Container from "@material-ui/core/Container";
 import Paper from "@material-ui/core/Paper";
 import ListItemLine from "../components/ListItemLine";

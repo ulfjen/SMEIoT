@@ -71,7 +71,7 @@ const _DashboardNewDeviceConnect: React.FunctionComponent<IDashboardNewDeviceCon
   const [connected, setConnected] = React.useState<boolean>(false);
 
   const state = useAsync(async () => {
-    let res = await api.apiDevicesNameGet({
+    const res = await api.apiDevicesNameGet({
       name
     });
     setConnected(res.connected || false);
@@ -84,7 +84,7 @@ const _DashboardNewDeviceConnect: React.FunctionComponent<IDashboardNewDeviceCon
   useInterval(async () => {
     if (!state.loading && state.error === undefined) {
 
-      let res = await api.apiDevicesNameGet({
+      const res = await api.apiDevicesNameGet({
         name
       });
       setConnected(res.connected || false);

@@ -4,7 +4,7 @@ import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
-import Frame from "./Frame";
+import DashboardFrame from "./DashboardFrame";
 import Grid from "@material-ui/core/Grid";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
@@ -51,7 +51,7 @@ const _DashboardNewDeviceFrame: React.FunctionComponent<IDashboardNewDeviceFrame
   const intl = useIntl();
 
   return (
-    <Frame
+    <DashboardFrame
       title={intl.formatMessage(messages.title)}
       direction="ltr"
       toolbarRight={

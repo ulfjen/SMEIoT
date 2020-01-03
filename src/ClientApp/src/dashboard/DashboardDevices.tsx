@@ -9,7 +9,7 @@ import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
-import Frame from "./Frame";
+import DashboardFrame from "./DashboardFrame";
 import { useTitle } from 'react-use';
 import ErrorBoundary from "../components/ErrorBoundary";
 import BrokerCard from "./BrokerCard";
@@ -26,6 +26,8 @@ import {
   LinkProps as ReachLinkProps,
   RouteComponentProps
 } from "@reach/router";
+import { useAppCookie } from "../helpers/useCookie";
+import UserAvatarMenu from '../components/UserAvatarMenu';
 
 const styles = ({
   palette,
@@ -89,7 +91,7 @@ const messages = defineMessages({
 });
 
 const _DashboardDevices: React.FunctionComponent<IDashboardDevices> = ({
-  classes
+  classes, navigate
 }) => {
   const intl = useIntl();
   useTitle(intl.formatMessage(messages.title));
@@ -97,10 +99,13 @@ const _DashboardDevices: React.FunctionComponent<IDashboardDevices> = ({
   const [loading, setLoading] = React.useState<boolean>(true);
   const [loadingError, setLoadingError] = React.useState<boolean>(false);
 
+  const appCookie = useAppCookie();
+
   return (
-    <Frame
+    <DashboardFrame
       title={intl.formatMessage(messages.title)}
       direction="ltr"
+      toolbarRight={<UserAvatarMenu appCookie={appCookie} navigate={navigate}/>}
       content={
         <Container maxWidth="lg" className={classes.container}>
           <ErrorBoundary>

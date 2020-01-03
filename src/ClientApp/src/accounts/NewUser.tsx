@@ -46,10 +46,9 @@ const styles = ({palette, spacing}: Theme) => createStyles({
 });
 
 export interface INewUserProps extends RouteComponentProps, WithStyles<typeof styles> {
-  csrfToken: string
 }
 
-const _NewUser: React.FunctionComponent<INewUserProps & WithStyles<typeof styles>> = ({csrfToken, classes}) => {
+const _NewUser: React.FunctionComponent<INewUserProps & WithStyles<typeof styles>> = ({classes}) => {
   const {
     username, setUsername,
     password, setPassword,
@@ -97,8 +96,7 @@ const _NewUser: React.FunctionComponent<INewUserProps & WithStyles<typeof styles
         <Typography component="h1" variant="h5">
           Sign up
         </Typography>
-        <UserPasswordForm csrfToken={csrfToken}
-                          url={undefined}
+        <UserPasswordForm url={undefined}
                           handleSubmit={handleSubmit}
                           username={username} setUsername={setUsername}
                           password={password} setPassword={setPassword}

@@ -9,12 +9,14 @@ import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
-import Frame from "./Frame";
+import DashboardFrame from "./DashboardFrame";
 import clsx from "clsx";
 import DashboardSensorBoard from "./DashboardSensorBoard";
 import { defineMessages, useIntl, FormattedMessage } from "react-intl";
 import { Link, RouteComponentProps } from "@reach/router";
 import { useTitle } from 'react-use';
+import UserAvatarMenu from '../components/UserAvatarMenu';
+import { useAppCookie } from "../helpers/useCookie";
 
 const styles = ({
   palette,
@@ -63,16 +65,19 @@ const messages = defineMessages({
 });
 
 const _DashboardSensors: React.FunctionComponent<IDashboardSensors> = ({
-  classes
+  classes, navigate
 }) => {
   const intl = useIntl();
   useTitle(intl.formatMessage(messages.title));
 
+  const appCookie = useAppCookie();
+
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
   return (
-    <Frame
+    <DashboardFrame
       title="Sensors"
       direction="ltr"
+      toolbarRight={<UserAvatarMenu appCookie={appCookie} navigate={navigate}/>}
       content={
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={3}>
