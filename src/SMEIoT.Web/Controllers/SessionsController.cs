@@ -48,7 +48,7 @@ namespace SMEIoT.Web.Controllers
     //      return NotFound();
     //
     //      var result =
-    //        await _signInManager.PasswordSignInAsync(model.Username, model.Password, isPersistent: true,
+    //        await _signInManager.PasswordSignInAsync(model.UserName, model.Password, isPersistent: true,
     //          lockoutOnFailure: false);
     //      if (result.Succeeded)
     //      {

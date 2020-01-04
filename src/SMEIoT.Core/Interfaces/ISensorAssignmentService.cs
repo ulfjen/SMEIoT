@@ -7,9 +7,9 @@ namespace SMEIoT.Core.Interfaces
   public interface ISensorAssignmentService
   {
     IAsyncEnumerable<UserSensor> ListAssignedUserSensorsBySensorName(string sensorName);
-    Task<bool> AssignSensorToUserAsync(string sensorName, string username);
-    Task<UserSensor> GetUserSensor(string username, string sensorName);
-    Task<bool> RevokeSensorFromUserAsync(string sensorName, string username);
+    Task<bool> AssignSensorToUserAsync(string sensorName, string userName);
+    Task<UserSensor> GetUserSensor(string userName, string sensorName);
+    Task<bool> RevokeSensorFromUserAsync(string sensorName, string userName);
 
   }
 }

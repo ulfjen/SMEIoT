@@ -50,14 +50,14 @@ namespace SMEIoT.Tests.Controllers.Api.V1
 
       // act
       var result =
-        await controller.Assign(new AssignUserSensorViewModel{Name="a-normal-sensor", Username = "normal-user-1"});
+        await controller.Assign(new AssignUserSensorViewModel{Name="a-normal-sensor", UserName = "normal-user-1"});
 
       // assert
       var actionResult = Assert.IsType<ActionResult<SensorAssignment>>(result);
       var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(actionResult.Result);
       var returnValue = Assert.IsType<SensorAssignment>(createdAtActionResult.Value);
       Assert.Equal("a-normal-sensor", returnValue.Name);
-      Assert.Equal("normal-user-1", returnValue.Username);
+      Assert.Equal("normal-user-1", returnValue.UserName);
       Assert.Equal(1, returnValue.Assignments);
     }
     
@@ -69,13 +69,13 @@ namespace SMEIoT.Tests.Controllers.Api.V1
 
       // act
       var result =
-        await controller.Assign(new AssignUserSensorViewModel{Name="a-normal-sensor", Username = "non-existed-user"});
+        await controller.Assign(new AssignUserSensorViewModel{Name="a-normal-sensor", UserName = "non-existed-user"});
 
       // assert
       var actionResult = Assert.IsType<ActionResult<SensorAssignment>>(result);
       var notFoundResult = Assert.IsType<NotFoundObjectResult>(actionResult.Result);
       var returnValue = Assert.IsType<Dictionary<string, string>>(notFoundResult.Value);
-      Assert.Equal("username", "can not find the user.");
+      Assert.Equal("userName", "can not find the user.");
     }
     
     [Fact]
@@ -86,7 +86,7 @@ namespace SMEIoT.Tests.Controllers.Api.V1
 
       // act
       var result =
-        await controller.Assign(new AssignUserSensorViewModel{Name="not-existed-sensor", Username = "normal-user-1"});
+        await controller.Assign(new AssignUserSensorViewModel{Name="not-existed-sensor", UserName = "normal-user-1"});
 
       // assert
       var actionResult = Assert.IsType<ActionResult<SensorAssignment>>(result);
@@ -103,13 +103,13 @@ namespace SMEIoT.Tests.Controllers.Api.V1
 
       // act
       var result =
-        await controller.Assign(new AssignUserSensorViewModel{Name="a-normal-sensor", Username = "non-existed-user"});
+        await controller.Assign(new AssignUserSensorViewModel{Name="a-normal-sensor", UserName = "non-existed-user"});
 
       // assert
       var actionResult = Assert.IsType<ActionResult<SensorAssignment>>(result);
       var notFoundResult = Assert.IsType<NotFoundObjectResult>(actionResult.Result);
       var returnValue = Assert.IsType<Dictionary<string, string>>(notFoundResult.Value);
-      Assert.Equal("username", "can not find the user.");
+      Assert.Equal("userName", "can not find the user.");
     }
     
     [Fact]
@@ -120,7 +120,7 @@ namespace SMEIoT.Tests.Controllers.Api.V1
 
       // act
       var result =
-        await controller.Assign(new AssignUserSensorViewModel{Name="not-existed-sensor", Username = "normal-user-1"});
+        await controller.Assign(new AssignUserSensorViewModel{Name="not-existed-sensor", UserName = "normal-user-1"});
 
       // assert
       var actionResult = Assert.IsType<ActionResult<SensorAssignment>>(result);
@@ -137,14 +137,14 @@ namespace SMEIoT.Tests.Controllers.Api.V1
 
       // act
       var result =
-        await controller.RevokeAssignment(new AssignUserSensorViewModel{Name="a-normal-sensor", Username = "normal-user-1"});
+        await controller.RevokeAssignment(new AssignUserSensorViewModel{Name="a-normal-sensor", UserName = "normal-user-1"});
 
       // assert
       var actionResult = Assert.IsType<ActionResult<Sensor>>(result);
       var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(actionResult.Result);
       var returnValue = Assert.IsType<SensorAssignment>(createdAtActionResult.Value);
       Assert.Equal("a-normal-sensor", returnValue.Name);
-      Assert.Equal("normal-user-1", returnValue.Username);
+      Assert.Equal("normal-user-1", returnValue.UserName);
       Assert.Equal(0, returnValue.Assignments);
     }
 #endif

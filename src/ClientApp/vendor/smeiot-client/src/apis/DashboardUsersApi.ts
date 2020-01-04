@@ -15,8 +15,8 @@
 
 import * as runtime from '../runtime';
 
-export interface DashboardUsersApiDashboardUsersUsernameGetRequest {
-    username: string;
+export interface DashboardUsersApiDashboardUsersUserNameGetRequest {
+    userName: string;
 }
 
 /**
@@ -26,9 +26,9 @@ export class DashboardUsersApi extends runtime.BaseAPI {
 
     /**
      */
-    async dashboardUsersUsernameGetRaw(requestParameters: DashboardUsersApiDashboardUsersUsernameGetRequest): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters.username === null || requestParameters.username === undefined) {
-            throw new runtime.RequiredError('username','Required parameter requestParameters.username was null or undefined when calling dashboardUsersUsernameGet.');
+    async dashboardUsersUserNameGetRaw(requestParameters: DashboardUsersApiDashboardUsersUserNameGetRequest): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.userName === null || requestParameters.userName === undefined) {
+            throw new runtime.RequiredError('userName','Required parameter requestParameters.userName was null or undefined when calling dashboardUsersUserNameGet.');
         }
 
         const queryParameters: runtime.HTTPQuery = {};
@@ -36,7 +36,7 @@ export class DashboardUsersApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/dashboard/users/{username}`.replace(`{${"username"}}`, encodeURIComponent(String(requestParameters.username))),
+            path: `/dashboard/users/{userName}`.replace(`{${"userName"}}`, encodeURIComponent(String(requestParameters.userName))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -47,8 +47,8 @@ export class DashboardUsersApi extends runtime.BaseAPI {
 
     /**
      */
-    async dashboardUsersUsernameGet(requestParameters: DashboardUsersApiDashboardUsersUsernameGetRequest): Promise<void> {
-        await this.dashboardUsersUsernameGetRaw(requestParameters);
+    async dashboardUsersUserNameGet(requestParameters: DashboardUsersApiDashboardUsersUserNameGetRequest): Promise<void> {
+        await this.dashboardUsersUserNameGetRaw(requestParameters);
     }
 
 }

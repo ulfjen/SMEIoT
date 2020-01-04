@@ -36,12 +36,12 @@ export interface UsersApiApiUsersPostRequest {
     validatedUserCredentialsBindingModel?: ValidatedUserCredentialsBindingModel;
 }
 
-export interface UsersApiApiUsersUsernameGetRequest {
-    username: string;
+export interface UsersApiApiUsersUserNameGetRequest {
+    userName: string;
 }
 
-export interface UsersApiApiUsersUsernamePasswordPutRequest {
-    username: string;
+export interface UsersApiApiUsersUserNamePasswordPutRequest {
+    userName: string;
     confirmedUserCredentialsUpdateBindingModel?: ConfirmedUserCredentialsUpdateBindingModel;
 }
 
@@ -79,9 +79,9 @@ export class UsersApi extends runtime.BaseAPI {
 
     /**
      */
-    async apiUsersUsernameGetRaw(requestParameters: UsersApiApiUsersUsernameGetRequest): Promise<runtime.ApiResponse<BasicUserApiModel>> {
-        if (requestParameters.username === null || requestParameters.username === undefined) {
-            throw new runtime.RequiredError('username','Required parameter requestParameters.username was null or undefined when calling apiUsersUsernameGet.');
+    async apiUsersUserNameGetRaw(requestParameters: UsersApiApiUsersUserNameGetRequest): Promise<runtime.ApiResponse<BasicUserApiModel>> {
+        if (requestParameters.userName === null || requestParameters.userName === undefined) {
+            throw new runtime.RequiredError('userName','Required parameter requestParameters.userName was null or undefined when calling apiUsersUserNameGet.');
         }
 
         const queryParameters: runtime.HTTPQuery = {};
@@ -89,7 +89,7 @@ export class UsersApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/api/users/{username}`.replace(`{${"username"}}`, encodeURIComponent(String(requestParameters.username))),
+            path: `/api/users/{userName}`.replace(`{${"userName"}}`, encodeURIComponent(String(requestParameters.userName))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -100,16 +100,16 @@ export class UsersApi extends runtime.BaseAPI {
 
     /**
      */
-    async apiUsersUsernameGet(requestParameters: UsersApiApiUsersUsernameGetRequest): Promise<BasicUserApiModel> {
-        const response = await this.apiUsersUsernameGetRaw(requestParameters);
+    async apiUsersUserNameGet(requestParameters: UsersApiApiUsersUserNameGetRequest): Promise<BasicUserApiModel> {
+        const response = await this.apiUsersUserNameGetRaw(requestParameters);
         return await response.value();
     }
 
     /**
      */
-    async apiUsersUsernamePasswordPutRaw(requestParameters: UsersApiApiUsersUsernamePasswordPutRequest): Promise<runtime.ApiResponse<UserCredentialsUpdateApiModel>> {
-        if (requestParameters.username === null || requestParameters.username === undefined) {
-            throw new runtime.RequiredError('username','Required parameter requestParameters.username was null or undefined when calling apiUsersUsernamePasswordPut.');
+    async apiUsersUserNamePasswordPutRaw(requestParameters: UsersApiApiUsersUserNamePasswordPutRequest): Promise<runtime.ApiResponse<UserCredentialsUpdateApiModel>> {
+        if (requestParameters.userName === null || requestParameters.userName === undefined) {
+            throw new runtime.RequiredError('userName','Required parameter requestParameters.userName was null or undefined when calling apiUsersUserNamePasswordPut.');
         }
 
         const queryParameters: runtime.HTTPQuery = {};
@@ -119,7 +119,7 @@ export class UsersApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json; v=1.0; v=1.0';
 
         const response = await this.request({
-            path: `/api/users/{username}/password`.replace(`{${"username"}}`, encodeURIComponent(String(requestParameters.username))),
+            path: `/api/users/{userName}/password`.replace(`{${"userName"}}`, encodeURIComponent(String(requestParameters.userName))),
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
@@ -131,8 +131,8 @@ export class UsersApi extends runtime.BaseAPI {
 
     /**
      */
-    async apiUsersUsernamePasswordPut(requestParameters: UsersApiApiUsersUsernamePasswordPutRequest): Promise<UserCredentialsUpdateApiModel> {
-        const response = await this.apiUsersUsernamePasswordPutRaw(requestParameters);
+    async apiUsersUserNamePasswordPut(requestParameters: UsersApiApiUsersUserNamePasswordPutRequest): Promise<UserCredentialsUpdateApiModel> {
+        const response = await this.apiUsersUserNamePasswordPutRaw(requestParameters);
         return await response.value();
     }
 

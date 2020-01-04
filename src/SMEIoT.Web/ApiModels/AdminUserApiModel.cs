@@ -11,7 +11,7 @@ namespace SMEIoT.Web.ApiModels
     public long Id { get; set; }
 
     [JsonProperty(Required = Required.DisallowNull)]
-    public string Username { get; set; }
+    public string UserName { get; set; }
 
     [JsonProperty(Required = Required.DisallowNull)]
     public IEnumerable<string> Roles { get; set; }
@@ -25,7 +25,7 @@ namespace SMEIoT.Web.ApiModels
     public AdminUserApiModel(User user, IList<string> roles)
     {
       Id = user.Id;
-      Username = user.UserName;
+      UserName = user.UserName;
       Roles = roles;
       CreatedAt = user.CreatedAt;
       LastSeenAt = user.LastSeenAt;

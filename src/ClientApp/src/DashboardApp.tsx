@@ -63,7 +63,7 @@ const DashboardApp: React.FunctionComponent<IDashboardApp> = ({
         <DashboardSensorDetails path="sensors/:deviceName/:sensorName"/>
         <DashboardMqttLogs path="broker/logs" />
         <DashboardUsers path="users" />
-        <DashboardEditUser path="users/:username" />
+        <DashboardEditUser path="users/:userName" />
       </Router>;
 };
 

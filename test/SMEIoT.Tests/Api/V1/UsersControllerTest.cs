@@ -29,13 +29,13 @@ namespace SMEIoT.Tests.Api.V1
       // act
       var result =
         await controller.Create(
-          new ValidatedUserCredentialsViewModel {Username = "admin", Password = "dummy-password-1"});
+          new ValidatedUserCredentialsViewModel {UserName = "admin", Password = "dummy-password-1"});
 
       // assert
       var actionResult = Assert.IsType<ActionResult<BasicUserViewModel>>(result);
       var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(actionResult.Result);
       var returnValue = Assert.IsType<BasicUserViewModel>(createdAtActionResult.Value);
-      Assert.Equal("admin", returnValue.Username);
+      Assert.Equal("admin", returnValue.UserName);
       Assert.Equal("ADMIN", returnValue.Roles.FirstOrDefault());
     }
 
@@ -44,16 +44,16 @@ namespace SMEIoT.Tests.Api.V1
     {
       var controller = BuildDefaultUserController();
       await controller.Create(
-        new ValidatedUserCredentialsViewModel {Username = "user1", Password = "dummy-password-1"});
+        new ValidatedUserCredentialsViewModel {UserName = "user1", Password = "dummy-password-1"});
       
       var result =
         await controller.Create(
-          new ValidatedUserCredentialsViewModel {Username = "user2", Password = "dummy-password-1"});
+          new ValidatedUserCredentialsViewModel {UserName = "user2", Password = "dummy-password-1"});
 
       var actionResult = Assert.IsType<ActionResult<BasicUserViewModel>>(result);
       var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(actionResult.Result);
       var returnValue = Assert.IsType<BasicUserViewModel>(createdAtActionResult.Value);
-      Assert.Equal("user2", returnValue.Username);
+      Assert.Equal("user2", returnValue.UserName);
       Assert.Null(returnValue.Roles.FirstOrDefault());
     }
     
@@ -72,7 +72,7 @@ namespace SMEIoT.Tests.Api.V1
       var actionResult = Assert.IsType<ActionResult<BasicUserViewModel>>(result);
       var okObjectResult = Assert.IsType<OkObjectResult>(actionResult.Result);
       var returnValue = Assert.IsType<BasicUserViewModel>(okObjectResult.Value);
-      Assert.Equal("user2", returnValue.Username);
+      Assert.Equal("user2", returnValue.UserName);
       Assert.Null(returnValue.Roles.FirstOrDefault());
     }
     
@@ -104,7 +104,7 @@ namespace SMEIoT.Tests.Api.V1
       var actionResult = Assert.IsType<ActionResult<ManageUserResultViewModel>>(result);
       var okObjectResult = Assert.IsType<OkObjectResult>(actionResult.Result);
       var returnValue = Assert.IsType<ManageUserResultViewModel>(okObjectResult.Value);
-      Assert.Equal("user1", returnValue.Username);
+      Assert.Equal("user1", returnValue.UserName);
     }
     
     [Fact]

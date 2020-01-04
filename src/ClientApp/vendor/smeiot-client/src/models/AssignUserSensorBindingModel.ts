@@ -24,7 +24,7 @@ export interface AssignUserSensorBindingModel {
      * @type {string}
      * @memberof AssignUserSensorBindingModel
      */
-    username?: string;
+    userName?: string;
 }
 
 export function AssignUserSensorBindingModelFromJSON(json: any): AssignUserSensorBindingModel {
@@ -37,7 +37,7 @@ export function AssignUserSensorBindingModelFromJSONTyped(json: any, ignoreDiscr
     }
     return {
         
-        'username': !exists(json, 'username') ? undefined : json['username'],
+        'userName': !exists(json, 'userName') ? undefined : json['userName'],
     };
 }
 
@@ -50,7 +50,7 @@ export function AssignUserSensorBindingModelToJSON(value?: AssignUserSensorBindi
     }
     return {
         
-        'username': value.username,
+        'userName': value.userName,
     };
 }
 

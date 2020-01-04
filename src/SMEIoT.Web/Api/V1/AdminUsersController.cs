@@ -38,30 +38,30 @@ namespace SMEIoT.Web.Api.V1
       return Ok(new AdminUserApiModelList(list));
     }
 
-    [HttpGet("{username}")]
+    [HttpGet("{userName}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<AdminUserApiModel>> Show(string username)
+    public async Task<ActionResult<AdminUserApiModel>> Show(string userName)
     {
-      var model = await GetAdminUserResultAsync(username);
+      var model = await GetAdminUserResultAsync(userName);
       return Ok(model);
     }
 
-    [HttpPut("{username}/roles")]
+    [HttpPut("{userName}/roles")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<UserCredentialsUpdateApiModel>> EditRoles(
-      [FromBody] UserRolesBindingModel binding, [FromRoute] string username)
+      [FromBody] UserRolesBindingModel binding, [FromRoute] string userName)
     {
-      await _userService.UpdateUserRoles(username, binding.Roles);
-      return Ok(await GetAdminUserResultAsync(username));
+      await _userService.UpdateUserRoles(userName, binding.Roles);
+      return Ok(await GetAdminUserResultAsync(userName));
     }
 
-    private async Task<AdminUserApiModel> GetAdminUserResultAsync(string username)
+    private async Task<AdminUserApiModel> GetAdminUserResultAsync(string userName)
     {
-      var (user, roles) = await _userService.GetUserAndRoleByName(username);
+      var (user, roles) = await _userService.GetUserAndRoleByName(userName);
       return new AdminUserApiModel(user, roles);
     }
 

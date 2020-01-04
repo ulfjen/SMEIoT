@@ -43,7 +43,7 @@ const RootApp: React.FunctionComponent<IRootApp> = ({
   const cookie = useAppCookie();
   console.log(location);
 
-  return cookie.username && location && location.pathname === "/" ? <Redirect to="/dashboard" /> :
+  return cookie.userName && location && location.pathname === "/" ? <Redirect to="/dashboard" /> :
     <IntlProvider locale={locale} messages={messages}>
       <ThemeProvider theme={theme}>
         <Router>

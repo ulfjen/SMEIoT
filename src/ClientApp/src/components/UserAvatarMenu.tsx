@@ -25,10 +25,10 @@ export interface IUserAvatarMenuProps extends WithStyles<typeof styles> {
 }
 
 const _UserAvatarMenu: React.FunctionComponent<IUserAvatarMenuProps & WithStyles<typeof styles>> = ({ classes, appCookie, navigate }) => {
-  const username = appCookie.username || "";
+  const userName = appCookie.userName || "";
   let options = {};
   let avatars = new Avatars(sprites(options));
-  const avatar = avatars.create(username);
+  const avatar = avatars.create(userName);
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 

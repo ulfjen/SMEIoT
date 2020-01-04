@@ -37,12 +37,12 @@ const styles = ({palette, spacing}: Theme) => createStyles({
 export interface ILoginFormProps extends WithStyles<typeof styles> {
   csrfToken: string;
   url: string;
-  username: string | undefined;
+  userName: string | undefined;
   errorPrompt: string | undefined;
 }
 
-const _LoginForm: React.FunctionComponent<ILoginFormProps & WithStyles<typeof styles>> = ({csrfToken, classes, url, username, errorPrompt, children}) => {
-  const [trackedUsername, setUsername] = useState<string>(username || "");
+const _LoginForm: React.FunctionComponent<ILoginFormProps & WithStyles<typeof styles>> = ({csrfToken, classes, url, userName, errorPrompt, children}) => {
+  const [trackedUserName, setUserName] = useState<string>(userName || "");
   const [showPassword, setShowPassword] = useState<boolean>(false);
   
   return <form className={classes.form} noValidate method="POST" action={url}>
@@ -52,12 +52,12 @@ const _LoginForm: React.FunctionComponent<ILoginFormProps & WithStyles<typeof st
       margin="normal"
       required
       fullWidth
-      id="username"
-      label="Username"
-      name="username"
-      autoComplete="username"
-      value={trackedUsername}
-      onChange={(event: React.ChangeEvent<HTMLInputElement>) => setUsername(event.target.value)}
+      id="userName"
+      label="UserName"
+      name="userName"
+      autoComplete="userName"
+      value={trackedUserName}
+      onChange={(event: React.ChangeEvent<HTMLInputElement>) => setUserName(event.target.value)}
       autoFocus
     />
     <TextField

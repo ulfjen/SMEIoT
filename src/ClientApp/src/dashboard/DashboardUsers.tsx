@@ -67,7 +67,7 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({classes
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [loaded, setLoaded] = React.useState<boolean>(false);
   const [users, setUsers] = React.useState<null | Array<AdminUserApiModel>>(null);
-  const [focusedUsername, setFocusedUsername] = React.useState<null | string>(null);
+  const [focusedUserName, setFocusedUserName] = React.useState<null | string>(null);
   const [dialogOpen, setDiaglogOpen] = React.useState<boolean>(false);
 
   const handleClose = () => {
@@ -76,7 +76,7 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({classes
   
   const handleEdit = () => {
     handleClose();
-    window.location.href = `/dashboard/users/${focusedUsername}`;
+    window.location.href = `/dashboard/users/${focusedUserName}`;
   };
 
   const handleDelete = () => {
@@ -104,7 +104,7 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({classes
   const renderUserLists = () => {
     if (users == null) { return null; }
 
-    return users.map(user => user ? <UserListItem user={user} setFocusedUsername={setFocusedUsername} setAnchorEl={setAnchorEl} key={user.id}/> : null);
+    return users.map(user => user ? <UserListItem user={user} setFocusedUserName={setFocusedUserName} setAnchorEl={setAnchorEl} key={user.id}/> : null);
   };
 
   React.useEffect(() => {
@@ -138,7 +138,7 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({classes
           className={classes.usersMenu}
           onClose={handleClose}
         >
-          <MenuItem onClick={handleClose} to={`/dashboard/users/${focusedUsername}`} component={Link}>Edit</MenuItem>
+          <MenuItem onClick={handleClose} to={`/dashboard/users/${focusedUserName}`} component={Link}>Edit</MenuItem>
           <MenuItem className={classes.usersMenuDeleteItem} onClick={handleDelete}>Delete</MenuItem>
         </Menu>
         <Dialog
@@ -147,7 +147,7 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({classes
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
-          <DialogTitle>Delete account {focusedUsername}?</DialogTitle>
+          <DialogTitle>Delete account {focusedUserName}?</DialogTitle>
           <DialogContent>
             <DialogContentText>
               Delete the user will disable its access to the system and asscociated users.

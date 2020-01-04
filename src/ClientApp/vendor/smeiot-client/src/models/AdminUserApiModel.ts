@@ -30,7 +30,7 @@ export interface AdminUserApiModel {
      * @type {string}
      * @memberof AdminUserApiModel
      */
-    username?: string;
+    userName?: string;
     /**
      * 
      * @type {Array<string>}
@@ -62,7 +62,7 @@ export function AdminUserApiModelFromJSONTyped(json: any, ignoreDiscriminator: b
     return {
         
         'id': !exists(json, 'id') ? undefined : json['id'],
-        'username': !exists(json, 'username') ? undefined : json['username'],
+        'userName': !exists(json, 'userName') ? undefined : json['userName'],
         'roles': !exists(json, 'roles') ? undefined : json['roles'],
         'createdAt': !exists(json, 'createdAt') ? undefined : json['createdAt'],
         'lastSeenAt': !exists(json, 'lastSeenAt') ? undefined : json['lastSeenAt'],
@@ -79,7 +79,7 @@ export function AdminUserApiModelToJSON(value?: AdminUserApiModel | null): any {
     return {
         
         'id': value.id,
-        'username': value.username,
+        'userName': value.userName,
         'roles': value.roles,
         'createdAt': value.createdAt,
         'lastSeenAt': value.lastSeenAt,

@@ -56,7 +56,7 @@ const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Th
 });
 
 export interface IDashboardEditUserRouteParams {
-  username: string;
+  userName: string;
 }
 
 export interface IDashboardEditUserProps extends RouteComponentProps<IDashboardEditUserRouteParams>, WithStyles<typeof styles> {
@@ -64,19 +64,19 @@ export interface IDashboardEditUserProps extends RouteComponentProps<IDashboardE
 }
 
 
-const _DashboardEditUser: React.FunctionComponent<IDashboardEditUserProps> = ({ classes, username }) => {
+const _DashboardEditUser: React.FunctionComponent<IDashboardEditUserProps> = ({ classes, userName }) => {
   const [user, setUser] = React.useState<AdminUserApiModel>({
     createdAt: moment.utc().toISOString(),
     id: 0,
     lastSeenAt: moment.utc().toISOString(),
     roles: [],
-    username: ""
+    userName: ""
   });
   const [admin, setAdmin] = React.useState<boolean>(false);  const [avatar, setAvatar] = React.useState<string>("");
   
   const saveUser = (user: AdminUserApiModel) => {
     setUser(user);
-    setAvatar(Avatars.create(user.username || ""));
+    setAvatar(Avatars.create(user.userName || ""));
 
     if (user && user.roles && user.roles.indexOf("Admin") !== -1) {
       setAdmin(true);
@@ -84,14 +84,14 @@ const _DashboardEditUser: React.FunctionComponent<IDashboardEditUserProps> = ({ 
   }
 
   const requestUser = async () => {
-    if (username === undefined || username === null) { return; }
-    saveUser(await new AdminUsersApi(GetDefaultApiConfig()).apiAdminUsersUsernameGet({
-      username
+    if (userName === undefined || userName === null) { return; }
+    saveUser(await new AdminUsersApi(GetDefaultApiConfig()).apiAdminUsersUserNameGet({
+      userName
     }));
   };
 
   const handleRoleChange = async (event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
-    let username = user.username || "";
+    let userName = user.userName || "";
     let roles = user.roles || [];
 
     if (checked) {
@@ -102,8 +102,8 @@ const _DashboardEditUser: React.FunctionComponent<IDashboardEditUserProps> = ({ 
       roles = roles.filter(cur => cur !== "Admin");
     }
 
-     var credentials = await new AdminUsersApi(GetDefaultApiConfig()).apiAdminUsersUsernameRolesPut({
-       username,
+     var credentials = await new AdminUsersApi(GetDefaultApiConfig()).apiAdminUsersUserNameRolesPut({
+       userName,
        userRolesBindingModel: {
          roles: roles || null
        }
@@ -123,7 +123,7 @@ const _DashboardEditUser: React.FunctionComponent<IDashboardEditUserProps> = ({ 
       requestUser();
     }
   }, []);
-  return <DashboardFrame title={`Edit ${username}`} direction="ltr" toolbarRight={
+  return <DashboardFrame title={`Edit ${userName}`} direction="ltr" toolbarRight={
     <IconButton
       edge="end"
       color="inherit"
@@ -147,7 +147,7 @@ const _DashboardEditUser: React.FunctionComponent<IDashboardEditUserProps> = ({ 
             <IconButton aria-label="settings">
             </IconButton>
           }
-          title={username}
+          title={userName}
           subheader={user.id}
         />
         <CardContent className={classes.cardContent}>

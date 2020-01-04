@@ -5,7 +5,7 @@
   @{
     var rendered = new Dictionary<string, object>();
     rendered["validation_errors"] = ViewData.ModelState.JsonValidation();
-    rendered["model"] = new {username = @Model.Username};
+    rendered["model"] = new {username = @Model.UserName};
   }
   <dom-json objects="rendered"></dom-json>
 }

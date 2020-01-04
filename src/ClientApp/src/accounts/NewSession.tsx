@@ -48,9 +48,9 @@ export interface INewSessionProps extends RouteComponentProps, WithStyles<typeof
 
 const _NewSession: React.FunctionComponent<INewSessionProps & WithStyles<typeof styles>> = ({classes}) => {
   const {
-    username, setUsername,
+    userName, setUserName,
     password, setPassword,
-    usernameErrors, setUsernameErrors,
+    userNameErrors, setUserNameErrors,
     passwordErrors, setPasswordErrors
   } = useUserCredentials();
   const cookie = useAppCookie();
@@ -66,7 +66,7 @@ const _NewSession: React.FunctionComponent<INewSessionProps & WithStyles<typeof 
     }
 
     if (model) {
-      setUsername(model.username);
+      setUserName(model.userName);
     }
   }
 
@@ -78,7 +78,7 @@ const _NewSession: React.FunctionComponent<INewSessionProps & WithStyles<typeof 
 
       const login = await new SessionsApi(GetDefaultApiConfig()).apiSessionsPost({
         loginBindingModel: {
-          username, password
+          userName, password
         }
       });
       console.log(login);
@@ -86,8 +86,8 @@ const _NewSession: React.FunctionComponent<INewSessionProps & WithStyles<typeof 
       window.location.replace(login.returnUrl || "/");
     // catch (response) {
     //   const {status, errors} = await response.json();
-    //   if (errors.hasOwnProperty("Username")) {
-    //     setUsernameErrors(errors["Username"].join("\n"));
+    //   if (errors.hasOwnProperty("UserName")) {
+    //     setUserNameErrors(errors["UserName"].join("\n"));
     //   }
     //   if (errors.hasOwnProperty("Password")) {
     //     setPasswordErrors(errors["Password"].join("\n"));
@@ -106,9 +106,9 @@ const _NewSession: React.FunctionComponent<INewSessionProps & WithStyles<typeof 
       </Typography>
       <UserPasswordForm url={undefined}
                         handleSubmit={handleSubmit}
-                        username={username} setUsername={setUsername}
+                        userName={userName} setUserName={setUserName}
                         password={password} setPassword={setPassword}
-                        usernameErrors={usernameErrors} setUsernameErrors={setUsernameErrors}
+                        userNameErrors={userNameErrors} setUserNameErrors={setUserNameErrors}
                         passwordErrors={passwordErrors} setPasswordErrors={setPasswordErrors}>
         <Button
           type="submit"

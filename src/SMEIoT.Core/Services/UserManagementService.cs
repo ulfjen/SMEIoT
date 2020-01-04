@@ -12,8 +12,11 @@ using System.Security.Claims;
 
 namespace SMEIoT.Core.Services
 {
+  // IdentityResult has an error catelog Identity/Extensions.Core/src/IdentityErrorDescriber.cs
   public class UserManagementService : IUserManagementService
   {
+    public const string Entity = "entity";
+
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<IdentityRole<long>> _roleManager;
     private readonly ILogger _logger;
@@ -30,12 +33,12 @@ namespace SMEIoT.Core.Services
       _logger = logger;
     }
 
-    public async Task<(User, IList<string>)> GetUserAndRoleByName(string username)
+    public async Task<(User, IList<string>)> GetUserAndRoleByName(string userName)
     {
-      var user = await _userManager.FindByNameAsync(username);
+      var user = await _userManager.FindByNameAsync(userName);
       if (user == null)
       {
-        throw new EntityNotFoundException($"cannot find the user {username}.", "userName");
+        throw new EntityNotFoundException($"cannot find the user {userName}.", "userName");
       }
 
       var roles = await _userManager.GetRolesAsync(user);
@@ -54,40 +57,57 @@ namespace SMEIoT.Core.Services
       return (user, roles);
     }
 
-    public async Task<bool> CreateUserWithPassword(string username, string password)
+    public async Task<bool> CreateUserWithPassword(string userName, string password)
     {
       var result =
-        await _userManager.CreateAsync(new User {UserName = username, SecurityStamp = Guid.NewGuid().ToString()},
+        await _userManager.CreateAsync(new User {UserName = userName, SecurityStamp = Guid.NewGuid().ToString()},
           password);
-      if (result.Succeeded)
+      if (!result.Succeeded)
       {
-        var storedUser = await _userManager.FindByNameAsync(username);
-
-        // depends on storage provider providing a sequence starting from 1
-        if (storedUser.Id <= 1L)
-        {
-          _logger.LogDebug($"Assign new user {storedUser.UserName} with admin role");
-          var roleResult = await _userManager.AddToRoleAsync(storedUser, "Admin");
-          if (!roleResult.Succeeded)
-          {
-            throw new Exception(roleResult.Errors.Select(e => e.Code).ToString());
+        foreach (var err in result.Errors) {
+          switch (err.Code) {
+            case nameof(IdentityErrorDescriber.DuplicateUserName):
+              throw new InvalidArgumentException("There is something wrong with your userName and password. Try another.", Entity);
+            case nameof(IdentityErrorDescriber.PasswordTooShort):
+              goto case nameof(IdentityErrorDescriber.PasswordRequiresUpper);
+            case nameof(IdentityErrorDescriber.PasswordRequiresUniqueChars):
+              goto case nameof(IdentityErrorDescriber.PasswordRequiresUpper);
+            case nameof(IdentityErrorDescriber.PasswordRequiresNonAlphanumeric):
+              goto case nameof(IdentityErrorDescriber.PasswordRequiresUpper);
+            case nameof(IdentityErrorDescriber.PasswordRequiresDigit):
+              goto case nameof(IdentityErrorDescriber.PasswordRequiresUpper);
+            case nameof(IdentityErrorDescriber.PasswordRequiresLower):
+              goto case nameof(IdentityErrorDescriber.PasswordRequiresUpper);
+            case nameof(IdentityErrorDescriber.PasswordRequiresUpper):
+              throw new InvalidArgumentException(err.Description, "password");
+            default:
+              throw new InvalidArgumentException(err.Description, Entity);
           }
         }
       }
-      else
+
+      var storedUser = await _userManager.FindByNameAsync(userName);
+
+      // depends on storage provider providing a sequence starting from 1
+      if (storedUser.Id <= 1L)
       {
-        throw new InvalidArgumentException("entity", result.ToString());
+        _logger.LogDebug($"Assign new user {storedUser.UserName} with admin role");
+        result = await _userManager.AddToRoleAsync(storedUser, "Admin");
+        if (!result.Succeeded)
+        {
+          throw new Exception(result.Errors.Select(e => e.Code).ToString());
+        }
       }
 
       return true;
     }
 
-    public async Task<bool> UpdateUserPassword(string username, string currentPassword, string newPassword)
+    public async Task<bool> UpdateUserPassword(string userName, string currentPassword, string newPassword)
     {
-      var user = await _userManager.FindByNameAsync(username);
+      var user = await _userManager.FindByNameAsync(userName);
       if (user == null)
       {
-        throw new EntityNotFoundException($"cannot find the user {username}.", "userName");
+        throw new EntityNotFoundException($"cannot find the user {userName}.", "userName");
       }
 
       var result = await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);
@@ -103,12 +123,12 @@ namespace SMEIoT.Core.Services
       return true;
     }
 
-    public async Task<bool> UpdateUserRoles(string username, IEnumerable<string> roles)
+    public async Task<bool> UpdateUserRoles(string userName, IEnumerable<string> roles)
     {
-      var user = await _userManager.FindByNameAsync(username);
+      var user = await _userManager.FindByNameAsync(userName);
       if (user == null)
       {
-        throw new EntityNotFoundException($"cannot find the user {username}.", "userName");
+        throw new EntityNotFoundException($"cannot find the user {userName}.", "userName");
       }
 
       if (roles == null)

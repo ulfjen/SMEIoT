@@ -1,27 +1,16 @@
 ﻿using System;
-using System.Runtime.Serialization;
 
 namespace SMEIoT.Core.Exceptions
 {
-  public class EntityNotFoundException : ArgumentException 
+  public class EntityNotFoundException : Exception 
   {
-    public EntityNotFoundException()
-    {
-    }
-
+    public string ParamName { get; internal set; }
+    
     public EntityNotFoundException(string message, string paramName)
-      : base(message, paramName)
+      : base(message)
     {
+      ParamName = paramName;
     }
-
-    public EntityNotFoundException(string message, Exception innerException)
-      : base(message, innerException)
-    {
-    }
-
-    protected EntityNotFoundException(SerializationInfo info, StreamingContext context)
-      : base(info, context)
-    {
-    }
+    
   }
 }

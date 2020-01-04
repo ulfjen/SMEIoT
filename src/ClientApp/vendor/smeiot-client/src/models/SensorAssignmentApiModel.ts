@@ -30,7 +30,7 @@ export interface SensorAssignmentApiModel {
      * @type {string}
      * @memberof SensorAssignmentApiModel
      */
-    username?: string;
+    userName?: string;
     /**
      * 
      * @type {number}
@@ -50,7 +50,7 @@ export function SensorAssignmentApiModelFromJSONTyped(json: any, ignoreDiscrimin
     return {
         
         'name': !exists(json, 'name') ? undefined : json['name'],
-        'username': !exists(json, 'username') ? undefined : json['username'],
+        'userName': !exists(json, 'userName') ? undefined : json['userName'],
         'assignmentCount': !exists(json, 'assignmentCount') ? undefined : json['assignmentCount'],
     };
 }
@@ -65,7 +65,7 @@ export function SensorAssignmentApiModelToJSON(value?: SensorAssignmentApiModel 
     return {
         
         'name': value.name,
-        'username': value.username,
+        'userName': value.userName,
         'assignmentCount': value.assignmentCount,
     };
 }

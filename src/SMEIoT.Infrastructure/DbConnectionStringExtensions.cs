@@ -12,7 +12,7 @@ namespace SMEIoT.Infrastructure
         {"Host", configuration.GetConnectionString("Host")},
         {"Port", configuration.GetConnectionString("Port")},
         {"Database", configuration.GetConnectionString("Database")},
-        {"Username", configuration.GetConnectionString("User")},
+        {"UserName", configuration.GetConnectionString("User")},
         {"Password", configuration.GetConnectionString("Password")}
       };
       return builder.ConnectionString;

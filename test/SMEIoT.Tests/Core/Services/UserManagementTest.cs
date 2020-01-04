@@ -43,14 +43,14 @@ namespace SMEIoT.Tests.Core.Services
     public async Task GetUserAndRoleByName_ReturnsUserAndRole()
     {
       var (service, dbContext, userManager) = BuildService();
-      const string username = "normal-user";
-      await userManager.CreateAsync(new User {UserName = username, ConcurrencyStamp = Guid.NewGuid().ToString()},
+      const string userName = "normal-user";
+      await userManager.CreateAsync(new User {UserName = userName, ConcurrencyStamp = Guid.NewGuid().ToString()},
         "a-password-1");
-      await userManager.AddToRolesAsync(await userManager.FindByNameAsync(username), new[] {"roles1", "roles2"});
+      await userManager.AddToRolesAsync(await userManager.FindByNameAsync(userName), new[] {"roles1", "roles2"});
       
-      var (user, roles) = await service.GetUserAndRoleByName(username);
+      var (user, roles) = await service.GetUserAndRoleByName(userName);
 
-      Assert.Equal(username, user.UserName);
+      Assert.Equal(userName, user.UserName);
       Assert.Equal(2, roles.Count);
       Assert.True(await userManager.IsInRoleAsync(user, "roles1"));
       Assert.True(await userManager.IsInRoleAsync(user, "roles2"));
@@ -60,16 +60,16 @@ namespace SMEIoT.Tests.Core.Services
     public async Task CreateUserWithPassword_AssignFirstUserWithAdminRole()
     {
       var (service, dbContext, userManager) = BuildService();
-      const string username1 = "normal-username-1";
-      const string username2 = "normal-username-2";
+      const string userName1 = "normal-userName-1";
+      const string userName2 = "normal-userName-2";
       
-      await service.CreateUserWithPassword(username1, "a-normal-password-1");
-      await service.CreateUserWithPassword(username2, "a-normal-password-2");
+      await service.CreateUserWithPassword(userName1, "a-normal-password-1");
+      await service.CreateUserWithPassword(userName2, "a-normal-password-2");
 
-      var roles1 = await userManager.GetRolesAsync(await userManager.FindByNameAsync(username1));
-      var roles2 = await userManager.GetRolesAsync(await userManager.FindByNameAsync(username2));
+      var roles1 = await userManager.GetRolesAsync(await userManager.FindByNameAsync(userName1));
+      var roles2 = await userManager.GetRolesAsync(await userManager.FindByNameAsync(userName2));
       Assert.Equal(1, roles1.Count);
-      Assert.True(await userManager.IsInRoleAsync(await userManager.FindByNameAsync(username1), "Admin"));
+      Assert.True(await userManager.IsInRoleAsync(await userManager.FindByNameAsync(userName1), "Admin"));
       Assert.Equal(0, roles2.Count);
     }
     
@@ -90,13 +90,13 @@ namespace SMEIoT.Tests.Core.Services
     public async Task UpdateUserPassword_UpdatesPassword()
     {
       var (service, dbContext, userManager) = BuildService();
-      const string username = "normal-username-1";
+      const string userName = "normal-userName-1";
       const string password = "a-normal-password";
       const string newPassword = "a-updated-password";
-      await userManager.CreateAsync(new User {UserName = username, ConcurrencyStamp = Guid.NewGuid().ToString()},
+      await userManager.CreateAsync(new User {UserName = userName, ConcurrencyStamp = Guid.NewGuid().ToString()},
         password);
       
-      var res = await service.UpdateUserPassword(username, password, newPassword);
+      var res = await service.UpdateUserPassword(userName, password, newPassword);
 
       Assert.True(res); 
     }
@@ -120,15 +120,15 @@ namespace SMEIoT.Tests.Core.Services
     public async Task UpdateUserRoles_Returns()
     {
       var (service, dbContext, userManager) = BuildService();
-      const string username = "normal-username-1";
+      const string userName = "normal-userName-1";
       const string password = "a-normal-password";
       var roles = new[] {"Admin", "TestRole1"};
-      await userManager.CreateAsync(new User {UserName = username, ConcurrencyStamp = Guid.NewGuid().ToString()},
+      await userManager.CreateAsync(new User {UserName = userName, ConcurrencyStamp = Guid.NewGuid().ToString()},
         password);
-      var user = await userManager.FindByNameAsync(username);
+      var user = await userManager.FindByNameAsync(userName);
       await userManager.AddToRolesAsync(user, new[] {"Admin"});
       
-      var res = await service.UpdateUserRoles(username, roles);
+      var res = await service.UpdateUserRoles(userName, roles);
 
       Assert.True(res);
       foreach (var role in roles)
@@ -141,14 +141,14 @@ namespace SMEIoT.Tests.Core.Services
     public async Task UpdateUserRoles_ClearRoles()
     {
       var (service, dbContext, userManager) = BuildService();
-      const string username = "normal-username-1";
+      const string userName = "normal-userName-1";
       const string password = "a-normal-password";
-      await userManager.CreateAsync(new User { UserName = username, ConcurrencyStamp = Guid.NewGuid().ToString() },
+      await userManager.CreateAsync(new User { UserName = userName, ConcurrencyStamp = Guid.NewGuid().ToString() },
         password);
-      var user = await userManager.FindByNameAsync(username);
+      var user = await userManager.FindByNameAsync(userName);
       await userManager.AddToRolesAsync(user, new[] { "Admin" });
 
-      var res = await service.UpdateUserRoles(username, Array.Empty<string>());
+      var res = await service.UpdateUserRoles(userName, Array.Empty<string>());
 
       Assert.True(res);
       Assert.False(await userManager.IsInRoleAsync(user, "Admin"));
@@ -161,13 +161,13 @@ namespace SMEIoT.Tests.Core.Services
       var (service, dbContext, userManager) = BuildService();
       for (var x = 1; x <= 12; ++x)
       {
-        var username = $"normal-user-{x}";
-        var user = new User {UserName = username, ConcurrencyStamp = Guid.NewGuid().ToString()};
+        var userName = $"normal-user-{x}";
+        var user = new User {UserName = userName, ConcurrencyStamp = Guid.NewGuid().ToString()};
         dbContext.Users.Add(user);
         // duplicated because of mock
         await userManager.CreateAsync(user,
           "a-password-1");
-        await userManager.AddToRolesAsync(await userManager.FindByNameAsync(username), new[] {"roles1", "roles2"}); 
+        await userManager.AddToRolesAsync(await userManager.FindByNameAsync(userName), new[] {"roles1", "roles2"}); 
       }
       await dbContext.SaveChangesAsync();
       var res = new List<(User, IList<string>)>();

@@ -1,15 +1,15 @@
 ﻿import {useState} from "react";
 
 const useUserCredentials = () => {
-  const [username, setUsername] = useState<string>("");
+  const [userName, setUserName] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [usernameErrors, setUsernameErrors] = useState<string>("");
+  const [userNameErrors, setUserNameErrors] = useState<string>("");
   const [passwordErrors, setPasswordErrors] = useState<string>("");
 
   return {
-    username, setUsername,
+    userName, setUserName,
     password, setPassword,
-    usernameErrors, setUsernameErrors,
+    userNameErrors, setUserNameErrors,
     passwordErrors, setPasswordErrors
   }
 };

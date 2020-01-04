@@ -8,7 +8,7 @@ namespace SMEIoT.Web.BindingModels
   {
     [BindRequired]
     [JsonProperty(Required = Required.DisallowNull)]
-    public string Username { get; set; } = null!;
+    public string UserName { get; set; } = null!;
 
     [BindRequired]
     [JsonProperty(Required = Required.DisallowNull)]

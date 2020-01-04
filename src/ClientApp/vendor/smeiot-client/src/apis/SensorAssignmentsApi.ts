@@ -35,9 +35,9 @@ export interface SensorAssignmentsApiApiSensorsNameUsersPostRequest {
     assignUserSensorBindingModel?: AssignUserSensorBindingModel;
 }
 
-export interface SensorAssignmentsApiApiSensorsNameUsersUsernameDeleteRequest {
+export interface SensorAssignmentsApiApiSensorsNameUsersUserNameDeleteRequest {
     name: string;
-    username: string;
+    userName: string;
 }
 
 /**
@@ -106,13 +106,13 @@ export class SensorAssignmentsApi extends runtime.BaseAPI {
 
     /**
      */
-    async apiSensorsNameUsersUsernameDeleteRaw(requestParameters: SensorAssignmentsApiApiSensorsNameUsersUsernameDeleteRequest): Promise<runtime.ApiResponse<void>> {
+    async apiSensorsNameUsersUserNameDeleteRaw(requestParameters: SensorAssignmentsApiApiSensorsNameUsersUserNameDeleteRequest): Promise<runtime.ApiResponse<void>> {
         if (requestParameters.name === null || requestParameters.name === undefined) {
-            throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling apiSensorsNameUsersUsernameDelete.');
+            throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling apiSensorsNameUsersUserNameDelete.');
         }
 
-        if (requestParameters.username === null || requestParameters.username === undefined) {
-            throw new runtime.RequiredError('username','Required parameter requestParameters.username was null or undefined when calling apiSensorsNameUsersUsernameDelete.');
+        if (requestParameters.userName === null || requestParameters.userName === undefined) {
+            throw new runtime.RequiredError('userName','Required parameter requestParameters.userName was null or undefined when calling apiSensorsNameUsersUserNameDelete.');
         }
 
         const queryParameters: runtime.HTTPQuery = {};
@@ -120,7 +120,7 @@ export class SensorAssignmentsApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/api/sensors/{name}/users/{username}`.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters.name))).replace(`{${"username"}}`, encodeURIComponent(String(requestParameters.username))),
+            path: `/api/sensors/{name}/users/{userName}`.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters.name))).replace(`{${"userName"}}`, encodeURIComponent(String(requestParameters.userName))),
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
@@ -131,8 +131,8 @@ export class SensorAssignmentsApi extends runtime.BaseAPI {
 
     /**
      */
-    async apiSensorsNameUsersUsernameDelete(requestParameters: SensorAssignmentsApiApiSensorsNameUsersUsernameDeleteRequest): Promise<void> {
-        await this.apiSensorsNameUsersUsernameDeleteRaw(requestParameters);
+    async apiSensorsNameUsersUserNameDelete(requestParameters: SensorAssignmentsApiApiSensorsNameUsersUserNameDeleteRequest): Promise<void> {
+        await this.apiSensorsNameUsersUserNameDeleteRaw(requestParameters);
     }
 
 }

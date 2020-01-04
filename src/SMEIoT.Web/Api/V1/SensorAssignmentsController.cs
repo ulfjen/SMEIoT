@@ -28,8 +28,8 @@ namespace SMEIoT.Web.Api.V1
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<SensorAssignmentApiModel>> Create(string name, AssignUserSensorBindingModel binding)
     {
-      await _service.AssignSensorToUserAsync(name, binding.Username);
-      var us = await _service.GetUserSensor(binding.Username, name);
+      await _service.AssignSensorToUserAsync(name, binding.UserName);
+      var us = await _service.GetUserSensor(binding.UserName, name);
 
       return CreatedAtAction(nameof(Create), us);
     }
@@ -47,14 +47,14 @@ namespace SMEIoT.Web.Api.V1
       }
     }
 
-    [HttpDelete("{name}/users/{username}")]
+    [HttpDelete("{name}/users/{userName}")]
     [ProducesResponseType(StatusCodes.Status202Accepted)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult> Delete(string name, string username)
+    public async Task<ActionResult> Delete(string name, string userName)
     {
-      await _service.RevokeSensorFromUserAsync(name, username);
+      await _service.RevokeSensorFromUserAsync(name, userName);
       return Ok();
     }
   }

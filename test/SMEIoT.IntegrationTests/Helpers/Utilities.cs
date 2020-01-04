@@ -22,9 +22,9 @@ namespace SMEIoT.IntegrationsTests.Helpers
 
     public static async void ReinitializeDbForTests(ApplicationDbContext db, UserManager<User> userManager)
     {
-      foreach (var username in new[] {"admin", "normal-user-1", "normal-user-2"})
+      foreach (var userName in new[] {"admin", "normal-user-1", "normal-user-2"})
       {
-        await userManager.DeleteAsync(await userManager.FindByNameAsync(username));
+        await userManager.DeleteAsync(await userManager.FindByNameAsync(userName));
       }
       db.Sensors.RemoveRange(db.Sensors.Where(s => s.NormalizedName == Sensor.NormalizeName("a-normal-sensor")));
       InitializeDbForTests(db, userManager);

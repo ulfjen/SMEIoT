@@ -107,7 +107,7 @@ export const Routes: IController = {
                 <DashboardNewSensor path="/dashboard/sensors/new" />
                 <DashboardMqtt path="/dashboard/mqtt" />
                 <DashboardUsers path="/dashboard/users"/>
-                <DashboardEditUser path="/dashboard/users/:username"/>
+                <DashboardEditUser path="/dashboard/users/:userName"/>
               </Router>
             </ThemeProvider>
           </IntlProvider>,

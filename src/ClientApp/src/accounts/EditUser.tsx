@@ -58,9 +58,9 @@ export interface IEditUserProps extends RouteComponentProps, WithStyles<typeof s
 
 const _EditUser: React.FunctionComponent<IEditUserProps & WithStyles<typeof styles>> = ({ classes }) => {
   const {
-    username, setUsername,
+    userName, setUserName,
     password, setPassword,
-    usernameErrors, setUsernameErrors,
+    userNameErrors, setUserNameErrors,
     passwordErrors, setPasswordErrors
   } = useUserCredentials();
 
@@ -71,7 +71,7 @@ const _EditUser: React.FunctionComponent<IEditUserProps & WithStyles<typeof styl
   let currentUser: BasicUserApiModel = {
     createdAt: moment.utc().toISOString(),
     roles: [],
-    username: ""
+    userName: ""
   };
 
   // @ts-ignore
@@ -82,8 +82,8 @@ const _EditUser: React.FunctionComponent<IEditUserProps & WithStyles<typeof styl
 
   const handleEdit = async () => {
     try {
-      const result = await new UsersApi(GetDefaultApiConfig()).apiUsersUsernamePasswordPut({
-        username: currentUser.username || "",
+      const result = await new UsersApi(GetDefaultApiConfig()).apiUsersUserNamePasswordPut({
+        userName: currentUser.userName || "",
         confirmedUserCredentialsUpdateBindingModel: {
           currentPassword: password,
           newPassword: newPassword
@@ -93,8 +93,8 @@ const _EditUser: React.FunctionComponent<IEditUserProps & WithStyles<typeof styl
       window.location.replace("/dashboard");
     } catch (response) {
       const { status, errors } = await response.json();
-      if (errors.hasOwnProperty("Username")) {
-        setUsernameErrors(errors["Username"].join("\n"));
+      if (errors.hasOwnProperty("UserName")) {
+        setUserNameErrors(errors["UserName"].join("\n"));
       }
       if (errors.hasOwnProperty("CurrentPassword")) {
         setPasswordErrors(errors["CurrentPassword"].join("\n"));
@@ -119,7 +119,7 @@ const _EditUser: React.FunctionComponent<IEditUserProps & WithStyles<typeof styl
       />
       <CardContent>
         <Typography variant="h5">
-          {currentUser.username}
+          {currentUser.userName}
         </Typography>
         <Typography color="textSecondary">{roles}</Typography>
         <Typography>Created at: {moment(currentUser.createdAt).format("LLLL")}</Typography>

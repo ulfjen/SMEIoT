@@ -54,14 +54,14 @@
         }
       }
     },
-    "/api/admin/users/{username}": {
+    "/api/admin/users/{userName}": {
       "get": {
         "tags": [
           "AdminUsers"
         ],
         "parameters": [
           {
-            "name": "username",
+            "name": "userName",
             "in": "path",
             "required": true,
             "schema": {
@@ -93,14 +93,14 @@
         }
       }
     },
-    "/api/admin/users/{username}/roles": {
+    "/api/admin/users/{userName}/roles": {
       "put": {
         "tags": [
           "AdminUsers"
         ],
         "parameters": [
           {
-            "name": "username",
+            "name": "userName",
             "in": "path",
             "required": true,
             "schema": {
@@ -651,7 +651,7 @@
         }
       }
     },
-    "/api/sensors/{name}/users/{username}": {
+    "/api/sensors/{name}/users/{userName}": {
       "delete": {
         "tags": [
           "SensorAssignments"
@@ -666,7 +666,7 @@
             }
           },
           {
-            "name": "username",
+            "name": "userName",
             "in": "path",
             "required": true,
             "schema": {
@@ -929,14 +929,14 @@
         }
       }
     },
-    "/api/users/{username}/password": {
+    "/api/users/{userName}/password": {
       "put": {
         "tags": [
           "Users"
         ],
         "parameters": [
           {
-            "name": "username",
+            "name": "userName",
             "in": "path",
             "required": true,
             "schema": {
@@ -987,14 +987,14 @@
         }
       }
     },
-    "/api/users/{username}": {
+    "/api/users/{userName}": {
       "get": {
         "tags": [
           "Users"
         ],
         "parameters": [
           {
-            "name": "username",
+            "name": "userName",
             "in": "path",
             "required": true,
             "schema": {
@@ -1036,7 +1036,7 @@
             "type": "integer",
             "format": "int64"
           },
-          "username": {
+          "userName": {
             "type": "string"
           },
           "roles": {
@@ -1120,7 +1120,7 @@
           "passwordUpdated": {
             "type": "boolean"
           },
-          "username": {
+          "userName": {
             "type": "string"
           },
           "roles": {
@@ -1272,7 +1272,7 @@
       "AssignUserSensorBindingModel": {
         "type": "object",
         "properties": {
-          "username": {
+          "userName": {
             "type": "string"
           }
         },
@@ -1284,7 +1284,7 @@
           "name": {
             "type": "string"
           },
-          "username": {
+          "userName": {
             "type": "string"
           },
           "assignmentCount": {
@@ -1371,7 +1371,7 @@
       "LoginBindingModel": {
         "type": "object",
         "properties": {
-          "username": {
+          "userName": {
             "type": "string"
           },
           "password": {
@@ -1396,7 +1396,7 @@
       "ValidatedUserCredentialsBindingModel": {
         "type": "object",
         "properties": {
-          "username": {
+          "userName": {
             "type": "string"
           },
           "password": {
@@ -1411,7 +1411,7 @@
       "BasicUserApiModel": {
         "type": "object",
         "properties": {
-          "username": {
+          "userName": {
             "type": "string"
           },
           "roles": {

@@ -37,17 +37,17 @@ const styles = ({palette, spacing}: Theme) => createStyles({
 export interface IUserPasswordFormProps extends WithStyles<typeof styles> {
   url: string | undefined;
   handleSubmit: (event: React.MouseEvent<HTMLFormElement>) => Promise<void> | undefined;
-  username: string;
-  setUsername: React.Dispatch<React.SetStateAction<string>>;
+  userName: string;
+  setUserName: React.Dispatch<React.SetStateAction<string>>;
   password: string;
   setPassword: React.Dispatch<React.SetStateAction<string>>;
-  usernameErrors: string;
-  setUsernameErrors: React.Dispatch<React.SetStateAction<string>>;
+  userNameErrors: string;
+  setUserNameErrors: React.Dispatch<React.SetStateAction<string>>;
   passwordErrors: string;
   setPasswordErrors: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const _UserPasswordForm: React.FunctionComponent<IUserPasswordFormProps & WithStyles<typeof styles>> = ({classes, url, children, handleSubmit, username, usernameErrors, password, passwordErrors, setUsername, setPassword, setPasswordErrors, setUsernameErrors}) => {
+const _UserPasswordForm: React.FunctionComponent<IUserPasswordFormProps & WithStyles<typeof styles>> = ({classes, url, children, handleSubmit, userName, userNameErrors, password, passwordErrors, setUserName, setPassword, setPasswordErrors, setUserNameErrors}) => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   
   // @ts-ignore
@@ -56,7 +56,7 @@ const _UserPasswordForm: React.FunctionComponent<IUserPasswordFormProps & WithSt
     const model = SMEIoTPreRendered.model;
     const errors = SMEIoTPreRendered.validation_errors;
     if (model) {
-      if (model.username) { setUsername(model.username); }
+      if (model.userName) { setUserName(model.userName); }
     }
   }
 
@@ -66,19 +66,19 @@ const _UserPasswordForm: React.FunctionComponent<IUserPasswordFormProps & WithSt
       margin="normal"
       required
       fullWidth
-      id="username"
-      label="Username"
-      name="username"
-      autoComplete="username"
+      id="userName"
+      label="UserName"
+      name="userName"
+      autoComplete="userName"
       autoFocus
       onChange={(event) => {
-        setUsername(event.target.value);
-        if (usernameErrors.length > 0) {
-          setUsernameErrors("");
+        setUserName(event.target.value);
+        if (userNameErrors.length > 0) {
+          setUserNameErrors("");
         }
       }}
-      error={usernameErrors.length > 0}
-      helperText={usernameErrors}
+      error={userNameErrors.length > 0}
+      helperText={userNameErrors}
     />
     <TextField
       variant="outlined"

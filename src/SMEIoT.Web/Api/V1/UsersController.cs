@@ -29,36 +29,36 @@ namespace SMEIoT.Web.Api.V1
     [AllowAnonymous]
     public async Task<ActionResult<BasicUserApiModel>> Create(ValidatedUserCredentialsBindingModel user)
     {
-      await _userService.CreateUserWithPassword(user.Username, user.Password);
-      var result = await GetBasicUserResultAsync(user.Username);
+      await _userService.CreateUserWithPassword(user.UserName, user.Password);
+      var result = await GetBasicUserResultAsync(user.UserName);
       return CreatedAtAction(nameof(Show), result);
     }
 
-    [HttpPut("{username}/password")]
+    [HttpPut("{userName}/password")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<UserCredentialsUpdateApiModel>> EditPassword(
-      ConfirmedUserCredentialsUpdateBindingModel binding, string username)
+      ConfirmedUserCredentialsUpdateBindingModel binding, string userName)
     {
-      await _userService.UpdateUserPassword(username, binding.CurrentPassword, binding.NewPassword);
-      var (user, roles) = await _userService.GetUserAndRoleByName(username);
+      await _userService.UpdateUserPassword(userName, binding.CurrentPassword, binding.NewPassword);
+      var (user, roles) = await _userService.GetUserAndRoleByName(userName);
       var res = new UserCredentialsUpdateApiModel(user, roles) {PasswordUpdated = true};
       return Ok(res);
     }
     
-    [HttpGet("{username}")]
+    [HttpGet("{userName}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<BasicUserApiModel>> Show(string username)
+    public async Task<ActionResult<BasicUserApiModel>> Show(string userName)
     {
-      var model = await GetBasicUserResultAsync(username);
+      var model = await GetBasicUserResultAsync(userName);
       return Ok(model);
     }
 
-    private async Task<BasicUserApiModel> GetBasicUserResultAsync(string username)
+    private async Task<BasicUserApiModel> GetBasicUserResultAsync(string userName)
     {
-      var (user, roles) = await _userService.GetUserAndRoleByName(username);
+      var (user, roles) = await _userService.GetUserAndRoleByName(userName);
       return new BasicUserApiModel(user, roles);
     }
   }

@@ -1,27 +1,15 @@
 using System;
-using System.Runtime.Serialization;
 
 namespace SMEIoT.Core.Exceptions
 {
-  public class InvalidArgumentException : ArgumentException 
+  public class InvalidArgumentException : Exception 
   {
-    public InvalidArgumentException()
-    {
-    }
-
+    public string ParamName { get; internal set; }
+    
     public InvalidArgumentException(string message, string paramName)
-      : base(message, paramName)
+      : base(message)
     {
-    }
-
-    public InvalidArgumentException(string message, Exception innerException)
-      : base(message, innerException)
-    {
-    }
-
-    protected InvalidArgumentException(SerializationInfo info, StreamingContext context)
-      : base(info, context)
-    {
+      ParamName = paramName;
     }
   }
 }

@@ -1,29 +1,33 @@
 using System;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
+using System.IO;
+using System.Net.Http;
+using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.IO;
-using System.Net.Http;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.AspNetCore.Mvc.Versioning.Conventions;
 using Microsoft.AspNetCore.Routing.Constraints;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Net.Http.Headers;
+using Microsoft.OpenApi.Models;
+using Microsoft.Extensions.Logging;
+using Hangfire;
+using NodaTime;
+using NodaTime.Serialization.SystemTextJson;
 using SMEIoT.Core.Entities;
 using SMEIoT.Infrastructure;
 using SMEIoT.Infrastructure.Data;
-using Microsoft.OpenApi.Models;
-using NodaTime;
-using NodaTime.Serialization.SystemTextJson;
 using SMEIoT.Core.Interfaces;
 using SMEIoT.Core.Services;
 using SMEIoT.Web.Api.Filters;
-using Hangfire;
-using Microsoft.Extensions.Logging;
 using SMEIoT.Web.Hubs;
 using SMEIoT.Web.Services;
 using SMEIoT.Web.Middlewares;
@@ -56,6 +60,7 @@ namespace SMEIoT.Web
         options.Queues = new[] { "critical", "default" };
       });
 
+      services.AddTransient<ProblemDetailsFactory, CustomProblemDetailsFactory>();
       services.AddScoped<ISensorAssignmentService, SensorAssignmentService>();
       services.AddScoped<IUserManagementService, UserManagementService>();
       services.AddScoped<IUserProfileService, UserProfileService>();
@@ -79,12 +84,14 @@ namespace SMEIoT.Web
       });
       services.AddScoped<LastSeenFilter>();
       services.AddControllersWithViews(options => {
-        options.Filters.Add(new ActionExceptionFilter());
+        options.Filters.Add(typeof(ActionExceptionFilter));
         options.Filters.Add(typeof(LastSeenFilter));
         })
         .AddJsonOptions(options =>
         {
           options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+          options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+          options.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
           options.JsonSerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
         });
       services.AddRouting(options =>

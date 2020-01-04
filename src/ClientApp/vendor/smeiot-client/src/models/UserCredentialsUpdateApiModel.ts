@@ -30,7 +30,7 @@ export interface UserCredentialsUpdateApiModel {
      * @type {string}
      * @memberof UserCredentialsUpdateApiModel
      */
-    username?: string;
+    userName?: string;
     /**
      * 
      * @type {Array<string>}
@@ -56,7 +56,7 @@ export function UserCredentialsUpdateApiModelFromJSONTyped(json: any, ignoreDisc
     return {
         
         'passwordUpdated': !exists(json, 'passwordUpdated') ? undefined : json['passwordUpdated'],
-        'username': !exists(json, 'username') ? undefined : json['username'],
+        'userName': !exists(json, 'userName') ? undefined : json['userName'],
         'roles': !exists(json, 'roles') ? undefined : json['roles'],
         'createdAt': !exists(json, 'createdAt') ? undefined : json['createdAt'],
     };
@@ -72,7 +72,7 @@ export function UserCredentialsUpdateApiModelToJSON(value?: UserCredentialsUpdat
     return {
         
         'passwordUpdated': value.passwordUpdated,
-        'username': value.username,
+        'userName': value.userName,
         'roles': value.roles,
         'createdAt': value.createdAt,
     };

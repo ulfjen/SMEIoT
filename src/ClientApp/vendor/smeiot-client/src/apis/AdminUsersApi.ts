@@ -37,12 +37,12 @@ export interface AdminUsersApiApiAdminUsersGetRequest {
     limit?: number;
 }
 
-export interface AdminUsersApiApiAdminUsersUsernameGetRequest {
-    username: string;
+export interface AdminUsersApiApiAdminUsersUserNameGetRequest {
+    userName: string;
 }
 
-export interface AdminUsersApiApiAdminUsersUsernameRolesPutRequest {
-    username: string;
+export interface AdminUsersApiApiAdminUsersUserNameRolesPutRequest {
+    userName: string;
     userRolesBindingModel?: UserRolesBindingModel;
 }
 
@@ -85,9 +85,9 @@ export class AdminUsersApi extends runtime.BaseAPI {
 
     /**
      */
-    async apiAdminUsersUsernameGetRaw(requestParameters: AdminUsersApiApiAdminUsersUsernameGetRequest): Promise<runtime.ApiResponse<AdminUserApiModel>> {
-        if (requestParameters.username === null || requestParameters.username === undefined) {
-            throw new runtime.RequiredError('username','Required parameter requestParameters.username was null or undefined when calling apiAdminUsersUsernameGet.');
+    async apiAdminUsersUserNameGetRaw(requestParameters: AdminUsersApiApiAdminUsersUserNameGetRequest): Promise<runtime.ApiResponse<AdminUserApiModel>> {
+        if (requestParameters.userName === null || requestParameters.userName === undefined) {
+            throw new runtime.RequiredError('userName','Required parameter requestParameters.userName was null or undefined when calling apiAdminUsersUserNameGet.');
         }
 
         const queryParameters: runtime.HTTPQuery = {};
@@ -95,7 +95,7 @@ export class AdminUsersApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/api/admin/users/{username}`.replace(`{${"username"}}`, encodeURIComponent(String(requestParameters.username))),
+            path: `/api/admin/users/{userName}`.replace(`{${"userName"}}`, encodeURIComponent(String(requestParameters.userName))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -106,16 +106,16 @@ export class AdminUsersApi extends runtime.BaseAPI {
 
     /**
      */
-    async apiAdminUsersUsernameGet(requestParameters: AdminUsersApiApiAdminUsersUsernameGetRequest): Promise<AdminUserApiModel> {
-        const response = await this.apiAdminUsersUsernameGetRaw(requestParameters);
+    async apiAdminUsersUserNameGet(requestParameters: AdminUsersApiApiAdminUsersUserNameGetRequest): Promise<AdminUserApiModel> {
+        const response = await this.apiAdminUsersUserNameGetRaw(requestParameters);
         return await response.value();
     }
 
     /**
      */
-    async apiAdminUsersUsernameRolesPutRaw(requestParameters: AdminUsersApiApiAdminUsersUsernameRolesPutRequest): Promise<runtime.ApiResponse<UserCredentialsUpdateApiModel>> {
-        if (requestParameters.username === null || requestParameters.username === undefined) {
-            throw new runtime.RequiredError('username','Required parameter requestParameters.username was null or undefined when calling apiAdminUsersUsernameRolesPut.');
+    async apiAdminUsersUserNameRolesPutRaw(requestParameters: AdminUsersApiApiAdminUsersUserNameRolesPutRequest): Promise<runtime.ApiResponse<UserCredentialsUpdateApiModel>> {
+        if (requestParameters.userName === null || requestParameters.userName === undefined) {
+            throw new runtime.RequiredError('userName','Required parameter requestParameters.userName was null or undefined when calling apiAdminUsersUserNameRolesPut.');
         }
 
         const queryParameters: runtime.HTTPQuery = {};
@@ -125,7 +125,7 @@ export class AdminUsersApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json; v=1.0; v=1.0';
 
         const response = await this.request({
-            path: `/api/admin/users/{username}/roles`.replace(`{${"username"}}`, encodeURIComponent(String(requestParameters.username))),
+            path: `/api/admin/users/{userName}/roles`.replace(`{${"userName"}}`, encodeURIComponent(String(requestParameters.userName))),
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
@@ -137,8 +137,8 @@ export class AdminUsersApi extends runtime.BaseAPI {
 
     /**
      */
-    async apiAdminUsersUsernameRolesPut(requestParameters: AdminUsersApiApiAdminUsersUsernameRolesPutRequest): Promise<UserCredentialsUpdateApiModel> {
-        const response = await this.apiAdminUsersUsernameRolesPutRaw(requestParameters);
+    async apiAdminUsersUserNameRolesPut(requestParameters: AdminUsersApiApiAdminUsersUserNameRolesPutRequest): Promise<UserCredentialsUpdateApiModel> {
+        const response = await this.apiAdminUsersUserNameRolesPutRaw(requestParameters);
         return await response.value();
     }
 

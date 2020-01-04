@@ -16,7 +16,7 @@ export function useCookie(key: string): any {
 }
 
 export class AppCookie {
-  username?: string;
+  userName?: string;
   admin: boolean = false;
 };
 
@@ -24,7 +24,7 @@ export function useAppCookie(): AppCookie {
   const u = useCookie("currentUser");
   let cookie = new AppCookie();
   if (u) {
-    if (u.hasOwnProperty("username")) { cookie.username = u.username; }
+    if (u.hasOwnProperty("userName")) { cookie.userName = u.userName; }
     if (u.hasOwnProperty("admin")) { cookie.admin = u.admin; }
   }
   return cookie;

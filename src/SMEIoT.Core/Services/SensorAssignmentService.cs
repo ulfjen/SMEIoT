@@ -35,18 +35,18 @@ namespace SMEIoT.Core.Services
       }
     }
 
-    public async Task<bool> AssignSensorToUserAsync(string sensorName, string username)
+    public async Task<bool> AssignSensorToUserAsync(string sensorName, string userName)
     {
-      var (sensor, user) = await GetUserAndSensor(sensorName, username);
+      var (sensor, user) = await GetUserAndSensor(sensorName, userName);
 
       _dbContext.UserSensors.Add(new UserSensor {UserId = user.Id, SensorId = sensor.Id});
       await _dbContext.SaveChangesAsync();
       return true;
     }
 
-    public async Task<UserSensor> GetUserSensor(string username, string sensorName)
+    public async Task<UserSensor> GetUserSensor(string userName, string sensorName)
     {
-      var (sensor, user) = await GetUserAndSensor(sensorName, username);
+      var (sensor, user) = await GetUserAndSensor(sensorName, userName);
       var us = await GetUserSensor(user, sensor);
       if (us == null)
       {
@@ -56,9 +56,9 @@ namespace SMEIoT.Core.Services
       return us;
     }
 
-    public async Task<bool> RevokeSensorFromUserAsync(string sensorName, string username)
+    public async Task<bool> RevokeSensorFromUserAsync(string sensorName, string userName)
     {
-      var (sensor, user) = await GetUserAndSensor(sensorName, username);
+      var (sensor, user) = await GetUserAndSensor(sensorName, userName);
 
       var userSensor = await GetUserSensor(user, sensor);
       if (userSensor == null)
@@ -76,7 +76,7 @@ namespace SMEIoT.Core.Services
       return _dbContext.UserSensors.SingleOrDefaultAsync(us => us.SensorId == sensor.Id && us.UserId == user.Id);
     }
 
-    private async Task<(Sensor, User)> GetUserAndSensor(string sensorName, string username)
+    private async Task<(Sensor, User)> GetUserAndSensor(string sensorName, string userName)
     {
       var sensor = await GetSensorByNameAsync(sensorName);
       if (sensor == null)
@@ -84,7 +84,7 @@ namespace SMEIoT.Core.Services
         throw new EntityNotFoundException("cannot be found.", "sensorName");
       }
 
-      var user = await GetUserByNameAsync(username);
+      var user = await GetUserByNameAsync(userName);
       if (user == null)
       {
         throw new EntityNotFoundException("cannot be found.", "userName");

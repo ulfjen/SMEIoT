@@ -8,7 +8,7 @@ namespace SMEIoT.Web.ApiModels
   public class BasicUserApiModel
   {
     [JsonProperty(Required = Required.DisallowNull)]
-    public string Username { get; set; }
+    public string UserName { get; set; }
     
     [JsonProperty(Required = Required.DisallowNull)]
     public IEnumerable<string> Roles { get; set; }
@@ -18,7 +18,7 @@ namespace SMEIoT.Web.ApiModels
 
     public BasicUserApiModel(User user, IList<string> roles)
     {
-      Username = user.UserName;
+      UserName = user.UserName;
       Roles = roles;
       CreatedAt = user.CreatedAt;
     }

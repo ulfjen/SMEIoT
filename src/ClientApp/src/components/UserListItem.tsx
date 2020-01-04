@@ -25,16 +25,16 @@ const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Th
 export interface IUserListItemProps extends WithStyles<typeof styles> {
   user: AdminUserApiModel;
   setAnchorEl: React.Dispatch<React.SetStateAction<null | HTMLElement>>;
-  setFocusedUsername: React.Dispatch<React.SetStateAction<null | string>>;
+  setFocusedUserName: React.Dispatch<React.SetStateAction<null | string>>;
 }
 
-const _UserListItem: React.FunctionComponent<IUserListItemProps & WithStyles<typeof styles>> = ({classes, user, setAnchorEl, setFocusedUsername}) => {
-  const username = user.username || "";
-  const avatar = Avatars.create(username);
+const _UserListItem: React.FunctionComponent<IUserListItemProps & WithStyles<typeof styles>> = ({classes, user, setAnchorEl, setFocusedUserName}) => {
+  const userName = user.userName || "";
+  const avatar = Avatars.create(userName);
   const lastSeenAt = moment(user.lastSeenAt).fromNow();
   
   const onClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    setFocusedUsername(username);
+    setFocusedUserName(userName);
     setAnchorEl(event.currentTarget);
   };
   
@@ -45,7 +45,7 @@ const _UserListItem: React.FunctionComponent<IUserListItemProps & WithStyles<typ
       </Avatar>
     </ListItemAvatar>
 
-    <ListItemText primary={username} secondary={`Last seen at ${lastSeenAt}`}/>
+    <ListItemText primary={userName} secondary={`Last seen at ${lastSeenAt}`}/>
     <ListItemSecondaryAction>
       <IconButton edge="end" aria-label="delete" onClick={onClick}>
         <MoreVertIcon/>
