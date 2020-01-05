@@ -114,6 +114,7 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({classes
   const appCookie = useAppCookie();
 
   return <DashboardFrame title="Users" direction="ltr"
+    drawer
     toolbarRight={<UserAvatarMenu appCookie={appCookie} navigate={navigate}/>}
     content={
       <Container maxWidth="lg" className={classes.container}>

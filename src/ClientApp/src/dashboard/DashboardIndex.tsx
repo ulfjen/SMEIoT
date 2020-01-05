@@ -10,7 +10,7 @@ import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import DashboardFrame from "./DashboardFrame";
 import clsx from 'clsx';
-import { Link as ReachLink, LinkProps as ReachLinkProps, RouteComponentProps } from '@reach/router';
+import { Link as ReachLink, Redirect, RouteComponentProps } from '@reach/router';
 import UserAvatarMenu from '../components/UserAvatarMenu';
 import { useAppCookie } from '../helpers/useCookie';
 
@@ -40,8 +40,8 @@ const _DashboardIndex: React.FunctionComponent<IDashboardIndexProps> = ({ classe
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
   const appCookie = useAppCookie();
-
-  return <DashboardFrame title="Dashboard" direction="ltr"
+  return !appCookie.admin ? <Redirect noThrow to="dashboard/sensors"/> : <DashboardFrame title="Dashboard" direction="ltr"
+    drawer
     toolbarRight={<UserAvatarMenu appCookie={appCookie} navigate={navigate}/>}
     content={
       <Container maxWidth="lg" className={classes.container}>

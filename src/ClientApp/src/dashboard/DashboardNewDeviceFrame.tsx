@@ -53,6 +53,7 @@ const _DashboardNewDeviceFrame: React.FunctionComponent<IDashboardNewDeviceFrame
   return (
     <DashboardFrame
       title={intl.formatMessage(messages.title)}
+      drawer
       direction="ltr"
       toolbarRight={
         <IconButton

@@ -24,18 +24,18 @@ namespace SMEIoT.Web.Api.V1
 
     [HttpPost("")]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     [AllowAnonymous]
     public async Task<ActionResult<BasicUserApiModel>> Create(ValidatedUserCredentialsBindingModel user)
     {
       await _userService.CreateUserWithPassword(user.UserName, user.Password);
       var result = await GetBasicUserResultAsync(user.UserName);
-      return CreatedAtAction(nameof(Show), result);
+      return CreatedAtAction(nameof(Show), new { userName = result.UserName }, result);
     }
 
     [HttpPut("{userName}/password")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult<UserCredentialsUpdateApiModel>> EditPassword(
       ConfirmedUserCredentialsUpdateBindingModel binding, string userName)
     {
@@ -47,7 +47,7 @@ namespace SMEIoT.Web.Api.V1
     
     [HttpGet("{userName}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<BasicUserApiModel>> Show(string userName)
     {

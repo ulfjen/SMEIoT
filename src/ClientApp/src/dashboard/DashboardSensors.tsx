@@ -49,7 +49,7 @@ const styles = ({
 
 export interface IDashboardSensors
   extends RouteComponentProps,
-    WithStyles<typeof styles> {}
+  WithStyles<typeof styles> { }
 
 const messages = defineMessages({
   title: {
@@ -76,26 +76,29 @@ const _DashboardSensors: React.FunctionComponent<IDashboardSensors> = ({
   return (
     <DashboardFrame
       title="Sensors"
+      drawer={appCookie.admin}
       direction="ltr"
-      toolbarRight={<UserAvatarMenu appCookie={appCookie} navigate={navigate}/>}
+      toolbarRight={<UserAvatarMenu appCookie={appCookie} navigate={navigate} />}
       content={
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={3}>
             <DashboardSensorBoard />
           </Grid>
-          <Tooltip
-            title={intl.formatMessage(messages.fabTooltip)}
-            aria-label={intl.formatMessage(messages.fabTooltip)}
-          >
-            <Fab
-              color="secondary"
-              className={classes.absolute}
-              to={"/dashboard/sensors/new"}
-              component={Link}
+          {appCookie.admin ?
+            <Tooltip
+              title={intl.formatMessage(messages.fabTooltip)}
+              aria-label={intl.formatMessage(messages.fabTooltip)}
             >
-              <AddIcon />
-            </Fab>
-          </Tooltip>
+              <Fab
+                color="secondary"
+                className={classes.absolute}
+                to={"/dashboard/sensors/new"}
+                component={Link}
+              >
+                <AddIcon />
+              </Fab>
+            </Tooltip>
+            : null}
         </Container>
       }
     />

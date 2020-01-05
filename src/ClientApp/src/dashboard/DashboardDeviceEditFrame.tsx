@@ -54,6 +54,7 @@ const DashboardDeviceEditFrame: React.FunctionComponent<IDashboardDeviceDetailFr
   return (
     <DashboardFrame
       title={intl.formatMessage(messages.title)}
+      drawer
       direction="ltr"
       toolbarRight={
         <IconButton

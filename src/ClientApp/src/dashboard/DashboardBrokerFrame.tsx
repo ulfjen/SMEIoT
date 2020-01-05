@@ -52,6 +52,7 @@ const _DashboardBrokerFrame: React.FunctionComponent<IDashboardBrokerFrameProps>
   return (
     <DashboardFrame
       title={title}
+      drawer
       direction="ltr"
       toolbarRight={
         <IconButton

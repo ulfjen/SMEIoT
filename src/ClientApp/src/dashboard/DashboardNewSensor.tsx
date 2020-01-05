@@ -80,7 +80,9 @@ const _DashboardNewSensor: React.FunctionComponent<IDashboardNewSensorProps> = (
     }
   }, []);
 
-  return <DashboardFrame title={`Create a new sensor`} direction="ltr" toolbarRight={
+  return <DashboardFrame 
+    drawer
+    title={`Create a new sensor`} direction="ltr" toolbarRight={
     <IconButton
       edge="end"
       color="inherit"

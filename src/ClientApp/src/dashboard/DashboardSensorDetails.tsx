@@ -108,6 +108,7 @@ const _DashboardSensorDetails: React.FunctionComponent<IDashboardSensorDetails> 
   return (
     <DashboardFrame
       title="Sensors"
+      drawer
       direction="ltr"
       toolbarRight={<UserAvatarMenu appCookie={appCookie} navigate={navigate}/>}
       content={

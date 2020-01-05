@@ -23,7 +23,7 @@ import { NavigateFn } from '@reach/router';
 
 const drawerWidth = 240;
 
-const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Theme) => createStyles({
+const styles = ({ palette, spacing, transitions, zIndex, mixins, breakpoints }: Theme) => createStyles({
   root: {
     display: 'flex',
   },
@@ -74,9 +74,10 @@ export interface IDashboardFrameProps extends WithStyles<typeof styles> {
   content: React.ReactNode;
   toolbarRight?: React.ReactNode;
   navigate?: NavigateFn;
+  drawer?: boolean;
 }
 
-const _DashboardFrame: React.FunctionComponent<IDashboardFrameProps> = ({classes, title, direction, content, toolbarRight}) => {
+const _DashboardFrame: React.FunctionComponent<IDashboardFrameProps> = ({ classes, title, direction, drawer, content, toolbarRight }) => {
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
   const handleDrawerToggle = () => {
@@ -84,24 +85,24 @@ const _DashboardFrame: React.FunctionComponent<IDashboardFrameProps> = ({classes
   };
 
 
-  const drawer = <div>
+  const drawerList = <div>
     <div className={classes.toolbarIcon}>
       <IconButton
         color="inherit"
         aria-label="close drawer"
         onClick={handleDrawerToggle}>
-        <ChevronLeftIcon/>
+        <ChevronLeftIcon />
       </IconButton>
     </div>
     <Hidden smUp implementation="css">
-    <Divider/>
+      <Divider />
     </Hidden>
-    <DrawerList/>
-    </div>;
+    <DrawerList />
+  </div>;
 
 
   return <div className={classes.root}>
-    <CssBaseline/>
+    <CssBaseline />
     <AppBar position="fixed" className={classes.appBar}>
       <Toolbar className={classes.toolbar}>
         <Hidden smUp implementation="css">
@@ -112,7 +113,7 @@ const _DashboardFrame: React.FunctionComponent<IDashboardFrameProps> = ({classes
             className={classes.menuButton}
             onClick={handleDrawerToggle}
           >
-            <MenuIcon/>
+            <MenuIcon />
           </IconButton>
         </Hidden>
 
@@ -122,7 +123,7 @@ const _DashboardFrame: React.FunctionComponent<IDashboardFrameProps> = ({classes
         {toolbarRight}
       </Toolbar>
     </AppBar>
-    <nav className={classes.drawer} aria-label="mailbox folders">
+    {drawer ? <nav className={classes.drawer} aria-label="mailbox folders">
       <Hidden smUp implementation="js">
         <Drawer
           variant="temporary"
@@ -136,7 +137,7 @@ const _DashboardFrame: React.FunctionComponent<IDashboardFrameProps> = ({classes
             keepMounted: true, // Better open performance on mobile.
           }}
         >
-          {drawer}
+          {drawerList}
         </Drawer>
       </Hidden>
       <Hidden xsDown implementation="js">
@@ -147,12 +148,13 @@ const _DashboardFrame: React.FunctionComponent<IDashboardFrameProps> = ({classes
           variant="permanent"
           open
         >
-          {drawer}
+          {drawerList}
         </Drawer>
       </Hidden>
     </nav>
+      : null}
     <main className={classes.content}>
-      <div className={classes.appBarSpacer}/>
+      <div className={classes.appBarSpacer} />
       {content}
     </main>
   </div>;

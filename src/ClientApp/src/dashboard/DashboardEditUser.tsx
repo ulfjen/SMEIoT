@@ -123,7 +123,8 @@ const _DashboardEditUser: React.FunctionComponent<IDashboardEditUserProps> = ({ 
       requestUser();
     }
   }, []);
-  return <DashboardFrame title={`Edit ${userName}`} direction="ltr" toolbarRight={
+  return <DashboardFrame title={`Edit ${userName}`}
+    drawer direction="ltr" toolbarRight={
     <IconButton
       edge="end"
       color="inherit"

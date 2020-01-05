@@ -18,12 +18,12 @@ import {
   Configuration, SessionsApi,
   UsersApi,
 } from "smeiot-client";
-import {GetDefaultApiConfig} from "../index";
+import { GetDefaultApiConfig } from "../index";
 import { FormattedMessage, defineMessages, useIntl } from "react-intl";
 import { useTitle } from 'react-use';
 import ProblemDetails from "../models/ProblemDetails";
 
-const styles = ({palette, spacing}: Theme) => createStyles({
+const styles = ({ palette, spacing }: Theme) => createStyles({
   '@global': {
     body: {
       backgroundColor: palette.common.white,
@@ -59,7 +59,7 @@ const messages = defineMessages({
   }
 });
 
-const _NewUser: React.FunctionComponent<INewUserProps & WithStyles<typeof styles>> = ({classes}) => {
+const _NewUser: React.FunctionComponent<INewUserProps & WithStyles<typeof styles>> = ({ classes }) => {
   const intl = useIntl();
   const uc = useUserCredentials();
 
@@ -76,7 +76,6 @@ const _NewUser: React.FunctionComponent<INewUserProps & WithStyles<typeof styles
         }
       });
 
-      console.log(result);
       const login = await new SessionsApi(GetDefaultApiConfig()).apiSessionsPost({
         loginBindingModel: {
           userName: uc.userName,
@@ -87,7 +86,6 @@ const _NewUser: React.FunctionComponent<INewUserProps & WithStyles<typeof styles
       window.location.replace(login.returnUrl || "/");
     } catch (response) {
       const details: ProblemDetails = await response.json();
-      console.log(details);
       const err = details.errors;
       if (!err && details.detail) {
         uc.setEntityError(details.detail);
@@ -102,45 +100,45 @@ const _NewUser: React.FunctionComponent<INewUserProps & WithStyles<typeof styles
     }
   };
 
-    return <Container component="main" maxWidth="xs">
-      <CssBaseline/>
-      <div className={classes.paper}>
-        <Avatar className={classes.avatar}>
-          <LockOutlinedIcon/>
-        </Avatar>
-        <Typography component="h1" variant="h5">
-          {intl.formatMessage(messages.title)}
-        </Typography>
-        <UserPasswordForm required
-                          handleSubmit={handleSubmit}
-                          userCredentials={uc}>
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="primary"
-            className={classes.submit}
-          >
-            <FormattedMessage
-              id="users.new.action"
-              description="Action label for the sign up"
-              defaultMessage="Sign up"
-            />
-          </Button>
-          <Grid container justify="flex-end">
-            <Grid item>
-              <Link component={ReachLink} to="/login" variant="body2">
-                <FormattedMessage
-                  id="sessions.new.signup_action"
-                  description="Action label for redirecting to log in page"
-                  defaultMessage="Already have an account? Log in"
-                />
-              </Link>
-            </Grid>
+  return <Container component="main" maxWidth="xs">
+    <CssBaseline />
+    <div className={classes.paper}>
+      <Avatar className={classes.avatar}>
+        <LockOutlinedIcon />
+      </Avatar>
+      <Typography component="h1" variant="h5">
+        {intl.formatMessage(messages.title)}
+      </Typography>
+      <UserPasswordForm required
+        handleSubmit={handleSubmit}
+        userCredentials={uc}>
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          color="primary"
+          className={classes.submit}
+        >
+          <FormattedMessage
+            id="users.new.action"
+            description="Action label for the sign up"
+            defaultMessage="Sign up"
+          />
+        </Button>
+        <Grid container justify="flex-end">
+          <Grid item>
+            <Link component={ReachLink} to="/login" variant="body2">
+              <FormattedMessage
+                id="sessions.new.signup_action"
+                description="Action label for redirecting to log in page"
+                defaultMessage="Already have an account? Log in"
+              />
+            </Link>
           </Grid>
-        </UserPasswordForm>
-      </div>
-    </Container>;
+        </Grid>
+      </UserPasswordForm>
+    </div>
+  </Container>;
 };
 
 const NewUser = withStyles(styles)(_NewUser);

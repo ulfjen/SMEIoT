@@ -104,6 +104,7 @@ const _DashboardDevices: React.FunctionComponent<IDashboardDevices> = ({
   return (
     <DashboardFrame
       title={intl.formatMessage(messages.title)}
+      drawer
       direction="ltr"
       toolbarRight={<UserAvatarMenu appCookie={appCookie} navigate={navigate}/>}
       content={
