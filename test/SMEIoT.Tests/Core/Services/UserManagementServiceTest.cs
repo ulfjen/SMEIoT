@@ -12,7 +12,7 @@ using Xunit;
 
 namespace SMEIoT.Tests.Core.Services
 {
-  public class UserManagementTest
+  public class UserManagementServiceTest
   {
     private static (UserManagementService, ApplicationDbContext, UserManager<User>) BuildService()
     {

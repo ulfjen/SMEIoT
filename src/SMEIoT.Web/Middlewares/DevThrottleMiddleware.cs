@@ -17,9 +17,6 @@ namespace SMEIoT.Web.Middlewares
 
     public async Task InvokeAsync(HttpContext context)
     {
-      Console.WriteLine(context.Request.Path);
-            Console.WriteLine(context.Request.Path.StartsWithSegments("/api"));
-
       if (context.Request.Path.StartsWithSegments("/api")) {
         await Task.Delay(3000);
       }

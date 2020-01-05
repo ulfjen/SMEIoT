@@ -174,20 +174,9 @@ namespace SMEIoT.Web
       app.UseEndpoints(endpoints =>
       {
         endpoints.MapControllers();
-        // endpoints.MapControllerRoute("new_login", "/login", new { controller = "Sessions", action = "New" },
-        //   new { httpMethod = new HttpMethodRouteConstraint(nameof(HttpMethod.Get)) });
         endpoints.MapControllerRoute("create_login", "/login", new { controller = "Sessions", action = "Create" });
         endpoints.MapControllerRoute("destroy_login", "/logout", new { controller = "Sessions", action = "Destroy" },
           new { httpMethod = new HttpMethodRouteConstraint(nameof(HttpMethod.Delete)) });
-        // endpoints.MapControllerRoute("signup", "/signup", new { controller = "Users", action = "New" });
-        // endpoints.MapControllerRoute("edit_user", "/account", new { controller = "Users", action = "Edit" });
-
-        // endpoints.MapControllerRoute("dashboard", "/dashboard/{*url}", new { controller = "Dashboard", action = "Index" });
-        // endpoints.MapControllerRoute("app", "/{*url}", new { controller = "Home", action = "Index" });
-
-        // endpoints.MapControllerRoute(
-        //   name: "default",
-        //   pattern: "{controller:slugify=Home}/{action:slugify=Index}/{id?}");
 
         endpoints.MapRazorPages();
         endpoints.MapHub<MqttHub>("/dashboard/mqtt_hub");

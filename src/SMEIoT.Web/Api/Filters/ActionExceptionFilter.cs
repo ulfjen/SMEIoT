@@ -24,17 +24,26 @@ namespace SMEIoT.Web.Api.Filters
 
     public Task OnExceptionAsync(ExceptionContext context)
     {
-      if (context.Exception is EntityNotFoundException entityNotFoundException)
-      {
-        context.Result = new NotFoundObjectResult(entityNotFoundException.ParamName) {StatusCode = StatusCodes.Status404NotFound};
+      switch (context.Exception) {
+        case EntityNotFoundException entityNotFoundException:
+          context.Result = new NotFoundObjectResult(entityNotFoundException.ParamName) {StatusCode = StatusCodes.Status404NotFound};
+          break;
+        case InvalidArgumentException argumentException:
+          var errors = new ModelStateDictionary();
+          errors.AddModelError(argumentException.ParamName, argumentException.Message);
+          context.Result = new BadRequestObjectResult(_pdFactory.CreateValidationProblemDetails(context.HttpContext, errors, StatusCodes.Status422UnprocessableEntity));
+          break;
+        case InvalidUserInputException exception:
+          context.Result = new ObjectResult(_pdFactory.CreateProblemDetails(context.HttpContext, StatusCodes.Status422UnprocessableEntity, null, null, exception.Message));
+          break;
+        case InternalException exception:
+          context.Result = new ObjectResult(_pdFactory.CreateProblemDetails(context.HttpContext, StatusCodes.Status500InternalServerError, null, null, exception.Message));
+          break;
+        default:
+          context.Result = new ObjectResult(_pdFactory.CreateProblemDetails(context.HttpContext, StatusCodes.Status500InternalServerError, null, null, "Unhandled exception."));
+          break;
       }
-      if (context.Exception is InvalidArgumentException argumentException)
-      {
-        // we use InvalidArgumentException when our validation fails on particular parameters failed.
-        var errors = new ModelStateDictionary();
-        errors.AddModelError(argumentException.ParamName, argumentException.Message);
-        context.Result = new BadRequestObjectResult(_pdFactory.CreateValidationProblemDetails(context.HttpContext, errors, StatusCodes.Status400BadRequest));
-      }
+      
       return Task.CompletedTask;
     }
   }

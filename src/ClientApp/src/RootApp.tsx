@@ -41,9 +41,8 @@ const RootApp: React.FunctionComponent<IRootApp> = ({
     [prefersDarkMode],
   );
   const cookie = useAppCookie();
-  console.log(location);
 
-  return cookie.userName && location && location.pathname === "/" ? <Redirect to="/dashboard" /> :
+  return cookie.userName && location && location.pathname === "/" ? <Redirect noThrow to="/dashboard" /> :
     <IntlProvider locale={locale} messages={messages}>
       <ThemeProvider theme={theme}>
         <Router>
