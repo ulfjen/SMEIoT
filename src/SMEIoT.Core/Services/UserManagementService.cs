@@ -66,7 +66,7 @@ namespace SMEIoT.Core.Services
         foreach (var err in result.Errors) {
           switch (err.Code) {
             case nameof(IdentityErrorDescriber.DuplicateUserName):
-              throw new InvalidUserInputException("There is something wrong with your userName and password. Try another.");
+              throw new InvalidUserInputException("There is something wrong with your username or password. Try another combination.");
             case nameof(IdentityErrorDescriber.PasswordTooShort):
               passwordErrors.Append(err.Description);
               break;

@@ -11,12 +11,15 @@ import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Container from '@material-ui/core/Container';
-import { Router, RouteComponentProps } from "@reach/router";
+import { Link as ReachLink, RouteComponentProps } from "@reach/router";
 import UserPasswordForm from "../components/UserPasswordForm";
-import useUserCredentials from "../components/useUserCredentials";
 import { useAppCookie } from "../helpers/useCookie";
 import {SessionsApi} from "smeiot-client";
 import {GetDefaultApiConfig} from "../index";
+import useUserCredentials from "../helpers/useUserCredentials";
+import { defineMessages, useIntl, FormattedMessage } from "react-intl";
+import { useTitle } from 'react-use';
+
 
 const styles = ({palette, spacing}: Theme) => createStyles({
   '@global': {
@@ -43,32 +46,23 @@ const styles = ({palette, spacing}: Theme) => createStyles({
   },
 });
 
-export interface INewSessionProps extends RouteComponentProps, WithStyles<typeof styles> {
+interface INewSessionProps extends RouteComponentProps, WithStyles<typeof styles> {
 }
 
-const _NewSession: React.FunctionComponent<INewSessionProps & WithStyles<typeof styles>> = ({classes}) => {
-  const {
-    userName, setUserName,
-    password, setPassword,
-    userNameErrors, setUserNameErrors,
-    passwordErrors, setPasswordErrors
-  } = useUserCredentials();
-  const cookie = useAppCookie();
-
-  var errorPrompt: string | undefined = undefined;
-  // @ts-ignore
-  const SMEIoTPreRendered = window["SMEIoTPreRendered"];
-  if (SMEIoTPreRendered) {
-    const model = SMEIoTPreRendered.model;
-    const errors = SMEIoTPreRendered.validation_errors;
-    if (errors) {
-      errorPrompt = errors[0].name;
-    }
-
-    if (model) {
-      setUserName(model.userName);
-    }
+const messages = defineMessages({
+  title: {
+    id: "sessions.new.title",
+    description: "Title for new login",
+    defaultMessage: "Log In"
   }
+});
+
+const _NewSession: React.FunctionComponent<INewSessionProps & WithStyles<typeof styles>> = ({classes}) => {
+  const intl = useIntl();
+  const uc = useUserCredentials();
+  
+  useTitle(intl.formatMessage(messages.title));
+  var errorPrompt: string | undefined = undefined;
 
   const handleSubmit = async (event: React.MouseEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -76,12 +70,13 @@ const _NewSession: React.FunctionComponent<INewSessionProps & WithStyles<typeof 
       return;
     }
 
-      const login = await new SessionsApi(GetDefaultApiConfig()).apiSessionsPost({
-        loginBindingModel: {
-          userName, password
-        }
-      });
-      console.log(login);
+    const login = await new SessionsApi(GetDefaultApiConfig()).apiSessionsPost({
+      loginBindingModel: {
+        userName: uc.userName,
+        password: uc.password
+      }
+    });
+    console.log(login);
 
       window.location.replace(login.returnUrl || "/");
     // catch (response) {
@@ -95,6 +90,13 @@ const _NewSession: React.FunctionComponent<INewSessionProps & WithStyles<typeof 
     // }
   };
 
+  React.useEffect(() => {
+    uc.setUserNameError("");
+  }, [uc.userName]);
+  React.useEffect(() => {
+    uc.setPasswordError("");
+  }, [uc.password]);
+
   return <Container component="main" maxWidth="xs">
     <CssBaseline/>
     <div className={classes.paper}>
@@ -102,14 +104,10 @@ const _NewSession: React.FunctionComponent<INewSessionProps & WithStyles<typeof 
         <LockOutlinedIcon/>
       </Avatar>
       <Typography component="h1" variant="h5">
-        Log in
+        {intl.formatMessage(messages.title)}
       </Typography>
-      <UserPasswordForm url={undefined}
-                        handleSubmit={handleSubmit}
-                        userName={userName} setUserName={setUserName}
-                        password={password} setPassword={setPassword}
-                        userNameErrors={userNameErrors} setUserNameErrors={setUserNameErrors}
-                        passwordErrors={passwordErrors} setPasswordErrors={setPasswordErrors}>
+      <UserPasswordForm handleSubmit={handleSubmit}
+                        userCredentials={uc}>
         <Button
           type="submit"
           fullWidth
@@ -117,12 +115,20 @@ const _NewSession: React.FunctionComponent<INewSessionProps & WithStyles<typeof 
           color="primary"
           className={classes.submit}
         >
-          Log in
+          <FormattedMessage
+            id="sessions.new.action"
+            description="Action label for the login"
+            defaultMessage="Log in"
+          />
         </Button>
         <Grid container justify="flex-end">
           <Grid item>
-            <Link href="/signup" variant="body2">
-              {"Don't have an account? Sign Up"}
+            <Link component={ReachLink} to="/signup" variant="body2">
+              <FormattedMessage
+              id="sessions.new.signup_action"
+              description="Action label for redirecting to sign up page"
+              defaultMessage="Don't have an account? Sign Up"
+            />
             </Link>
           </Grid>
         </Grid>

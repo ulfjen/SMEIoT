@@ -21,7 +21,7 @@ import {
 } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
 import moment from "moment";
-import useUserCredentials from "../components/useUserCredentials";
+import useUserCredentials from "../helpers/useUserCredentials";
 import { RouteComponentProps } from "@reach/router";
 
 const styles = ({ palette, spacing }: Theme) => createStyles({
@@ -57,15 +57,10 @@ export interface IEditUserProps extends RouteComponentProps, WithStyles<typeof s
 }
 
 const _EditUser: React.FunctionComponent<IEditUserProps & WithStyles<typeof styles>> = ({ classes }) => {
-  const {
-    userName, setUserName,
-    password, setPassword,
-    userNameErrors, setUserNameErrors,
-    passwordErrors, setPasswordErrors
-  } = useUserCredentials();
+  const uc = useUserCredentials();
 
   const [newPassword, setNewPassword] = React.useState<string>("");
-  const [newPasswordErrors, setNewPasswordErrors] = React.useState<string>("");
+  const [newPasswordError, setNewPasswordError] = React.useState<string>("");
 
 
   let currentUser: BasicUserApiModel = {
@@ -85,7 +80,7 @@ const _EditUser: React.FunctionComponent<IEditUserProps & WithStyles<typeof styl
       const result = await new UsersApi(GetDefaultApiConfig()).apiUsersUserNamePasswordPut({
         userName: currentUser.userName || "",
         confirmedUserCredentialsUpdateBindingModel: {
-          currentPassword: password,
+          currentPassword: uc.password,
           newPassword: newPassword
         }
       });
@@ -94,13 +89,13 @@ const _EditUser: React.FunctionComponent<IEditUserProps & WithStyles<typeof styl
     } catch (response) {
       const { status, errors } = await response.json();
       if (errors.hasOwnProperty("UserName")) {
-        setUserNameErrors(errors["UserName"].join("\n"));
+        uc.setUserNameError(errors["UserName"].join("\n"));
       }
       if (errors.hasOwnProperty("CurrentPassword")) {
-        setPasswordErrors(errors["CurrentPassword"].join("\n"));
+        uc.setPasswordError(errors["CurrentPassword"].join("\n"));
       }
       if (errors.hasOwnProperty("NewPassword")) {
-        setNewPasswordErrors(errors["NewPassword"].join("\n"));
+        setNewPasswordError(errors["NewPassword"].join("\n"));
       }
 
     }
@@ -126,14 +121,14 @@ const _EditUser: React.FunctionComponent<IEditUserProps & WithStyles<typeof styl
 
         <PasswordField
           label="Current Password"
-          setPassword={setPassword}
-          errors={passwordErrors}
-          setErrors={setPasswordErrors} />
+          setPassword={uc.setPassword}
+          errors={uc.passwordError}
+          setErrors={uc.setPasswordError} />
         <PasswordField
           label="New Password"
           setPassword={setNewPassword}
-          errors={newPasswordErrors}
-          setErrors={setNewPasswordErrors} />
+          errors={newPasswordError}
+          setErrors={setNewPasswordError} />
       </CardContent>
       <CardActions>
         <Button onClick={() => { window.location.href = "/dashboard"; }}>Cancel</Button>

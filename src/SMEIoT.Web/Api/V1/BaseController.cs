@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Net.Mime;
 
 namespace SMEIoT.Web.Api.V1
 {
@@ -6,6 +7,7 @@ namespace SMEIoT.Web.Api.V1
   [ApiController]
   [Produces("application/json")]
   [Route("api/[controller]")]
+  [Consumes(MediaTypeNames.Application.Json)]
   public class BaseController : ControllerBase
   {
   }

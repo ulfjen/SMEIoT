@@ -23,7 +23,6 @@ namespace SMEIoT.Web.Api.V1
     }
 
     [HttpPost("")]
-    [Consumes(MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [AllowAnonymous]

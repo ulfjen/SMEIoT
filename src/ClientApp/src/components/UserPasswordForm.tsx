@@ -4,109 +4,89 @@ import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
-import {FunctionComponent, useContext, useState} from "react";
+import { useState } from "react";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import IconButton from "@material-ui/core/IconButton";
-import {Visibility, VisibilityOff} from "@material-ui/icons";
+import FormHelperText from '@material-ui/core/FormHelperText';
+import { Visibility, VisibilityOff } from "@material-ui/icons";
+import { UserCredentials } from "../helpers/useUserCredentials";
+import { defineMessages, useIntl } from "react-intl";
+import FormControl from "@material-ui/core/FormControl";
 
-const styles = ({palette, spacing}: Theme) => createStyles({
-  '@global': {
-    body: {
-      backgroundColor: palette.common.white,
-    },
-  },
-  paper: {
-    marginTop: spacing(8),
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  avatar: {
-    margin: spacing(1),
-    backgroundColor: palette.secondary.main,
-  },
+const styles = ({spacing}: Theme) => createStyles({
   form: {
     width: '100%', // Fix IE 11 issue.
     marginTop: spacing(3),
-  },
-  submit: {
-    margin: spacing(3, 0, 2),
-  },
+  }
 });
 
-export interface IUserPasswordFormProps extends WithStyles<typeof styles> {
-  url: string | undefined;
+interface IUserPasswordFormProps extends WithStyles<typeof styles> {
   handleSubmit: (event: React.MouseEvent<HTMLFormElement>) => Promise<void> | undefined;
-  userName: string;
-  setUserName: React.Dispatch<React.SetStateAction<string>>;
-  password: string;
-  setPassword: React.Dispatch<React.SetStateAction<string>>;
-  userNameErrors: string;
-  setUserNameErrors: React.Dispatch<React.SetStateAction<string>>;
-  passwordErrors: string;
-  setPasswordErrors: React.Dispatch<React.SetStateAction<string>>;
+  required?: boolean;
+  userCredentials: UserCredentials;
 }
 
-const _UserPasswordForm: React.FunctionComponent<IUserPasswordFormProps & WithStyles<typeof styles>> = ({classes, url, children, handleSubmit, userName, userNameErrors, password, passwordErrors, setUserName, setPassword, setPasswordErrors, setUserNameErrors}) => {
-  const [showPassword, setShowPassword] = useState<boolean>(false);
-  
-  // @ts-ignore
-  const SMEIoTPreRendered = window["SMEIoTPreRendered"];
-  if (SMEIoTPreRendered) {
-    const model = SMEIoTPreRendered.model;
-    const errors = SMEIoTPreRendered.validation_errors;
-    if (model) {
-      if (model.userName) { setUserName(model.userName); }
-    }
+const messages = defineMessages({
+  username: {
+    id: "components.userpasswordform.username_label",
+    description: "UserName label in the form",
+    defaultMessage: "Username"
+  },
+  password: {
+    id: "components.userpasswordform.password_label",
+    description: "Password label in the form",
+    defaultMessage: "Password"
   }
+});
 
-  return <form className={classes.form} noValidate method="POST" onSubmit={handleSubmit} action={url}>
+const _UserPasswordForm: React.FunctionComponent<IUserPasswordFormProps & WithStyles<typeof styles>> = ({classes, children, handleSubmit, userCredentials, required}) => {
+  const intl = useIntl();
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+
+  const userNameChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
+    userCredentials.setUserName(event.target.value);
+    userCredentials.setUserNameError("");
+  };
+  
+  const passwordChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
+    userCredentials.setPassword(event.target.value);
+    userCredentials.setPasswordError("");
+  };
+  
+  return <form className={classes.form} noValidate method="POST" onSubmit={handleSubmit}>
+    <FormControl error={true}>
+      <FormHelperText>{userCredentials.entityError}</FormHelperText>
+    </FormControl>
     <TextField
       variant="outlined"
       margin="normal"
-      required
+      required={required}
       fullWidth
-      id="userName"
-      label="UserName"
-      name="userName"
+      label={intl.formatMessage(messages.username)}
       autoComplete="userName"
       autoFocus
-      onChange={(event) => {
-        setUserName(event.target.value);
-        if (userNameErrors.length > 0) {
-          setUserNameErrors("");
-        }
-      }}
-      error={userNameErrors.length > 0}
-      helperText={userNameErrors}
+      onChange={userNameChanged}
+      error={userCredentials.userNameError.length > 0}
+      helperText={userCredentials.userNameError}
     />
     <TextField
       variant="outlined"
       margin="normal"
-      required
+      required={required}
       fullWidth
-      name="password"
-      label="Password"
+      label={intl.formatMessage(messages.password)}
       type={showPassword ? "text" : "password"}
-      id="password"
-      autoComplete="current-password"
-      onChange={(event) => {
-        setPassword(event.target.value);
-        if (passwordErrors.length > 0) {
-          setPasswordErrors("");
-        }
-      }}
-      error={passwordErrors.length > 0}
-      helperText={passwordErrors}
+      autoComplete="password"
+      onChange={passwordChanged}
+      error={userCredentials.passwordError.length > 0}
+      helperText={userCredentials.passwordError}
       InputProps={{
         endAdornment: (
           <InputAdornment position="end">
             <IconButton
               edge="end"
               aria-label="toggle password visibility"
-              onClick={() => {
-                setShowPassword(!showPassword)
-              }}
+              onClick={() => setShowPassword(!showPassword)}
             >
               {showPassword ? <VisibilityOff/> : <Visibility/>}
             </IconButton>
@@ -116,7 +96,6 @@ const _UserPasswordForm: React.FunctionComponent<IUserPasswordFormProps & WithSt
     />
     {children}
   </form>
-
 };
 
 const UserPasswordForm = withStyles(styles)(_UserPasswordForm);

@@ -11,14 +11,17 @@ import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Container from '@material-ui/core/Container';
-import { Router, RouteComponentProps } from "@reach/router";
+import { Link as ReachLink, RouteComponentProps } from "@reach/router";
 import UserPasswordForm from "../components/UserPasswordForm";
-import useUserCredentials from "../components/useUserCredentials";
+import useUserCredentials from "../helpers/useUserCredentials";
 import {
   Configuration, SessionsApi,
   UsersApi,
 } from "smeiot-client";
 import {GetDefaultApiConfig} from "../index";
+import { FormattedMessage, defineMessages, useIntl } from "react-intl";
+import { useTitle } from 'react-use';
+import ProblemDetails from "../models/ProblemDetails";
 
 const styles = ({palette, spacing}: Theme) => createStyles({
   '@global': {
@@ -48,41 +51,53 @@ const styles = ({palette, spacing}: Theme) => createStyles({
 export interface INewUserProps extends RouteComponentProps, WithStyles<typeof styles> {
 }
 
-const _NewUser: React.FunctionComponent<INewUserProps & WithStyles<typeof styles>> = ({classes}) => {
-  const {
-    userName, setUserName,
-    password, setPassword,
-    userNameErrors, setUserNameErrors,
-    passwordErrors, setPasswordErrors
-  } = useUserCredentials();
+const messages = defineMessages({
+  title: {
+    id: "users.new.title",
+    description: "Title for new users",
+    defaultMessage: "Sign Up"
+  }
+});
 
+const _NewUser: React.FunctionComponent<INewUserProps & WithStyles<typeof styles>> = ({classes}) => {
+  const intl = useIntl();
+  const uc = useUserCredentials();
+
+  useTitle(intl.formatMessage(messages.title));
   const handleSubmit = async (event: React.MouseEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (event.target === undefined) {
-      return;
-    }
+    uc.setEntityError("");
 
     try {
       const result = await new UsersApi(GetDefaultApiConfig()).apiUsersPost({
         validatedUserCredentialsBindingModel: {
-          userName, password
+          userName: uc.userName,
+          password: uc.password
         }
       });
 
+      console.log(result);
       const login = await new SessionsApi(GetDefaultApiConfig()).apiSessionsPost({
         loginBindingModel: {
-          userName, password
+          userName: uc.userName,
+          password: uc.password
         }
       });
 
       window.location.replace(login.returnUrl || "/");
     } catch (response) {
-      const {status, errors} = await response.json();
-      if (errors.hasOwnProperty("UserName")) {
-        setUserNameErrors(errors["UserName"].join("\n"));
-      }
-      if (errors.hasOwnProperty("Password")) {
-        setPasswordErrors(errors["Password"].join("\n"));
+      const details: ProblemDetails = await response.json();
+      console.log(details);
+      const err = details.errors;
+      if (!err && details.detail) {
+        uc.setEntityError(details.detail);
+      } else {
+        if (err.hasOwnProperty("userName")) {
+          uc.setUserNameError(err["userName"].join("\n"));
+        }
+        if (err.hasOwnProperty("password")) {
+          uc.setPasswordError(err["password"].join("\n"));
+        }
       }
     }
   };
@@ -94,14 +109,11 @@ const _NewUser: React.FunctionComponent<INewUserProps & WithStyles<typeof styles
           <LockOutlinedIcon/>
         </Avatar>
         <Typography component="h1" variant="h5">
-          Sign up
+          {intl.formatMessage(messages.title)}
         </Typography>
-        <UserPasswordForm url={undefined}
+        <UserPasswordForm required
                           handleSubmit={handleSubmit}
-                          userName={userName} setUserName={setUserName}
-                          password={password} setPassword={setPassword}
-                          userNameErrors={userNameErrors} setUserNameErrors={setUserNameErrors}
-                          passwordErrors={passwordErrors} setPasswordErrors={setPasswordErrors}>
+                          userCredentials={uc}>
           <Button
             type="submit"
             fullWidth
@@ -109,12 +121,20 @@ const _NewUser: React.FunctionComponent<INewUserProps & WithStyles<typeof styles
             color="primary"
             className={classes.submit}
           >
-            Sign Up
+            <FormattedMessage
+              id="users.new.action"
+              description="Action label for the sign up"
+              defaultMessage="Sign up"
+            />
           </Button>
           <Grid container justify="flex-end">
             <Grid item>
-              <Link href="/login" variant="body2">
-                Already have an account? Sign in
+              <Link component={ReachLink} to="/login" variant="body2">
+                <FormattedMessage
+                  id="sessions.new.signup_action"
+                  description="Action label for redirecting to log in page"
+                  defaultMessage="Already have an account? Log in"
+                />
               </Link>
             </Grid>
           </Grid>
