@@ -13,20 +13,15 @@ import withStyles from "@material-ui/core/styles/withStyles";
 import Container from '@material-ui/core/Container';
 import { Link as ReachLink, RouteComponentProps } from "@reach/router";
 import UserPasswordForm from "../components/UserPasswordForm";
-import { useAppCookie } from "../helpers/useCookie";
-import {SessionsApi} from "smeiot-client";
-import {GetDefaultApiConfig} from "../index";
+import { SessionsApi } from "smeiot-client";
+import { GetDefaultApiConfig } from "../index";
 import useUserCredentials from "../helpers/useUserCredentials";
 import { defineMessages, useIntl, FormattedMessage } from "react-intl";
 import { useTitle } from 'react-use';
+import ValidationProblemDetails from "../models/ValidationProblemDetails";
+import ErrorBoundary from "../components/ErrorBoundary";
 
-
-const styles = ({palette, spacing}: Theme) => createStyles({
-  '@global': {
-    body: {
-      backgroundColor: palette.common.white,
-    },
-  },
+const styles = ({ palette, spacing }: Theme) => createStyles({
   paper: {
     marginTop: spacing(8),
     display: 'flex',
@@ -36,10 +31,6 @@ const styles = ({palette, spacing}: Theme) => createStyles({
   avatar: {
     margin: spacing(1),
     backgroundColor: palette.secondary.main,
-  },
-  form: {
-    width: '100%', // Fix IE 11 issue.
-    marginTop: spacing(3),
   },
   submit: {
     margin: spacing(3, 0, 2),
@@ -57,83 +48,84 @@ const messages = defineMessages({
   }
 });
 
-const _NewSession: React.FunctionComponent<INewSessionProps & WithStyles<typeof styles>> = ({classes}) => {
+const _NewSession: React.FunctionComponent<INewSessionProps & WithStyles<typeof styles>> = ({ classes, navigate }) => {
   const intl = useIntl();
   const uc = useUserCredentials();
-  
+
   useTitle(intl.formatMessage(messages.title));
-  var errorPrompt: string | undefined = undefined;
 
   const handleSubmit = async (event: React.MouseEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (event.target === undefined) {
       return;
     }
+    uc.setEntityError("");
 
-    const login = await new SessionsApi(GetDefaultApiConfig()).apiSessionsPost({
-      loginBindingModel: {
-        userName: uc.userName,
-        password: uc.password
+    try {
+      const login = await new SessionsApi(GetDefaultApiConfig()).apiSessionsPost({
+        loginBindingModel: {
+          userName: uc.userName,
+          password: uc.password
+        }
+      });
+
+      navigate && navigate(login.returnUrl || "/");
+    } catch (response) {
+      const details: ValidationProblemDetails = await response.json();
+      if (details.detail) {
+        uc.setEntityError(details.detail);
       }
-    });
-    console.log(login);
-
-      window.location.replace(login.returnUrl || "/");
-    // catch (response) {
-    //   const {status, errors} = await response.json();
-    //   if (errors.hasOwnProperty("UserName")) {
-    //     setUserNameErrors(errors["UserName"].join("\n"));
-    //   }
-    //   if (errors.hasOwnProperty("Password")) {
-    //     setPasswordErrors(errors["Password"].join("\n"));
-    //   }
-    // }
+      const err = details.errors;
+      if (err) {
+        if (err.hasOwnProperty("userName")) {
+          uc.setUserNameError(err["userName"].join("\n"));
+        }
+        if (err.hasOwnProperty("password")) {
+          uc.setPasswordError(err["password"].join("\n"));
+        }
+      }
+    }
   };
 
-  React.useEffect(() => {
-    uc.setUserNameError("");
-  }, [uc.userName]);
-  React.useEffect(() => {
-    uc.setPasswordError("");
-  }, [uc.password]);
-
   return <Container component="main" maxWidth="xs">
-    <CssBaseline/>
-    <div className={classes.paper}>
-      <Avatar className={classes.avatar}>
-        <LockOutlinedIcon/>
-      </Avatar>
-      <Typography component="h1" variant="h5">
-        {intl.formatMessage(messages.title)}
-      </Typography>
-      <UserPasswordForm handleSubmit={handleSubmit}
-                        userCredentials={uc}>
-        <Button
-          type="submit"
-          fullWidth
-          variant="contained"
-          color="primary"
-          className={classes.submit}
-        >
-          <FormattedMessage
-            id="sessions.new.action"
-            description="Action label for the login"
-            defaultMessage="Log in"
-          />
-        </Button>
-        <Grid container justify="flex-end">
-          <Grid item>
-            <Link component={ReachLink} to="/signup" variant="body2">
-              <FormattedMessage
-              id="sessions.new.signup_action"
-              description="Action label for redirecting to sign up page"
-              defaultMessage="Don't have an account? Sign Up"
+    <CssBaseline />
+    <ErrorBoundary>
+      <div className={classes.paper}>
+        <Avatar className={classes.avatar}>
+          <LockOutlinedIcon />
+        </Avatar>
+        <Typography component="h1" variant="h5">
+          {intl.formatMessage(messages.title)}
+        </Typography>
+        <UserPasswordForm handleSubmit={handleSubmit}
+          userCredentials={uc}>
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            color="primary"
+            className={classes.submit}
+          >
+            <FormattedMessage
+              id="sessions.new.action"
+              description="Action label for the login"
+              defaultMessage="Log in"
             />
-            </Link>
+          </Button>
+          <Grid container justify="flex-end">
+            <Grid item>
+              <Link component={ReachLink} to="/signup" variant="body2">
+                <FormattedMessage
+                  id="sessions.new.signup_action"
+                  description="Action label for redirecting to sign up page"
+                  defaultMessage="Don't have an account? Sign Up"
+                />
+              </Link>
+            </Grid>
           </Grid>
-        </Grid>
-      </UserPasswordForm>
-    </div>
+        </UserPasswordForm>
+      </div>
+    </ErrorBoundary>
   </Container>;
 };
 

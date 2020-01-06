@@ -14,21 +14,14 @@ import Container from '@material-ui/core/Container';
 import { Link as ReachLink, RouteComponentProps } from "@reach/router";
 import UserPasswordForm from "../components/UserPasswordForm";
 import useUserCredentials from "../helpers/useUserCredentials";
-import {
-  Configuration, SessionsApi,
-  UsersApi,
-} from "smeiot-client";
+import { SessionsApi, UsersApi, ProblemDetails } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
 import { FormattedMessage, defineMessages, useIntl } from "react-intl";
 import { useTitle } from 'react-use';
-import ProblemDetails from "../models/ProblemDetails";
+import ValidationProblemDetails from "../models/ValidationProblemDetails";
+import ErrorBoundary from "../components/ErrorBoundary";
 
 const styles = ({ palette, spacing }: Theme) => createStyles({
-  '@global': {
-    body: {
-      backgroundColor: palette.common.white,
-    },
-  },
   paper: {
     marginTop: spacing(8),
     display: 'flex',
@@ -38,10 +31,6 @@ const styles = ({ palette, spacing }: Theme) => createStyles({
   avatar: {
     margin: spacing(1),
     backgroundColor: palette.secondary.main,
-  },
-  form: {
-    width: '100%', // Fix IE 11 issue.
-    marginTop: spacing(3),
   },
   submit: {
     margin: spacing(3, 0, 2),
@@ -59,13 +48,16 @@ const messages = defineMessages({
   }
 });
 
-const _NewUser: React.FunctionComponent<INewUserProps & WithStyles<typeof styles>> = ({ classes }) => {
+const _NewUser: React.FunctionComponent<INewUserProps & WithStyles<typeof styles>> = ({ classes, navigate }) => {
   const intl = useIntl();
   const uc = useUserCredentials();
 
   useTitle(intl.formatMessage(messages.title));
   const handleSubmit = async (event: React.MouseEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (event.target === undefined) {
+      return;
+    }
     uc.setEntityError("");
 
     try {
@@ -83,13 +75,14 @@ const _NewUser: React.FunctionComponent<INewUserProps & WithStyles<typeof styles
         }
       });
 
-      window.location.replace(login.returnUrl || "/");
+      navigate && navigate(login.returnUrl || "/");
     } catch (response) {
-      const details: ProblemDetails = await response.json();
-      const err = details.errors;
-      if (!err && details.detail) {
+      const details: ValidationProblemDetails = await response.json();
+      if (details.detail) {
         uc.setEntityError(details.detail);
-      } else {
+      }
+      const err = details.errors;
+      if (err) {
         if (err.hasOwnProperty("userName")) {
           uc.setUserNameError(err["userName"].join("\n"));
         }
@@ -102,42 +95,44 @@ const _NewUser: React.FunctionComponent<INewUserProps & WithStyles<typeof styles
 
   return <Container component="main" maxWidth="xs">
     <CssBaseline />
-    <div className={classes.paper}>
-      <Avatar className={classes.avatar}>
-        <LockOutlinedIcon />
-      </Avatar>
-      <Typography component="h1" variant="h5">
-        {intl.formatMessage(messages.title)}
-      </Typography>
-      <UserPasswordForm required
-        handleSubmit={handleSubmit}
-        userCredentials={uc}>
-        <Button
-          type="submit"
-          fullWidth
-          variant="contained"
-          color="primary"
-          className={classes.submit}
-        >
-          <FormattedMessage
-            id="users.new.action"
-            description="Action label for the sign up"
-            defaultMessage="Sign up"
-          />
-        </Button>
-        <Grid container justify="flex-end">
-          <Grid item>
-            <Link component={ReachLink} to="/login" variant="body2">
-              <FormattedMessage
-                id="sessions.new.signup_action"
-                description="Action label for redirecting to log in page"
-                defaultMessage="Already have an account? Log in"
-              />
-            </Link>
+    <ErrorBoundary>
+      <div className={classes.paper}>
+        <Avatar className={classes.avatar}>
+          <LockOutlinedIcon />
+        </Avatar>
+        <Typography component="h1" variant="h5">
+          {intl.formatMessage(messages.title)}
+        </Typography>
+        <UserPasswordForm required
+          handleSubmit={handleSubmit}
+          userCredentials={uc}>
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            color="primary"
+            className={classes.submit}
+          >
+            <FormattedMessage
+              id="users.new.action"
+              description="Action label for the sign up"
+              defaultMessage="Sign up"
+            />
+          </Button>
+          <Grid container justify="flex-end">
+            <Grid item>
+              <Link component={ReachLink} to="/login" variant="body2">
+                <FormattedMessage
+                  id="sessions.new.signup_action"
+                  description="Action label for redirecting to log in page"
+                  defaultMessage="Already have an account? Log in"
+                />
+              </Link>
+            </Grid>
           </Grid>
-        </Grid>
-      </UserPasswordForm>
-    </div>
+        </UserPasswordForm>
+      </div>
+    </ErrorBoundary>
   </Container>;
 };
 

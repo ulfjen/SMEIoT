@@ -13,128 +13,174 @@ import CardContent from '@material-ui/core/CardContent';
 import CardHeader from '@material-ui/core/CardHeader';
 import BuildIcon from '@material-ui/icons/Build';
 import PasswordField from "../components/PasswordField";
-
-import {
-  Configuration, SessionsApi,
-  UsersApi,
-  BasicUserApiModel,
-} from "smeiot-client";
+import { UsersApi } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
 import moment from "moment";
 import useUserCredentials from "../helpers/useUserCredentials";
 import { RouteComponentProps } from "@reach/router";
+import { useIntl, defineMessages, FormattedMessage } from "react-intl";
+import { useTitle, useAsync } from "react-use";
+import { useAppCookie } from "../helpers/useCookie";
+import ValidationProblemDetails from "../models/ValidationProblemDetails";
+import Skeleton from "@material-ui/lab/Skeleton";
+import ErrorBoundary from "../components/ErrorBoundary";
 
 const styles = ({ palette, spacing }: Theme) => createStyles({
-  '@global': {
-    body: {
-      backgroundColor: palette.common.white,
-    },
-  },
-  container: {},
-  paper: {
-    marginTop: spacing(8),
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  avatar: {
-    margin: spacing(1),
-    backgroundColor: palette.secondary.main,
-  },
-  form: {
-    width: '100%', // Fix IE 11 issue.
-    marginTop: spacing(3),
-  },
-  submit: {
-    margin: spacing(3, 0, 2),
-  },
   page: {
     marginTop: spacing(3)
+  },
+  label: {
+    paddingTop: 3
+  },
+  content: {
+    paddingTop: 0
   }
 });
 
 export interface IEditUserProps extends RouteComponentProps, WithStyles<typeof styles> {
 }
 
-const _EditUser: React.FunctionComponent<IEditUserProps & WithStyles<typeof styles>> = ({ classes }) => {
+const messages = defineMessages({
+  title: {
+    id: "users.edit.title",
+    description: "Title for editusers",
+    defaultMessage: "Profile"
+  },
+  password: {
+    id: "users.edit.password_label",
+    description: "Password label",
+    defaultMessage: "Password"
+  },
+  newPassword: {
+    id: "users.edit.newpassword_label",
+    description: "New password label",
+    defaultMessage: "New password"
+  }
+});
+
+const _EditUser: React.FunctionComponent<IEditUserProps & WithStyles<typeof styles>> = ({ classes, navigate }) => {
+  const intl = useIntl();
   const uc = useUserCredentials();
+
+  useTitle(intl.formatMessage(messages.title));
+  const appCookie = useAppCookie();
 
   const [newPassword, setNewPassword] = React.useState<string>("");
   const [newPasswordError, setNewPasswordError] = React.useState<string>("");
 
+  const state = useAsync(async () => {
+    return await new UsersApi(GetDefaultApiConfig()).apiUsersUserNameGet({
+      userName: appCookie.userName || ""
+    });
+  }, [appCookie.userName]);
 
-  let currentUser: BasicUserApiModel = {
-    createdAt: moment.utc().toISOString(),
-    roles: [],
-    userName: ""
-  };
+  const handleEdit = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    event.preventDefault();
+    if (event.target === undefined) {
+      return;
+    }
+    uc.setEntityError("");
 
-  // @ts-ignore
-  if (window.SMEIoTPreRendered) {
-    // @ts-ignore
-    currentUser = window.SMEIoTPreRendered["currentUser"];
-  }
-
-  const handleEdit = async () => {
+    if (!state.value || !state.value?.userName) {
+      throw new Error("user can not be found. Try to clean the cookie and refresh.");
+    } 
     try {
       const result = await new UsersApi(GetDefaultApiConfig()).apiUsersUserNamePasswordPut({
-        userName: currentUser.userName || "",
+        userName: state.value.userName,
         confirmedUserCredentialsUpdateBindingModel: {
           currentPassword: uc.password,
           newPassword: newPassword
         }
       });
 
-      window.location.replace("/dashboard");
+      navigate && navigate("/dashboard");
     } catch (response) {
-      const { status, errors } = await response.json();
-      if (errors.hasOwnProperty("UserName")) {
-        uc.setUserNameError(errors["UserName"].join("\n"));
+      const details: ValidationProblemDetails = await response.json();
+      if (details.detail) {
+        uc.setEntityError(details.detail);
       }
-      if (errors.hasOwnProperty("CurrentPassword")) {
-        uc.setPasswordError(errors["CurrentPassword"].join("\n"));
+      const err = details.errors;
+      if (err) {
+        if (err.hasOwnProperty("userName")) {
+          uc.setUserNameError(err["userName"].join("\n"));
+        }
+        if (err.hasOwnProperty("password")) {
+          uc.setPasswordError(err["password"].join("\n"));
+        }
+        if (err.hasOwnProperty("newPassword")) {
+          setNewPasswordError(err["newPassword"].join("\n"));
+        }
       }
-      if (errors.hasOwnProperty("NewPassword")) {
-        setNewPasswordError(errors["NewPassword"].join("\n"));
-      }
-
     }
   };
 
-  var roles = (currentUser.roles || []).join(", ");
+  const roles = (state.value?.roles || []).join(", ");
 
   return <Container component="main" maxWidth="lg" className={classes.page}>
     <CssBaseline />
-    <Card>
-      <CardHeader
-        avatar={
-          <BuildIcon />
-        }
-        title={"Edit profile"}
-      />
-      <CardContent>
-        <Typography variant="h5">
-          {currentUser.userName}
-        </Typography>
-        <Typography color="textSecondary">{roles}</Typography>
-        <Typography>Created at: {moment(currentUser.createdAt).format("LLLL")}</Typography>
+    <ErrorBoundary>
+      <Card>
+        <CardHeader
+          avatar={
+            <BuildIcon />
+          }
+          title={intl.formatMessage(messages.title)}
+        />
+        <CardContent className={classes.content}>
+          <div className={classes.label}>
+            {state.loading ?
+              <Skeleton variant="rect" width={160} height={30} /> :
+              <Typography variant="h5">
+                {state.value?.userName}
+              </Typography>}
+          </div>
+          <div className={classes.label}>
+            {state.loading ? <Skeleton variant="rect" width={80} height={20} /> : <Typography color="textSecondary">{roles}</Typography>}
+          </div>
+          <div className={classes.label}>
+            {state.loading ?
+              <Skeleton variant="rect" width={480} height={20} /> :
+              <Typography>
+                <FormattedMessage
+                  id="users.edit.created_at"
+                  description="Account creation time message"
+                  defaultMessage="Your account is created at {time}."
+                  values={{
+                    time: moment(state.value?.createdAt).format("LLLL")
+                  }}
+                />
+              </Typography>}
+          </div>
 
-        <PasswordField
-          label="Current Password"
-          setPassword={uc.setPassword}
-          errors={uc.passwordError}
-          setErrors={uc.setPasswordError} />
-        <PasswordField
-          label="New Password"
-          setPassword={setNewPassword}
-          errors={newPasswordError}
-          setErrors={setNewPasswordError} />
-      </CardContent>
-      <CardActions>
-        <Button onClick={() => { window.location.href = "/dashboard"; }}>Cancel</Button>
-        <Button color="primary" onClick={handleEdit}>Edit</Button>
-      </CardActions>
-    </Card>
+          <PasswordField
+            label={intl.formatMessage(messages.password)}
+            setPassword={uc.setPassword}
+            errors={uc.passwordError}
+            setErrors={uc.setPasswordError} />
+          <PasswordField
+            label={intl.formatMessage(messages.newPassword)}
+            setPassword={setNewPassword}
+            errors={newPasswordError}
+            setErrors={setNewPasswordError} />
+        </CardContent>
+        <CardActions>
+          <Button onClick={() => { navigate && navigate("/dashboard") }}>
+            <FormattedMessage
+              id="users.edit.action.cancel"
+              description="Cancel action in the user profile page"
+              defaultMessage="Cancel"
+            />
+          </Button>
+          <Button color="primary" onClick={handleEdit}>
+            <FormattedMessage
+              id="users.edit.action.edit"
+              description="Edit action in the user profile page"
+              defaultMessage="Edit"
+            />
+          </Button>
+        </CardActions>
+      </Card>
+    </ErrorBoundary>
   </Container>;
 };
 

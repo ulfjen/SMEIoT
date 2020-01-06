@@ -70,8 +70,9 @@ namespace SMEIoT.Web
         Status = statusCode,
         Type = type,
         Detail = detail,
-        Instance = instance,
+        Instance = instance
       };
+      problemDetails.Extensions["errors"] = errors;
 
       if (title != null)
       {
