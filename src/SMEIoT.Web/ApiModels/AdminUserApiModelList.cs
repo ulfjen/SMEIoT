@@ -8,9 +8,14 @@ namespace SMEIoT.Web.ApiModels
     [JsonProperty(Required = Required.DisallowNull)]
     public IEnumerable<AdminUserApiModel> Users { get; set; }
 
-    public AdminUserApiModelList(IEnumerable<AdminUserApiModel> users)
+    // the total amount of items that the query can return.
+    [JsonProperty(Required = Required.DisallowNull)]
+    public int Total { get; set; }
+
+    public AdminUserApiModelList(IEnumerable<AdminUserApiModel> users, int total)
     {
       Users = users;
+      Total = total;
     }
   }
 }

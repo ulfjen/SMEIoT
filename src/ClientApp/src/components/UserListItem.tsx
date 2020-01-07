@@ -26,9 +26,10 @@ export interface IUserListItemProps extends WithStyles<typeof styles> {
   user: AdminUserApiModel;
   setAnchorEl: React.Dispatch<React.SetStateAction<null | HTMLElement>>;
   setFocusedUserName: React.Dispatch<React.SetStateAction<null | string>>;
+  className?: string;
 }
 
-const _UserListItem: React.FunctionComponent<IUserListItemProps & WithStyles<typeof styles>> = ({classes, user, setAnchorEl, setFocusedUserName}) => {
+const _UserListItem: React.FunctionComponent<IUserListItemProps & WithStyles<typeof styles>> = ({classes, className, user, setAnchorEl, setFocusedUserName}) => {
   const userName = user.userName || "";
   const avatar = Avatars.create(userName);
   const lastSeenAt = moment(user.lastSeenAt).fromNow();
@@ -38,7 +39,7 @@ const _UserListItem: React.FunctionComponent<IUserListItemProps & WithStyles<typ
     setAnchorEl(event.currentTarget);
   };
   
-  return <ListItem>
+  return <ListItem className={className}>
     <ListItemAvatar>
       <Avatar>
         <svg dangerouslySetInnerHTML={{__html: avatar}} />

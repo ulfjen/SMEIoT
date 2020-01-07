@@ -10,10 +10,11 @@ import UserListItem from "../components/UserListItem";
 import Typography from "@material-ui/core/Typography";
 import Chip from "@material-ui/core/Chip";
 import Menu from "@material-ui/core/Menu";
+import Box from "@material-ui/core/Box";
 import MenuItem from "@material-ui/core/MenuItem";
 import Skeleton from "@material-ui/lab/Skeleton";
-import {GetDefaultApiConfig} from "../index";
-import {AdminUserApiModel, AdminUsersApi, BasicUserApiModel} from "smeiot-client";
+import { GetDefaultApiConfig } from "../index";
+import { AdminUserApiModel, AdminUsersApi, AdminUserApiModelList } from "smeiot-client";
 import Card from "@material-ui/core/Card";
 import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -26,12 +27,22 @@ import moment from 'moment';
 import { Link, RouteComponentProps } from '@reach/router';
 import UserAvatarMenu from '../components/UserAvatarMenu';
 import { useAppCookie } from '../helpers/useCookie';
+import { defineMessages, useIntl } from 'react-intl';
+import { useTitle, useAsync } from 'react-use';
+import { FixedSizeList, areEqual, ListChildComponentProps } from 'react-window';
+import AutoSizer from "react-virtualized-auto-sizer";
+import Grid from '@material-ui/core/Grid';
+import InfiniteLoader from 'react-window-infinite-loader';
+import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+import ListItemText from '@material-ui/core/ListItemText';
+import ListItem from '@material-ui/core/ListItem';
 
 
-const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Theme) => createStyles({
+const styles = ({ palette, spacing, transitions, zIndex, mixins, breakpoints }: Theme) => createStyles({
   container: {
     paddingTop: spacing(4),
     paddingBottom: spacing(4),
+    height: '90%'
   },
   list: {
   },
@@ -43,37 +54,47 @@ const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Th
     },
     marginBottom: spacing(2)
   },
-  paper: {
-    padding: spacing(2),
-    display: 'flex',
-    overflow: 'auto',
-    flexDirection: 'column',
-  },
-  fixedHeight: {
-    height: 240,
-  },
   usersMenu: {
   },
   usersMenuDeleteItem: {
     color: palette.error.main
+  },
+  item: {
+  },
+  card: {
+    height: "100%"
   }
 });
 
 export interface IDashboardUsersProps extends RouteComponentProps, WithStyles<typeof styles> {
 }
 
+const messages = defineMessages({
+  title: {
+    id: "dashboard.users.index.title",
+    description: "Used as title in the user index page on the dashboard",
+    defaultMessage: "Users"
+  }
+});
 
-const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({classes, navigate}) => {
+const USERS_PER_REQ = 10;
+
+const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({ classes, navigate }) => {
+  const intl = useIntl();
+  const appCookie = useAppCookie();
+
+  useTitle(intl.formatMessage(messages.title));
+
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [loaded, setLoaded] = React.useState<boolean>(false);
-  const [users, setUsers] = React.useState<null | Array<AdminUserApiModel>>(null);
+  const [users, setUsers] = React.useState<Array<AdminUserApiModel>>([]);
   const [focusedUserName, setFocusedUserName] = React.useState<null | string>(null);
   const [dialogOpen, setDiaglogOpen] = React.useState<boolean>(false);
+  const [hasNextPage, setHasNextPage] = React.useState<boolean>(true);
 
   const handleClose = () => {
     setAnchorEl(null);
   };
-  
+
   const handleEdit = () => {
     handleClose();
     window.location.href = `/dashboard/users/${focusedUserName}`;
@@ -83,56 +104,89 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({classes
     handleClose();
     setDiaglogOpen(true);
   };
-  
+
   const handleDialogClose = () => {
     setDiaglogOpen(false);
   };
-  
+
   const handleDeleteClose = async () => {
     setDiaglogOpen(false);
   };
 
-  const requestUsers = async (start = 1, limit = 10) => {
-    if (loaded) { return; }
-    const result = await new AdminUsersApi(GetDefaultApiConfig()).apiAdminUsersGet({
-        start, limit
+  const outerListType = React.forwardRef((props, ref: React.Ref<HTMLUListElement>) => (
+    <List ref={ref} {...props} />
+  ));
+  const isUserLoaded = (index: number) => !hasNextPage || index < users.length;
+  const loadMoreUsers = (startIndex: number, stopIndex: number) => {
+    return new AdminUsersApi(GetDefaultApiConfig()).apiAdminUsersGet({
+      offset: startIndex, // we only render things when scroll down so no need to be extra fancy
+      limit: USERS_PER_REQ
+    }).then((result: AdminUserApiModelList) => {
+      if (!result.users) {
+        return;
+      }
+      const newUsers = users.concat(result.users);
+      setUsers(newUsers);
+      if (result.total && newUsers.length >= result.total) {
+        setHasNextPage(false);
+      }
+      console.log(newUsers, result);
+      return result;
     });
-    setLoaded(true);
-    setUsers((result.users as ((prevState: (Array<AdminUserApiModel> | null)) => (Array<AdminUserApiModel> | null)) | Array<AdminUserApiModel> | null));
+  }
+  // for loading indicator
+  const userCount = hasNextPage ? users.length + 1 : users.length;
+
+  const userItemRenderer: React.FunctionComponent<ListChildComponentProps> = ({ index, style }) => {
+    return <Box css={style}>
+      {index === users.length ? <ListItem>
+      <ListItemAvatar>
+        <Skeleton variant="circle" width={40} height={40} />
+      </ListItemAvatar>
+
+      <ListItemText primary={<Skeleton variant="rect" width={200} height={17} />} secondary={<Skeleton variant="text" />} />
+    </ListItem> : <UserListItem className={classes.item} user={users[index]} setFocusedUserName={setFocusedUserName} setAnchorEl={setAnchorEl} key={users[index].id} />
+    }</Box>
   };
 
-  const renderUserLists = () => {
-    if (users == null) { return null; }
-
-    return users.map(user => user ? <UserListItem user={user} setFocusedUserName={setFocusedUserName} setAnchorEl={setAnchorEl} key={user.id}/> : null);
-  };
-
-  React.useEffect(() => {
-    requestUsers();
-  }, []);
-
-  const appCookie = useAppCookie();
-
-  return <DashboardFrame title="Users" direction="ltr"
+  return <DashboardFrame
+    title={intl.formatMessage(messages.title)}
+    direction="ltr"
     drawer
-    toolbarRight={<UserAvatarMenu appCookie={appCookie} navigate={navigate}/>}
+    toolbarRight={<UserAvatarMenu appCookie={appCookie} navigate={navigate} />}
     content={
       <Container maxWidth="lg" className={classes.container}>
         <Paper className={classes.filterBar}>
           <Typography>Show:</Typography>
-          <Chip label="Admin"/>
+          <Chip label="Admin" />
         </Paper>
-        <Card>
-          <List className={classes.list}>
-            {loaded ? (
-              renderUserLists()
-            ) : (
-              <Skeleton variant="rect" height={4}/>
+        <Card className={classes.card}>
+          <AutoSizer>
+            {({ height, width }) => (
+              <InfiniteLoader
+                isItemLoaded={isUserLoaded}
+                itemCount={userCount}
+                loadMoreItems={loadMoreUsers}
+              >
+                {({ onItemsRendered, ref }) => (
+                  <FixedSizeList
+                    className={classes.list}
+                    height={height}
+                    width={width}
+                    itemCount={userCount}
+                    itemSize={72}
+                    onItemsRendered={onItemsRendered}
+                    ref={ref}
+                    outerElementType={outerListType}
+                  >
+                    {userItemRenderer}
+                  </FixedSizeList>
+                )}
+              </InfiniteLoader>
             )}
-          </List>
+          </AutoSizer>
         </Card>
         <Menu
-          id="user-management-menu"
           anchorEl={anchorEl}
           keepMounted
           open={Boolean(anchorEl)}

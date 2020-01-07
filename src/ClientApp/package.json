@@ -20,7 +20,9 @@
     "@types/reach__router": "^1.2.6",
     "@types/react": "^16.9.17",
     "@types/react-dom": "^16.9.2",
+    "@types/react-virtualized-auto-sizer": "^1.0.0",
     "@types/react-window": "^1.8.1",
+    "@types/react-window-infinite-loader": "^1.0.2",
     "@typescript-eslint/eslint-plugin": "^2.14.0",
     "@typescript-eslint/parser": "^2.14.0",
     "eslint": "^6.8.0",
@@ -48,8 +50,10 @@
     "react-dom": "^16.10.2",
     "react-intl": "^3.9.3",
     "react-use": "^13.13.0",
+    "react-virtualized-auto-sizer": "^1.0.2",
     "react-vis": "^1.11.7",
     "react-window": "^1.8.5",
+    "react-window-infinite-loader": "^1.0.5",
     "smeiot-client": "file:vendor/smeiot-client"
   },
   "eslintConfig": {

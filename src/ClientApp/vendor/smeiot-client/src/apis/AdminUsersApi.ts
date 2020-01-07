@@ -33,7 +33,7 @@ import {
 } from '../models';
 
 export interface AdminUsersApiApiAdminUsersGetRequest {
-    start?: number;
+    offset?: number;
     limit?: number;
 }
 
@@ -56,8 +56,8 @@ export class AdminUsersApi extends runtime.BaseAPI {
     async apiAdminUsersGetRaw(requestParameters: AdminUsersApiApiAdminUsersGetRequest): Promise<runtime.ApiResponse<AdminUserApiModelList>> {
         const queryParameters: runtime.HTTPQuery = {};
 
-        if (requestParameters.start !== undefined) {
-            queryParameters['start'] = requestParameters.start;
+        if (requestParameters.offset !== undefined) {
+            queryParameters['offset'] = requestParameters.offset;
         }
 
         if (requestParameters.limit !== undefined) {
@@ -122,7 +122,7 @@ export class AdminUsersApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        headerParameters['Content-Type'] = 'application/json; v=1.0; v=1.0';
+        headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
             path: `/api/admin/users/{userName}/roles`.replace(`{${"userName"}}`, encodeURIComponent(String(requestParameters.userName))),

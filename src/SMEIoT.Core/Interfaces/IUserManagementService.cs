@@ -14,5 +14,6 @@ namespace SMEIoT.Core.Interfaces
     Task UpdateUserRoles(string userName, IEnumerable<string> roles);
     Task<bool> IsAdmin(IEnumerable<string> roles);
     IAsyncEnumerable<(User, IList<string>)> ListBasicUserResultAsync(int offset, int limit);
+    Task<int> NumberOfUsersAsync();
   }
 }

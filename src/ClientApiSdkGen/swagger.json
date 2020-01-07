@@ -12,12 +12,12 @@
         ],
         "parameters": [
           {
-            "name": "start",
+            "name": "offset",
             "in": "query",
             "schema": {
               "type": "integer",
               "format": "int32",
-              "default": 1
+              "default": 0
             }
           },
           {
@@ -110,17 +110,7 @@
         ],
         "requestBody": {
           "content": {
-            "application/json; v=1.0; v=1.0": {
-              "schema": {
-                "$ref": "#/components/schemas/UserRolesBindingModel"
-              }
-            },
-            "text/json; v=1.0; v=1.0": {
-              "schema": {
-                "$ref": "#/components/schemas/UserRolesBindingModel"
-              }
-            },
-            "application/*+json; v=1.0; v=1.0": {
+            "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/UserRolesBindingModel"
               }
@@ -216,17 +206,7 @@
         ],
         "requestBody": {
           "content": {
-            "application/json; v=1.0; v=1.0": {
-              "schema": {
-                "$ref": "#/components/schemas/DeviceConfigBindingModel"
-              }
-            },
-            "text/json; v=1.0; v=1.0": {
-              "schema": {
-                "$ref": "#/components/schemas/DeviceConfigBindingModel"
-              }
-            },
-            "application/*+json; v=1.0; v=1.0": {
+            "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/DeviceConfigBindingModel"
               }
@@ -274,17 +254,7 @@
         ],
         "requestBody": {
           "content": {
-            "application/json; v=1.0; v=1.0": {
-              "schema": {
-                "$ref": "#/components/schemas/DeviceConfigBindingModel"
-              }
-            },
-            "text/json; v=1.0; v=1.0": {
-              "schema": {
-                "$ref": "#/components/schemas/DeviceConfigBindingModel"
-              }
-            },
-            "application/*+json; v=1.0; v=1.0": {
+            "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/DeviceConfigBindingModel"
               }
@@ -553,17 +523,7 @@
         ],
         "requestBody": {
           "content": {
-            "application/json; v=1.0; v=1.0": {
-              "schema": {
-                "$ref": "#/components/schemas/AssignUserSensorBindingModel"
-              }
-            },
-            "text/json; v=1.0; v=1.0": {
-              "schema": {
-                "$ref": "#/components/schemas/AssignUserSensorBindingModel"
-              }
-            },
-            "application/*+json; v=1.0; v=1.0": {
+            "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/AssignUserSensorBindingModel"
               }
@@ -755,17 +715,7 @@
         ],
         "requestBody": {
           "content": {
-            "application/json; v=1.0; v=1.0": {
-              "schema": {
-                "$ref": "#/components/schemas/SensorLocatorBindingModel"
-              }
-            },
-            "text/json; v=1.0; v=1.0": {
-              "schema": {
-                "$ref": "#/components/schemas/SensorLocatorBindingModel"
-              }
-            },
-            "application/*+json; v=1.0; v=1.0": {
+            "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/SensorLocatorBindingModel"
               }
@@ -850,17 +800,7 @@
         ],
         "requestBody": {
           "content": {
-            "application/json; v=1.0; v=1.0": {
-              "schema": {
-                "$ref": "#/components/schemas/LoginBindingModel"
-              }
-            },
-            "text/json; v=1.0; v=1.0": {
-              "schema": {
-                "$ref": "#/components/schemas/LoginBindingModel"
-              }
-            },
-            "application/*+json; v=1.0; v=1.0": {
+            "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/LoginBindingModel"
               }
@@ -916,8 +856,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Client Error",
             "content": {
               "application/json": {
                 "schema": {
@@ -946,17 +886,7 @@
         ],
         "requestBody": {
           "content": {
-            "application/json; v=1.0; v=1.0": {
-              "schema": {
-                "$ref": "#/components/schemas/ConfirmedUserCredentialsUpdateBindingModel"
-              }
-            },
-            "text/json; v=1.0; v=1.0": {
-              "schema": {
-                "$ref": "#/components/schemas/ConfirmedUserCredentialsUpdateBindingModel"
-              }
-            },
-            "application/*+json; v=1.0; v=1.0": {
+            "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/ConfirmedUserCredentialsUpdateBindingModel"
               }
@@ -974,8 +904,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Client Error",
             "content": {
               "application/json": {
                 "schema": {
@@ -1013,8 +943,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Client Error",
             "content": {
               "application/json": {
                 "schema": {
@@ -1062,6 +992,10 @@
             "items": {
               "$ref": "#/components/schemas/AdminUserApiModel"
             }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -1397,10 +1331,12 @@
         "type": "object",
         "properties": {
           "userName": {
+            "maxLength": 1000,
+            "minLength": 3,
             "type": "string"
           },
           "password": {
-            "maxLength": 1024,
+            "maxLength": 1000,
             "minLength": 8,
             "type": "string",
             "format": "password"

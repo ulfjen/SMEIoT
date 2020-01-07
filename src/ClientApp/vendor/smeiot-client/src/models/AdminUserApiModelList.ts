@@ -32,6 +32,12 @@ export interface AdminUserApiModelList {
      * @memberof AdminUserApiModelList
      */
     users?: Array<AdminUserApiModel>;
+    /**
+     * 
+     * @type {number}
+     * @memberof AdminUserApiModelList
+     */
+    total?: number;
 }
 
 export function AdminUserApiModelListFromJSON(json: any): AdminUserApiModelList {
@@ -45,6 +51,7 @@ export function AdminUserApiModelListFromJSONTyped(json: any, ignoreDiscriminato
     return {
         
         'users': !exists(json, 'users') ? undefined : ((json['users'] as Array<any>).map(AdminUserApiModelFromJSON)),
+        'total': !exists(json, 'total') ? undefined : json['total'],
     };
 }
 
@@ -58,6 +65,7 @@ export function AdminUserApiModelListToJSON(value?: AdminUserApiModelList | null
     return {
         
         'users': value.users === undefined ? undefined : ((value.users as Array<any>).map(AdminUserApiModelToJSON)),
+        'total': value.total,
     };
 }
 

@@ -122,7 +122,7 @@ export class SensorsApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        headerParameters['Content-Type'] = 'application/json; v=1.0; v=1.0';
+        headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
             path: `/api/sensors`,

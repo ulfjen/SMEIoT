@@ -230,6 +230,11 @@ namespace SMEIoT.Core.Services
       }
     }
 
+    public async Task<int> NumberOfUsersAsync()
+    {
+      return await _dbContext.Users.CountAsync();
+    }
+
     public Task<bool> IsAdmin(IEnumerable<string> roles)
     {
       return Task.FromResult(roles.Contains("Admin"));
