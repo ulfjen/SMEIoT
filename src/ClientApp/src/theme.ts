@@ -1,18 +1,18 @@
 import red from '@material-ui/core/colors/red';
 
-// https://material.io/resources/color/#!/?view.left=1&view.right=0&secondary.color=F3E5F5&primary.color=42A5F5&secondary.text.color=424242
+// https://material.io/resources/color/#!/?view.left=0&view.right=0&secondary.color=42A5F5&primary.color=3F51B5
 const palette = {
   primary: {
+    main: "#3f51b5",
+    light: "#757de8",
+    dark: "#002984",
+    contrastText: "#ffffff"
+  },
+  secondary: {
     main: "#42a5f5",
     light: "#80d6ff",
     dark: "#0077c2",
     contrastText: "#000000"
-  },
-  secondary: {
-    main: "#f4e5f5",
-    light: "#ffffff",
-    dark: "#c0b3a2",
-    contrastText: "#424242"
   },
   error: {
     main: red.A400,
