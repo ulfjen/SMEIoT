@@ -25,7 +25,7 @@ namespace SMEIoT.Web.Api.V1
 
     [HttpGet("")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<AdminUserApiModelList>> Index([FromQuery] int offset = 0, [FromQuery] int limit = 10, [FromQuery(Name="roles")] IEnumerable<string>? roles = null)
     {
@@ -40,7 +40,7 @@ namespace SMEIoT.Web.Api.V1
 
     [HttpGet("{userName}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<AdminUserApiModel>> Show(string userName)
     {
@@ -50,7 +50,7 @@ namespace SMEIoT.Web.Api.V1
 
     [HttpPut("{userName}/roles")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<UserCredentialsUpdateApiModel>> EditRoles(
       [FromBody] UserRolesBindingModel binding, [FromRoute] string userName)

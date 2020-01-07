@@ -23,7 +23,7 @@ namespace SMEIoT.Web.Api.V1
     
     [HttpPost("{name}/users")]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<SensorAssignmentApiModel>> Create(string name, AssignUserSensorBindingModel binding)
@@ -36,7 +36,7 @@ namespace SMEIoT.Web.Api.V1
     
     [HttpGet("{name}/users")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Authorize(Roles = "Admin")]
     public async IAsyncEnumerable<UserSensor> Index(string name)
@@ -49,7 +49,7 @@ namespace SMEIoT.Web.Api.V1
 
     [HttpDelete("{name}/users/{userName}")]
     [ProducesResponseType(StatusCodes.Status202Accepted)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Delete(string name, string userName)

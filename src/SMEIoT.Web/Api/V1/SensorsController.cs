@@ -27,7 +27,7 @@ namespace SMEIoT.Web.Api.V1
 
     [HttpGet("")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<SensorDetailsApiModelList>> Index([FromQuery] int start = 1, [FromQuery] int limit = 10)
     {
@@ -66,7 +66,7 @@ namespace SMEIoT.Web.Api.V1
 
     [HttpPost("")]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<BasicSensorApiModel>> Create(SensorLocatorBindingModel view)
     {

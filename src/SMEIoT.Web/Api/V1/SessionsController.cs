@@ -27,7 +27,7 @@ namespace SMEIoT.Web.Api.V1
 //    [ValidateAntiForgeryToken]
     [HttpPost("")]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult<LoginedApiModel>> Create(LoginBindingModel model)
     {
 //      ViewData["ReturnUrl"] = model.ReturnUrl;

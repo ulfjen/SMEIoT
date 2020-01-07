@@ -28,7 +28,7 @@ namespace SMEIoT.Web.Api.V1
 
     [HttpGet("basic")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<BasicBrokerApiModel>> ShowBasic()
     {
@@ -39,7 +39,7 @@ namespace SMEIoT.Web.Api.V1
 
     [HttpGet("statistics")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<BrokerStatisticsApiModel>> ShowStatistics()
     {

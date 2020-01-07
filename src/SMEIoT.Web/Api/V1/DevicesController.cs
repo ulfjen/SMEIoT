@@ -39,7 +39,7 @@ namespace SMEIoT.Web.Api.V1
 
     [HttpPost("bootstrap")]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<DeviceApiModel>> BootstrapWithPreSharedKey(DeviceConfigBindingModel view)
     {
@@ -51,7 +51,7 @@ namespace SMEIoT.Web.Api.V1
 
     [HttpPut("{name}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<DeviceApiModel>> Update(DeviceConfigBindingModel view)
     {
@@ -62,7 +62,7 @@ namespace SMEIoT.Web.Api.V1
 
     [HttpGet("{name}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<DeviceApiModel>> Show(string name)
     {
@@ -73,7 +73,7 @@ namespace SMEIoT.Web.Api.V1
 
     [HttpGet("{name}/psk")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<string>> ShowPsk(string name)
     {
@@ -120,7 +120,7 @@ namespace SMEIoT.Web.Api.V1
 
     [HttpGet("")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<DeviceApiModelList>> Index([FromQuery] int start = 1, [FromQuery] int limit = 10)
     {
