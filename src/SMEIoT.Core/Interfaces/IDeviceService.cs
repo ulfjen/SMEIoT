@@ -14,6 +14,7 @@ namespace SMEIoT.Core.Interfaces
 
     IAsyncEnumerable<Sensor> ListSensorsAsync(int start, int limit);
 
+    IAsyncEnumerable<Sensor> ListSensorsByDeviceAsync(Device device);
     Task CreateSensorByDeviceAndNameAsync(Device device, string sensorName);
     Task<Sensor> GetSensorByDeviceAndNameAsync(Device device, string sensorName);
     IAsyncEnumerable<(double value, Instant createdAt)> GetNumberTimeSeriesByDeviceAndSensorAsync(Device device, Sensor sensor, Instant startedAt, Duration duration);

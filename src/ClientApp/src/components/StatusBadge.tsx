@@ -4,6 +4,8 @@ import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import clsx from "clsx";
+import green from '@material-ui/core/colors/green';
+import red from '@material-ui/core/colors/red';
 
 const RADIUS_STANDARD = 7;
 
@@ -31,10 +33,10 @@ const styles = ({ typography, transitions }: Theme) => createStyles({
     }),
   },
   normalColor: {
-    backgroundColor: "green"
+    backgroundColor: green[800]
   },
   errorColor: {
-    backgroundColor: "red"
+    backgroundColor: red[500]
   }
 });
 

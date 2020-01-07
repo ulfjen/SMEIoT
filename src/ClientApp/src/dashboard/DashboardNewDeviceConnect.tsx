@@ -9,8 +9,7 @@ import Button from "@material-ui/core/Button";
 import Skeleton from "@material-ui/lab/Skeleton";
 import { Link as ReachLink, RouteComponentProps } from "@reach/router";
 import {
-  DevicesApi,
-  DeviceApiModel
+  DevicesApi
 } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
 import DashboardNewDeviceFrame from "./DashboardNewDeviceFrame";
@@ -23,7 +22,6 @@ import {
   useIntl,
   FormattedMessage
 } from "react-intl";
-import { DeviceApiModelFromJSON } from "smeiot-client";
 import useInterval from "../helpers/useInterval";
 
 const styles = ({ spacing }: Theme) =>

@@ -1,10 +1,11 @@
 using SMEIoT.Core.Entities;
 using NodaTime;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace SMEIoT.Web.ApiModels
 {
-  public class DeviceApiModel
+  public class BasicDeviceApiModel
   {
     [JsonProperty(Required = Required.DisallowNull)]
     public string Name { get; }
@@ -30,7 +31,7 @@ namespace SMEIoT.Web.ApiModels
     [JsonProperty(Required = Required.DisallowNull)]
     public Instant? LastMessageAt { get; }
 
-    public DeviceApiModel(Device device)
+    public BasicDeviceApiModel(Device device)
     {
       Name = device.Name;
       CreatedAt = device.CreatedAt;

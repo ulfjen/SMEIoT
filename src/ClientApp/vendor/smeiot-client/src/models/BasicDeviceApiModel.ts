@@ -23,64 +23,64 @@ import {
 /**
  * 
  * @export
- * @interface DeviceApiModel
+ * @interface BasicDeviceApiModel
  */
-export interface DeviceApiModel {
+export interface BasicDeviceApiModel {
     /**
      * 
      * @type {string}
-     * @memberof DeviceApiModel
+     * @memberof BasicDeviceApiModel
      */
     readonly name?: string;
     /**
      * 
      * @type {string}
-     * @memberof DeviceApiModel
+     * @memberof BasicDeviceApiModel
      */
     readonly createdAt?: string;
     /**
      * 
      * @type {string}
-     * @memberof DeviceApiModel
+     * @memberof BasicDeviceApiModel
      */
     readonly updatedAt?: string;
     /**
      * 
      * @type {DeviceAuthenticationType}
-     * @memberof DeviceApiModel
+     * @memberof BasicDeviceApiModel
      */
     authenticationType?: DeviceAuthenticationType;
     /**
      * 
      * @type {string}
-     * @memberof DeviceApiModel
+     * @memberof BasicDeviceApiModel
      */
     readonly preSharedKey?: string;
     /**
      * 
      * @type {boolean}
-     * @memberof DeviceApiModel
+     * @memberof BasicDeviceApiModel
      */
     readonly connected?: boolean;
     /**
      * 
      * @type {string}
-     * @memberof DeviceApiModel
+     * @memberof BasicDeviceApiModel
      */
     readonly connectedAt?: string;
     /**
      * 
      * @type {string}
-     * @memberof DeviceApiModel
+     * @memberof BasicDeviceApiModel
      */
     readonly lastMessageAt?: string;
 }
 
-export function DeviceApiModelFromJSON(json: any): DeviceApiModel {
-    return DeviceApiModelFromJSONTyped(json, false);
+export function BasicDeviceApiModelFromJSON(json: any): BasicDeviceApiModel {
+    return BasicDeviceApiModelFromJSONTyped(json, false);
 }
 
-export function DeviceApiModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): DeviceApiModel {
+export function BasicDeviceApiModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): BasicDeviceApiModel {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -97,7 +97,7 @@ export function DeviceApiModelFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-export function DeviceApiModelToJSON(value?: DeviceApiModel | null): any {
+export function BasicDeviceApiModelToJSON(value?: BasicDeviceApiModel | null): any {
     if (value === undefined) {
         return undefined;
     }

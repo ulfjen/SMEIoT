@@ -3,12 +3,12 @@ using Newtonsoft.Json;
 
 namespace SMEIoT.Web.ApiModels
 {
-  public class DeviceApiModelList
+  public class BasicDeviceApiModelList
   {
     [JsonProperty(Required = Required.DisallowNull)]
-    public IEnumerable<DeviceApiModel> Devices { get; set; }
+    public IEnumerable<BasicDeviceApiModel> Devices { get; set; }
 
-    public DeviceApiModelList(IEnumerable<DeviceApiModel> devices)
+    public BasicDeviceApiModelList(IEnumerable<BasicDeviceApiModel> devices)
     {
       Devices = devices;
     }

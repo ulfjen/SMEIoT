@@ -14,7 +14,7 @@ import { useTitle } from 'react-use';
 import BrokerCard from "./BrokerCard";
 import DeviceCard from "./DeviceCard";
 import BannerNotice from "../components/BannerNotice";
-import { DeviceApiModel, DeviceApiModelFromJSON, DevicesApi } from "smeiot-client";
+import { BasicDeviceApiModel, BasicDeviceApiModelFromJSON, DevicesApi } from "smeiot-client";
 import moment from "moment";
 import { defineMessages, useIntl, FormattedMessage } from "react-intl";
 import {
@@ -95,17 +95,17 @@ const _DashboardDeviceBoard: React.FunctionComponent<IDashboardDeviceBoard> = ({
   };
 
   const renderDevices = () => {
-    return devices.map((d: DeviceApiModel) => (
+    return devices.map((d: BasicDeviceApiModel) => (
       <Grid item key={d.name} xs={4} sm={6}>
         <DeviceCard device={d} onMoreClick={handleMoreClicked} />
       </Grid>
     ));
   };
 
-  const [devices, setDevices] = React.useState<Array<DeviceApiModel>>([]);
+  const [devices, setDevices] = React.useState<Array<BasicDeviceApiModel>>([]);
 
   const unconnectedDeviceNames = devices
-    .filter((d: DeviceApiModel) => !d.connected)
+    .filter((d: BasicDeviceApiModel) => !d.connected)
     .map(d => d.name);
 
   React.useEffect(() => {

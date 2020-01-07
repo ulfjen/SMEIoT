@@ -15,7 +15,7 @@ import Typography from "@material-ui/core/Typography";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import ListAltIcon from '@material-ui/icons/ListAlt';
-import { SensorDetailsApiModel, DeviceApiModel } from "smeiot-client";
+import { SensorDetailsApiModel, BasicDeviceApiModel } from "smeiot-client";
 import { defineMessages, useIntl, FormattedMessage } from "react-intl";
 import {
   Link as ReachLink,
@@ -51,7 +51,7 @@ const styles = ({
   });
 
 export interface IDeviceCard extends WithStyles<typeof styles> {
-  device: DeviceApiModel;
+  device: BasicDeviceApiModel;
   onMoreClick: (event: React.MouseEvent<HTMLButtonElement>, deviceName?: string) => void;
 }
 

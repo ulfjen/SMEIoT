@@ -13,6 +13,7 @@ namespace SMEIoT.Core.Services
   public class DeviceService : IDeviceService
   {
     private readonly IApplicationDbContext _dbContext;
+    private static readonly List<string> ForbiddenDeviceNames = new List<string> { "config_suggest", "bootstrap" }; 
 
     public DeviceService(IApplicationDbContext dbContext)
     {
@@ -21,6 +22,9 @@ namespace SMEIoT.Core.Services
     
     public async Task<string> BootstrapDeviceWithPreSharedKeyAsync(string name, string key)
     {
+      if (ForbiddenDeviceNames.Contains(name)) {
+        throw new InvalidArgumentException($"Reserverd device name {name}.", "name");
+      }
       _dbContext.Devices.Add(new Device
         {
           Name = name,
@@ -51,7 +55,7 @@ namespace SMEIoT.Core.Services
                     select d).FirstOrDefaultAsync();
     }
 
-    public async IAsyncEnumerable<Device> ListDevicesAsync(int start, int limit)
+    public async IAsyncEnumerable<Device> ListDevicesAsync(int offset, int limit)
     {
       if (start <= 0)
       {
@@ -87,6 +91,15 @@ namespace SMEIoT.Core.Services
     {
       _dbContext.Sensors.Add(new Sensor { Name = sensorName, NormalizedName = Sensor.NormalizeName(sensorName), DeviceId = device.Id });
       await _dbContext.SaveChangesAsync();
+    }
+
+
+    public async IAsyncEnumerable<Sensor> ListSensorsByDeviceAsync(Device device)
+    {
+      await foreach (var sensor in _dbContext.Sensors.Where(s => s.DeviceId == device.Id).AsAsyncEnumerable())
+      {
+        yield return sensor;
+      }
     }
 
     public async Task<Sensor> GetSensorByDeviceAndNameAsync(Device device, string sensorName)

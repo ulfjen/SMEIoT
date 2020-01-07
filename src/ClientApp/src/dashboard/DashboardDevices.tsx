@@ -15,8 +15,7 @@ import ErrorBoundary from "../components/ErrorBoundary";
 import BrokerCard from "./BrokerCard";
 import DashboardDeviceBoard from "./DashboardDeviceBoard";
 import {
-  DeviceApiModel,
-  DeviceApiModelFromJSON,
+  BasicDeviceApiModel,
   DevicesApi
 } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";

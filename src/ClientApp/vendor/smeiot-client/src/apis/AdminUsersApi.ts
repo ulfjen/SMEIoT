@@ -35,6 +35,7 @@ import {
 export interface AdminUsersApiApiAdminUsersGetRequest {
     offset?: number;
     limit?: number;
+    roles?: Array<string>;
 }
 
 export interface AdminUsersApiApiAdminUsersUserNameGetRequest {
@@ -62,6 +63,10 @@ export class AdminUsersApi extends runtime.BaseAPI {
 
         if (requestParameters.limit !== undefined) {
             queryParameters['limit'] = requestParameters.limit;
+        }
+
+        if (requestParameters.roles) {
+            queryParameters['roles'] = requestParameters.roles;
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

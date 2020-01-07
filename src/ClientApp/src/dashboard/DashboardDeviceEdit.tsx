@@ -23,7 +23,7 @@ import {
   DeviceConfigBindingModel,
   SensorsApi,
   DevicesApi,
-  DeviceApiModel
+  DeviceDetailsApiModel
 } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
 import Tooltip from "@material-ui/core/Tooltip";
@@ -168,7 +168,7 @@ const _DashboardDeviceEdit: React.FunctionComponent<IDashboardDeviceEditProps> =
   }, []);
 
   const deviceApi = new DevicesApi(GetDefaultApiConfig());
-  const state: AsyncState<DeviceApiModel> = useAsync(async () => {
+  const state: AsyncState<DeviceDetailsApiModel> = useAsync(async () => {
     return await deviceApi.apiDevicesNameGet({
       name: deviceName
     });

@@ -41,11 +41,11 @@ namespace SMEIoT.Web.Api.V1
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<DeviceApiModel>> BootstrapWithPreSharedKey(DeviceConfigBindingModel view)
+    public async Task<ActionResult<BasicDeviceApiModel>> BootstrapWithPreSharedKey(DeviceConfigBindingModel view)
     {
       var deviceName = await _service.BootstrapDeviceWithPreSharedKeyAsync(view.Name, view.Key);
       var device = await _service.GetDeviceByNameAsync(deviceName);
-      var res = new DeviceApiModel(device);
+      var res = new BasicDeviceApiModel(device);
       return CreatedAtAction(nameof(BootstrapWithPreSharedKey), res);
     }
 
@@ -53,35 +53,28 @@ namespace SMEIoT.Web.Api.V1
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<DeviceApiModel>> Update(DeviceConfigBindingModel view)
+    public async Task<ActionResult<BasicDeviceApiModel>> Update(DeviceConfigBindingModel view)
     {
       var device = await _service.GetDeviceByNameAsync(view.Name);
-      var res = new DeviceApiModel(device);
+      var res = new BasicDeviceApiModel(device);
       return Ok(res);
     }
 
     [HttpGet("{name}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<DeviceApiModel>> Show(string name)
+    public async Task<ActionResult<DeviceDetailsApiModel>> Show(string name)
     {
       var device = await _service.GetDeviceByNameAsync(name);
-      var res = new DeviceApiModel(device);
-      return Ok(res);
-    }
-
-    [HttpGet("{name}/psk")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<string>> ShowPsk(string name)
-    {
-      var device = await _service.GetDeviceByNameAsync(name);
-      var res = device.PreSharedKey;
-      if (res == null) {
-        throw new NotImplementedException();
+      var sensors = new List<SensorDetailsApiModel>();
+      await foreach (var sensor in _service.ListSensorsByDeviceAsync(device))
+      {
+        sensors.Add(new SensorDetailsApiModel(sensor, new List<(double, Instant)>()));
       }
+
+      var res = new DeviceDetailsApiModel(device, sensors);
       return Ok(res);
     }
 
@@ -96,6 +89,8 @@ namespace SMEIoT.Web.Api.V1
     }
 
     [HttpGet("config_suggest/bootstrap")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<DeviceConfigSuggestApiModel>> SuggestBootstrap()
     {
       var device = await _service.GetARandomUnconnectedDeviceAsync();
@@ -107,12 +102,16 @@ namespace SMEIoT.Web.Api.V1
     }
 
     [HttpGet("config_suggest/key")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<DeviceConfigSuggestApiModel>> SuggestSecureKey()
     {
       return Ok(new DeviceConfigSuggestApiModel(null, _secureKeySuggestService.GenerateSecureKeyWithByteLength(64))); // TODO: Add a max length
     }
 
     [HttpGet("config_suggest/device_name")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<DeviceConfigSuggestApiModel>> SuggestDeviceName()
     {
       return Ok(new DeviceConfigSuggestApiModel(_identifierSuggestService.GenerateRandomIdentifierForDevice(DefaultDeviceNameSuggestWordLength)));
@@ -122,15 +121,15 @@ namespace SMEIoT.Web.Api.V1
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<DeviceApiModelList>> Index([FromQuery] int start = 1, [FromQuery] int limit = 10)
+    public async Task<ActionResult<BasicDeviceApiModelList>> Index([FromQuery] int start = 1, [FromQuery] int limit = 10)
     {
-      var list = new List<DeviceApiModel>();
+      var list = new List<BasicDeviceApiModel>();
       await foreach (var device in _service.ListDevicesAsync(start, limit))
       {
-        list.Add(new DeviceApiModel(device));
+        list.Add(new BasicDeviceApiModel(device));
       }
 
-      return Ok(new DeviceApiModelList(list));
+      return Ok(new BasicDeviceApiModelList(list));
     }
 
   }

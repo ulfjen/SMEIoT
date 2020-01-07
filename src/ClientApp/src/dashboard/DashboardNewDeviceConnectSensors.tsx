@@ -11,7 +11,7 @@ import { Link, RouteComponentProps } from "@reach/router";
 import { useTitle } from 'react-use';
 import {
   DevicesApi,
-  DeviceApiModel
+  BasicDeviceApiModel
 } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
 import DashboardNewDeviceFrame from "./DashboardNewDeviceFrame";
@@ -56,7 +56,7 @@ const _DashboardNewDeviceConnectSensors: React.FunctionComponent<IDashboardNewDe
 
   const [loading, setLoading] = React.useState<boolean>(true);
   const [loadingError, setLoadingError] = React.useState<boolean>(false);
-  const [device, setDevice] = React.useState<DeviceApiModel>({});
+  const [device, setDevice] = React.useState<BasicDeviceApiModel>({});
 
   React.useEffect(() => {
     (async () => {

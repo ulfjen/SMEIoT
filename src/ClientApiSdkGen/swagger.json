@@ -28,6 +28,16 @@
               "format": "int32",
               "default": 10
             }
+          },
+          {
+            "name": "roles",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
           }
         ],
         "responses": {
@@ -41,8 +51,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Client Error",
             "content": {
               "application/json": {
                 "schema": {
@@ -80,8 +90,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Client Error",
             "content": {
               "application/json": {
                 "schema": {
@@ -128,8 +138,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Client Error",
             "content": {
               "application/json": {
                 "schema": {
@@ -157,8 +167,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Client Error",
             "content": {
               "application/json": {
                 "schema": {
@@ -186,8 +196,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Client Error",
             "content": {
               "application/json": {
                 "schema": {
@@ -219,13 +229,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DeviceApiModel"
+                  "$ref": "#/components/schemas/BasicDeviceApiModel"
                 }
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Client Error",
             "content": {
               "application/json": {
                 "schema": {
@@ -267,13 +277,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DeviceApiModel"
+                  "$ref": "#/components/schemas/BasicDeviceApiModel"
                 }
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Client Error",
             "content": {
               "application/json": {
                 "schema": {
@@ -304,13 +314,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DeviceApiModel"
+                  "$ref": "#/components/schemas/DeviceDetailsApiModel"
                 }
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "404": {
+            "description": "Not Found",
             "content": {
               "application/json": {
                 "schema": {
@@ -318,38 +328,9 @@
                 }
               }
             }
-          }
-        }
-      }
-    },
-    "/api/devices/{name}/psk": {
-      "get": {
-        "tags": [
-          "Devices"
-        ],
-        "parameters": [
-          {
-            "name": "name",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Client Error",
             "content": {
               "application/json": {
                 "schema": {
@@ -488,13 +469,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/DeviceApiModelList"
+                  "$ref": "#/components/schemas/BasicDeviceApiModelList"
                 }
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Client Error",
             "content": {
               "application/json": {
                 "schema": {
@@ -541,8 +522,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Client Error",
             "content": {
               "application/json": {
                 "schema": {
@@ -588,8 +569,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Client Error",
             "content": {
               "application/json": {
                 "schema": {
@@ -638,8 +619,8 @@
           "202": {
             "description": "Success"
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Client Error",
             "content": {
               "application/json": {
                 "schema": {
@@ -697,8 +678,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Client Error",
             "content": {
               "application/json": {
                 "schema": {
@@ -733,8 +714,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Client Error",
             "content": {
               "application/json": {
                 "schema": {
@@ -818,8 +799,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "422": {
+            "description": "Client Error",
             "content": {
               "application/json": {
                 "schema": {
@@ -1124,9 +1105,65 @@
         "type": "integer",
         "format": "int32"
       },
-      "DeviceApiModel": {
+      "BasicDeviceApiModel": {
         "type": "object",
         "properties": {
+          "name": {
+            "type": "string",
+            "readOnly": true
+          },
+          "createdAt": {
+            "type": "string",
+            "readOnly": true
+          },
+          "updatedAt": {
+            "type": "string",
+            "readOnly": true
+          },
+          "authenticationType": {
+            "$ref": "#/components/schemas/DeviceAuthenticationType"
+          },
+          "preSharedKey": {
+            "type": "string",
+            "readOnly": true
+          },
+          "connected": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "connectedAt": {
+            "type": "string",
+            "readOnly": true
+          },
+          "lastMessageAt": {
+            "type": "string",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "BasicSensorApiModel": {
+        "type": "object",
+        "properties": {
+          "sensorName": {
+            "type": "string"
+          },
+          "deviceName": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "DeviceDetailsApiModel": {
+        "type": "object",
+        "properties": {
+          "sensors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BasicSensorApiModel"
+            },
+            "readOnly": true
+          },
           "name": {
             "type": "string",
             "readOnly": true
@@ -1191,13 +1228,13 @@
         },
         "additionalProperties": false
       },
-      "DeviceApiModelList": {
+      "BasicDeviceApiModelList": {
         "type": "object",
         "properties": {
           "devices": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/DeviceApiModel"
+              "$ref": "#/components/schemas/BasicDeviceApiModel"
             }
           }
         },
@@ -1285,18 +1322,6 @@
             "type": "string"
           },
           "name": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "BasicSensorApiModel": {
-        "type": "object",
-        "properties": {
-          "sensorName": {
-            "type": "string"
-          },
-          "deviceName": {
             "type": "string"
           }
         },
