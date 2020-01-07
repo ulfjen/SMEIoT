@@ -57,31 +57,31 @@ namespace SMEIoT.Core.Services
 
     public async IAsyncEnumerable<Device> ListDevicesAsync(int offset, int limit)
     {
-      if (start <= 0)
+      if (offset < 0)
       {
-        throw new ArgumentException("start can't be negative or zero");
+        throw new InvalidArgumentException("Offset can't be negative.", "offset");
       }
       if (limit < 0)
       {
-        throw new ArgumentException("limit can't be negative"); 
+        throw new InvalidArgumentException("Limit can't be negative.", "limit"); 
       }
-      await foreach (var device in _dbContext.Devices.OrderBy(u => u.Id).Skip(start-1).Take(limit).AsAsyncEnumerable())
+      await foreach (var device in _dbContext.Devices.OrderBy(u => u.Id).Skip(offset).Take(limit).AsAsyncEnumerable())
       {
         yield return device;
       }
     }
 
-    public async IAsyncEnumerable<Sensor> ListSensorsAsync(int start, int limit)
+    public async IAsyncEnumerable<Sensor> ListSensorsAsync(int offset, int limit)
     {
-      if (start <= 0)
+      if (offset < 0)
       {
-        throw new ArgumentException("start can't be negative or zero");
+        throw new InvalidArgumentException("Offset can't be negative.", "offset");
       }
       if (limit < 0)
       {
-        throw new ArgumentException("limit can't be negative"); 
+        throw new InvalidArgumentException("Limit can't be negative.", "limit");       
       }
-      await foreach (var sensor in _dbContext.Sensors.OrderBy(u => u.Id).Skip(start-1).Take(limit).AsAsyncEnumerable())
+      await foreach (var sensor in _dbContext.Sensors.OrderBy(u => u.Id).Skip(offset).Take(limit).AsAsyncEnumerable())
       {
         yield return sensor;
       }
@@ -118,7 +118,7 @@ namespace SMEIoT.Core.Services
       var query = from sv in _dbContext.SensorValues
                   where sv.SensorId == sensor.Id && sv.CreatedAt >= startedAt && sv.CreatedAt < startedAt + duration
                   select sv;
-      foreach (var sv in query) {
+      await foreach (var sv in query.AsAsyncEnumerable()) {
         // throw new SystemException($"sv {sv.Value} {sv.CreatedAt}");
         yield return (sv.Value, sv.CreatedAt);
       }

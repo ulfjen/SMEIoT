@@ -8,7 +8,7 @@ using NodaTime;
 using SMEIoT.Core.Entities;
 using SMEIoT.Core.Interfaces;
 using Microsoft.Extensions.Logging;
-using Mono.Posix;
+using Mono.Unix.Native;
 
 namespace SMEIoT.Core.Services
 {
@@ -22,6 +22,7 @@ namespace SMEIoT.Core.Services
       get {
         var brokerSendingMessage = BrokerLastMessageAt != null && _clock.GetCurrentInstant() - BrokerLastMessageAt <= Duration.FromSeconds(45);
         var brokerExist = BrokerPid != null && BrokerPid == BrokerPidFromAuthPlugin;
+        _logger.LogTrace($"Broker last message {BrokerLastMessageAt}; Pid {BrokerPid}; Plugin {BrokerPidFromAuthPlugin}");
         // ensure we are talking with the same process
         return brokerSendingMessage && brokerExist;
       }
@@ -55,7 +56,7 @@ namespace SMEIoT.Core.Services
       }
     }
 
-    private Task SendSignalAsync(int signal, bool ignoreAuthPluginPid)
+    private Task SendSignalAsync(Signum signal, bool ignoreAuthPluginPid)
     {
       if (BrokerPid == null || (!ignoreAuthPluginPid && BrokerPidFromAuthPlugin == null)) {
         return Task.FromException(new ArgumentException($"The broker is not running correctly. We get pid from the broker as {BrokerPid}. And the auth plugin says {BrokerPidFromAuthPlugin}."));
@@ -69,10 +70,10 @@ namespace SMEIoT.Core.Services
       }
     }
 
-    public Task ReloadBrokerBySignalAsync(bool ignoreAuthPluginPid = false) => SendSignalAsync((int) Signals.SIGHUP, ignoreAuthPluginPid);
+    public Task ReloadBrokerBySignalAsync(bool ignoreAuthPluginPid = false) => SendSignalAsync(Signum.SIGHUP, ignoreAuthPluginPid);
 
     // do it by kill it and wait for systemd to bring the service online
-    public Task RestartBrokerBySignalAsync(bool ignoreAuthPluginPid = false) => SendSignalAsync((int) Signals.SIGKILL, ignoreAuthPluginPid);
+    public Task RestartBrokerBySignalAsync(bool ignoreAuthPluginPid = false) => SendSignalAsync(Signum.SIGKILL, ignoreAuthPluginPid);
 
     public bool RegisterBrokerStatistics(string name, string value)
     {
@@ -84,25 +85,30 @@ namespace SMEIoT.Core.Services
       return GetStatisticsValue(name);
     }
 
-    public IEnumerable<KeyValuePair<string, string>> ListBrokerStatistics()
+    public Task<IEnumerable<KeyValuePair<string, string>>> ListBrokerStatisticsAsync()
     {
-      return _values.ToArray();
+      IEnumerable<KeyValuePair<string, string>> res = _values.ToArray();
+      return Task.FromResult(res);
     }
 
     private string? GetStatisticsValue(string name)
     {
-      string value;
-      var got = _values.TryGetValue(name, out value);
-      return got ? value : null;
+      try {
+        string? value;
+        var got = _values.TryGetValue(name, out value);
+        return got ? value : null;
+      } catch (ArgumentNullException) {
+        return null;
+      }
     }
 
-    public Tuple<double?, double?, double?> GetBrokerLoads()
+    public Task<Tuple<double?, double?, double?>> GetBrokerLoadAsync()
     {
       var min1 = TryGetAverageStatistics(new [] { ByteLoadReceived1Min, ByteLoadSent1Min });
       var min5 = TryGetAverageStatistics(new [] { ByteLoadReceived5Min, ByteLoadSent5Min });
       var min15 = TryGetAverageStatistics(new [] { ByteLoadReceived15Min, ByteLoadSent15Min });
  
-      return Tuple.Create(min1, min5, min15);
+      return Task.FromResult(Tuple.Create(min1, min5, min15));
     }
 
     private double? TryGetAverageStatistics(string[] names)

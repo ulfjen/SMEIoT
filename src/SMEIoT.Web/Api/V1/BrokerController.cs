@@ -15,7 +15,7 @@ namespace SMEIoT.Web.Api.V1
 {
   public class BrokerController : BaseController
   {
-    private readonly ILogger<BrokerController> _logger;
+    private readonly ILogger _logger;
     private readonly IMosquittoBrokerService _service;
 
     public BrokerController(
@@ -32,8 +32,8 @@ namespace SMEIoT.Web.Api.V1
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<BasicBrokerApiModel>> ShowBasic()
     {
-      var loads = _service.GetBrokerLoads();
-      var res = new BasicBrokerApiModel(_service.BrokerRunning, _service.BrokerLastMessageAt, loads);
+      var load = await _service.GetBrokerLoadAsync();
+      var res = new BasicBrokerApiModel(_service.BrokerRunning, _service.BrokerLastMessageAt, load);
       return Ok(res);
     }
 
@@ -43,7 +43,7 @@ namespace SMEIoT.Web.Api.V1
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<BrokerStatisticsApiModel>> ShowStatistics()
     {
-      var statistics = _service.ListBrokerStatistics();
+      var statistics = await _service.ListBrokerStatisticsAsync();
       var res = new BrokerStatisticsApiModel(statistics);
       return Ok(res);
     }

@@ -19,6 +19,12 @@ namespace SMEIoT.Web.Services
   {
     public string UserName { get; set; }
     public bool Admin { get; set; }
+
+    public UserCookie(string userName, bool admin = false)
+    {
+      UserName = userName;
+      Admin = admin;
+    }
   }
 
   public static class UserCookieManagementService
@@ -39,7 +45,7 @@ namespace SMEIoT.Web.Services
       var (user, roles) = await service.GetUserAndRoleByPrincipal(context.Principal);
       var isAdmin = await service.IsAdmin(roles);
 
-      var userCookie = new UserCookie { UserName = user.UserName, Admin = isAdmin };
+      var userCookie = new UserCookie(user.UserName, isAdmin);
       var serializeOptions = new JsonSerializerOptions
       {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase

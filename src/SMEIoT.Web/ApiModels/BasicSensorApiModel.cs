@@ -16,5 +16,11 @@ namespace SMEIoT.Web.ApiModels
       SensorName = sensor.Name;
       DeviceName = sensor.Device.Name;
     }
+
+    public BasicSensorApiModel(string sensorName, string deviceName)
+    {
+      SensorName = sensorName;
+      DeviceName = deviceName;
+    }
   }
 }

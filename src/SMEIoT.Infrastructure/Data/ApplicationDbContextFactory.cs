@@ -13,7 +13,7 @@ namespace SMEIoT.Infrastructure.Data
     public ApplicationDbContext CreateDbContext(string[] args)
     {
       // Get environment
-      string environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+      string environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
 
       // Build config
       var dir = Path.Combine(Directory.GetCurrentDirectory(), "..", "SMEIoT.Web");

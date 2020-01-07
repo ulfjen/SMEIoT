@@ -55,7 +55,7 @@ namespace SMEIoT.Core.Services
         if (device.PreSharedKey != null) {
           return builder.Append(device.PreSharedKey);
         }
-      } catch (EntityNotFoundException _) {
+      } catch (EntityNotFoundException) {
         return await FailResponseAsync(builder);
       }
 

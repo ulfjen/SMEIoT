@@ -47,6 +47,10 @@ export interface DevicesApiApiDevicesGetRequest {
     limit?: number;
 }
 
+export interface DevicesApiApiDevicesNameBasicGetRequest {
+    name: string;
+}
+
 export interface DevicesApiApiDevicesNameGetRequest {
     name: string;
 }
@@ -193,6 +197,34 @@ export class DevicesApi extends runtime.BaseAPI {
      */
     async apiDevicesGet(requestParameters: DevicesApiApiDevicesGetRequest): Promise<BasicDeviceApiModelList> {
         const response = await this.apiDevicesGetRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiDevicesNameBasicGetRaw(requestParameters: DevicesApiApiDevicesNameBasicGetRequest): Promise<runtime.ApiResponse<BasicDeviceApiModel>> {
+        if (requestParameters.name === null || requestParameters.name === undefined) {
+            throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling apiDevicesNameBasicGet.');
+        }
+
+        const queryParameters: runtime.HTTPQuery = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/devices/{name}/basic`.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters.name))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => BasicDeviceApiModelFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiDevicesNameBasicGet(requestParameters: DevicesApiApiDevicesNameBasicGetRequest): Promise<BasicDeviceApiModel> {
+        const response = await this.apiDevicesNameBasicGetRaw(requestParameters);
         return await response.value();
     }
 

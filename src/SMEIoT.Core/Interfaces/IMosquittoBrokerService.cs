@@ -9,8 +9,8 @@ namespace SMEIoT.Core.Interfaces
   {
     bool RegisterBrokerStatistics(string name, string value);
     string? GetBrokerStatistics(string name);
-    IEnumerable<KeyValuePair<string, string>> ListBrokerStatistics();
-    Tuple<double?, double?, double?> GetBrokerLoads();
+    Task<IEnumerable<KeyValuePair<string, string>>> ListBrokerStatisticsAsync();
+    Task<Tuple<double?, double?, double?>> GetBrokerLoadAsync();
     int? GetBrokerPidFromPidFile(string path);
     Task ReloadBrokerBySignalAsync(bool ignoreAuthPluginPid);
     Task RestartBrokerBySignalAsync(bool ignoreAuthPluginPid);

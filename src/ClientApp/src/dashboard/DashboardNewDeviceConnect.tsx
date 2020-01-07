@@ -9,7 +9,7 @@ import Button from "@material-ui/core/Button";
 import Skeleton from "@material-ui/lab/Skeleton";
 import { Link as ReachLink, RouteComponentProps } from "@reach/router";
 import {
-  DevicesApi
+  DevicesApi, BasicDeviceApiModelFromJSON
 } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
 import DashboardNewDeviceFrame from "./DashboardNewDeviceFrame";
@@ -69,7 +69,7 @@ const _DashboardNewDeviceConnect: React.FunctionComponent<IDashboardNewDeviceCon
   const [connected, setConnected] = React.useState<boolean>(false);
 
   const state = useAsync(async () => {
-    const res = await api.apiDevicesNameGet({
+    const res = await api.apiDevicesNameBasicGet({
       name
     });
     setConnected(res.connected || false);
@@ -77,7 +77,7 @@ const _DashboardNewDeviceConnect: React.FunctionComponent<IDashboardNewDeviceCon
     return res;
   }, [name]);
 
-  const device = state.value || DeviceApiModelFromJSON({});
+  const device = state.value || BasicDeviceApiModelFromJSON({});
   
   useInterval(async () => {
     if (!state.loading && state.error === undefined) {

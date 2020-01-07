@@ -10,9 +10,9 @@ namespace SMEIoT.Core.Interfaces
     Task<string> BootstrapDeviceWithPreSharedKeyAsync(string identity, string key);
     Task<Device> GetDeviceByNameAsync(string deviceName);
     Task<Device?> GetARandomUnconnectedDeviceAsync();
-    IAsyncEnumerable<Device> ListDevicesAsync(int start, int limit);
+    IAsyncEnumerable<Device> ListDevicesAsync(int offset, int limit);
 
-    IAsyncEnumerable<Sensor> ListSensorsAsync(int start, int limit);
+    IAsyncEnumerable<Sensor> ListSensorsAsync(int offset, int limit);
 
     IAsyncEnumerable<Sensor> ListSensorsByDeviceAsync(Device device);
     Task CreateSensorByDeviceAndNameAsync(Device device, string sensorName);

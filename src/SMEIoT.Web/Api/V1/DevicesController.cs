@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 using System;
+using System.Linq;
 using SMEIoT.Core.Entities;
 using SMEIoT.Core.Interfaces;
 using SMEIoT.Web.ApiModels;
@@ -16,7 +17,7 @@ namespace SMEIoT.Web.Api.V1
 {
   public class DevicesController : BaseController
   {
-    private readonly ILogger<DevicesController> _logger;
+    private readonly ILogger _logger;
     private readonly IDeviceService _service;
     private readonly IDeviceSensorIdentifierSuggestService _identifierSuggestService;
     private readonly ISecureKeySuggestService _secureKeySuggestService;
@@ -68,13 +69,28 @@ namespace SMEIoT.Web.Api.V1
     public async Task<ActionResult<DeviceDetailsApiModel>> Show(string name)
     {
       var device = await _service.GetDeviceByNameAsync(name);
-      var sensors = new List<SensorDetailsApiModel>();
+
+      var sensors = new List<BasicSensorApiModel>();
       await foreach (var sensor in _service.ListSensorsByDeviceAsync(device))
       {
-        sensors.Add(new SensorDetailsApiModel(sensor, new List<(double, Instant)>()));
+        sensors.Add(new BasicSensorApiModel(sensor));
       }
 
+      var sensorNamesFromMqtt = _mqttService.ListSensorNamesByDeviceName(device.Name);
+      sensors.AddRange(sensorNamesFromMqtt.Select(n => new BasicSensorApiModel(n, device.Name)));
+
       var res = new DeviceDetailsApiModel(device, sensors);
+      return Ok(res);
+    }
+
+    [HttpGet("{name}/basic")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<BasicDeviceApiModel>> ShowBasic(string name)
+    {
+      var device = await _service.GetDeviceByNameAsync(name);
+      var res = new BasicDeviceApiModel(device);
       return Ok(res);
     }
 

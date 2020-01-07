@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Hosting;
 using SMEIoT.Core.Interfaces;
 
 namespace SMEIoT.Infrastructure.MqttClient
@@ -17,7 +16,6 @@ namespace SMEIoT.Infrastructure.MqttClient
     private readonly IHostEnvironment _env;
     private readonly int _delay = 100;
     private bool _reconnect;
-    private bool _stoppedTimer;
 
     public BackgroundMqttClientHostedService(
       IMosquittoClientService client,
@@ -43,7 +41,7 @@ namespace SMEIoT.Infrastructure.MqttClient
       }
     }
 
-    private void ConnectClient(object state)
+    private void ConnectClient(object? state)
     {
       _logger.LogInformation("Start to connect MQTT client with the Mosquitto broker.");
 
@@ -51,7 +49,6 @@ namespace SMEIoT.Infrastructure.MqttClient
       _client.Connect();
 
       _reconnect = false;
-      _stoppedTimer = false;
       _timer = new Timer(ExecuteRunLoop, null, 0, _delay);
     }
 
@@ -76,7 +73,7 @@ namespace SMEIoT.Infrastructure.MqttClient
       }
     }
 
-    private void ExecuteRunLoop(object state)
+    private void ExecuteRunLoop(object? state)
     {
       try
       {
@@ -101,10 +98,8 @@ namespace SMEIoT.Infrastructure.MqttClient
       }
       finally
       {
-        if (!_stoppedTimer) {
+        if (_timer != null) {
           _timer.Change(_delay, Timeout.Infinite);
-        } else {
-          _timer.Change(Timeout.Infinite, Timeout.Infinite);
         }
       }
     }
@@ -112,7 +107,6 @@ namespace SMEIoT.Infrastructure.MqttClient
     public Task StopAsync(CancellationToken cancellationToken)
     {
       // timer may still run a few times but that's fine
-      _stoppedTimer = true;
       _timer?.Change(Timeout.Infinite, Timeout.Infinite);
 
       return Task.CompletedTask;
