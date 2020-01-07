@@ -27,15 +27,15 @@ namespace SMEIoT.Web.Api.V1
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<AdminUserApiModelList>> Index([FromQuery] int offset = 0, [FromQuery] int limit = 10)
+    public async Task<ActionResult<AdminUserApiModelList>> Index([FromQuery] int offset = 0, [FromQuery] int limit = 10, [FromQuery(Name="roles")] IEnumerable<string>? roles = null)
     {
       var list = new List<AdminUserApiModel>();
-      await foreach (var (user, roles) in _userService.ListBasicUserResultAsync(offset, limit))
+      await foreach (var (user, userRoles) in _userService.ListBasicUserResultAsync(offset, limit, roles))
       {
-        list.Add(new AdminUserApiModel(user, roles));
+        list.Add(new AdminUserApiModel(user, userRoles));
       }
 
-      return Ok(new AdminUserApiModelList(list, await _userService.NumberOfUsersAsync()));
+      return Ok(new AdminUserApiModelList(list, await _userService.NumberOfUsersAsync(roles)));
     }
 
     [HttpGet("{userName}")]

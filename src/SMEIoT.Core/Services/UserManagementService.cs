@@ -9,6 +9,7 @@ using SMEIoT.Core.Entities;
 using SMEIoT.Core.Exceptions;
 using SMEIoT.Core.Interfaces;
 using System.Security.Claims;
+using System.Linq.Dynamic.Core;
 
 namespace SMEIoT.Core.Services
 {
@@ -213,7 +214,9 @@ namespace SMEIoT.Core.Services
       }
     }
 
-    public async IAsyncEnumerable<(User, IList<string>)> ListBasicUserResultAsync(int offset, int limit)
+    /// if roles are empty, we return every users
+    /// otherwise we return the users have designated roles
+    public async IAsyncEnumerable<(User, IList<string>)> ListBasicUserResultAsync(int offset, int limit, IEnumerable<string>? roles)
     {
       if (offset < 0)
       {
@@ -223,16 +226,49 @@ namespace SMEIoT.Core.Services
       {
         throw new InvalidArgumentException("limit can't be negative", "limit"); 
       }
-      await foreach (var user in _dbContext.Users.OrderBy(u => u.Id).Skip(offset).Take(limit).AsAsyncEnumerable())
+      var roleIds = await GetRoleIdsFromNamesAsync(roles); 
+      
+      var query = GetUserQuery(roleIds);
+      await foreach (var user in query.OrderBy(u => u.Id).Skip(offset).Take(limit).AsAsyncEnumerable())
       {
-        var roles = await _userManager.GetRolesAsync(user);
-        yield return (user, roles);
+        yield return (user, await _userManager.GetRolesAsync(user));
       }
     }
 
-    public async Task<int> NumberOfUsersAsync()
+    private async Task<List<long>> GetRoleIdsFromNamesAsync(IEnumerable<string>? roles)
     {
-      return await _dbContext.Users.CountAsync();
+      var ids = new List<long>(); 
+      if (roles == null) { return ids; }
+      await Task.WhenAll(roles.Select(async (roleName) => 
+      {
+        var role = await _roleManager.FindByNameAsync(roleName);
+        if (role == null) {
+          throw new InvalidArgumentException($"Unknown role name {roleName}", "roles");
+        }
+        if (long.TryParse(await _roleManager.GetRoleIdAsync(role), out long roleId)) {
+          ids.Add(roleId);
+        } else {
+          throw new InternalException($"Internal role id mapping unknown. {role}");
+        }
+      }));
+      return ids;
+    }
+
+    private IQueryable<User> GetUserQuery(List<long> roleIds)
+    {
+      try {
+      return roleIds.Count == 0 ? _dbContext.Users.AsQueryable() : _dbContext.Users
+          .Join(_dbContext.UserRoles.Where("@0.Contains(outerIt.Id)", roleIds), user => user.Id, ur => ur.UserId, (user, userRole) => user).AsQueryable();
+      }catch{
+        throw new InternalException("FIX query exception  ");
+      }
+    }
+
+    public async Task<int> NumberOfUsersAsync(IEnumerable<string>? roles)
+    {
+      var roleIds = await GetRoleIdsFromNamesAsync(roles); 
+      var query = GetUserQuery(roleIds);
+      return await query.CountAsync();
     }
 
     public Task<bool> IsAdmin(IEnumerable<string> roles)

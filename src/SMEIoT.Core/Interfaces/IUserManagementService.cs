@@ -13,7 +13,7 @@ namespace SMEIoT.Core.Interfaces
     Task UpdateUserPassword(string userName, string currentPassword, string newPassword);
     Task UpdateUserRoles(string userName, IEnumerable<string> roles);
     Task<bool> IsAdmin(IEnumerable<string> roles);
-    IAsyncEnumerable<(User, IList<string>)> ListBasicUserResultAsync(int offset, int limit);
-    Task<int> NumberOfUsersAsync();
+    IAsyncEnumerable<(User, IList<string>)> ListBasicUserResultAsync(int offset, int limit, IEnumerable<string>? roles);
+    Task<int> NumberOfUsersAsync(IEnumerable<string>? roles);
   }
 }
