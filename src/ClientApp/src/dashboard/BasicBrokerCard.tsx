@@ -16,18 +16,25 @@ import {
   RouteComponentProps
 } from "@reach/router";
 import useInterval from "../helpers/useInterval";
-import BrokerCardHeader from "./BrokerCardHeader";
+import ExpandedCardHeader from "../components/ExpandedCardHeader";
 import { BrokerApi } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
 import LoadFactors from "../components/LoadFactors";
 import StatusBadge from "../components/StatusBadge";
+import { ReactComponent as Broker } from "../images/broker.svg";
 
-const styles = ({ transitions, spacing }: Theme) =>
-  createStyles({
-    root: {
-      padding: 16,
-    }
-  });
+const styles = ({ transitions, spacing }: Theme) => createStyles({
+  root: {
+    padding: 16,
+  },
+  media: {
+    height: "60%",
+    filter: "brightness(0) invert(1)"
+  },
+  secondary: {
+    marginTop: 2
+  }
+});
 
 export interface IBasicBrokerCard extends WithStyles<typeof styles> { }
 
@@ -37,6 +44,24 @@ interface BasicBroker {
   min5?: number;
   min15?: number;
 }
+
+const messages = defineMessages({
+  title: {
+    id: "dashboard.components.basic_broker.title",
+    description: "The broker block title on the basic broker card.",
+    defaultMessage: "Broker"
+  },
+  running: {
+    id: "dashboard.components.basic_broker.status.running",
+    description: "Used as in basic broker status",
+    defaultMessage: "Running"
+  },
+  stopped: {
+    id: "dashboard.components.basic_broker.status.stopped",
+    description: "Used as in basic broker status",
+    defaultMessage: "Stopped"
+  },
+});
 
 const _BasicBrokerCard: React.FunctionComponent<IBasicBrokerCard> = ({ classes }) => {
   const intl = useIntl();
@@ -65,13 +90,24 @@ const _BasicBrokerCard: React.FunctionComponent<IBasicBrokerCard> = ({ classes }
 
   return <Card>
     <CardActionArea className={classes.root} component={ReachLink} to={"/dashboard/devices"}>
-      <BrokerCardHeader
-        status={loading ? <Skeleton variant="rect" width={70} height={20} /> : <StatusBadge status={broker.running ? "running" : "stopped"} />}
+      <ExpandedCardHeader
+        title={loading ? <Skeleton variant="rect" width={70} height={30} /> : <Typography component="span" variant="h5" display="block">
+          {intl.formatMessage(messages.title)}</Typography>}
+        status={<StatusBadge
+          color={loading ? null : (broker.running ? "normal" : "error")} 
+          badge={loading && <Skeleton variant="circle" width={14} height={14}/>}
+        >
+          {loading ? <Skeleton variant="rect" width={60} height={14}/> : intl.formatMessage(broker.running ? messages.running : messages.stopped)}
+        </StatusBadge>}
+        avatar={<Broker className={classes.media} />}
       />
-      <LoadFactors min1={broker.min1} min5={broker.min5} min15={broker.min15} />
+      <div className={classes.secondary}>
+        {loading ? <Skeleton variant="rect" width={200} height={10} /> : (broker.running ? <LoadFactors min1={broker.min1} min5={broker.min5} min15={broker.min15} /> : null)}
+      </div>
       <Typography color="textSecondary">
         {
-          broker.running ? <FormattedMessage
+          loading ? <Skeleton variant="text" /> :
+          (broker.running ? <FormattedMessage
             id="dashboard.components.basic_broker_card.instruct_running"
             description="Running instruction on the broker card when the broker runs normally."
             defaultMessage="The broker is operating."
@@ -79,7 +115,7 @@ const _BasicBrokerCard: React.FunctionComponent<IBasicBrokerCard> = ({ classes }
               id="dashboard.components.basic_broker_card.instruct_stopped"
               description="Running instruction on the broker card when the broker stopped."
               defaultMessage="The broker is stopped. Please wait a few seconds."
-            />
+            />)
         }
       </Typography>
     </CardActionArea>

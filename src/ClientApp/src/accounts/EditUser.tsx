@@ -81,9 +81,9 @@ const _EditUser: React.FunctionComponent<IEditUserProps & WithStyles<typeof styl
     }
     uc.setEntityError("");
 
-    if (!state.value || !state.value?.userName) {
+    if (!state.value || state.value.userName === undefined) {
       throw new Error("user can not be found. Try to clean the cookie and refresh.");
-    } 
+    }
     try {
       const result = await new UsersApi(GetDefaultApiConfig()).apiUsersUserNamePasswordPut({
         userName: state.value.userName,
@@ -114,7 +114,7 @@ const _EditUser: React.FunctionComponent<IEditUserProps & WithStyles<typeof styl
     }
   };
 
-  const roles = (state.value?.roles || []).join(", ");
+  const roles = ((state.value && state.value.roles) || []).join(", ");
 
   return <Container component="main" maxWidth="lg" className={classes.page}>
     <CssBaseline />
@@ -131,7 +131,7 @@ const _EditUser: React.FunctionComponent<IEditUserProps & WithStyles<typeof styl
             {state.loading ?
               <Skeleton variant="rect" width={160} height={30} /> :
               <Typography variant="h5">
-                {state.value?.userName}
+                {state.value && state.value.userName}
               </Typography>}
           </div>
           <div className={classes.label}>
@@ -146,7 +146,7 @@ const _EditUser: React.FunctionComponent<IEditUserProps & WithStyles<typeof styl
                   description="Account creation time message"
                   defaultMessage="Your account is created at {time}."
                   values={{
-                    time: moment(state.value?.createdAt).format("LLLL")
+                    time: state.value && moment(state.value.createdAt).format("LLLL")
                   }}
                 />
               </Typography>}

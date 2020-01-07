@@ -6,9 +6,6 @@ import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Avatar from "@material-ui/core/Avatar";
 import Typography from "@material-ui/core/Typography";
-import { FormattedMessage } from "react-intl";
-import StatusBadge from "../components/StatusBadge";
-import { ReactComponent as Broker } from "../images/broker.svg";
 
 const styles = ({ transitions, spacing }: Theme) => createStyles({
   root: {
@@ -21,45 +18,42 @@ const styles = ({ transitions, spacing }: Theme) => createStyles({
   content: {
     display: 'flex',
   },
-  media: {
-    height: "60%",
-    filter: "brightness(0) invert(1)"
-  },
   status: {
     marginLeft: "auto",
   },
   action: {
     marginLeft: "auto",
+  },
+  avatar: {
+    marginBottom: 5,
   }
 });
 
-export interface IBrokerCardHeader extends WithStyles<typeof styles> {
+export interface IExpandedCardHeader extends WithStyles<typeof styles> {
   className?: string;
   action?: React.ReactNode;
   status?: React.ReactNode;
+  avatar?: React.ReactNode;
+  title: React.ReactNode | string;
 }
 
-const _BrokerCardHeader: React.FunctionComponent<IBrokerCardHeader> = ({ classes, className, action, status }) => {
+const _ExpandedCardHeader: React.FunctionComponent<IExpandedCardHeader> = ({ classes, className, title, action, avatar, status }) => {
   return <div className={clsx(classes.root, className)}>
     <div className={classes.head}>
-      <Avatar>
-        <Broker className={classes.media} />
-      </Avatar>
+      {avatar && <Avatar className={classes.avatar}>
+        {avatar}
+      </Avatar>}
       {action && <div className={classes.action}>{action}</div>}
     </div>
     <div className={classes.content}>
       <Typography component="span" variant="h5" display="block">
-        <FormattedMessage
-          id="dashboard.components.basic_broker_card.title"
-          description="Title on the broker card"
-          defaultMessage="Broker"
-        />
+        {title}
       </Typography>
       {status && <div className={classes.status}>{status}</div>}
     </div>
   </div>;
 };
 
-const BrokerCardHeader = withStyles(styles)(_BrokerCardHeader);
+const ExpandedCardHeader = withStyles(styles)(_ExpandedCardHeader);
 
-export default BrokerCardHeader;
+export default ExpandedCardHeader;

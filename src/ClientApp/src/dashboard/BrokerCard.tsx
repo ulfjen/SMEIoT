@@ -22,11 +22,12 @@ import {
   LinkProps as ReachLinkProps,
   RouteComponentProps
 } from "@reach/router";
-import BrokerCardHeader from "./BrokerCardHeader";
+import ExpandedCardHeader from "../components/ExpandedCardHeader";
 import StatusBadge from "../components/StatusBadge";
 import useInterval from "../helpers/useInterval";
 import { BrokerApi } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
+import { ReactComponent as Broker } from "../images/broker.svg";
 
 const styles = ({ spacing, transitions }: Theme) => createStyles({
   expand: {
@@ -39,12 +40,16 @@ const styles = ({ spacing, transitions }: Theme) => createStyles({
   header: {
     padding: 16
   },
+  media: {
+    height: "60%",
+    filter: "brightness(0) invert(1)"
+  },
 });
 
 export interface IBrokerCard extends WithStyles<typeof styles> { }
 
 const messages = defineMessages({
-  broker: {
+  title: {
     id: "dashboard.broker.title",
     description: "The broker block title on the dashboard page.",
     defaultMessage: "Broker"
@@ -78,7 +83,17 @@ const messages = defineMessages({
     id: "dashboard.broker.actions.more",
     description: "The action label for showing menu.",
     defaultMessage: "More"
-  }
+  },
+  running: {
+    id: "dashboard.components.basic_broker.status.running",
+    description: "Used as in basic broker status",
+    defaultMessage: "Running"
+  },
+  stopped: {
+    id: "dashboard.components.basic_broker.status.stopped",
+    description: "Used as in basic broker status",
+    defaultMessage: "Stopped"
+  },
 });
 
 interface BasicBrokerStatistics {
@@ -117,7 +132,7 @@ const _BrokerCard: React.FunctionComponent<IBrokerCard> = ({ classes }) => {
 
   return (
     <Card>
-      <BrokerCardHeader 
+      <ExpandedCardHeader
         className={classes.header}
         action={
           <IconButton
@@ -127,7 +142,14 @@ const _BrokerCard: React.FunctionComponent<IBrokerCard> = ({ classes }) => {
             <MoreVertIcon />
           </IconButton>
         }
-        status={loading ? <Skeleton variant="rect" width={70} height={20} /> : <StatusBadge status={running ? "running" : "stopped"} />}
+        title={loading ? <Skeleton variant="rect" width={70} height={30} /> : intl.formatMessage(messages.title)}
+        status={<StatusBadge
+          color={loading ? null : (running ? "normal" : "error")}
+          badge={loading && <Skeleton variant="circle" height={14} width={14} />}
+        >
+          {loading ? <Skeleton variant="rect" width={60} height={14} /> : intl.formatMessage(running ? messages.running : messages.stopped)}
+        </StatusBadge>}
+        avatar={<Broker className={classes.media} />}
       />
       <CardContent>
         {/* <Typography variant="body2" color="textSecondary" component="p"> */}
