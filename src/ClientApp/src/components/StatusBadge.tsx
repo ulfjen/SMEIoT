@@ -6,10 +6,11 @@ import withStyles from "@material-ui/core/styles/withStyles";
 import clsx from "clsx";
 import green from '@material-ui/core/colors/green';
 import red from '@material-ui/core/colors/red';
+import Typography from "@material-ui/core/Typography";
 
 const RADIUS_STANDARD = 7;
 
-const styles = ({ typography, transitions }: Theme) => createStyles({
+const styles = ({ palette, typography, transitions }: Theme) => createStyles({
   root: {
     position: "relative"
   },
@@ -33,9 +34,15 @@ const styles = ({ typography, transitions }: Theme) => createStyles({
     }),
   },
   normalColor: {
+    color: "#333333"
+  },
+  normalBgColor: {
     backgroundColor: green[800]
   },
   errorColor: {
+    color: "#666666"
+  },
+  errorBgColor: {
     backgroundColor: red[500]
   }
 });
@@ -49,12 +56,16 @@ export interface IStatusBadgeProps extends WithStyles<typeof styles> {
 
 const _StatusBadge: React.FunctionComponent<IStatusBadgeProps> = ({ classes, children, className, color, badge }) => {
   let colorClass = "";
+  let colorBgClass = "";
+
   switch (color) {
     case "normal":
       colorClass = classes.normalColor;
+      colorBgClass = classes.normalBgColor;
       break;
     case "error":
       colorClass = classes.errorColor;
+      colorBgClass = classes.errorBgColor;
     default:
       break;
   }
@@ -62,11 +73,11 @@ const _StatusBadge: React.FunctionComponent<IStatusBadgeProps> = ({ classes, chi
   return (
     <div className={clsx(classes.root, className)}>
       <span
-        className={clsx(classes.status, colorClass)}
+        className={clsx(classes.status, colorBgClass)}
       >
         {badge}
       </span>
-      <span className={classes.content}>{children}</span>
+      <span className={clsx(classes.content, colorClass)}>{children}</span>
     </div>
   );
 };

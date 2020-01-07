@@ -4,14 +4,16 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import Typography from '@material-ui/core/Typography';
 import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
+import { withStyles, lighten, darken } from '@material-ui/core/styles';
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
-import withStyles from "@material-ui/core/styles/withStyles";
 import Container from '@material-ui/core/Container';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CardHeader from '@material-ui/core/CardHeader';
 import BuildIcon from '@material-ui/icons/Build';
+import DoneOutlineOutlinedIcon from '@material-ui/icons/DoneOutlineOutlined';
+import CloseIcon from '@material-ui/icons/Close';
 import PasswordField from "../components/PasswordField";
 import { UsersApi } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
@@ -24,8 +26,15 @@ import { useAppCookie } from "../helpers/useCookie";
 import ValidationProblemDetails from "../models/ValidationProblemDetails";
 import Skeleton from "@material-ui/lab/Skeleton";
 import ErrorBoundary from "../components/ErrorBoundary";
+import Avatar from "@material-ui/core/Avatar";
+import Snackbar from "@material-ui/core/Snackbar";
+import Slide from "@material-ui/core/Slide";
+import useInterval from "../helpers/useInterval";
+import { TransitionProps } from "@material-ui/core/transitions";
+import Paper from "@material-ui/core/Paper";
+import IconButton from "@material-ui/core/IconButton";
 
-const styles = ({ palette, spacing }: Theme) => createStyles({
+const styles = ({ palette, spacing, typography, shape }: Theme) => createStyles({
   page: {
     marginTop: spacing(3)
   },
@@ -34,6 +43,40 @@ const styles = ({ palette, spacing }: Theme) => createStyles({
   },
   content: {
     paddingTop: 0
+  },
+  snackbar: {
+    color: darken(palette.success.main, 0.6),
+    backgroundColor: lighten(palette.success.main, 0.9),
+    '& $icon': {
+      color: palette.success.main,
+    }
+  },
+  snackbarPaper: {
+    ...typography.body2,
+    borderRadius: shape.borderRadius,
+    backgroundColor: 'transparent',
+    display: 'flex',
+    padding: 2,
+  },
+  snackbarMessage: {
+    padding: '2px 0',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+  },
+  snackbarIcon: {
+    marginRight: 12,
+    padding: '7px 0',
+    display: 'flex',
+    fontSize: 22,
+    opacity: 0.9,
+  },
+  snackbarAction: {
+    display: 'flex',
+    alignItems: 'center',
+    marginLeft: 'auto',
+    paddingLeft: 16,
+    marginRight: -8,
   }
 });
 
@@ -55,10 +98,19 @@ const messages = defineMessages({
     id: "users.edit.newpassword_label",
     description: "New password label",
     defaultMessage: "New password"
+  },
+  closeSnackbar: {
+    id: "users.edit.snackbar.close",
+    description: "Close success message",
+    defaultMessage: "Close"
   }
 });
 
-const _EditUser: React.FunctionComponent<IEditUserProps & WithStyles<typeof styles>> = ({ classes, navigate }) => {
+function TransitionUp(props: TransitionProps) {
+  return <Slide {...props} direction="up" />;
+}
+
+const _EditUser: React.FunctionComponent<IEditUserProps> = ({ classes, navigate }) => {
   const intl = useIntl();
   const uc = useUserCredentials();
 
@@ -73,6 +125,8 @@ const _EditUser: React.FunctionComponent<IEditUserProps & WithStyles<typeof styl
       userName: appCookie.userName || ""
     });
   }, [appCookie.userName]);
+
+  const [successBarOpen, setSuccessBarOpen] = React.useState<boolean>(false);
 
   const handleEdit = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.preventDefault();
@@ -93,7 +147,14 @@ const _EditUser: React.FunctionComponent<IEditUserProps & WithStyles<typeof styl
         }
       });
 
-      navigate && navigate("/dashboard");
+      setSuccessBarOpen(true);
+      uc.setUserName("");
+      uc.setPassword("");
+      uc.setUserNameError("");
+      uc.setPasswordError("");
+      uc.setEntityError("");
+      setNewPassword("");
+      setNewPasswordError("");
     } catch (response) {
       const details: ValidationProblemDetails = await response.json();
       if (details.detail) {
@@ -113,6 +174,9 @@ const _EditUser: React.FunctionComponent<IEditUserProps & WithStyles<typeof styl
       }
     }
   };
+  const handleClose = () => {
+    setSuccessBarOpen(false);
+  }
 
   const roles = ((state.value && state.value.roles) || []).join(", ");
 
@@ -122,9 +186,10 @@ const _EditUser: React.FunctionComponent<IEditUserProps & WithStyles<typeof styl
       <Card>
         <CardHeader
           avatar={
-            <BuildIcon />
-          }
-          title={intl.formatMessage(messages.title)}
+            <Avatar>
+              <BuildIcon />
+            </Avatar>}
+          title={<Typography variant="h5" color="primary">{intl.formatMessage(messages.title)}</Typography>}
         />
         <CardContent className={classes.content}>
           <div className={classes.label}>
@@ -166,9 +231,9 @@ const _EditUser: React.FunctionComponent<IEditUserProps & WithStyles<typeof styl
         <CardActions>
           <Button onClick={() => { navigate && navigate("/dashboard") }}>
             <FormattedMessage
-              id="users.edit.action.cancel"
+              id="users.edit.action.back"
               description="Cancel action in the user profile page"
-              defaultMessage="Cancel"
+              defaultMessage="Back"
             />
           </Button>
           <Button color="primary" onClick={handleEdit}>
@@ -180,6 +245,43 @@ const _EditUser: React.FunctionComponent<IEditUserProps & WithStyles<typeof styl
           </Button>
         </CardActions>
       </Card>
+      <Snackbar
+        className={classes.snackbar}
+        open={successBarOpen}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+        autoHideDuration={3000}
+        onClose={handleClose}
+        TransitionComponent={TransitionUp}
+        ContentProps={{ className: classes.snackbar }}
+        message={
+          <Paper
+            square
+            elevation={0}
+            className={classes.snackbarPaper}
+          >
+            <div className={classes.snackbarIcon}>
+              <DoneOutlineOutlinedIcon fontSize="inherit" />
+            </div>
+            <div className={classes.snackbarMessage}>
+              <FormattedMessage
+                id="users.edit.action.success_message"
+                description="Success snackbar showed when editing is successful"
+                defaultMessage="Successfully updated your password."
+              />
+            </div>
+            <div className={classes.snackbarAction}>
+              <IconButton
+                size="small"
+                aria-label={intl.formatMessage(messages.closeSnackbar)}
+                title={intl.formatMessage(messages.closeSnackbar)}
+                color="inherit"
+                onClick={handleClose}
+              >
+                <CloseIcon fontSize="small" />
+              </IconButton>
+            </div>
+          </Paper>}
+      />
     </ErrorBoundary>
   </Container>;
 };

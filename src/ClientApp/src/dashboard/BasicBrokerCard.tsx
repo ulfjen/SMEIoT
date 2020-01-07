@@ -32,11 +32,13 @@ const styles = ({ transitions, spacing }: Theme) => createStyles({
     filter: "brightness(0) invert(1)"
   },
   secondary: {
-    marginTop: 2
+    marginTop: 5
   }
 });
 
-export interface IBasicBrokerCard extends WithStyles<typeof styles> { }
+export interface IBasicBrokerCard extends WithStyles<typeof styles> { 
+  avatar?: boolean;
+}
 
 interface BasicBroker {
   running: boolean;
@@ -63,7 +65,7 @@ const messages = defineMessages({
   },
 });
 
-const _BasicBrokerCard: React.FunctionComponent<IBasicBrokerCard> = ({ classes }) => {
+const _BasicBrokerCard: React.FunctionComponent<IBasicBrokerCard> = ({ classes, avatar }) => {
   const intl = useIntl();
 
   const [broker, setBroker] = React.useState<BasicBroker>({
@@ -91,7 +93,7 @@ const _BasicBrokerCard: React.FunctionComponent<IBasicBrokerCard> = ({ classes }
   return <Card>
     <CardActionArea className={classes.root} component={ReachLink} to={"/dashboard/devices"}>
       <ExpandedCardHeader
-        title={loading ? <Skeleton variant="rect" width={70} height={30} /> : <Typography component="span" variant="h5" display="block">
+        title={loading ? <Skeleton variant="rect" width={100} height={25} /> : <Typography variant="h5" color="primary" display="block">
           {intl.formatMessage(messages.title)}</Typography>}
         status={<StatusBadge
           color={loading ? null : (broker.running ? "normal" : "error")} 
@@ -99,7 +101,7 @@ const _BasicBrokerCard: React.FunctionComponent<IBasicBrokerCard> = ({ classes }
         >
           {loading ? <Skeleton variant="rect" width={60} height={14}/> : intl.formatMessage(broker.running ? messages.running : messages.stopped)}
         </StatusBadge>}
-        avatar={<Broker className={classes.media} />}
+        avatar={avatar && <Broker className={classes.media} />}
       />
       <div className={classes.secondary}>
         {loading ? <Skeleton variant="rect" width={200} height={10} /> : (broker.running ? <LoadFactors min1={broker.min1} min5={broker.min5} min15={broker.min15} /> : null)}

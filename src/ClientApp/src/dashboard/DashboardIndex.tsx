@@ -13,6 +13,7 @@ import clsx from 'clsx';
 import { Link as ReachLink, Redirect, RouteComponentProps } from '@reach/router';
 import UserAvatarMenu from '../components/UserAvatarMenu';
 import { useAppCookie } from '../helpers/useCookie';
+import BasicBrokerCard from './BasicBrokerCard';
 
 const styles = ({ palette, spacing, transitions, zIndex, mixins, breakpoints }: Theme) => createStyles({
   container: {
@@ -83,6 +84,9 @@ const _DashboardIndex: React.FunctionComponent<IDashboardIndexProps> = ({ classe
             </Paper>
           </Grid>
           {/* System stats */}
+          <Grid item xs={12}>
+            <BasicBrokerCard />
+          </Grid>
           <Grid item xs={12}>
             <Paper className={classes.paper}>
               <Link color="primary" to="/dashboard/broker/logs" component={ReachLink}>

@@ -46,7 +46,7 @@ const _ExpandedCardHeader: React.FunctionComponent<IExpandedCardHeader> = ({ cla
       {action && <div className={classes.action}>{action}</div>}
     </div>
     <div className={classes.content}>
-      <Typography component="span" variant="h5" display="block">
+      <Typography color="primary" variant="h5" display="block">
         {title}
       </Typography>
       {status && <div className={classes.status}>{status}</div>}

@@ -87,7 +87,7 @@ const _DashboardBrokerFrame: React.FunctionComponent<IDashboardBrokerFrameProps>
             </Breadcrumbs>
             </Grid>
             <Grid item xs={12}>
-              <BasicBrokerCard/>
+              <BasicBrokerCard avatar/>
             </Grid>
             {children}
           </Grid>
