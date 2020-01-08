@@ -16,46 +16,39 @@ import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface SensorAssignmentApiModel
+ * @interface DeviceBootstrapConfigBindingModel
  */
-export interface SensorAssignmentApiModel {
+export interface DeviceBootstrapConfigBindingModel {
     /**
      * 
      * @type {string}
-     * @memberof SensorAssignmentApiModel
+     * @memberof DeviceBootstrapConfigBindingModel
      */
     name: string;
     /**
      * 
      * @type {string}
-     * @memberof SensorAssignmentApiModel
+     * @memberof DeviceBootstrapConfigBindingModel
      */
-    userName: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof SensorAssignmentApiModel
-     */
-    assignmentCount: number;
+    key: string;
 }
 
-export function SensorAssignmentApiModelFromJSON(json: any): SensorAssignmentApiModel {
-    return SensorAssignmentApiModelFromJSONTyped(json, false);
+export function DeviceBootstrapConfigBindingModelFromJSON(json: any): DeviceBootstrapConfigBindingModel {
+    return DeviceBootstrapConfigBindingModelFromJSONTyped(json, false);
 }
 
-export function SensorAssignmentApiModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): SensorAssignmentApiModel {
+export function DeviceBootstrapConfigBindingModelFromJSONTyped(json: any, ignoreDiscriminator: boolean): DeviceBootstrapConfigBindingModel {
     if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
         
         'name': json['name'],
-        'userName': json['userName'],
-        'assignmentCount': json['assignmentCount'],
+        'key': json['key'],
     };
 }
 
-export function SensorAssignmentApiModelToJSON(value?: SensorAssignmentApiModel | null): any {
+export function DeviceBootstrapConfigBindingModelToJSON(value?: DeviceBootstrapConfigBindingModel | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -65,8 +58,7 @@ export function SensorAssignmentApiModelToJSON(value?: SensorAssignmentApiModel 
     return {
         
         'name': value.name,
-        'userName': value.userName,
-        'assignmentCount': value.assignmentCount,
+        'key': value.key,
     };
 }
 

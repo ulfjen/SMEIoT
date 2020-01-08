@@ -146,7 +146,7 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
   React.useEffect(() => {
     (async () => {
       let res = await api.apiDevicesConfigSuggestBootstrapGet();
-      setDevice({ ...device, name: res.deviceName || undefined, key: res.key || undefined });
+      setDevice({ ...device, name: res.deviceName, key: res.key });
       if (res.continuedConfigurationDevice) {
         setUnconnectedDeviceName(res.continuedConfigurationDevice);
       }

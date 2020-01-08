@@ -35,55 +35,55 @@ export interface DeviceDetailsApiModel {
      * @type {Array<BasicSensorApiModel>}
      * @memberof DeviceDetailsApiModel
      */
-    readonly sensors?: Array<BasicSensorApiModel>;
+    readonly sensors: Array<BasicSensorApiModel>;
     /**
      * 
      * @type {string}
      * @memberof DeviceDetailsApiModel
      */
-    readonly name?: string;
+    readonly name: string;
     /**
      * 
      * @type {string}
      * @memberof DeviceDetailsApiModel
      */
-    readonly createdAt?: string;
+    readonly createdAt: string;
     /**
      * 
      * @type {string}
      * @memberof DeviceDetailsApiModel
      */
-    readonly updatedAt?: string;
+    readonly updatedAt: string;
     /**
      * 
      * @type {DeviceAuthenticationType}
      * @memberof DeviceDetailsApiModel
      */
-    authenticationType?: DeviceAuthenticationType;
+    authenticationType: DeviceAuthenticationType;
     /**
      * 
      * @type {string}
      * @memberof DeviceDetailsApiModel
      */
-    readonly preSharedKey?: string;
+    readonly preSharedKey: string;
     /**
      * 
      * @type {boolean}
      * @memberof DeviceDetailsApiModel
      */
-    readonly connected?: boolean;
+    readonly connected: boolean;
     /**
      * 
      * @type {string}
      * @memberof DeviceDetailsApiModel
      */
-    readonly connectedAt?: string;
+    readonly connectedAt: string | null;
     /**
      * 
      * @type {string}
      * @memberof DeviceDetailsApiModel
      */
-    readonly lastMessageAt?: string;
+    readonly lastMessageAt: string | null;
 }
 
 export function DeviceDetailsApiModelFromJSON(json: any): DeviceDetailsApiModel {
@@ -96,15 +96,15 @@ export function DeviceDetailsApiModelFromJSONTyped(json: any, ignoreDiscriminato
     }
     return {
         
-        'sensors': !exists(json, 'sensors') ? undefined : ((json['sensors'] as Array<any>).map(BasicSensorApiModelFromJSON)),
-        'name': !exists(json, 'name') ? undefined : json['name'],
-        'createdAt': !exists(json, 'createdAt') ? undefined : json['createdAt'],
-        'updatedAt': !exists(json, 'updatedAt') ? undefined : json['updatedAt'],
-        'authenticationType': !exists(json, 'authenticationType') ? undefined : DeviceAuthenticationTypeFromJSON(json['authenticationType']),
-        'preSharedKey': !exists(json, 'preSharedKey') ? undefined : json['preSharedKey'],
-        'connected': !exists(json, 'connected') ? undefined : json['connected'],
-        'connectedAt': !exists(json, 'connectedAt') ? undefined : json['connectedAt'],
-        'lastMessageAt': !exists(json, 'lastMessageAt') ? undefined : json['lastMessageAt'],
+        'sensors': ((json['sensors'] as Array<any>).map(BasicSensorApiModelFromJSON)),
+        'name': json['name'],
+        'createdAt': json['createdAt'],
+        'updatedAt': json['updatedAt'],
+        'authenticationType': DeviceAuthenticationTypeFromJSON(json['authenticationType']),
+        'preSharedKey': json['preSharedKey'],
+        'connected': json['connected'],
+        'connectedAt': json['connectedAt'],
+        'lastMessageAt': json['lastMessageAt'],
     };
 }
 

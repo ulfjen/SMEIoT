@@ -24,13 +24,15 @@ namespace SMEIoT.Web.Api.Filters
 
     public Task OnExceptionAsync(ExceptionContext context)
     {
+      var errors = new ModelStateDictionary();
+
       switch (context.Exception) {
-        case EntityNotFoundException entityNotFoundException:
-          context.Result = new NotFoundObjectResult(entityNotFoundException.ParamName) {StatusCode = StatusCodes.Status404NotFound};
+        case EntityNotFoundException exception:
+          errors.AddModelError(exception.ParamName, exception.Message);
+          context.Result = new NotFoundObjectResult(_pdFactory.CreateValidationProblemDetails(context.HttpContext, errors, StatusCodes.Status404NotFound)) {StatusCode = StatusCodes.Status404NotFound};
           break;
-        case InvalidArgumentException argumentException:
-          var errors = new ModelStateDictionary();
-          errors.AddModelError(argumentException.ParamName, argumentException.Message);
+        case InvalidArgumentException exception:
+          errors.AddModelError(exception.ParamName, exception.Message);
           context.Result = new BadRequestObjectResult(_pdFactory.CreateValidationProblemDetails(context.HttpContext, errors, StatusCodes.Status422UnprocessableEntity));
           break;
         case InvalidUserInputException exception:

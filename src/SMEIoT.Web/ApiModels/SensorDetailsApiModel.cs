@@ -1,7 +1,7 @@
 using SMEIoT.Core.Entities;
-using Newtonsoft.Json;
 using System.Collections.Generic;
 using NodaTime;
+using Newtonsoft.Json;
 
 namespace SMEIoT.Web.ApiModels
 {
@@ -10,7 +10,6 @@ namespace SMEIoT.Web.ApiModels
     [JsonProperty(Required = Required.DisallowNull)]
     public IEnumerable<NumberTimeSeriesApiModel> Data { get; set; }
     
-    [JsonProperty(Required = Required.DisallowNull)]
     public Instant StartedAt { get; set; }
 
     public SensorDetailsApiModel(Sensor sensor, IEnumerable<(double, Instant)> values) : base(sensor)

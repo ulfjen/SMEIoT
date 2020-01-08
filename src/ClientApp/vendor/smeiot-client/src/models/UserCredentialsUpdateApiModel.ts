@@ -24,25 +24,25 @@ export interface UserCredentialsUpdateApiModel {
      * @type {boolean}
      * @memberof UserCredentialsUpdateApiModel
      */
-    passwordUpdated?: boolean;
+    passwordUpdated: boolean;
     /**
      * 
      * @type {string}
      * @memberof UserCredentialsUpdateApiModel
      */
-    userName?: string;
+    userName: string;
     /**
      * 
      * @type {Array<string>}
      * @memberof UserCredentialsUpdateApiModel
      */
-    roles?: Array<string>;
+    roles: Array<string>;
     /**
      * 
      * @type {string}
      * @memberof UserCredentialsUpdateApiModel
      */
-    createdAt?: string;
+    createdAt: string;
 }
 
 export function UserCredentialsUpdateApiModelFromJSON(json: any): UserCredentialsUpdateApiModel {
@@ -55,10 +55,10 @@ export function UserCredentialsUpdateApiModelFromJSONTyped(json: any, ignoreDisc
     }
     return {
         
-        'passwordUpdated': !exists(json, 'passwordUpdated') ? undefined : json['passwordUpdated'],
-        'userName': !exists(json, 'userName') ? undefined : json['userName'],
-        'roles': !exists(json, 'roles') ? undefined : json['roles'],
-        'createdAt': !exists(json, 'createdAt') ? undefined : json['createdAt'],
+        'passwordUpdated': json['passwordUpdated'],
+        'userName': json['userName'],
+        'roles': json['roles'],
+        'createdAt': json['createdAt'],
     };
 }
 

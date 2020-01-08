@@ -13,7 +13,6 @@ namespace SMEIoT.Web.ApiModels
     [JsonProperty(Required = Required.DisallowNull)]
     public IEnumerable<string> Roles { get; set; }
     
-    [JsonProperty(Required = Required.DisallowNull)]
     public Instant CreatedAt { get; set; }
 
     public BasicUserApiModel(User user, IList<string> roles)

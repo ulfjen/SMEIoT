@@ -31,7 +31,7 @@ export interface BasicDeviceApiModelList {
      * @type {Array<BasicDeviceApiModel>}
      * @memberof BasicDeviceApiModelList
      */
-    devices?: Array<BasicDeviceApiModel>;
+    devices: Array<BasicDeviceApiModel>;
 }
 
 export function BasicDeviceApiModelListFromJSON(json: any): BasicDeviceApiModelList {
@@ -44,7 +44,7 @@ export function BasicDeviceApiModelListFromJSONTyped(json: any, ignoreDiscrimina
     }
     return {
         
-        'devices': !exists(json, 'devices') ? undefined : ((json['devices'] as Array<any>).map(BasicDeviceApiModelFromJSON)),
+        'devices': ((json['devices'] as Array<any>).map(BasicDeviceApiModelFromJSON)),
     };
 }
 
@@ -57,7 +57,7 @@ export function BasicDeviceApiModelListToJSON(value?: BasicDeviceApiModelList | 
     }
     return {
         
-        'devices': value.devices === undefined ? undefined : ((value.devices as Array<any>).map(BasicDeviceApiModelToJSON)),
+        'devices': ((value.devices as Array<any>).map(BasicDeviceApiModelToJSON)),
     };
 }
 

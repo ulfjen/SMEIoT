@@ -24,7 +24,7 @@ export interface BrokerStatisticsApiModel {
      * @type {{ [key: string]: string; }}
      * @memberof BrokerStatisticsApiModel
      */
-    statistics?: { [key: string]: string; };
+    statistics: { [key: string]: string; };
 }
 
 export function BrokerStatisticsApiModelFromJSON(json: any): BrokerStatisticsApiModel {
@@ -37,7 +37,7 @@ export function BrokerStatisticsApiModelFromJSONTyped(json: any, ignoreDiscrimin
     }
     return {
         
-        'statistics': !exists(json, 'statistics') ? undefined : json['statistics'],
+        'statistics': json['statistics'],
     };
 }
 

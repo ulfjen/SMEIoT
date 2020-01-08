@@ -24,19 +24,19 @@ export interface DeviceConfigSuggestApiModel {
      * @type {string}
      * @memberof DeviceConfigSuggestApiModel
      */
-    deviceName?: string | null;
+    deviceName: string;
     /**
      * 
      * @type {string}
      * @memberof DeviceConfigSuggestApiModel
      */
-    key?: string | null;
+    key: string;
     /**
      * 
      * @type {string}
      * @memberof DeviceConfigSuggestApiModel
      */
-    continuedConfigurationDevice?: string | null;
+    continuedConfigurationDevice: string;
 }
 
 export function DeviceConfigSuggestApiModelFromJSON(json: any): DeviceConfigSuggestApiModel {
@@ -49,9 +49,9 @@ export function DeviceConfigSuggestApiModelFromJSONTyped(json: any, ignoreDiscri
     }
     return {
         
-        'deviceName': !exists(json, 'deviceName') ? undefined : json['deviceName'],
-        'key': !exists(json, 'key') ? undefined : json['key'],
-        'continuedConfigurationDevice': !exists(json, 'continuedConfigurationDevice') ? undefined : json['continuedConfigurationDevice'],
+        'deviceName': json['deviceName'],
+        'key': json['key'],
+        'continuedConfigurationDevice': json['continuedConfigurationDevice'],
     };
 }
 

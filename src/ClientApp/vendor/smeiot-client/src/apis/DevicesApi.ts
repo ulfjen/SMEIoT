@@ -21,6 +21,9 @@ import {
     BasicDeviceApiModelList,
     BasicDeviceApiModelListFromJSON,
     BasicDeviceApiModelListToJSON,
+    DeviceBootstrapConfigBindingModel,
+    DeviceBootstrapConfigBindingModelFromJSON,
+    DeviceBootstrapConfigBindingModelToJSON,
     DeviceConfigBindingModel,
     DeviceConfigBindingModelFromJSON,
     DeviceConfigBindingModelToJSON,
@@ -39,11 +42,11 @@ import {
 } from '../models';
 
 export interface DevicesApiApiDevicesBootstrapPostRequest {
-    deviceConfigBindingModel?: DeviceConfigBindingModel;
+    deviceBootstrapConfigBindingModel: DeviceBootstrapConfigBindingModel;
 }
 
 export interface DevicesApiApiDevicesGetRequest {
-    start?: number;
+    offset?: number;
     limit?: number;
 }
 
@@ -57,7 +60,7 @@ export interface DevicesApiApiDevicesNameGetRequest {
 
 export interface DevicesApiApiDevicesNamePutRequest {
     name: string;
-    deviceConfigBindingModel?: DeviceConfigBindingModel;
+    deviceConfigBindingModel: DeviceConfigBindingModel;
 }
 
 export interface DevicesApiApiDevicesNameSensorCandidatesGetRequest {
@@ -72,18 +75,22 @@ export class DevicesApi extends runtime.BaseAPI {
     /**
      */
     async apiDevicesBootstrapPostRaw(requestParameters: DevicesApiApiDevicesBootstrapPostRequest): Promise<runtime.ApiResponse<BasicDeviceApiModel>> {
+        if (requestParameters.deviceBootstrapConfigBindingModel === null || requestParameters.deviceBootstrapConfigBindingModel === undefined) {
+            throw new runtime.RequiredError('deviceBootstrapConfigBindingModel','Required parameter requestParameters.deviceBootstrapConfigBindingModel was null or undefined when calling apiDevicesBootstrapPost.');
+        }
+
         const queryParameters: runtime.HTTPQuery = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        headerParameters['Content-Type'] = 'application/json';
+        headerParameters['Content-Type'] = 'application/json; v=1.0';
 
         const response = await this.request({
             path: `/api/devices/bootstrap`,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: DeviceConfigBindingModelToJSON(requestParameters.deviceConfigBindingModel),
+            body: DeviceBootstrapConfigBindingModelToJSON(requestParameters.deviceBootstrapConfigBindingModel),
         });
 
         return new runtime.JSONApiResponse(response, (jsonValue) => BasicDeviceApiModelFromJSON(jsonValue));
@@ -173,8 +180,8 @@ export class DevicesApi extends runtime.BaseAPI {
     async apiDevicesGetRaw(requestParameters: DevicesApiApiDevicesGetRequest): Promise<runtime.ApiResponse<BasicDeviceApiModelList>> {
         const queryParameters: runtime.HTTPQuery = {};
 
-        if (requestParameters.start !== undefined) {
-            queryParameters['start'] = requestParameters.start;
+        if (requestParameters.offset !== undefined) {
+            queryParameters['offset'] = requestParameters.offset;
         }
 
         if (requestParameters.limit !== undefined) {
@@ -263,11 +270,15 @@ export class DevicesApi extends runtime.BaseAPI {
             throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling apiDevicesNamePut.');
         }
 
+        if (requestParameters.deviceConfigBindingModel === null || requestParameters.deviceConfigBindingModel === undefined) {
+            throw new runtime.RequiredError('deviceConfigBindingModel','Required parameter requestParameters.deviceConfigBindingModel was null or undefined when calling apiDevicesNamePut.');
+        }
+
         const queryParameters: runtime.HTTPQuery = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        headerParameters['Content-Type'] = 'application/json';
+        headerParameters['Content-Type'] = 'application/json; v=1.0';
 
         const response = await this.request({
             path: `/api/devices/{name}`.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters.name))),

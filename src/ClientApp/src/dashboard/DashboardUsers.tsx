@@ -29,7 +29,6 @@ import { useAppCookie } from '../helpers/useCookie';
 import { defineMessages, useIntl } from 'react-intl';
 import { useTitle, useAsync } from 'react-use';
 import { FixedSizeList, areEqual, ListChildComponentProps } from 'react-window';
-import AutoSizer from "react-virtualized-auto-sizer";
 import Grid from '@material-ui/core/Grid';
 import InfiniteLoader from 'react-window-infinite-loader';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';

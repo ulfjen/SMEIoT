@@ -33,7 +33,7 @@ import {
 } from '../models';
 
 export interface UsersApiApiUsersPostRequest {
-    validatedUserCredentialsBindingModel?: ValidatedUserCredentialsBindingModel;
+    validatedUserCredentialsBindingModel: ValidatedUserCredentialsBindingModel;
 }
 
 export interface UsersApiApiUsersUserNameGetRequest {
@@ -42,7 +42,7 @@ export interface UsersApiApiUsersUserNameGetRequest {
 
 export interface UsersApiApiUsersUserNamePasswordPutRequest {
     userName: string;
-    confirmedUserCredentialsUpdateBindingModel?: ConfirmedUserCredentialsUpdateBindingModel;
+    confirmedUserCredentialsUpdateBindingModel: ConfirmedUserCredentialsUpdateBindingModel;
 }
 
 /**
@@ -53,11 +53,15 @@ export class UsersApi extends runtime.BaseAPI {
     /**
      */
     async apiUsersPostRaw(requestParameters: UsersApiApiUsersPostRequest): Promise<runtime.ApiResponse<BasicUserApiModel>> {
+        if (requestParameters.validatedUserCredentialsBindingModel === null || requestParameters.validatedUserCredentialsBindingModel === undefined) {
+            throw new runtime.RequiredError('validatedUserCredentialsBindingModel','Required parameter requestParameters.validatedUserCredentialsBindingModel was null or undefined when calling apiUsersPost.');
+        }
+
         const queryParameters: runtime.HTTPQuery = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        headerParameters['Content-Type'] = 'application/json';
+        headerParameters['Content-Type'] = 'application/json; v=1.0';
 
         const response = await this.request({
             path: `/api/users`,
@@ -112,11 +116,15 @@ export class UsersApi extends runtime.BaseAPI {
             throw new runtime.RequiredError('userName','Required parameter requestParameters.userName was null or undefined when calling apiUsersUserNamePasswordPut.');
         }
 
+        if (requestParameters.confirmedUserCredentialsUpdateBindingModel === null || requestParameters.confirmedUserCredentialsUpdateBindingModel === undefined) {
+            throw new runtime.RequiredError('confirmedUserCredentialsUpdateBindingModel','Required parameter requestParameters.confirmedUserCredentialsUpdateBindingModel was null or undefined when calling apiUsersUserNamePasswordPut.');
+        }
+
         const queryParameters: runtime.HTTPQuery = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        headerParameters['Content-Type'] = 'application/json';
+        headerParameters['Content-Type'] = 'application/json; v=1.0';
 
         const response = await this.request({
             path: `/api/users/{userName}/password`.replace(`{${"userName"}}`, encodeURIComponent(String(requestParameters.userName))),

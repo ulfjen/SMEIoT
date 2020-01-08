@@ -31,49 +31,49 @@ export interface BasicDeviceApiModel {
      * @type {string}
      * @memberof BasicDeviceApiModel
      */
-    readonly name?: string;
+    readonly name: string;
     /**
      * 
      * @type {string}
      * @memberof BasicDeviceApiModel
      */
-    readonly createdAt?: string;
+    readonly createdAt: string;
     /**
      * 
      * @type {string}
      * @memberof BasicDeviceApiModel
      */
-    readonly updatedAt?: string;
+    readonly updatedAt: string;
     /**
      * 
      * @type {DeviceAuthenticationType}
      * @memberof BasicDeviceApiModel
      */
-    authenticationType?: DeviceAuthenticationType;
+    authenticationType: DeviceAuthenticationType;
     /**
      * 
      * @type {string}
      * @memberof BasicDeviceApiModel
      */
-    readonly preSharedKey?: string;
+    readonly preSharedKey: string;
     /**
      * 
      * @type {boolean}
      * @memberof BasicDeviceApiModel
      */
-    readonly connected?: boolean;
+    readonly connected: boolean;
     /**
      * 
      * @type {string}
      * @memberof BasicDeviceApiModel
      */
-    readonly connectedAt?: string;
+    readonly connectedAt: string | null;
     /**
      * 
      * @type {string}
      * @memberof BasicDeviceApiModel
      */
-    readonly lastMessageAt?: string;
+    readonly lastMessageAt: string | null;
 }
 
 export function BasicDeviceApiModelFromJSON(json: any): BasicDeviceApiModel {
@@ -86,14 +86,14 @@ export function BasicDeviceApiModelFromJSONTyped(json: any, ignoreDiscriminator:
     }
     return {
         
-        'name': !exists(json, 'name') ? undefined : json['name'],
-        'createdAt': !exists(json, 'createdAt') ? undefined : json['createdAt'],
-        'updatedAt': !exists(json, 'updatedAt') ? undefined : json['updatedAt'],
-        'authenticationType': !exists(json, 'authenticationType') ? undefined : DeviceAuthenticationTypeFromJSON(json['authenticationType']),
-        'preSharedKey': !exists(json, 'preSharedKey') ? undefined : json['preSharedKey'],
-        'connected': !exists(json, 'connected') ? undefined : json['connected'],
-        'connectedAt': !exists(json, 'connectedAt') ? undefined : json['connectedAt'],
-        'lastMessageAt': !exists(json, 'lastMessageAt') ? undefined : json['lastMessageAt'],
+        'name': json['name'],
+        'createdAt': json['createdAt'],
+        'updatedAt': json['updatedAt'],
+        'authenticationType': DeviceAuthenticationTypeFromJSON(json['authenticationType']),
+        'preSharedKey': json['preSharedKey'],
+        'connected': json['connected'],
+        'connectedAt': json['connectedAt'],
+        'lastMessageAt': json['lastMessageAt'],
     };
 }
 

@@ -31,7 +31,7 @@ export interface SensorDetailsApiModelList {
      * @type {Array<SensorDetailsApiModel>}
      * @memberof SensorDetailsApiModelList
      */
-    sensors?: Array<SensorDetailsApiModel>;
+    sensors: Array<SensorDetailsApiModel>;
 }
 
 export function SensorDetailsApiModelListFromJSON(json: any): SensorDetailsApiModelList {
@@ -44,7 +44,7 @@ export function SensorDetailsApiModelListFromJSONTyped(json: any, ignoreDiscrimi
     }
     return {
         
-        'sensors': !exists(json, 'sensors') ? undefined : ((json['sensors'] as Array<any>).map(SensorDetailsApiModelFromJSON)),
+        'sensors': ((json['sensors'] as Array<any>).map(SensorDetailsApiModelFromJSON)),
     };
 }
 
@@ -57,7 +57,7 @@ export function SensorDetailsApiModelListToJSON(value?: SensorDetailsApiModelLis
     }
     return {
         
-        'sensors': value.sensors === undefined ? undefined : ((value.sensors as Array<any>).map(SensorDetailsApiModelToJSON)),
+        'sensors': ((value.sensors as Array<any>).map(SensorDetailsApiModelToJSON)),
     };
 }
 

@@ -38,12 +38,12 @@ export interface SensorsApiApiSensorsDeviceNameSensorNameGetRequest {
 }
 
 export interface SensorsApiApiSensorsGetRequest {
-    start?: number;
+    offset?: number;
     limit?: number;
 }
 
 export interface SensorsApiApiSensorsPostRequest {
-    sensorLocatorBindingModel?: SensorLocatorBindingModel;
+    sensorLocatorBindingModel: SensorLocatorBindingModel;
 }
 
 /**
@@ -88,8 +88,8 @@ export class SensorsApi extends runtime.BaseAPI {
     async apiSensorsGetRaw(requestParameters: SensorsApiApiSensorsGetRequest): Promise<runtime.ApiResponse<SensorDetailsApiModelList>> {
         const queryParameters: runtime.HTTPQuery = {};
 
-        if (requestParameters.start !== undefined) {
-            queryParameters['start'] = requestParameters.start;
+        if (requestParameters.offset !== undefined) {
+            queryParameters['offset'] = requestParameters.offset;
         }
 
         if (requestParameters.limit !== undefined) {
@@ -118,11 +118,15 @@ export class SensorsApi extends runtime.BaseAPI {
     /**
      */
     async apiSensorsPostRaw(requestParameters: SensorsApiApiSensorsPostRequest): Promise<runtime.ApiResponse<BasicSensorApiModel>> {
+        if (requestParameters.sensorLocatorBindingModel === null || requestParameters.sensorLocatorBindingModel === undefined) {
+            throw new runtime.RequiredError('sensorLocatorBindingModel','Required parameter requestParameters.sensorLocatorBindingModel was null or undefined when calling apiSensorsPost.');
+        }
+
         const queryParameters: runtime.HTTPQuery = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        headerParameters['Content-Type'] = 'application/json';
+        headerParameters['Content-Type'] = 'application/json; v=1.0';
 
         const response = await this.request({
             path: `/api/sensors`,

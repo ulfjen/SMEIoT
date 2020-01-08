@@ -24,13 +24,13 @@ export interface NumberTimeSeriesApiModel {
      * @type {number}
      * @memberof NumberTimeSeriesApiModel
      */
-    value?: number;
+    value: number;
     /**
      * 
      * @type {string}
      * @memberof NumberTimeSeriesApiModel
      */
-    createdAt?: string;
+    createdAt: string;
 }
 
 export function NumberTimeSeriesApiModelFromJSON(json: any): NumberTimeSeriesApiModel {
@@ -43,8 +43,8 @@ export function NumberTimeSeriesApiModelFromJSONTyped(json: any, ignoreDiscrimin
     }
     return {
         
-        'value': !exists(json, 'value') ? undefined : json['value'],
-        'createdAt': !exists(json, 'createdAt') ? undefined : json['createdAt'],
+        'value': json['value'],
+        'createdAt': json['createdAt'],
     };
 }
 

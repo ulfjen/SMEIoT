@@ -1,16 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Newtonsoft.Json;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace SMEIoT.Web.BindingModels
 {
   public class SensorLocatorBindingModel
   {
-    [BindRequired]
-    [JsonProperty(Required = Required.DisallowNull)]
-    public string DeviceName { get; set; } = null!;
+    [Required]
+    public string DeviceName { get; set; } = string.Empty;
 
-    [BindRequired]
-    [JsonProperty(Required = Required.DisallowNull)]
-    public string Name { get; set; } = null!;
+    [Required]
+    public string Name { get; set; } = string.Empty;
   }
 }

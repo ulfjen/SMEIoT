@@ -4,6 +4,14 @@
     "title": "SMEIoT API",
     "version": "v1"
   },
+  "servers": [
+    {
+      "url": "https://localhost:5001"
+    },
+    {
+      "url": "https://smeiot.se"
+    }
+  ],
   "paths": {
     "/api/admin/users": {
       "get": {
@@ -90,8 +98,8 @@
               }
             }
           },
-          "422": {
-            "description": "Client Error",
+          "404": {
+            "description": "Not Found",
             "content": {
               "application/json": {
                 "schema": {
@@ -120,7 +128,7 @@
         ],
         "requestBody": {
           "content": {
-            "application/json": {
+            "application/json; v=1.0": {
               "schema": {
                 "$ref": "#/components/schemas/UserRolesBindingModel"
               }
@@ -134,6 +142,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UserCredentialsUpdateApiModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -216,12 +234,13 @@
         ],
         "requestBody": {
           "content": {
-            "application/json": {
+            "application/json; v=1.0": {
               "schema": {
-                "$ref": "#/components/schemas/DeviceConfigBindingModel"
+                "$ref": "#/components/schemas/DeviceBootstrapConfigBindingModel"
               }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "201": {
@@ -264,12 +283,13 @@
         ],
         "requestBody": {
           "content": {
-            "application/json": {
+            "application/json; v=1.0": {
               "schema": {
                 "$ref": "#/components/schemas/DeviceConfigBindingModel"
               }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "200": {
@@ -278,6 +298,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/BasicDeviceApiModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -484,12 +514,12 @@
         ],
         "parameters": [
           {
-            "name": "start",
+            "name": "offset",
             "in": "query",
             "schema": {
               "type": "integer",
               "format": "int32",
-              "default": 1
+              "default": 0
             }
           },
           {
@@ -543,12 +573,13 @@
         ],
         "requestBody": {
           "content": {
-            "application/json": {
+            "application/json; v=1.0": {
               "schema": {
                 "$ref": "#/components/schemas/AssignUserSensorBindingModel"
               }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "201": {
@@ -688,12 +719,12 @@
         ],
         "parameters": [
           {
-            "name": "start",
+            "name": "offset",
             "in": "query",
             "schema": {
               "type": "integer",
               "format": "int32",
-              "default": 1
+              "default": 0
             }
           },
           {
@@ -735,12 +766,13 @@
         ],
         "requestBody": {
           "content": {
-            "application/json": {
+            "application/json; v=1.0": {
               "schema": {
                 "$ref": "#/components/schemas/SensorLocatorBindingModel"
               }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "201": {
@@ -820,12 +852,13 @@
         ],
         "requestBody": {
           "content": {
-            "application/json": {
+            "application/json; v=1.0": {
               "schema": {
                 "$ref": "#/components/schemas/LoginBindingModel"
               }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "201": {
@@ -858,12 +891,13 @@
         ],
         "requestBody": {
           "content": {
-            "application/json": {
+            "application/json; v=1.0": {
               "schema": {
                 "$ref": "#/components/schemas/ValidatedUserCredentialsBindingModel"
               }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "201": {
@@ -906,12 +940,13 @@
         ],
         "requestBody": {
           "content": {
-            "application/json": {
+            "application/json; v=1.0": {
               "schema": {
                 "$ref": "#/components/schemas/ConfirmedUserCredentialsUpdateBindingModel"
               }
             }
-          }
+          },
+          "required": true
         },
         "responses": {
           "200": {
@@ -963,8 +998,8 @@
               }
             }
           },
-          "422": {
-            "description": "Client Error",
+          "404": {
+            "description": "Not Found",
             "content": {
               "application/json": {
                 "schema": {
@@ -980,6 +1015,13 @@
   "components": {
     "schemas": {
       "AdminUserApiModel": {
+        "required": [
+          "createdAt",
+          "id",
+          "lastSeenAt",
+          "roles",
+          "userName"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -1005,6 +1047,10 @@
         "additionalProperties": false
       },
       "AdminUserApiModelList": {
+        "required": [
+          "total",
+          "users"
+        ],
         "type": "object",
         "properties": {
           "users": {
@@ -1057,6 +1103,9 @@
         "additionalProperties": false
       },
       "UserRolesBindingModel": {
+        "required": [
+          "roles"
+        ],
         "type": "object",
         "properties": {
           "roles": {
@@ -1069,6 +1118,12 @@
         "additionalProperties": false
       },
       "UserCredentialsUpdateApiModel": {
+        "required": [
+          "createdAt",
+          "passwordUpdated",
+          "roles",
+          "userName"
+        ],
         "type": "object",
         "properties": {
           "passwordUpdated": {
@@ -1090,30 +1145,44 @@
         "additionalProperties": false
       },
       "BasicBrokerApiModel": {
+        "required": [
+          "lastUpdatedAt",
+          "min1",
+          "min15",
+          "min5",
+          "running"
+        ],
         "type": "object",
         "properties": {
           "running": {
             "type": "boolean"
           },
           "lastUpdatedAt": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "min1": {
             "type": "number",
-            "format": "double"
+            "format": "double",
+            "nullable": true
           },
           "min5": {
             "type": "number",
-            "format": "double"
+            "format": "double",
+            "nullable": true
           },
           "min15": {
             "type": "number",
-            "format": "double"
+            "format": "double",
+            "nullable": true
           }
         },
         "additionalProperties": false
       },
       "BrokerStatisticsApiModel": {
+        "required": [
+          "statistics"
+        ],
         "type": "object",
         "properties": {
           "statistics": {
@@ -1125,7 +1194,11 @@
         },
         "additionalProperties": false
       },
-      "DeviceConfigBindingModel": {
+      "DeviceBootstrapConfigBindingModel": {
+        "required": [
+          "key",
+          "name"
+        ],
         "type": "object",
         "properties": {
           "name": {
@@ -1145,6 +1218,16 @@
         "format": "int32"
       },
       "BasicDeviceApiModel": {
+        "required": [
+          "authenticationType",
+          "connected",
+          "connectedAt",
+          "createdAt",
+          "lastMessageAt",
+          "name",
+          "preSharedKey",
+          "updatedAt"
+        ],
         "type": "object",
         "properties": {
           "name": {
@@ -1172,16 +1255,34 @@
           },
           "connectedAt": {
             "type": "string",
+            "nullable": true,
             "readOnly": true
           },
           "lastMessageAt": {
             "type": "string",
+            "nullable": true,
             "readOnly": true
           }
         },
         "additionalProperties": false
       },
+      "DeviceConfigBindingModel": {
+        "required": [
+          "key"
+        ],
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "BasicSensorApiModel": {
+        "required": [
+          "deviceName",
+          "sensorName"
+        ],
         "type": "object",
         "properties": {
           "sensorName": {
@@ -1194,6 +1295,17 @@
         "additionalProperties": false
       },
       "DeviceDetailsApiModel": {
+        "required": [
+          "authenticationType",
+          "connected",
+          "connectedAt",
+          "createdAt",
+          "lastMessageAt",
+          "name",
+          "preSharedKey",
+          "sensors",
+          "updatedAt"
+        ],
         "type": "object",
         "properties": {
           "sensors": {
@@ -1228,16 +1340,21 @@
           },
           "connectedAt": {
             "type": "string",
+            "nullable": true,
             "readOnly": true
           },
           "lastMessageAt": {
             "type": "string",
+            "nullable": true,
             "readOnly": true
           }
         },
         "additionalProperties": false
       },
       "SensorCandidatesApiModel": {
+        "required": [
+          "names"
+        ],
         "type": "object",
         "properties": {
           "names": {
@@ -1250,24 +1367,29 @@
         "additionalProperties": false
       },
       "DeviceConfigSuggestApiModel": {
+        "required": [
+          "continuedConfigurationDevice",
+          "deviceName",
+          "key"
+        ],
         "type": "object",
         "properties": {
           "deviceName": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "key": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           },
           "continuedConfigurationDevice": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         },
         "additionalProperties": false
       },
       "BasicDeviceApiModelList": {
+        "required": [
+          "devices"
+        ],
         "type": "object",
         "properties": {
           "devices": {
@@ -1280,6 +1402,9 @@
         "additionalProperties": false
       },
       "AssignUserSensorBindingModel": {
+        "required": [
+          "userName"
+        ],
         "type": "object",
         "properties": {
           "userName": {
@@ -1289,6 +1414,11 @@
         "additionalProperties": false
       },
       "SensorAssignmentApiModel": {
+        "required": [
+          "assignmentCount",
+          "name",
+          "userName"
+        ],
         "type": "object",
         "properties": {
           "name": {
@@ -1309,6 +1439,10 @@
         "additionalProperties": false
       },
       "NumberTimeSeriesApiModel": {
+        "required": [
+          "createdAt",
+          "value"
+        ],
         "type": "object",
         "properties": {
           "value": {
@@ -1322,6 +1456,12 @@
         "additionalProperties": false
       },
       "SensorDetailsApiModel": {
+        "required": [
+          "data",
+          "deviceName",
+          "sensorName",
+          "startedAt"
+        ],
         "type": "object",
         "properties": {
           "data": {
@@ -1343,6 +1483,9 @@
         "additionalProperties": false
       },
       "SensorDetailsApiModelList": {
+        "required": [
+          "sensors"
+        ],
         "type": "object",
         "properties": {
           "sensors": {
@@ -1355,6 +1498,10 @@
         "additionalProperties": false
       },
       "SensorLocatorBindingModel": {
+        "required": [
+          "deviceName",
+          "name"
+        ],
         "type": "object",
         "properties": {
           "deviceName": {
@@ -1367,6 +1514,10 @@
         "additionalProperties": false
       },
       "LoginBindingModel": {
+        "required": [
+          "password",
+          "userName"
+        ],
         "type": "object",
         "properties": {
           "userName": {
@@ -1377,12 +1528,16 @@
           },
           "returnUrl": {
             "type": "string",
-            "format": "uri"
+            "format": "uri",
+            "nullable": true
           }
         },
         "additionalProperties": false
       },
       "LoginedApiModel": {
+        "required": [
+          "returnUrl"
+        ],
         "type": "object",
         "properties": {
           "returnUrl": {
@@ -1392,6 +1547,10 @@
         "additionalProperties": false
       },
       "ValidatedUserCredentialsBindingModel": {
+        "required": [
+          "password",
+          "userName"
+        ],
         "type": "object",
         "properties": {
           "userName": {
@@ -1409,6 +1568,11 @@
         "additionalProperties": false
       },
       "BasicUserApiModel": {
+        "required": [
+          "createdAt",
+          "roles",
+          "userName"
+        ],
         "type": "object",
         "properties": {
           "userName": {
@@ -1427,11 +1591,13 @@
         "additionalProperties": false
       },
       "ConfirmedUserCredentialsUpdateBindingModel": {
+        "required": [
+          "currentPassword",
+          "newPassword"
+        ],
         "type": "object",
         "properties": {
           "currentPassword": {
-            "maxLength": 1024,
-            "minLength": 8,
             "type": "string",
             "format": "password"
           },

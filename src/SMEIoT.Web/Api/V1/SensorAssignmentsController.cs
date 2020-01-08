@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using SMEIoT.Core.Entities;
 using SMEIoT.Core.Interfaces;
 using SMEIoT.Web.ApiModels;
@@ -26,7 +27,7 @@ namespace SMEIoT.Web.Api.V1
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<SensorAssignmentApiModel>> Create(string name, AssignUserSensorBindingModel binding)
+    public async Task<ActionResult<SensorAssignmentApiModel>> Create(string name, [BindRequired] AssignUserSensorBindingModel binding)
     {
       await _service.AssignSensorToUserAsync(name, binding.UserName);
       var us = await _service.GetUserSensor(binding.UserName, name);

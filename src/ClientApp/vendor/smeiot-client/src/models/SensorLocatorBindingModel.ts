@@ -24,13 +24,13 @@ export interface SensorLocatorBindingModel {
      * @type {string}
      * @memberof SensorLocatorBindingModel
      */
-    deviceName?: string;
+    deviceName: string;
     /**
      * 
      * @type {string}
      * @memberof SensorLocatorBindingModel
      */
-    name?: string;
+    name: string;
 }
 
 export function SensorLocatorBindingModelFromJSON(json: any): SensorLocatorBindingModel {
@@ -43,8 +43,8 @@ export function SensorLocatorBindingModelFromJSONTyped(json: any, ignoreDiscrimi
     }
     return {
         
-        'deviceName': !exists(json, 'deviceName') ? undefined : json['deviceName'],
-        'name': !exists(json, 'name') ? undefined : json['name'],
+        'deviceName': json['deviceName'],
+        'name': json['name'],
     };
 }
 

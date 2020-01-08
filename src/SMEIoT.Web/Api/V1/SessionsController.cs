@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using SMEIoT.Core.Entities;
 using SMEIoT.Web.ApiModels;
@@ -28,7 +29,7 @@ namespace SMEIoT.Web.Api.V1
     [HttpPost("")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult<LoginedApiModel>> Create(LoginBindingModel model)
+    public async Task<ActionResult<LoginedApiModel>> Create([BindRequired] LoginBindingModel model)
     {
 //      ViewData["ReturnUrl"] = model.ReturnUrl;
 //      if (!ModelState.IsValid)

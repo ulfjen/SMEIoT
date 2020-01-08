@@ -24,19 +24,19 @@ export interface BasicUserApiModel {
      * @type {string}
      * @memberof BasicUserApiModel
      */
-    userName?: string;
+    userName: string;
     /**
      * 
      * @type {Array<string>}
      * @memberof BasicUserApiModel
      */
-    roles?: Array<string>;
+    roles: Array<string>;
     /**
      * 
      * @type {string}
      * @memberof BasicUserApiModel
      */
-    createdAt?: string;
+    createdAt: string;
 }
 
 export function BasicUserApiModelFromJSON(json: any): BasicUserApiModel {
@@ -49,9 +49,9 @@ export function BasicUserApiModelFromJSONTyped(json: any, ignoreDiscriminator: b
     }
     return {
         
-        'userName': !exists(json, 'userName') ? undefined : json['userName'],
-        'roles': !exists(json, 'roles') ? undefined : json['roles'],
-        'createdAt': !exists(json, 'createdAt') ? undefined : json['createdAt'],
+        'userName': json['userName'],
+        'roles': json['roles'],
+        'createdAt': json['createdAt'],
     };
 }
 

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Text.Json;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -27,6 +29,7 @@ using SMEIoT.Core.Interfaces;
 using SMEIoT.Core.Services;
 using SMEIoT.Web.Api.Filters;
 using SMEIoT.Web.Hubs;
+using SMEIoT.Web.Api.Config;
 using SMEIoT.Web.Services;
 using SMEIoT.Web.Middlewares;
 
@@ -58,7 +61,7 @@ namespace SMEIoT.Web
         options.Queues = new[] { "critical", "default" };
       });
 
-      services.AddTransient<ProblemDetailsFactory, CustomProblemDetailsFactory>();
+      services.AddTransient<ProblemDetailsFactory, SMEIoTProblemDetailsFactory>();
       services.AddScoped<ISensorAssignmentService, SensorAssignmentService>();
       services.AddScoped<IUserManagementService, UserManagementService>();
       services.AddScoped<IUserProfileService, UserProfileService>();
@@ -105,7 +108,8 @@ namespace SMEIoT.Web
       if (_env.IsDevelopment()) {
         services.AddSwaggerGen(c =>
         {
-          c.OperationFilter<SwaggerDefaultValues>();
+          c.OperationFilter<ApiVersionOperationFilter>();
+          c.SchemaFilter<RequiredSchemaFilter>();
           c.SwaggerDoc("v1", new OpenApiInfo { Title = "SMEIoT API", Version = "v1" });
         });
       }
@@ -134,7 +138,21 @@ namespace SMEIoT.Web
         app.UseDeveloperExceptionPage();
         app.UseDatabaseErrorPage();
         app.UseHangfireDashboard();
-        app.UseSwagger();
+        app.UseSwagger(c => {
+          c.PreSerializeFilters.Add((swaggerDoc, httpReq) =>
+          {
+            if (httpReq.Host.Host == "localhost") {
+              swaggerDoc.Servers = new List<OpenApiServer> {
+                new OpenApiServer { Url = $"{httpReq.Scheme}://{httpReq.Host.Value}" },
+                new OpenApiServer { Url = "https://smeiot.se" }
+              };
+            } else {
+              swaggerDoc.Servers = new List<OpenApiServer> {
+                new OpenApiServer { Url = $"{httpReq.Scheme}://{httpReq.Host.Value}" }
+              };
+            }
+          });
+        });
 
         app.UseSwaggerUI(c =>
         {

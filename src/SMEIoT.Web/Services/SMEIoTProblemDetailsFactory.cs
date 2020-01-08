@@ -7,14 +7,14 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Options;
 
-namespace SMEIoT.Web
+namespace SMEIoT.Web.Services
 {
-  public class CustomProblemDetailsFactory : ProblemDetailsFactory
+  public class SMEIoTProblemDetailsFactory : ProblemDetailsFactory
   {
     private readonly ApiBehaviorOptions options;
     private readonly JsonOptions jsonOptions;
 
-    public CustomProblemDetailsFactory(IOptions<ApiBehaviorOptions> options, IOptions<JsonOptions> jsonOptions)
+    public SMEIoTProblemDetailsFactory(IOptions<ApiBehaviorOptions> options, IOptions<JsonOptions> jsonOptions)
     {
       this.options = options?.Value ?? throw new ArgumentNullException(nameof(options));
       this.jsonOptions = jsonOptions?.Value ?? throw new ArgumentNullException(nameof(jsonOptions));
@@ -58,7 +58,7 @@ namespace SMEIoT.Web
         throw new ArgumentNullException(nameof(modelStateDictionary));
       }
 
-      statusCode ??= 400;
+      statusCode ??= 422;
       
       var errors = modelStateDictionary.ToDictionary(
         kvp => jsonOptions?.JsonSerializerOptions?.PropertyNamingPolicy?.ConvertName(kvp.Key) ?? kvp.Key,

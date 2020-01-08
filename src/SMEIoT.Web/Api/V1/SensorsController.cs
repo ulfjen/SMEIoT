@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 using SMEIoT.Core.Entities;
@@ -29,10 +30,10 @@ namespace SMEIoT.Web.Api.V1
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<SensorDetailsApiModelList>> Index([FromQuery] int start = 1, [FromQuery] int limit = 10)
+    public async Task<ActionResult<SensorDetailsApiModelList>> Index([FromQuery] int offset = 0, [FromQuery] int limit = 10)
     {
       var list = new List<SensorDetailsApiModel>();
-      await foreach (var sensor in _service.ListSensorsAsync(start, limit))
+      await foreach (var sensor in _service.ListSensorsAsync(offset, limit))
       {
         var vals = new List<(double, Instant)>();
         await foreach (var v in _service.GetNumberTimeSeriesByDeviceAndSensorAsync(sensor.Device, sensor, SystemClock.Instance.GetCurrentInstant()-Duration.FromSeconds(3600), Duration.FromSeconds(3600)))
@@ -68,7 +69,7 @@ namespace SMEIoT.Web.Api.V1
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<BasicSensorApiModel>> Create(SensorLocatorBindingModel view)
+    public async Task<ActionResult<BasicSensorApiModel>> Create([BindRequired] SensorLocatorBindingModel view)
     {
       var device = await _service.GetDeviceByNameAsync(view.DeviceName);
       await _service.CreateSensorByDeviceAndNameAsync(device, view.Name);

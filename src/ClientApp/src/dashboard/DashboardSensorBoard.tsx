@@ -107,7 +107,7 @@ const _DashboardSensorBoard: React.FunctionComponent<IDashboardSensorBoard> = ({
     (async () => {
       const api = new SensorsApi(GetDefaultApiConfig());
       var res = await api.apiSensorsGet({
-        start: 1,
+        offset: 0,
         limit: 10
       });
       if (res !== null && res.sensors) {

@@ -24,7 +24,7 @@ export interface LoginedApiModel {
      * @type {string}
      * @memberof LoginedApiModel
      */
-    returnUrl?: string;
+    returnUrl: string;
 }
 
 export function LoginedApiModelFromJSON(json: any): LoginedApiModel {
@@ -37,7 +37,7 @@ export function LoginedApiModelFromJSONTyped(json: any, ignoreDiscriminator: boo
     }
     return {
         
-        'returnUrl': !exists(json, 'returnUrl') ? undefined : json['returnUrl'],
+        'returnUrl': json['returnUrl'],
     };
 }
 

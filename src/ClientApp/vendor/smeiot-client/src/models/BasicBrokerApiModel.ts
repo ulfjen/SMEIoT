@@ -24,31 +24,31 @@ export interface BasicBrokerApiModel {
      * @type {boolean}
      * @memberof BasicBrokerApiModel
      */
-    running?: boolean;
+    running: boolean;
     /**
      * 
      * @type {string}
      * @memberof BasicBrokerApiModel
      */
-    lastUpdatedAt?: string;
+    lastUpdatedAt: string | null;
     /**
      * 
      * @type {number}
      * @memberof BasicBrokerApiModel
      */
-    min1?: number;
+    min1: number | null;
     /**
      * 
      * @type {number}
      * @memberof BasicBrokerApiModel
      */
-    min5?: number;
+    min5: number | null;
     /**
      * 
      * @type {number}
      * @memberof BasicBrokerApiModel
      */
-    min15?: number;
+    min15: number | null;
 }
 
 export function BasicBrokerApiModelFromJSON(json: any): BasicBrokerApiModel {
@@ -61,11 +61,11 @@ export function BasicBrokerApiModelFromJSONTyped(json: any, ignoreDiscriminator:
     }
     return {
         
-        'running': !exists(json, 'running') ? undefined : json['running'],
-        'lastUpdatedAt': !exists(json, 'lastUpdatedAt') ? undefined : json['lastUpdatedAt'],
-        'min1': !exists(json, 'min1') ? undefined : json['min1'],
-        'min5': !exists(json, 'min5') ? undefined : json['min5'],
-        'min15': !exists(json, 'min15') ? undefined : json['min15'],
+        'running': json['running'],
+        'lastUpdatedAt': json['lastUpdatedAt'],
+        'min1': json['min1'],
+        'min5': json['min5'],
+        'min15': json['min15'],
     };
 }
 

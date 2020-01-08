@@ -10,7 +10,6 @@ namespace SMEIoT.Web.ApiModels
     [JsonProperty(Required = Required.DisallowNull)]
     public string UserName { get; set; }
     
-    [JsonProperty(Required = Required.DisallowNull)]
     public int AssignmentCount { get; set; }
   }
 }

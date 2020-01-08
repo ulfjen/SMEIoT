@@ -56,7 +56,7 @@ const _DashboardNewDeviceConnectSensors: React.FunctionComponent<IDashboardNewDe
 
   const [loading, setLoading] = React.useState<boolean>(true);
   const [loadingError, setLoadingError] = React.useState<boolean>(false);
-  const [device, setDevice] = React.useState<BasicDeviceApiModel>({});
+  const [device, setDevice] = React.useState<BasicDeviceApiModel>();
 
   React.useEffect(() => {
     (async () => {
@@ -87,7 +87,7 @@ const _DashboardNewDeviceConnectSensors: React.FunctionComponent<IDashboardNewDe
           {loading ? (
             <Skeleton variant="rect" className={classes.loadingPanel} />
           ) : (
-            loadingError ?
+            loadingError && device ?
               (device.name ? 
               <FormattedMessage
                 id="dashboard.devices.new.errors.loading_error_without_name"

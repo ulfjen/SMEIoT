@@ -1,25 +1,20 @@
 using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
 using NodaTime;
+using Newtonsoft.Json;
 
 namespace SMEIoT.Web.ApiModels
 {
   public class BasicBrokerApiModel 
   {
-    [JsonProperty(Required = Required.DisallowNull)]
-    public bool Running { get; set; }
+    public bool Running { get; set; } = default;
     
-    [JsonProperty(Required = Required.DisallowNull)]
     public Instant? LastUpdatedAt { get; set; }
 
-    [JsonProperty(Required = Required.DisallowNull)]
     public double? Min1 { get; set; }
 
-    [JsonProperty(Required = Required.DisallowNull)]
     public double? Min5 { get; set; }
 
-    [JsonProperty(Required = Required.DisallowNull)]
     public double? Min15 { get; set; }
 
     public BasicBrokerApiModel(bool running, Instant? lastUpdatedAt, Tuple<double?, double?, double?> loads)

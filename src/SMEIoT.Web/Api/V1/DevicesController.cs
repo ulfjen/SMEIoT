@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 using System;
@@ -42,7 +43,7 @@ namespace SMEIoT.Web.Api.V1
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<BasicDeviceApiModel>> BootstrapWithPreSharedKey(DeviceConfigBindingModel view)
+    public async Task<ActionResult<BasicDeviceApiModel>> BootstrapWithPreSharedKey([BindRequired] DeviceBootstrapConfigBindingModel view)
     {
       var deviceName = await _service.BootstrapDeviceWithPreSharedKeyAsync(view.Name, view.Key);
       var device = await _service.GetDeviceByNameAsync(deviceName);
@@ -52,11 +53,13 @@ namespace SMEIoT.Web.Api.V1
 
     [HttpPut("{name}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<BasicDeviceApiModel>> Update(DeviceConfigBindingModel view)
+    public async Task<ActionResult<BasicDeviceApiModel>> Update(string name, [BindRequired] DeviceConfigBindingModel key)
     {
-      var device = await _service.GetDeviceByNameAsync(view.Name);
+      throw new NotImplementedException();
+      var device = await _service.GetDeviceByNameAsync(name);
       var res = new BasicDeviceApiModel(device);
       return Ok(res);
     }
@@ -137,10 +140,10 @@ namespace SMEIoT.Web.Api.V1
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<BasicDeviceApiModelList>> Index([FromQuery] int start = 1, [FromQuery] int limit = 10)
+    public async Task<ActionResult<BasicDeviceApiModelList>> Index([FromQuery] int offset = 0, [FromQuery] int limit = 10)
     {
       var list = new List<BasicDeviceApiModel>();
-      await foreach (var device in _service.ListDevicesAsync(start, limit))
+      await foreach (var device in _service.ListDevicesAsync(offset, limit))
       {
         list.Add(new BasicDeviceApiModel(device));
       }

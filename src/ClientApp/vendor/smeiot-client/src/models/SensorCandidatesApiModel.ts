@@ -24,7 +24,7 @@ export interface SensorCandidatesApiModel {
      * @type {Array<string>}
      * @memberof SensorCandidatesApiModel
      */
-    names?: Array<string>;
+    names: Array<string>;
 }
 
 export function SensorCandidatesApiModelFromJSON(json: any): SensorCandidatesApiModel {
@@ -37,7 +37,7 @@ export function SensorCandidatesApiModelFromJSONTyped(json: any, ignoreDiscrimin
     }
     return {
         
-        'names': !exists(json, 'names') ? undefined : json['names'],
+        'names': json['names'],
     };
 }
 

@@ -1,21 +1,16 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Newtonsoft.Json;
 
 namespace SMEIoT.Web.BindingModels
 {
   public class LoginBindingModel
   {
-    [BindRequired]
-    [JsonProperty(Required = Required.DisallowNull)]
-    public string UserName { get; set; } = null!;
+    [Required]
+    public string UserName { get; set; } = string.Empty;
 
-    [BindRequired]
-    [JsonProperty(Required = Required.DisallowNull)]
-    public string Password { get; set; } = null!;
+    [Required]
+    public string Password { get; set; } = string.Empty;
     
     [Url]
-    [JsonProperty(Required = Required.DisallowNull)]
     public string? ReturnUrl { get; set; }
   }
 }

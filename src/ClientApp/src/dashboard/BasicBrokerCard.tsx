@@ -17,7 +17,7 @@ import {
 } from "@reach/router";
 import useInterval from "../helpers/useInterval";
 import ExpandedCardHeader from "../components/ExpandedCardHeader";
-import { BrokerApi } from "smeiot-client";
+import { BrokerApi, BasicBrokerApiModel } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
 import LoadFactors from "../components/LoadFactors";
 import StatusBadge from "../components/StatusBadge";
@@ -68,8 +68,12 @@ const messages = defineMessages({
 const _BasicBrokerCard: React.FunctionComponent<IBasicBrokerCard> = ({ classes, avatar }) => {
   const intl = useIntl();
 
-  const [broker, setBroker] = React.useState<BasicBroker>({
-    running: false
+  const [broker, setBroker] = React.useState<BasicBrokerApiModel>({
+    running: false,
+    lastUpdatedAt: null,
+    min1: null,
+    min5: null,
+    min15: null
   });
   const [loading, setLoading] = React.useState<boolean>(false);
 
@@ -78,12 +82,7 @@ const _BasicBrokerCard: React.FunctionComponent<IBasicBrokerCard> = ({ classes, 
     setLoading(true);
     let details = await api.apiBrokerBasicGet();
     if (details === null) { return; }
-    setBroker({
-      running: details.running || broker.running,
-      min1: details.min1,
-      min5: details.min5,
-      min15: details.min15
-    });
+    setBroker(details);
     setLoading(false);
   };
 
@@ -104,7 +103,7 @@ const _BasicBrokerCard: React.FunctionComponent<IBasicBrokerCard> = ({ classes, 
         avatar={avatar && <Broker className={classes.media} />}
       />
       <div className={classes.secondary}>
-        {loading ? <Skeleton variant="rect" width={200} height={10} /> : (broker.running ? <LoadFactors min1={broker.min1} min5={broker.min5} min15={broker.min15} /> : null)}
+        {loading ? <Skeleton variant="rect" width={200} height={10} /> : null}
       </div>
       <Typography color="textSecondary">
         {

@@ -11,6 +11,7 @@ using SMEIoT.Web.BindingModels;
 namespace SMEIoT.Web.Api.V1
 {
   [Route("api/admin/users")]
+  [Authorize(Roles = "Admin")]
   public class AdminUsersController : BaseController
   {
     private readonly ILogger _logger;
@@ -26,7 +27,6 @@ namespace SMEIoT.Web.Api.V1
     [HttpGet("")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<AdminUserApiModelList>> Index([FromQuery] int offset = 0, [FromQuery] int limit = 10, [FromQuery(Name="roles")] IEnumerable<string>? roles = null)
     {
       var list = new List<AdminUserApiModel>();
@@ -40,8 +40,7 @@ namespace SMEIoT.Web.Api.V1
 
     [HttpGet("{userName}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<AdminUserApiModel>> Show(string userName)
     {
       var model = await GetAdminUserResultAsync(userName);
@@ -50,8 +49,8 @@ namespace SMEIoT.Web.Api.V1
 
     [HttpPut("{userName}/roles")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<UserCredentialsUpdateApiModel>> EditRoles(
       [FromBody] UserRolesBindingModel binding, [FromRoute] string userName)
     {

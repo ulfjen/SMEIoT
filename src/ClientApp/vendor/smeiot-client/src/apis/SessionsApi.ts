@@ -27,7 +27,7 @@ import {
 } from '../models';
 
 export interface SessionsApiApiSessionsPostRequest {
-    loginBindingModel?: LoginBindingModel;
+    loginBindingModel: LoginBindingModel;
 }
 
 /**
@@ -38,11 +38,15 @@ export class SessionsApi extends runtime.BaseAPI {
     /**
      */
     async apiSessionsPostRaw(requestParameters: SessionsApiApiSessionsPostRequest): Promise<runtime.ApiResponse<LoginedApiModel>> {
+        if (requestParameters.loginBindingModel === null || requestParameters.loginBindingModel === undefined) {
+            throw new runtime.RequiredError('loginBindingModel','Required parameter requestParameters.loginBindingModel was null or undefined when calling apiSessionsPost.');
+        }
+
         const queryParameters: runtime.HTTPQuery = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        headerParameters['Content-Type'] = 'application/json';
+        headerParameters['Content-Type'] = 'application/json; v=1.0';
 
         const response = await this.request({
             path: `/api/sessions`,

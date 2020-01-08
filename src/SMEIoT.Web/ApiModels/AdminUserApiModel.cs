@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using NodaTime;
+using System;
 using SMEIoT.Core.Entities;
 using Newtonsoft.Json;
 
@@ -7,7 +8,6 @@ namespace SMEIoT.Web.ApiModels
 {
   public class AdminUserApiModel
   {
-    [JsonProperty(Required = Required.DisallowNull)]
     public long Id { get; set; }
 
     [JsonProperty(Required = Required.DisallowNull)]
@@ -16,13 +16,11 @@ namespace SMEIoT.Web.ApiModels
     [JsonProperty(Required = Required.DisallowNull)]
     public IEnumerable<string> Roles { get; set; }
 
-    [JsonProperty(Required = Required.DisallowNull)]
     public Instant CreatedAt { get; set; }
 
-    [JsonProperty(Required = Required.DisallowNull)]
     public Instant LastSeenAt { get; set; }
 
-    public AdminUserApiModel(User user, IList<string> roles)
+    public AdminUserApiModel(User user, IEnumerable<string> roles)
     {
       Id = user.Id;
       UserName = user.UserName;

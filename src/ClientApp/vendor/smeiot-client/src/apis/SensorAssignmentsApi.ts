@@ -32,7 +32,7 @@ export interface SensorAssignmentsApiApiSensorsNameUsersGetRequest {
 
 export interface SensorAssignmentsApiApiSensorsNameUsersPostRequest {
     name: string;
-    assignUserSensorBindingModel?: AssignUserSensorBindingModel;
+    assignUserSensorBindingModel: AssignUserSensorBindingModel;
 }
 
 export interface SensorAssignmentsApiApiSensorsNameUsersUserNameDeleteRequest {
@@ -80,11 +80,15 @@ export class SensorAssignmentsApi extends runtime.BaseAPI {
             throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling apiSensorsNameUsersPost.');
         }
 
+        if (requestParameters.assignUserSensorBindingModel === null || requestParameters.assignUserSensorBindingModel === undefined) {
+            throw new runtime.RequiredError('assignUserSensorBindingModel','Required parameter requestParameters.assignUserSensorBindingModel was null or undefined when calling apiSensorsNameUsersPost.');
+        }
+
         const queryParameters: runtime.HTTPQuery = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        headerParameters['Content-Type'] = 'application/json';
+        headerParameters['Content-Type'] = 'application/json; v=1.0';
 
         const response = await this.request({
             path: `/api/sensors/{name}/users`.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters.name))),

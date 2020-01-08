@@ -31,25 +31,25 @@ export interface SensorDetailsApiModel {
      * @type {Array<NumberTimeSeriesApiModel>}
      * @memberof SensorDetailsApiModel
      */
-    data?: Array<NumberTimeSeriesApiModel>;
+    data: Array<NumberTimeSeriesApiModel>;
     /**
      * 
      * @type {string}
      * @memberof SensorDetailsApiModel
      */
-    startedAt?: string;
+    startedAt: string;
     /**
      * 
      * @type {string}
      * @memberof SensorDetailsApiModel
      */
-    sensorName?: string;
+    sensorName: string;
     /**
      * 
      * @type {string}
      * @memberof SensorDetailsApiModel
      */
-    deviceName?: string;
+    deviceName: string;
 }
 
 export function SensorDetailsApiModelFromJSON(json: any): SensorDetailsApiModel {
@@ -62,10 +62,10 @@ export function SensorDetailsApiModelFromJSONTyped(json: any, ignoreDiscriminato
     }
     return {
         
-        'data': !exists(json, 'data') ? undefined : ((json['data'] as Array<any>).map(NumberTimeSeriesApiModelFromJSON)),
-        'startedAt': !exists(json, 'startedAt') ? undefined : json['startedAt'],
-        'sensorName': !exists(json, 'sensorName') ? undefined : json['sensorName'],
-        'deviceName': !exists(json, 'deviceName') ? undefined : json['deviceName'],
+        'data': ((json['data'] as Array<any>).map(NumberTimeSeriesApiModelFromJSON)),
+        'startedAt': json['startedAt'],
+        'sensorName': json['sensorName'],
+        'deviceName': json['deviceName'],
     };
 }
 
@@ -78,7 +78,7 @@ export function SensorDetailsApiModelToJSON(value?: SensorDetailsApiModel | null
     }
     return {
         
-        'data': value.data === undefined ? undefined : ((value.data as Array<any>).map(NumberTimeSeriesApiModelToJSON)),
+        'data': ((value.data as Array<any>).map(NumberTimeSeriesApiModelToJSON)),
         'startedAt': value.startedAt,
         'sensorName': value.sensorName,
         'deviceName': value.deviceName,

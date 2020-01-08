@@ -24,13 +24,13 @@ export interface ValidatedUserCredentialsBindingModel {
      * @type {string}
      * @memberof ValidatedUserCredentialsBindingModel
      */
-    userName?: string;
+    userName: string;
     /**
      * 
      * @type {string}
      * @memberof ValidatedUserCredentialsBindingModel
      */
-    password?: string;
+    password: string;
 }
 
 export function ValidatedUserCredentialsBindingModelFromJSON(json: any): ValidatedUserCredentialsBindingModel {
@@ -43,8 +43,8 @@ export function ValidatedUserCredentialsBindingModelFromJSONTyped(json: any, ign
     }
     return {
         
-        'userName': !exists(json, 'userName') ? undefined : json['userName'],
-        'password': !exists(json, 'password') ? undefined : json['password'],
+        'userName': json['userName'],
+        'password': json['password'],
     };
 }
 

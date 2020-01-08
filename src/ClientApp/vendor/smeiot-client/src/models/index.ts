@@ -9,6 +9,7 @@ export * from './BasicUserApiModel';
 export * from './BrokerStatisticsApiModel';
 export * from './ConfirmedUserCredentialsUpdateBindingModel';
 export * from './DeviceAuthenticationType';
+export * from './DeviceBootstrapConfigBindingModel';
 export * from './DeviceConfigBindingModel';
 export * from './DeviceConfigSuggestApiModel';
 export * from './DeviceDetailsApiModel';

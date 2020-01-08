@@ -24,19 +24,19 @@ export interface LoginBindingModel {
      * @type {string}
      * @memberof LoginBindingModel
      */
-    userName?: string;
+    userName: string;
     /**
      * 
      * @type {string}
      * @memberof LoginBindingModel
      */
-    password?: string;
+    password: string;
     /**
      * 
      * @type {string}
      * @memberof LoginBindingModel
      */
-    returnUrl?: string;
+    returnUrl?: string | null;
 }
 
 export function LoginBindingModelFromJSON(json: any): LoginBindingModel {
@@ -49,8 +49,8 @@ export function LoginBindingModelFromJSONTyped(json: any, ignoreDiscriminator: b
     }
     return {
         
-        'userName': !exists(json, 'userName') ? undefined : json['userName'],
-        'password': !exists(json, 'password') ? undefined : json['password'],
+        'userName': json['userName'],
+        'password': json['password'],
         'returnUrl': !exists(json, 'returnUrl') ? undefined : json['returnUrl'],
     };
 }

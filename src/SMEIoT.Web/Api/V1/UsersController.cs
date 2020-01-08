@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using SMEIoT.Core.Interfaces;
 using SMEIoT.Web.ApiModels;
@@ -26,7 +27,7 @@ namespace SMEIoT.Web.Api.V1
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     [AllowAnonymous]
-    public async Task<ActionResult<BasicUserApiModel>> Create(ValidatedUserCredentialsBindingModel user)
+    public async Task<ActionResult<BasicUserApiModel>> Create([BindRequired] ValidatedUserCredentialsBindingModel user)
     {
       await _userService.CreateUserWithPassword(user.UserName, user.Password);
       var result = await GetBasicUserResultAsync(user.UserName);
@@ -36,8 +37,9 @@ namespace SMEIoT.Web.Api.V1
     [HttpPut("{userName}/password")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult<UserCredentialsUpdateApiModel>> EditPassword(
-      ConfirmedUserCredentialsUpdateBindingModel binding, string userName)
+    [Authorize]
+    public async Task<ActionResult<UserCredentialsUpdateApiModel>> EditPassword(string userName,
+      [BindRequired] ConfirmedUserCredentialsUpdateBindingModel binding)
     {
       await _userService.UpdateUserPassword(userName, binding.CurrentPassword, binding.NewPassword);
       var (user, roles) = await _userService.GetUserAndRoleByName(userName);
@@ -47,7 +49,7 @@ namespace SMEIoT.Web.Api.V1
     
     [HttpGet("{userName}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<BasicUserApiModel>> Show(string userName)
     {

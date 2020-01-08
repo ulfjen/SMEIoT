@@ -1,14 +1,15 @@
 ﻿using System.Linq;
+using System.Collections.Generic;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.OpenApi.Models;
 
-namespace SMEIoT.Web
+namespace SMEIoT.Web.Api.Config
 {
   /// <summary>
   /// Represents the Swagger/Swashbuckle operation filter used to document the implicit API version parameter.
   /// </summary>
-  public class SwaggerDefaultValues : IOperationFilter
+  public class ApiVersionOperationFilter : IOperationFilter
   {
     /// <summary>
     /// Applies the filter to the specified operation using the given context.
@@ -28,13 +29,16 @@ namespace SMEIoT.Web
 
       foreach (var format in apiDescription.SupportedRequestFormats.Reverse())
       {
-        if (!operation.RequestBody.Content.ContainsKey(format.MediaType))
+        if (operation.RequestBody.Content.ContainsKey(format.MediaType))
         {
           continue;
         }
 
-        operation.RequestBody.Content[$"{format.MediaType}; v=1.0"] = operation.RequestBody.Content[format.MediaType];
-        operation.RequestBody.Content.Remove(format.MediaType);
+        var newContent = new Dictionary<string, OpenApiMediaType>();
+        foreach (var k in operation.RequestBody.Content.Keys) {
+          newContent[format.MediaType] = operation.RequestBody.Content[k];
+        }
+        operation.RequestBody.Content = newContent;
       }
     }
   }

@@ -24,31 +24,31 @@ export interface AdminUserApiModel {
      * @type {number}
      * @memberof AdminUserApiModel
      */
-    id?: number;
+    id: number;
     /**
      * 
      * @type {string}
      * @memberof AdminUserApiModel
      */
-    userName?: string;
+    userName: string;
     /**
      * 
      * @type {Array<string>}
      * @memberof AdminUserApiModel
      */
-    roles?: Array<string>;
+    roles: Array<string>;
     /**
      * 
      * @type {string}
      * @memberof AdminUserApiModel
      */
-    createdAt?: string;
+    createdAt: string;
     /**
      * 
      * @type {string}
      * @memberof AdminUserApiModel
      */
-    lastSeenAt?: string;
+    lastSeenAt: string;
 }
 
 export function AdminUserApiModelFromJSON(json: any): AdminUserApiModel {
@@ -61,11 +61,11 @@ export function AdminUserApiModelFromJSONTyped(json: any, ignoreDiscriminator: b
     }
     return {
         
-        'id': !exists(json, 'id') ? undefined : json['id'],
-        'userName': !exists(json, 'userName') ? undefined : json['userName'],
-        'roles': !exists(json, 'roles') ? undefined : json['roles'],
-        'createdAt': !exists(json, 'createdAt') ? undefined : json['createdAt'],
-        'lastSeenAt': !exists(json, 'lastSeenAt') ? undefined : json['lastSeenAt'],
+        'id': json['id'],
+        'userName': json['userName'],
+        'roles': json['roles'],
+        'createdAt': json['createdAt'],
+        'lastSeenAt': json['lastSeenAt'],
     };
 }
 

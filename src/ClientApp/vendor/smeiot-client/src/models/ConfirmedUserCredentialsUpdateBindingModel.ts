@@ -24,13 +24,13 @@ export interface ConfirmedUserCredentialsUpdateBindingModel {
      * @type {string}
      * @memberof ConfirmedUserCredentialsUpdateBindingModel
      */
-    currentPassword?: string;
+    currentPassword: string;
     /**
      * 
      * @type {string}
      * @memberof ConfirmedUserCredentialsUpdateBindingModel
      */
-    newPassword?: string;
+    newPassword: string;
 }
 
 export function ConfirmedUserCredentialsUpdateBindingModelFromJSON(json: any): ConfirmedUserCredentialsUpdateBindingModel {
@@ -43,8 +43,8 @@ export function ConfirmedUserCredentialsUpdateBindingModelFromJSONTyped(json: an
     }
     return {
         
-        'currentPassword': !exists(json, 'currentPassword') ? undefined : json['currentPassword'],
-        'newPassword': !exists(json, 'newPassword') ? undefined : json['newPassword'],
+        'currentPassword': json['currentPassword'],
+        'newPassword': json['newPassword'],
     };
 }
 

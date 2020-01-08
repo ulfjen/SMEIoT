@@ -1,5 +1,5 @@
-using SMEIoT.Core.Entities;
 using Newtonsoft.Json;
+using SMEIoT.Core.Entities;
 
 namespace SMEIoT.Web.ApiModels
 {
