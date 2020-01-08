@@ -55,8 +55,28 @@ namespace SMEIoT.Core.EventHandlers
       var topic = message.Topic;
       if (topic.StartsWith(SensorTopicPrefix))
       {
-        _mqttService.RegisterSensorNameAsync(topic.Substring(7));
+        var parsed = topic.AsSpan();
+        parsed = parsed.Slice(SensorTopicPrefix.Length);
+        var splitP = parsed.IndexOf('/');
+        if (splitP != -1) {
+          var deviceName = parsed.Slice(0, splitP).ToString();
+          if (!_mqttService.RegisterDeviceName(deviceName))
+          {
+            // TODO: report device registeration failed
+          } else
+          {
+            var sensorName = parsed.Slice(splitP).ToString();
+             if (!_mqttService.RegisterSensorNameWithDeviceName(sensorName, deviceName))
+            {
+              // TODO: report sensor registeration failed
+            }
+          }
+        } else
+        {
+          // TODO: generates parsed error
+        }
       }
+
       // TODO: Sends a job into dispatch for storage
     }
   }

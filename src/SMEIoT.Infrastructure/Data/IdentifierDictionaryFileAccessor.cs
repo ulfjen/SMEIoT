@@ -6,29 +6,28 @@ using SMEIoT.Core.Interfaces;
 
 namespace SMEIoT.Infrastructure.Data
 {
-  public class IdentifierDictionaryFileAccessor: IIdentifierDictionaryFileAccessor
+  public class IdentifierDictionaryFileAccessor : IIdentifierDictionaryFileAccessor
   {
-    private readonly IFileInfo _fileInfo;
-    
+    private readonly List<string> _identifiers;
+
     public IdentifierDictionaryFileAccessor(IFileProvider fileProvider)
     {
-      _fileInfo = fileProvider.GetFileInfo("identifier-candidates.txt");
-    }
+      var fileInfo = fileProvider.GetFileInfo("identifier-candidates.txt");
 
-    public List<string> ListIdentifiers()
-    {
-      var res = new List<string>();
-      
-      if (_fileInfo.Exists)
+      _identifiers = new List<string>();
+      if (fileInfo.Exists)
       {
-        using var stream = _fileInfo.CreateReadStream();
+        using var stream = fileInfo.CreateReadStream();
         using var reader = new StreamReader(stream);
         while (!reader.EndOfStream)
         {
           try
           {
             var line = reader.ReadLine();
-            res.Add(line);
+            if (line != null)
+            {
+              _identifiers.Add(line);
+            }
           }
           catch (IOException exception)
           {
@@ -41,7 +40,12 @@ namespace SMEIoT.Infrastructure.Data
         throw new SystemException("identifier-candidates.txt can't be found.");
       }
 
-      return res;
     }
+
+    public List<string> ListIdentifiers()
+    {
+      return _identifiers;
+    }
+
   }
 }

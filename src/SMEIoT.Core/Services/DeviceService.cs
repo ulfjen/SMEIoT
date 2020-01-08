@@ -1,12 +1,9 @@
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using NodaTime;
 using SMEIoT.Core.Entities;
 using SMEIoT.Core.Exceptions;
 using SMEIoT.Core.Interfaces;
-using System;
 
 namespace SMEIoT.Core.Services
 {
@@ -37,7 +34,7 @@ namespace SMEIoT.Core.Services
       var device = await _dbContext.Devices.Where(d => d.NormalizedName == Device.NormalizeName(deviceName)).FirstOrDefaultAsync();
       if (device == null)
       {
-        throw new EntityNotFoundException("cannot find the device.", "deviceName");
+        throw new EntityNotFoundException("cannot find the device.", nameof(deviceName));
       }
 
       return device;
