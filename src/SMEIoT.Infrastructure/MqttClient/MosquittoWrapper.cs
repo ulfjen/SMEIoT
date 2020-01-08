@@ -16,7 +16,7 @@ namespace SMEIoT.Infrastructure.MqttClient
     public delegate void MessageCallbackDelegate(int mid, string topic, IntPtr payload, int payloadlen, int qos, int retain);
 
     [DllImport(MosquittoDll, CallingConvention = CallingConvention.Cdecl)]
-    public static extern int mosq_init();
+    internal static extern int mosq_init();
 
     [DllImport(MosquittoDll, CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
     internal static extern int mosq_set_tls_psk(string psk, string identity, string? ciphers);

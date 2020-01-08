@@ -12,10 +12,10 @@ namespace SMEIoT.Tests.Shared
     {
     }
 
-    public virtual DbSet<User> Users { get; set; }
-    public virtual DbSet<Sensor> Sensors { get; set; }
-    public virtual DbSet<UserSensor> UserSensors { get; set; }
-    public virtual DbSet<IdentityUserRole<long>> UserRoles { get; set; }
-    public virtual DbSet<Device> Devices { get; set; }
+    public virtual DbSet<User> Users { get; set; } = null!;
+    public virtual DbSet<Sensor> Sensors { get; set; } = null!;
+    public virtual DbSet<UserSensor> UserSensors { get; set; } = null!;
+    public virtual DbSet<IdentityUserRole<long>> UserRoles { get; set; } = null!;
+    public virtual DbSet<Device> Devices { get; set; } = null!;
   }
 }

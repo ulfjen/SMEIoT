@@ -12,7 +12,7 @@ namespace SMEIoT.Tests.Core.Services
 {
   public class DeviceSensorIdentifierSuggestServiceTest
   {
-    private static async Task<DeviceSensorIdentifierSuggestService> BuildService()
+    private static DeviceSensorIdentifierSuggestService BuildService()
     {
       var mockedAccessor = new Mock<IIdentifierDictionaryFileAccessor>();
       mockedAccessor.Setup(x => x.ListIdentifiers()).Returns(new List<string> { "id1", "id2", "id3" });
@@ -27,10 +27,10 @@ namespace SMEIoT.Tests.Core.Services
     }
 
     [Fact]
-    public async Task GenerateRandomIdentifierForDevice_ReturnsIdentifier()
+    public void GenerateRandomIdentifierForDevice_ReturnsIdentifier()
     {
       // arrange
-      var service = await BuildService();
+      var service = BuildService();
 
       // act
       var res = service.GenerateRandomIdentifierForDevice(1);
@@ -40,18 +40,18 @@ namespace SMEIoT.Tests.Core.Services
     }
 
     [Fact]
-    public async Task GenerateRandomIdentifierForDevice_ThrowsIfLessOneWord()
+    public void GenerateRandomIdentifierForDevice_ThrowsIfLessOneWord()
     {
-      var service = await BuildService();
+      var service = BuildService();
 
       Assert.Throws<ArgumentException>(() => service.GenerateRandomIdentifierForDevice(0));
     }
 
 
     [Fact]
-    public async Task ListIdentifierCandidatesForSensor_ReturnsCandidate()
+    public void ListIdentifierCandidatesForSensor_ReturnsCandidate()
     {
-      var service = await BuildService();
+      var service = BuildService();
 
       var cand = service.ListIdentifierCandidatesForSensor("device2");
 
@@ -60,9 +60,9 @@ namespace SMEIoT.Tests.Core.Services
 
 
     [Fact]
-    public async Task ListIdentifierCandidatesForSensor_ReturnsOneCandidate()
+    public void ListIdentifierCandidatesForSensor_ReturnsOneCandidate()
     {
-      var service = await BuildService();
+      var service = BuildService();
 
       var cand = service.ListIdentifierCandidatesForSensor("device1");
 
@@ -70,9 +70,9 @@ namespace SMEIoT.Tests.Core.Services
     }
 
     [Fact]
-    public async Task ListIdentifierCandidatesForSensor_ReturnsNull()
+    public void ListIdentifierCandidatesForSensor_ReturnsNull()
     {
-      var service = await BuildService();
+      var service = BuildService();
 
       var cand = service.ListIdentifierCandidatesForSensor("device-not-existed");
 
