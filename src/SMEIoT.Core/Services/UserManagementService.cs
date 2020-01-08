@@ -256,12 +256,8 @@ namespace SMEIoT.Core.Services
 
     private IQueryable<User> GetUserQuery(List<long> roleIds)
     {
-      try {
       return roleIds.Count == 0 ? _dbContext.Users.AsQueryable() : _dbContext.Users
-          .Join(_dbContext.UserRoles.Where("@0.Contains(outerIt.Id)", roleIds), user => user.Id, ur => ur.UserId, (user, userRole) => user).AsQueryable();
-      }catch{
-        throw new InternalException("FIX query exception  ");
-      }
+          .Join(_dbContext.UserRoles.Where("@0.Contains(RoleId)", roleIds), user => user.Id, ur => ur.UserId, (user, userRole) => user).AsQueryable();
     }
 
     public async Task<int> NumberOfUsersAsync(IEnumerable<string>? roles)

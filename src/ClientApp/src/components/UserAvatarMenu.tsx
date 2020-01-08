@@ -5,12 +5,11 @@ import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import IconButton from "@material-ui/core/IconButton";
 import Avatar from "@material-ui/core/Avatar";
-import Avatars from "@dicebear/avatars";
-import sprites from "@dicebear/avatars-jdenticon-sprites";
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import { AppCookie } from "../helpers/useCookie";
 import { NavigateFn } from "@reach/router";
+import { UserAvatar } from "..";
 
 const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Theme) => createStyles({
   container: {
@@ -26,10 +25,6 @@ export interface IUserAvatarMenuProps extends WithStyles<typeof styles> {
 
 const _UserAvatarMenu: React.FunctionComponent<IUserAvatarMenuProps & WithStyles<typeof styles>> = ({ classes, appCookie, navigate }) => {
   const userName = appCookie.userName || "";
-  let options = {};
-  let avatars = new Avatars(sprites(options));
-  const avatar = avatars.create(userName);
-
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -60,7 +55,7 @@ const _UserAvatarMenu: React.FunctionComponent<IUserAvatarMenuProps & WithStyles
       color="inherit"
     >
       <Avatar>
-        <svg dangerouslySetInnerHTML={{ __html: avatar }} />
+        {UserAvatar.getInstance().getSvg(userName)}
       </Avatar>
     </IconButton>
     <Menu

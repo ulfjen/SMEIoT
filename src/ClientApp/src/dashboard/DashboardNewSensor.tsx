@@ -19,7 +19,6 @@ import CloseIcon from '@material-ui/icons/Close';
 import { Link, RouteComponentProps } from '@reach/router';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
-import { Avatars } from "../avatars";
 import { SensorsApi } from 'smeiot-client';
 
 const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Theme) => createStyles({

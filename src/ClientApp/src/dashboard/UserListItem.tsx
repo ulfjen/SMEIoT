@@ -5,7 +5,6 @@ import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import IconButton from "@material-ui/core/IconButton";
 import MoreVertIcon from '@material-ui/icons/MoreVert';
@@ -13,13 +12,10 @@ import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import Avatar from "@material-ui/core/Avatar";
 import {AdminUserApiModel} from "smeiot-client";
 import moment from "moment";
-import { Avatars } from "../avatars";
+import { defineMessages, useIntl } from "react-intl";
+import { UserAvatar } from "..";
 
-const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Theme) => createStyles({
-  container: {
-    paddingTop: spacing(4),
-    paddingBottom: spacing(4),
-  },
+const styles = ({palette}: Theme) => createStyles({
 });
 
 export interface IUserListItemProps extends WithStyles<typeof styles> {
@@ -27,31 +23,46 @@ export interface IUserListItemProps extends WithStyles<typeof styles> {
   setAnchorEl: React.Dispatch<React.SetStateAction<null | HTMLElement>>;
   setFocusedUserName: React.Dispatch<React.SetStateAction<null | string>>;
   className?: string;
+  style?: React.CSSProperties;
 }
 
-const _UserListItem: React.FunctionComponent<IUserListItemProps & WithStyles<typeof styles>> = ({classes, className, user, setAnchorEl, setFocusedUserName}) => {
+const messages = defineMessages({
+  seen: {
+    id: "dashboard.components.avatar_list_item.seen",
+    description: "Used as the template message in the user list item",
+    defaultMessage: "Last seen {seen}"
+  },
+  moreAria: {
+    id: "dashboard.components.avatar_list_item.action.aria.more",
+    description: "Used as an aria label",
+    defaultMessage: "More"
+  }
+});
+
+const _UserListItem: React.FunctionComponent<IUserListItemProps & WithStyles<typeof styles>> = ({classes, style, className, user, setAnchorEl, setFocusedUserName}) => {
+  const intl = useIntl();
   const userName = user.userName || "";
-  const avatar = Avatars.create(userName);
   const lastSeenAt = moment(user.lastSeenAt).fromNow();
   
   const onClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     setFocusedUserName(userName);
+    console.log(event.currentTarget); 
     setAnchorEl(event.currentTarget);
   };
   
-  return <ListItem className={className}>
+  return <ListItem style={style} className={className}>
     <ListItemAvatar>
       <Avatar>
-        <svg dangerouslySetInnerHTML={{__html: avatar}} />
+      {UserAvatar.getInstance().getSvg(userName)}
       </Avatar>
     </ListItemAvatar>
 
-    <ListItemText primary={userName} secondary={`Last seen at ${lastSeenAt}`}/>
-    <ListItemSecondaryAction>
-      <IconButton edge="end" aria-label="delete" onClick={onClick}>
+    <ListItemText primary={userName} secondary={intl.formatMessage(messages.seen, { seen: lastSeenAt })}/>
+    <div>
+      <IconButton edge="end" aria-label={intl.formatMessage(messages.moreAria)} onClick={onClick}>
         <MoreVertIcon/>
       </IconButton>
-    </ListItemSecondaryAction>
+    </div>
   </ListItem>;
 };
 

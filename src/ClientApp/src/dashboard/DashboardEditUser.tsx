@@ -7,7 +7,7 @@ import withStyles from "@material-ui/core/styles/withStyles";
 import DashboardFrame from "./DashboardFrame";
 import Typography from "@material-ui/core/Typography";
 import Skeleton from "@material-ui/lab/Skeleton";
-import {GetDefaultApiConfig} from "../index";
+import {GetDefaultApiConfig, UserAvatar} from "../index";
 import Card from "@material-ui/core/Card";
 import { AdminUserApiModel, AdminUsersApi, UsersApi} from "smeiot-client";
 import moment from "moment";
@@ -19,7 +19,6 @@ import CloseIcon from '@material-ui/icons/Close';
 import { Link, RouteComponentProps } from '@reach/router';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
-import { Avatars } from "../avatars";
 
 const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Theme) => createStyles({
   container: {
@@ -72,11 +71,10 @@ const _DashboardEditUser: React.FunctionComponent<IDashboardEditUserProps> = ({ 
     roles: [],
     userName: ""
   });
-  const [admin, setAdmin] = React.useState<boolean>(false);  const [avatar, setAvatar] = React.useState<string>("");
+  const [admin, setAdmin] = React.useState<boolean>(false);  
   
   const saveUser = (user: AdminUserApiModel) => {
     setUser(user);
-    setAvatar(Avatars.create(user.userName || ""));
 
     if (user && user.roles && user.roles.indexOf("Admin") !== -1) {
       setAdmin(true);
@@ -141,7 +139,7 @@ const _DashboardEditUser: React.FunctionComponent<IDashboardEditUserProps> = ({ 
         <CardHeader
           avatar={
             <Avatar className={classes.avatar}>
-              <svg dangerouslySetInnerHTML={{ __html: avatar }} />
+              {UserAvatar.getInstance().create(userName || "")}
             </Avatar>
           }
           action={

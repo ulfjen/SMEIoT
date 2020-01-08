@@ -1,16 +1,15 @@
-import Container from '@material-ui/core/Container';
 import * as React from "react";
 import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import DashboardFrame from "./DashboardFrame";
+import Container from '@material-ui/core/Container';
 import List from "@material-ui/core/List";
-import UserListItem from "../components/UserListItem";
+import UserListItem from "./UserListItem";
 import Typography from "@material-ui/core/Typography";
 import Chip from "@material-ui/core/Chip";
 import Menu from "@material-ui/core/Menu";
-import Box from "@material-ui/core/Box";
 import MenuItem from "@material-ui/core/MenuItem";
 import Skeleton from "@material-ui/lab/Skeleton";
 import { GetDefaultApiConfig } from "../index";
@@ -36,7 +35,13 @@ import InfiniteLoader from 'react-window-infinite-loader';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItem from '@material-ui/core/ListItem';
-
+import Box from "@material-ui/core/Box";
+import useMenu from '../helpers/useMenu';
+import Avatar from '@material-ui/core/Avatar';
+import { UserAvatar } from "..";
+import IconButton from '@material-ui/core/IconButton';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
+import Measure from 'react-measure';
 
 const styles = ({ palette, spacing, transitions, zIndex, mixins, breakpoints }: Theme) => createStyles({
   container: {
@@ -74,46 +79,88 @@ const messages = defineMessages({
     id: "dashboard.users.index.title",
     description: "Used as title in the user index page on the dashboard",
     defaultMessage: "Users"
+  },
+  seen: {
+    id: "dashboard.components.avatar_list_item.seen",
+    description: "Used as the template message in the user list item",
+    defaultMessage: "Last seen {seen}"
+  },
+  moreAria: {
+    id: "dashboard.components.avatar_list_item.action.aria.more",
+    description: "Used as an aria label",
+    defaultMessage: "More"
   }
 });
 
 const USERS_PER_REQ = 10;
 
+
+const _userItemRenderer = ({ index, style, data }: {
+  index: number,
+  style: React.CSSProperties,
+  data: [Array<AdminUserApiModel>, (anchor: HTMLElement, item: any) => void]
+}) => {
+  console.log(index, data);
+  const [users, openMenu] = data;
+  return index === users.length ? <ListItem key={-1} style={style}>
+    <ListItemAvatar>
+      <Skeleton variant="circle" width={40} height={40} />
+    </ListItemAvatar>
+
+    <ListItemText disableTypography primary={<Skeleton variant="rect" width={200} height={17} />} secondary={<Skeleton variant="text" />} />
+  </ListItem> :
+    <ListItem key={index} style={style} >
+      <ListItemAvatar>
+        <Avatar>
+          {UserAvatar.getInstance().getSvg(users[index].userName || "")}
+        </Avatar>
+      </ListItemAvatar>
+
+      <ListItemText primary={users[index].userName} secondary={null} />
+      <div>
+        <IconButton edge="end" onClick={(event) => openMenu(event.currentTarget, index)}>
+          <MoreVertIcon />
+        </IconButton>
+      </div>
+    </ListItem>;
+};
+
+const userItemRenderer = React.memo(_userItemRenderer, areEqual);
 const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({ classes, navigate }) => {
   const intl = useIntl();
   const appCookie = useAppCookie();
 
   useTitle(intl.formatMessage(messages.title));
 
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [users, setUsers] = React.useState<Array<AdminUserApiModel>>([]);
   const [focusedUserName, setFocusedUserName] = React.useState<null | string>(null);
   const [dialogOpen, setDiaglogOpen] = React.useState<boolean>(false);
   const [hasNextPage, setHasNextPage] = React.useState<boolean>(true);
+  const [menuAnchor, menuItem, handleMenuClose, openMenu] = useMenu();
+  const openMenucb = React.useCallback(openMenu, []);
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleEdit = () => {
-    handleClose();
+  const handleEdit = React.useCallback(e => {
+    e.stopPropagation();
+    handleMenuClose();
     window.location.href = `/dashboard/users/${focusedUserName}`;
-  };
+  }, [handleMenuClose]);
 
-  const handleDelete = () => {
-    handleClose();
+  const handleDelete = React.useCallback(e => {
+    e.stopPropagation();
+    handleMenuClose();
     setDiaglogOpen(true);
-  };
+  }, [handleMenuClose, setDiaglogOpen]);
 
-  const handleDialogClose = () => {
+  const handleDialogClose = React.useCallback(e => {
+    e.stopPropagation();
     setDiaglogOpen(false);
-  };
+  }, [setDiaglogOpen]);
 
-  const handleDeleteClose = async () => {
+  const handleDeleteClose = React.useCallback(async (e) => {
     setDiaglogOpen(false);
-  };
+  }, [setDiaglogOpen]);
 
-  const outerListType = React.forwardRef((props, ref: React.Ref<HTMLUListElement>) => (
+  const innerListType = React.forwardRef((props, ref: React.Ref<HTMLUListElement>) => (
     <List ref={ref} {...props} />
   ));
   const isUserLoaded = (index: number) => !hasNextPage || index < users.length;
@@ -126,6 +173,7 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({ classe
         return;
       }
       const newUsers = users.concat(result.users);
+      console.log(`setting newUser ${newUsers} `)
       setUsers(newUsers);
       if (result.total && newUsers.length >= result.total) {
         setHasNextPage(false);
@@ -137,18 +185,10 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({ classe
   // for loading indicator
   const userCount = hasNextPage ? users.length + 1 : users.length;
 
-  const userItemRenderer: React.FunctionComponent<ListChildComponentProps> = ({ index, style }) => {
-    return <Box css={style}>
-      {index === users.length ? <ListItem>
-      <ListItemAvatar>
-        <Skeleton variant="circle" width={40} height={40} />
-      </ListItemAvatar>
-
-      <ListItemText primary={<Skeleton variant="rect" width={200} height={17} />} secondary={<Skeleton variant="text" />} />
-    </ListItem> : <UserListItem className={classes.item} user={users[index]} setFocusedUserName={setFocusedUserName} setAnchorEl={setAnchorEl} key={users[index].id} />
-    }</Box>
-  };
-
+  const [dimensions, setDimensions] = React.useState({
+    width: -1,
+    height: -1,
+  });
   return <DashboardFrame
     title={intl.formatMessage(messages.title)}
     direction="ltr"
@@ -160,10 +200,18 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({ classe
           <Typography>Show:</Typography>
           <Chip label="Admin" />
         </Paper>
-        <Card className={classes.card}>
-          <AutoSizer>
-            {({ height, width }) => (
+        <Measure
+          bounds
+          onResize={contentRect => {
+            if (contentRect.bounds) {
+              setDimensions(contentRect.bounds);
+            }
+          }}
+        >
+          {({ measureRef }) => (
+            <Card ref={measureRef} className={classes.card}>
               <InfiniteLoader
+
                 isItemLoaded={isUserLoaded}
                 itemCount={userCount}
                 loadMoreItems={loadMoreUsers}
@@ -171,29 +219,31 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({ classe
                 {({ onItemsRendered, ref }) => (
                   <FixedSizeList
                     className={classes.list}
-                    height={height}
-                    width={width}
+                    height={dimensions.height}
+                    width={dimensions.width}
                     itemCount={userCount}
                     itemSize={72}
                     onItemsRendered={onItemsRendered}
                     ref={ref}
-                    outerElementType={outerListType}
+                    innerElementType={innerListType}
+                    itemData={[users, openMenucb]}
                   >
                     {userItemRenderer}
                   </FixedSizeList>
                 )}
               </InfiniteLoader>
-            )}
-          </AutoSizer>
-        </Card>
+              )}
+          </Card>)}
+        </Measure>
+
         <Menu
-          anchorEl={anchorEl}
+          anchorEl={menuAnchor}
           keepMounted
-          open={Boolean(anchorEl)}
+          open={Boolean(menuAnchor)}
           className={classes.usersMenu}
-          onClose={handleClose}
+          onClose={handleMenuClose}
         >
-          <MenuItem onClick={handleClose} to={`/dashboard/users/${focusedUserName}`} component={Link}>Edit</MenuItem>
+          <MenuItem onClick={handleMenuClose} to={`/dashboard/users/${focusedUserName}`} component={Link}>Edit</MenuItem>
           <MenuItem className={classes.usersMenuDeleteItem} onClick={handleDelete}>Delete</MenuItem>
         </Menu>
         <Dialog
