@@ -13,7 +13,7 @@ using SMEIoT.Web.BindingModels;
 
 namespace SMEIoT.Web.Api.V1
 {
-  public class DevicesController : BaseController 
+  public class DevicesController : BaseController
   {
     private readonly ILogger<DevicesController> _logger;
     private readonly IDeviceService _service;
