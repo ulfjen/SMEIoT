@@ -34,7 +34,7 @@ const styles = ({ transitions, spacing }: Theme) => createStyles({
   }
 });
 
-export interface IBasicBrokerCard extends WithStyles<typeof styles> { 
+export interface IBasicBrokerCard extends WithStyles<typeof styles> {
   avatar?: boolean;
 }
 
@@ -92,33 +92,32 @@ const _BasicBrokerCard: React.FunctionComponent<IBasicBrokerCard> = ({ classes, 
       <ExpandedCardHeader
         title={loading ? <Skeleton variant="rect" width={100} height={25} /> : intl.formatMessage(messages.title)}
         status={<StatusBadge
-          severity={broker.running ? "success" : "error"} 
-          badge={loading && <Skeleton variant="circle" width={14} height={14}/>}
+          severity={broker.running ? "success" : "error"}
+          badge={loading && <Skeleton variant="circle" width={14} height={14} />}
         >
-          {loading ? <Skeleton variant="rect" width={60} height={14}/> : intl.formatMessage(broker.running ? messages.running : messages.stopped)}
+          {loading ? <Skeleton variant="rect" width={60} height={14} /> : intl.formatMessage(broker.running ? messages.running : messages.stopped)}
         </StatusBadge>}
         avatar={avatar && <Broker className={classes.media} />}
       />
       <CardContent>
-      <div className={classes.secondary}>
-        {loading ? <Skeleton variant="rect" width={200} height={10} /> : null}
-      </div>
-      <Typography color="textSecondary">
-        {
-          loading ? <Skeleton variant="text" /> :
-          (broker.running ? <FormattedMessage
-            id="dashboard.components.basic_broker_card.instruct_running"
-            description="Running instruction on the broker card when the broker runs normally."
-            defaultMessage="The broker is operating."
-          /> : <FormattedMessage
+        <div className={classes.secondary}>
+          {loading ? <Skeleton variant="rect" width={200} height={10} /> : null}
+        </div>
+        {loading ? <Skeleton variant="text" /> :
+          <Typography color="textSecondary">
+            {broker.running ? <FormattedMessage
+              id="dashboard.components.basic_broker_card.instruct_running"
+              description="Running instruction on the broker card when the broker runs normally."
+              defaultMessage="The broker is operating."
+            /> : <FormattedMessage
               id="dashboard.components.basic_broker_card.instruct_stopped"
               description="Running instruction on the broker card when the broker stopped."
               defaultMessage="The broker is stopped. Please wait a few seconds."
-            />)
-        }
-      </Typography>
+            />}
+            </Typography>}
+
       </CardContent>
-      
+
     </CardActionArea>
   </Card>;
 };
