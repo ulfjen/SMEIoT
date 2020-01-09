@@ -1,8 +1,10 @@
+using System.Threading.Tasks;
+
 namespace SMEIoT.Core.Interfaces
 {
   public interface IMosquittoClientAuthenticationService
   {
-    string ClientName { get; }
-    string ClientPsk { get; }
+    Task<string> GetClientNameAsync();
+    Task<string> GetClientPskAsync();
   }
 }

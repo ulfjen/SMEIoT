@@ -16,6 +16,7 @@ using System.Diagnostics.Contracts;
 
 namespace SMEIoT.Web.Api.V1
 {
+  [Authorize(Roles = "Admin")]
   public class DevicesController : BaseController
   {
     private readonly ILogger _logger;
@@ -24,6 +25,7 @@ namespace SMEIoT.Web.Api.V1
     private readonly ISecureKeySuggestService _secureKeySuggestService;
     private readonly IMqttIdentifierService _mqttService;
     private const int DefaultDeviceNameSuggestWordLength = 2;
+    private const int DefaultKeyByteLength = 64;
 
     public DevicesController(
       ILogger<DevicesController> logger,
@@ -42,7 +44,6 @@ namespace SMEIoT.Web.Api.V1
     [HttpPost("bootstrap")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<BasicDeviceApiModel>> BootstrapWithPreSharedKey([BindRequired] DeviceBootstrapConfigBindingModel view)
     {
       var deviceName = await _service.BootstrapDeviceWithPreSharedKeyAsync(view.Name, view.Key);
@@ -55,7 +56,6 @@ namespace SMEIoT.Web.Api.V1
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<BasicDeviceApiModel>> Update(string name, [BindRequired] DeviceConfigBindingModel key)
     {
       throw new NotImplementedException();
@@ -68,7 +68,6 @@ namespace SMEIoT.Web.Api.V1
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<DeviceDetailsApiModel>> Show(string name)
     {
       var device = await _service.GetDeviceByNameAsync(name);
@@ -80,7 +79,7 @@ namespace SMEIoT.Web.Api.V1
       }
 
       var sensorNamesFromMqtt = _mqttService.ListSensorNamesByDeviceName(device.Name);
-      sensors.AddRange(sensorNamesFromMqtt.Select(n => new BasicSensorApiModel(n, device.Name)));
+      sensors.AddRange(sensorNamesFromMqtt.Select(n => new BasicSensorApiModel(n)));
 
       var res = new DeviceDetailsApiModel(device, sensors);
       return Ok(res);
@@ -89,7 +88,6 @@ namespace SMEIoT.Web.Api.V1
     [HttpGet("{name}/basic")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<BasicDeviceApiModel>> ShowBasic(string name)
     {
       var device = await _service.GetDeviceByNameAsync(name);
@@ -100,7 +98,6 @@ namespace SMEIoT.Web.Api.V1
     [HttpGet("{name}/sensor_candidates")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<SensorCandidatesApiModel>> ListSensorCandidates(string name)
     {
       var suggestSensorNames = _mqttService.ListSensorNamesByDeviceName(name);
@@ -109,37 +106,38 @@ namespace SMEIoT.Web.Api.V1
 
     [HttpGet("config_suggest/bootstrap")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<DeviceConfigSuggestApiModel>> SuggestBootstrap()
     {
       var device = await _service.GetARandomUnconnectedDeviceAsync();
       return Ok(new DeviceConfigSuggestApiModel(
-        _identifierSuggestService.GenerateRandomIdentifierForDevice(DefaultDeviceNameSuggestWordLength),
-        _secureKeySuggestService.GenerateSecureKeyWithByteLength(64),
+        await _identifierSuggestService.GenerateRandomIdentifierForDeviceAsync(DefaultDeviceNameSuggestWordLength),
+        await _secureKeySuggestService.GenerateSecureKeyWithByteLengthAsync(DefaultKeyByteLength),
         device?.Name
       ));
     }
 
     [HttpGet("config_suggest/key")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<DeviceConfigSuggestApiModel>> SuggestSecureKey()
     {
-      return Ok(new DeviceConfigSuggestApiModel(null, _secureKeySuggestService.GenerateSecureKeyWithByteLength(64))); // TODO: Add a max length
+      return Ok(new DeviceConfigSuggestApiModel(
+        null,
+        await _secureKeySuggestService.GenerateSecureKeyWithByteLengthAsync(DefaultKeyByteLength)
+      ));
     }
 
     [HttpGet("config_suggest/device_name")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<DeviceConfigSuggestApiModel>> SuggestDeviceName()
     {
-      return Ok(new DeviceConfigSuggestApiModel(_identifierSuggestService.GenerateRandomIdentifierForDevice(DefaultDeviceNameSuggestWordLength)));
+      return Ok(new DeviceConfigSuggestApiModel(
+        await _identifierSuggestService.GenerateRandomIdentifierForDeviceAsync(DefaultDeviceNameSuggestWordLength)
+      ));
     }
 
     [HttpGet("")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<BasicDeviceApiModelList>> Index([FromQuery] int offset = 0, [FromQuery] int limit = 10)
     {
       var list = new List<BasicDeviceApiModel>();

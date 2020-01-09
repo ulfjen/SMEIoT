@@ -13,6 +13,13 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import {
+    SensorStatus,
+    SensorStatusFromJSON,
+    SensorStatusFromJSONTyped,
+    SensorStatusToJSON,
+} from './';
+
 /**
  * 
  * @export
@@ -27,10 +34,10 @@ export interface BasicSensorApiModel {
     sensorName: string;
     /**
      * 
-     * @type {string}
+     * @type {SensorStatus}
      * @memberof BasicSensorApiModel
      */
-    deviceName: string;
+    status: SensorStatus;
 }
 
 export function BasicSensorApiModelFromJSON(json: any): BasicSensorApiModel {
@@ -44,7 +51,7 @@ export function BasicSensorApiModelFromJSONTyped(json: any, ignoreDiscriminator:
     return {
         
         'sensorName': json['sensorName'],
-        'deviceName': json['deviceName'],
+        'status': SensorStatusFromJSON(json['status']),
     };
 }
 
@@ -58,7 +65,7 @@ export function BasicSensorApiModelToJSON(value?: BasicSensorApiModel | null): a
     return {
         
         'sensorName': value.sensorName,
-        'deviceName': value.deviceName,
+        'status': SensorStatusToJSON(value.status),
     };
 }
 

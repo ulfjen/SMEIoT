@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -40,7 +41,7 @@ namespace SMEIoT.Core.Services
       return stringBuilder.ToString();
     }
 
-    public string GenerateRandomIdentifierForDevice(int numWords = 2)
+    public Task<string> GenerateRandomIdentifierForDeviceAsync(int numWords = 2)
     {
       if (numWords < 1)
       {
@@ -53,7 +54,7 @@ namespace SMEIoT.Core.Services
         var name = GenerateRandomIdentifier(numWords);
         if (!_dbConnection.ExecuteScalar<bool>("SELECT COUNT(DISTINCT 1) FROM devices WHERE normalized_name = @NormalizedName;", new {NormalizedName = Device.NormalizeName(name)}))
         {
-          return name;
+          return Task.FromResult(name);
         }
       }
       throw new SystemException("Can't generate device names after retried 3 times.");

@@ -20,7 +20,7 @@ import ProgressButton from "../components/ProgressButton";
 import SuggestTextField from "../components/SuggestTextField";
 import {
   DevicesApi,
-  DeviceConfigBindingModel
+  DeviceBootstrapConfigBindingModel
 } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
 
@@ -74,7 +74,7 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
   const intl = useIntl();
   useTitle(intl.formatMessage(messages.title));
 
-  const [device, setDevice] = React.useState<DeviceConfigBindingModel>({name: "", key: ""});
+  const [config, setConfig] = React.useState<DeviceBootstrapConfigBindingModel>({name: "", key: ""});
   const [handlingNext, setHandlingNext] = React.useState<boolean>(false);
   const [loading, setLoading] = React.useState<boolean>(true);
   const [unconnectedDeviceName, setUnconnectedDeviceName] = React.useState<
@@ -86,7 +86,7 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
     setHandlingNext(true);
     const api = new DevicesApi(GetDefaultApiConfig());
     const res = await api.apiDevicesBootstrapPost({
-      deviceConfigBindingModel: device
+      deviceBootstrapConfigBindingModel: config
     });
     if (res !== null) {
       if (navigate) {
@@ -104,7 +104,7 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
     const res = await api.apiDevicesConfigSuggestDeviceNameGet();
 
     if (res.deviceName !== null) {
-      setDevice({ ...device, name: res.deviceName });
+      setConfig({ ...config, name: res.deviceName });
     }
 
     setSuggestDeviceName(false);
@@ -113,7 +113,7 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
   const onDeviceNameChange: React.ChangeEventHandler<
     HTMLInputElement | HTMLTextAreaElement
   > = event => {
-    setDevice({ ...device, name: event.target.value });
+    setConfig({ ...config, name: event.target.value });
   };
 
   const [suggestingKey, setSuggestKey] = React.useState<boolean>(false);
@@ -123,7 +123,7 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
     const res = await api.apiDevicesConfigSuggestKeyGet();
 
     if (res.key !== null) {
-      setDevice({ ...device, key: res.key });
+      setConfig({ ...config, key: res.key });
     }
 
     setSuggestKey(false);
@@ -132,7 +132,7 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
   const onKeyChange: React.ChangeEventHandler<
     HTMLInputElement | HTMLTextAreaElement
   > = event => {
-    setDevice({ ...device, key: event.target.value });
+    setConfig({ ...config, key: event.target.value });
   };
 
   const onBannerClick = async (
@@ -146,7 +146,7 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
   React.useEffect(() => {
     (async () => {
       let res = await api.apiDevicesConfigSuggestBootstrapGet();
-      setDevice({ ...device, name: res.deviceName, key: res.key });
+      setConfig({ ...config, name: res.deviceName, key: res.key });
       if (res.continuedConfigurationDevice) {
         setUnconnectedDeviceName(res.continuedConfigurationDevice);
       }
@@ -192,14 +192,14 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
               <SuggestTextField
                 label={intl.formatMessage(messages.nameLabel)}
                 autoFocus
-                value={device.name}
+                value={config.name}
                 onChange={onDeviceNameChange}
                 onSuggest={onSuggestDeviceName}
                 suggesting={suggestingDeviceName}
               />
               <SuggestTextField
                 label={intl.formatMessage(messages.keyLabel)}
-                value={device.key}
+                value={config.key}
                 onChange={onKeyChange}
                 onSuggest={onSuggestKey}
                 suggesting={suggestingKey}

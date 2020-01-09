@@ -46,8 +46,8 @@ namespace SMEIoT.Core.Services
 
     private async Task<StringBuilder> HandlePskCommandAsync(StringBuilder builder, string body)
     {
-      if (body == _clientService.ClientName) {
-        return builder.Append(_clientService.ClientPsk);
+      if (body == await _clientService.GetClientNameAsync()) {
+        return builder.Append(await _clientService.GetClientPskAsync());
       }
 
       try {

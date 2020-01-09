@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Linq;
 using SMEIoT.Core.Interfaces;
 using Microsoft.Extensions.Configuration;
@@ -21,8 +22,6 @@ namespace SMEIoT.Infrastructure.Services
     public string? Host { get; internal set; }
     public int Port { get; internal set; }
     public int KeepAlive { get; internal set; }
-    public string Psk { get; internal set; }
-    public string Identity { get; internal set; }
     public string? Ciphers { get; internal set; }
     public List<string> Topics { get; internal set; } = new List<string>();
     public int Timeout { get; internal set; }
@@ -31,11 +30,12 @@ namespace SMEIoT.Infrastructure.Services
 
     public ConnectCallbackDelegate? ConnectCallback { get; internal set; }
     public MessageCallbackDelegate? MessageCallback { get; internal set; }
+    
+    private readonly IMosquittoClientAuthenticationService _authService;
 
     public MosquittoClientService(IMosquittoClientAuthenticationService authService, IConfiguration config, MosquittoMessageHandler handler)
     {
-      Psk = authService.ClientPsk;
-      Identity = authService.ClientName;
+      _authService = authService;
       Host = config.GetConnectionString("MqttHost");
       int port;
       var portStr = config.GetConnectionString("MqttPort");
@@ -52,9 +52,11 @@ namespace SMEIoT.Infrastructure.Services
       MosquittoWrapper.mosq_init();   
     }
 
-    public void Connect()
+    public async Task Connect()
     {
-      var res = MosquittoWrapper.mosq_set_tls_psk(Psk, Identity, Ciphers);
+      var psk = await _authService.GetClientPskAsync();
+      var identity = await _authService.GetClientNameAsync();
+      var res = MosquittoWrapper.mosq_set_tls_psk(psk, identity, Ciphers);
       if (res != 0)
       {
         throw new ArgumentException($"Mosquitto mosq_set_tls_psk returned {res}");

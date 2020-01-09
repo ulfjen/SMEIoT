@@ -18,6 +18,10 @@ import {
     NumberTimeSeriesApiModelFromJSON,
     NumberTimeSeriesApiModelFromJSONTyped,
     NumberTimeSeriesApiModelToJSON,
+    SensorStatus,
+    SensorStatusFromJSON,
+    SensorStatusFromJSONTyped,
+    SensorStatusToJSON,
 } from './';
 
 /**
@@ -26,6 +30,12 @@ import {
  * @interface SensorDetailsApiModel
  */
 export interface SensorDetailsApiModel {
+    /**
+     * 
+     * @type {string}
+     * @memberof SensorDetailsApiModel
+     */
+    deviceName: string;
     /**
      * 
      * @type {Array<NumberTimeSeriesApiModel>}
@@ -46,10 +56,10 @@ export interface SensorDetailsApiModel {
     sensorName: string;
     /**
      * 
-     * @type {string}
+     * @type {SensorStatus}
      * @memberof SensorDetailsApiModel
      */
-    deviceName: string;
+    status: SensorStatus;
 }
 
 export function SensorDetailsApiModelFromJSON(json: any): SensorDetailsApiModel {
@@ -62,10 +72,11 @@ export function SensorDetailsApiModelFromJSONTyped(json: any, ignoreDiscriminato
     }
     return {
         
+        'deviceName': json['deviceName'],
         'data': ((json['data'] as Array<any>).map(NumberTimeSeriesApiModelFromJSON)),
         'startedAt': json['startedAt'],
         'sensorName': json['sensorName'],
-        'deviceName': json['deviceName'],
+        'status': SensorStatusFromJSON(json['status']),
     };
 }
 
@@ -78,10 +89,11 @@ export function SensorDetailsApiModelToJSON(value?: SensorDetailsApiModel | null
     }
     return {
         
+        'deviceName': value.deviceName,
         'data': ((value.data as Array<any>).map(NumberTimeSeriesApiModelToJSON)),
         'startedAt': value.startedAt,
         'sensorName': value.sensorName,
-        'deviceName': value.deviceName,
+        'status': SensorStatusToJSON(value.status),
     };
 }
 

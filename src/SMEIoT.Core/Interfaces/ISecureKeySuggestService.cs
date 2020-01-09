@@ -1,7 +1,9 @@
+using System.Threading.Tasks;
+
 namespace SMEIoT.Core.Interfaces
 {
   public interface ISecureKeySuggestService
   {
-    string GenerateSecureKeyWithByteLength(int length);
+    Task<string> GenerateSecureKeyWithByteLengthAsync(int length);
   }
 }

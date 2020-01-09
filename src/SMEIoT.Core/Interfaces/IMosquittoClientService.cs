@@ -10,8 +10,6 @@ namespace SMEIoT.Core.Interfaces
     string? Host { get; }
     int Port { get; }
     int KeepAlive { get; }
-    string Psk { get; }
-    string Identity { get; }
     string? Ciphers { get; }
     List<string> Topics { get; }
     int Timeout { get; }
@@ -19,7 +17,7 @@ namespace SMEIoT.Core.Interfaces
     int SleepOnReconnect { get; }
 
     void SubscribeTopic(string topic);
-    void Connect();
+    Task Connect();
     int RunLoop();
     int Reconnect();
   }

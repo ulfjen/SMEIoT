@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using System.Text;
 using SMEIoT.Core.Interfaces;
 
@@ -32,7 +33,7 @@ namespace SMEIoT.Core.Services
       };
 
     // string length is twice the length of bytes (hex form)
-    public string GenerateSecureKeyWithByteLength(int length)
+    public Task<string> GenerateSecureKeyWithByteLengthAsync(int length)
     {
       if (length < ByteLengthLowerBound)
       {
@@ -52,7 +53,7 @@ namespace SMEIoT.Core.Services
         {
           result.Append(HexStringTable[b]);
         }
-        return result.ToString();
+        return Task.FromResult(result.ToString());
       }
     }
   }

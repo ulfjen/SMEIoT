@@ -1278,18 +1278,27 @@
         },
         "additionalProperties": false
       },
+      "SensorStatus": {
+        "enum": [
+          0,
+          1,
+          2
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
       "BasicSensorApiModel": {
         "required": [
-          "deviceName",
-          "sensorName"
+          "sensorName",
+          "status"
         ],
         "type": "object",
         "properties": {
           "sensorName": {
             "type": "string"
           },
-          "deviceName": {
-            "type": "string"
+          "status": {
+            "$ref": "#/components/schemas/SensorStatus"
           }
         },
         "additionalProperties": false
@@ -1460,10 +1469,14 @@
           "data",
           "deviceName",
           "sensorName",
-          "startedAt"
+          "startedAt",
+          "status"
         ],
         "type": "object",
         "properties": {
+          "deviceName": {
+            "type": "string"
+          },
           "data": {
             "type": "array",
             "items": {
@@ -1476,8 +1489,8 @@
           "sensorName": {
             "type": "string"
           },
-          "deviceName": {
-            "type": "string"
+          "status": {
+            "$ref": "#/components/schemas/SensorStatus"
           }
         },
         "additionalProperties": false
