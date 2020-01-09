@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using NodaTime;
 using System;
 using SMEIoT.Core.Interfaces;
@@ -13,8 +14,8 @@ using SMEIoT.Core.Services;
 using SMEIoT.Infrastructure.Services;
 using Npgsql;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Builder;
 using System.Data;
 
 namespace SMEIoT.Infrastructure
@@ -42,6 +43,12 @@ namespace SMEIoT.Infrastructure
         // we want less dependencies.
         // and hangfire PostgreSql can't store Nodatime.
         .UseLiteDbStorage($"Filename=Hangfire.db; Mode=Shared; Cache Size=5000");
+    }
+
+    public static void UseHangfireActivator(this IApplicationBuilder app, IServiceProvider serviceProvider)
+    {
+      Hangfire.GlobalConfiguration.Configuration
+        .UseActivator(new HangfireActivatorService(serviceProvider.GetService<IServiceScopeFactory>()));
     }
 
     public static void ConfigureMqttClient(this IServiceCollection services, IConfiguration configuration)

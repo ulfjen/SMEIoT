@@ -135,9 +135,11 @@ namespace SMEIoT.Web
       {
         app.UseMiddleware<DevThrottleMiddleware>();
 
+        app.UseHangfireActivator(serviceProvider);
+        app.UseHangfireDashboard();
+
         app.UseDeveloperExceptionPage();
         app.UseDatabaseErrorPage();
-        app.UseHangfireDashboard();
         app.UseSwagger(c => {
           c.PreSerializeFilters.Add((swaggerDoc, httpReq) =>
           {
@@ -168,8 +170,6 @@ namespace SMEIoT.Web
         app.UseHsts();
       }
 
-      Hangfire.GlobalConfiguration.Configuration
-        .UseActivator(new HangfireActivator(serviceProvider));
       app.UseHttpsRedirection();
 
       app.UseStaticFiles(new StaticFileOptions
