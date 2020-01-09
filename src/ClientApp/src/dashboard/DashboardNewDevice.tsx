@@ -27,8 +27,6 @@ import { GetDefaultApiConfig } from "../index";
 const styles = ({ spacing }: Theme) =>
   createStyles({
     container: {
-      paddingTop: spacing(4),
-      paddingBottom: spacing(4)
     },
     instructions: {
       marginTop: spacing(1),

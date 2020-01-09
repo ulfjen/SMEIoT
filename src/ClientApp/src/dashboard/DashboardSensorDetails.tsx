@@ -31,8 +31,6 @@ const styles = ({
 }: Theme) =>
   createStyles({
     container: {
-      paddingTop: spacing(4),
-      paddingBottom: spacing(4)
     },
     paper: {
       padding: spacing(2),

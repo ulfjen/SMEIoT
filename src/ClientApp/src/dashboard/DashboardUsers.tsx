@@ -44,8 +44,6 @@ import Measure from 'react-measure';
 
 const styles = ({ palette, spacing, transitions, zIndex, mixins, breakpoints }: Theme) => createStyles({
   container: {
-    paddingTop: spacing(4),
-    paddingBottom: spacing(4),
     height: '90%'
   },
   list: {

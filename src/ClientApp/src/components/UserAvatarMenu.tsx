@@ -13,8 +13,6 @@ import { UserAvatar } from "..";
 
 const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Theme) => createStyles({
   container: {
-    paddingTop: spacing(4),
-    paddingBottom: spacing(4),
   },
 });
 

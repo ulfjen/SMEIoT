@@ -10,8 +10,6 @@ import Menu from "@material-ui/core/Menu";
 
 const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Theme) => createStyles({
   container: {
-    paddingTop: spacing(4),
-    paddingBottom: spacing(4),
   },
 });
 

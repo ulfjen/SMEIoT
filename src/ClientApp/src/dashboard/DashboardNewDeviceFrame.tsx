@@ -19,8 +19,6 @@ import { defineMessages, useIntl, FormattedMessage } from "react-intl";
 const styles = ({ spacing }: Theme) =>
   createStyles({
     container: {
-      paddingTop: spacing(4),
-      paddingBottom: spacing(4)
     }
   });
 

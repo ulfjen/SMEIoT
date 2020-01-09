@@ -22,8 +22,6 @@ import {
 const styles = ({ spacing }: Theme) =>
   createStyles({
     container: {
-      paddingTop: spacing(4),
-      paddingBottom: spacing(4)
     }
   });
 
