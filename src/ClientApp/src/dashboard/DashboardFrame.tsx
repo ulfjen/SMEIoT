@@ -1,4 +1,4 @@
-import clsx from 'clsx';
+import * as React from "react";
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
@@ -8,22 +8,17 @@ import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import * as React from "react";
 import DrawerList from "./DrawerList";
 import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Hidden from "@material-ui/core/Hidden";
-import CloseIcon from '@material-ui/icons/Close';
-import UserAvatarMenu from "../components/UserAvatarMenu";
-import { BasicUserApiModel } from 'smeiot-client';
-import moment from 'moment';
 import { NavigateFn } from '@reach/router';
 
 const drawerWidth = 240;
 
-const styles = ({ palette, spacing, transitions, zIndex, mixins, breakpoints }: Theme) => createStyles({
+const styles = ({ spacing, transitions, zIndex, mixins }: Theme) => createStyles({
   root: {
     display: 'flex',
   },

@@ -5,7 +5,7 @@ import { IntlProvider } from "react-intl";
 import ThemeProvider from "@material-ui/styles/ThemeProvider";
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import createMuiTheme from "@material-ui/core/styles/createMuiTheme";
-import palette from "./theme";
+import { palette, typography } from "./theme";
 import RootApp from "./RootApp";
 import EnMessages from "./locales/en.json";
 import DashboardApp from "./DashboardApp";
@@ -30,17 +30,17 @@ const SMEIoTApp: React.FunctionComponent<ISMEIoTApp> = ({
       createMuiTheme({
         palette: Object.assign({
           type: prefersDarkMode ? 'dark' : 'light',
-        }, palette)
+        }, palette),
+        typography
       }),
     [prefersDarkMode],
   );
 
-
   return <IntlProvider locale={locale} messages={messages}>
     <ThemeProvider theme={theme}>
       <Router>
-        <DashboardApp path="/dashboard/*" locale={locale} />
-        <RootApp path="/*" locale={locale} />
+        <DashboardApp path="/dashboard/*" />
+        <RootApp path="/*" />
       </Router>
     </ThemeProvider>
   </IntlProvider>;

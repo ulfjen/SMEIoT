@@ -3,15 +3,18 @@ import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
-import { TypographyProps } from "@material-ui/core/Typography";
+import { lighten } from "@material-ui/core/styles";
 
-const styles = ({ palette, spacing, typography, transitions, zIndex, mixins, breakpoints }: Theme) => createStyles({
+const styles = ({ palette, typography }: Theme) => createStyles({
+  root: {
+    display: "inline-block"
+  },
   line: {
     display: "flex",
     alignItems: "center",
   },
-  root: {
-    display: "inline-block"
+  greyout: {
+    color: lighten(palette.text.secondary, 0.25)
   },
   labels: {
     display: "inline-block",
@@ -35,19 +38,17 @@ const styles = ({ palette, spacing, typography, transitions, zIndex, mixins, bre
 export interface ITwoLayerLabelActionProps extends WithStyles<typeof styles> {
   first: string;
   second: string;
-  firstVariant?: TypographyProps["variant"];
+  greyoutFirst?: boolean;
   action?: React.ReactNode;
 }
 
 const _TwoLayerLabelAction: React.FunctionComponent<ITwoLayerLabelActionProps & WithStyles<typeof styles>> = ({
-  classes, first, second, firstVariant, action
+  classes, first, second, greyoutFirst, action
 }) => {
-  let variant = firstVariant || "inherit";
-
   return <div className={classes.root}>
     <div className={classes.line}>
       <div className={classes.labels}>
-        <span>{first}</span>
+        <span className={greyoutFirst ? classes.greyout : undefined}>{first}</span>
         <span className={classes.divider}>/</span>
         <span>{second}</span>
       </div>

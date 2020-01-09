@@ -7,7 +7,7 @@ import withStyles from "@material-ui/core/styles/withStyles";
 import Avatar from "@material-ui/core/Avatar";
 import Typography from "@material-ui/core/Typography";
 
-const styles = ({ transitions, spacing }: Theme) => createStyles({
+const styles = ({ palette }: Theme) => createStyles({
   root: {
     padding: 16,
     display: 'flex',
@@ -22,11 +22,19 @@ const styles = ({ transitions, spacing }: Theme) => createStyles({
   status: {
     marginLeft: "auto",
   },
+  statusWithAction: {
+    marginRight: 10
+  },
   action: {
     marginLeft: "auto",
+    marginTop: -6,
+    marginRight: -12,
   },
   avatar: {
     marginBottom: 5,
+  },
+  headBottomBorder: {
+    borderBottom: `2px solid ${palette.divider}`
   }
 });
 
@@ -39,19 +47,51 @@ export interface IExpandedCardHeader extends WithStyles<typeof styles> {
 }
 
 const _ExpandedCardHeader: React.FunctionComponent<IExpandedCardHeader> = ({ classes, className, title, action, avatar, status }) => {
+  let head: React.ReactNode | undefined;
+  let content: React.ReactNode | undefined;
+
+  if (typeof title === "string") {
+    title = <Typography color="primary" component="h2" variant="h5">
+      {title}
+    </Typography>
+  }
+
+  if (status) {
+    const stautsClass = action ? clsx(classes.status, classes.statusWithAction) : classes.status;
+    status = <div className={stautsClass}>{status}</div>;
+  }
+
+  let pushTitleToHead = false;
+  if (avatar) {
+    avatar = <Avatar className={classes.avatar}>
+      {avatar}
+    </Avatar>
+  } else if (action) { // avoid blank under the title if no avatar with action
+    pushTitleToHead = true;
+  }
+
+  if (pushTitleToHead) {
+    head = title;
+    className = className ? clsx(className, classes.headBottomBorder) : classes.headBottomBorder;
+  } else {
+    head = avatar;
+    content = title;
+  }
+  head = <div className={classes.head}>
+    {head}
+    {action && <div className={classes.action}>{action}</div>}
+  </div>;
+
+  if (content || status) {
+    content = <div className={classes.content}>
+      {content}
+      {status}
+    </div>
+  }
+
   return <div className={clsx(classes.root, className)}>
-    <div className={classes.head}>
-      {avatar && <Avatar className={classes.avatar}>
-        {avatar}
-      </Avatar>}
-      {action && <div className={classes.action}>{action}</div>}
-    </div>
-    <div className={classes.content}>
-      <Typography color="primary" variant="h5" display="block">
-        {title}
-      </Typography>
-      {status && <div className={classes.status}>{status}</div>}
-    </div>
+    {head}
+    {content}
   </div>;
 };
 

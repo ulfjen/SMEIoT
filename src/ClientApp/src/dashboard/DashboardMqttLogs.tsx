@@ -13,7 +13,6 @@ import { Link, RouteComponentProps } from '@reach/router';
 import * as SignalR from "@microsoft/signalr";
 import { FixedSizeList, areEqual, ListChildComponentProps } from 'react-window';
 import { defineMessages, useIntl, FormattedMessage } from "react-intl";
-import StatusBadge from "../components/StatusBadge";
 import DashboardBrokerFrame from "./DashboardBrokerFrame";
 
 const styles = ({ palette, spacing, transitions, zIndex, mixins, breakpoints }: Theme) => createStyles({

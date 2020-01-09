@@ -90,10 +90,9 @@ const _BasicBrokerCard: React.FunctionComponent<IBasicBrokerCard> = ({ classes, 
   return <Card>
     <CardActionArea component={ReachLink} to={"/dashboard/devices"}>
       <ExpandedCardHeader
-        title={loading ? <Skeleton variant="rect" width={100} height={25} /> : <Typography variant="h5" color="primary" display="block">
-          {intl.formatMessage(messages.title)}</Typography>}
+        title={loading ? <Skeleton variant="rect" width={100} height={25} /> : intl.formatMessage(messages.title)}
         status={<StatusBadge
-          color={loading ? null : (broker.running ? "normal" : "error")} 
+          severity={broker.running ? "success" : "error"} 
           badge={loading && <Skeleton variant="circle" width={14} height={14}/>}
         >
           {loading ? <Skeleton variant="rect" width={60} height={14}/> : intl.formatMessage(broker.running ? messages.running : messages.stopped)}

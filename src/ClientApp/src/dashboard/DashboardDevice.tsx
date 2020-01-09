@@ -49,6 +49,7 @@ import ExpansionPanelActions from "@material-ui/core/ExpansionPanelActions";
 import ListItem from "@material-ui/core/ListItem";
 import List from "@material-ui/core/List";
 import CardActions from "@material-ui/core/CardActions";
+import MoreVertIcon from "@material-ui/icons/MoreVert";
 
 const styles = ({ typography, palette, spacing }: Theme) => createStyles({
   container: {
@@ -143,6 +144,11 @@ const messages = defineMessages({
     description: "The aria label for close action",
     defaultMessage: "Close this action"
   },
+  moreAria: {
+    id: "dashboard.devices.edit.more",
+    description: "The aria label for more action",
+    defaultMessage: "More"
+  },
   status: {
     connected: {
       id: "dashboard.devices.edit.status.connected",
@@ -176,6 +182,19 @@ const messages = defineMessages({
       defaultMessage: "Inactive Sensors"
     },
   },
+  sensor: {
+    connect: {
+      id: "dashboard.devices.edit.sensor.connect",
+      description: "Label on sensor connection component's action",
+      defaultMessage: "Connect"
+    },
+    buttonLabel: {
+      id: "dashboard.devices.edit.sensor.label",
+      description: "Aria Label on sensor connection component's action",
+      defaultMessage: "Connect sensor to the device"
+    },
+    
+  }
 });
 
 const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
@@ -261,9 +280,9 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
   const renderOtherSensors = () => {
     return sensors.map(sensor =>
       <ListItem disableGutters key={sensor}>
-        <TwoLayerLabelAction first={"masses-pavy"} second={"b"} action={
-          <Tooltip title="Add" aria-label="add">
-            <IconButton aria-label="Connect sensor to the device" disabled={false} onClick={() => { }}>
+        <TwoLayerLabelAction greyoutFirst first={"masses-pavy"} second={"b"} action={
+          <Tooltip title={intl.formatMessage(messages.sensor.connect)} aria-label={intl.formatMessage(messages.sensor.connect)}>
+            <IconButton aria-label={intl.formatMessage(messages.sensor.buttonLabel)} disabled={false} onClick={() => { }}>
               <AddIcon />
             </IconButton>
           </Tooltip>} />
@@ -333,11 +352,19 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
               <ExpandedCardHeader
                 title={state.loading ? <Skeleton variant="rect" width={240} height={30} /> : state.value && state.value.name}
                 status={<StatusBadge
-                  color={state.loading || state.value === undefined ? null : (state.value.connected ? "normal" : "error")}
-                  badge={state.loading && <Skeleton variant="circle" height={14} width={14} />}
-                >
-                  {state.loading ? <Skeleton variant="rect" width={100} height={14} /> : state.value && intl.formatMessage(state.value.connected ? messages.status.connected : messages.status.notConnected)}
-                </StatusBadge>}
+                    severity={state.value !== undefined ? (state.value.connected ? "success" : "error") : "error"} 
+                    badge={state.loading && <Skeleton variant="circle" height={14} width={14} />}
+                  >
+                    {state.loading ? <Skeleton variant="rect" width={100} height={14} /> : state.value && intl.formatMessage(state.value.connected ? messages.status.connected : messages.status.notConnected)}
+                  </StatusBadge>}
+                action={
+                  <IconButton
+                    aria-label={intl.formatMessage(messages.moreAria)}
+                    onClick={() => {}}
+                  >
+                    <MoreVertIcon />
+                  </IconButton>
+                }
               />
               <CardContent>
                 {state.loading ? <div><Skeleton variant="text" /><Skeleton variant="text" /><Skeleton variant="text" /></div> : <Typography variant="body2" color="textSecondary" component="p">
@@ -361,7 +388,7 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
             <Paper className={classes.paper}>
               <CardHeader
                 title={state.loading ? <Skeleton variant="rect" width={240} height={26} /> : intl.formatMessage(messages.connected.title)}
-                titleTypographyProps={{ color: "secondary", variant: "h6", display: "block" }}
+                titleTypographyProps={{ color: "secondary", variant: "h6" }}
               />
               {state.loading ? <CardContent><Skeleton variant="text" /><Skeleton variant="text" /><Skeleton variant="text" /></CardContent> : renderPanel()}
             </Paper>
@@ -370,7 +397,7 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
             <Paper className={classes.paper}>
               <CardHeader
                 title={state.loading ? <Skeleton variant="rect" width={240} height={26} /> : intl.formatMessage(messages.notRegistered.title)}
-                titleTypographyProps={{ color: "secondary", variant: "h6", display: "block" }}
+                titleTypographyProps={{ color: "secondary", variant: "h6" }}
               />
               <CardContent>
 
@@ -386,7 +413,7 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
             <Paper className={classes.paper}>
               <CardHeader
                 title={state.loading ? <Skeleton variant="rect" width={240} height={26} /> : intl.formatMessage(messages.notConnected.title)}
-                titleTypographyProps={{ color: "secondary", variant: "h6", display: "block" }}
+                titleTypographyProps={{ color: "secondary", variant: "h6" }}
               />
               <CardContent>
                 {state.loading ? <div><Skeleton variant="text" /><Skeleton variant="text" /><Skeleton variant="text" /></div> : <Typography variant="body2" color="textSecondary" component="p">

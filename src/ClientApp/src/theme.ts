@@ -1,11 +1,12 @@
-import red from '@material-ui/core/colors/red';
+import { PaletteOptions, Palette } from "@material-ui/core/styles/createPalette";
+import { TypographyOptions } from "@material-ui/core/styles/createTypography";
 
-// https://material.io/resources/color/#!/?view.left=0&view.right=0&secondary.color=42A5F5&primary.color=3F51B5
-const palette = {
+// https://material.io/resources/color/#!/?view.left=1&view.right=0&secondary.color=42A5F5&primary.color=5C6BC0
+const palette: PaletteOptions = {
   primary: {
-    main: "#3f51b5",
-    light: "#757de8",
-    dark: "#002984",
+    main: "#5c6bc0",
+    light: "#8e99f3",
+    dark: "#26418f",
     contrastText: "#ffffff"
   },
   secondary: {
@@ -13,10 +14,28 @@ const palette = {
     light: "#80d6ff",
     dark: "#0077c2",
     contrastText: "#000000"
-  },
-  error: {
-    main: red.A400,
-  },
+  }
 };
 
-export default palette;
+const typography: TypographyOptions | ((palette: Palette) => TypographyOptions) = {
+  h1: {
+    fontSize: "6rem"
+  },
+  h2: {
+    fontSize: "3.75rem"
+  },
+  h3: {
+    fontSize: "3rem"
+  },
+  h4: {
+    fontSize: "2.125rem"
+  },
+  h5: {
+    fontSize: "1.5rem"
+  },
+  h6: {
+    fontSize: "1.25rem"
+  }
+}
+
+export { palette, typography };

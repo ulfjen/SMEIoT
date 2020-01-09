@@ -140,7 +140,7 @@ const _BrokerCard: React.FunctionComponent<IBrokerCard> = ({ classes }) => {
         }
         title={loading ? <Skeleton variant="rect" width={100} height={25} /> : intl.formatMessage(messages.title)}
         status={<StatusBadge
-          color={loading ? null : (running ? "normal" : "error")}
+          severity={running ? "success" : "error"} 
           badge={loading && <Skeleton variant="circle" height={14} width={14} />}
         >
           {loading ? <Skeleton variant="rect" width={60} height={14} /> : intl.formatMessage(running ? messages.running : messages.stopped)}

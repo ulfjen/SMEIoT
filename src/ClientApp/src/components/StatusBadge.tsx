@@ -1,85 +1,89 @@
 import * as React from "react";
+import clsx from "clsx";
 import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
-import clsx from "clsx";
-import green from '@material-ui/core/colors/green';
-import red from '@material-ui/core/colors/red';
-import Typography from "@material-ui/core/Typography";
+import { lighten } from "@material-ui/core/styles";
 
 const RADIUS_STANDARD = 7;
 
 const styles = ({ palette, typography, transitions }: Theme) => createStyles({
   root: {
-    position: "relative"
+    display: 'flex',
+    alignItems: "center",
+    paddingTop: 5,
+    paddingBottom: 5
   },
   content: {
     paddingLeft: RADIUS_STANDARD * 0.5,
-    display: "inline-box",
-    lineHeight: 1,
-    fontSize: typography.pxToRem(14),
-    verticalAlign: "middle"
+    lineHeight: 1.5,
+    fontSize: typography.body2.fontSize,
+    letterSpacing: typography.body2.letterSpacing,
   },
   status: {
-    display: "inline-box",
     boxSizing: "border-box",
     minWidth: RADIUS_STANDARD * 2,
     height: RADIUS_STANDARD * 2,
     borderRadius: RADIUS_STANDARD,
-    verticalAlign: "middle",
     transition: transitions.create('transform', {
       easing: transitions.easing.easeInOut,
       duration: transitions.duration.enteringScreen,
     }),
   },
-  normalColor: {
-    color: "#333333"
+  success: {
+    color: lighten(palette.text.primary, 0.1),
   },
-  normalBgColor: {
-    backgroundColor: green[800]
+  successStatus: {
+    backgroundColor: lighten(palette.success.main, 0.3)
   },
-  errorColor: {
-    color: "#666666"
+  info: {
+    color: lighten(palette.text.primary, 0.1),
   },
-  errorBgColor: {
-    backgroundColor: red[500]
+  infoStatus: {
+    backgroundColor: lighten(palette.info.main, 0.3),
+  },
+  warning: {
+    color: lighten(palette.text.secondary, 0.2),
+  },
+  warningStatus: {
+    backgroundColor: lighten(palette.warning.main, 0.3),
+  },
+  error: {
+    color: lighten(palette.text.secondary, 0.2),
+  },
+  errorStatus: {
+    backgroundColor: lighten(palette.error.main, 0.3),
   }
 });
 
+type SeverityType = 'error' | 'info' | 'success' | 'warning';
+type SeverityStatusType = 'errorStatus' | 'infoStatus' | 'successStatus' | 'warningStatus';
+const STATUS_MAP: Record<SeverityType, SeverityStatusType> = {
+  'error': 'errorStatus',
+  'info': 'infoStatus',
+  'success': 'successStatus',
+  'warning': 'warningStatus'
+}
+
 export interface IStatusBadgeProps extends WithStyles<typeof styles> {
-  onClick?: React.MouseEventHandler<HTMLButtonElement>;
-  color?: "error" | "normal" | null;
+  severity: SeverityType;
   className?: string;
   badge?: React.ReactNode;
 }
 
-const _StatusBadge: React.FunctionComponent<IStatusBadgeProps> = ({ classes, children, className, color, badge }) => {
-  let colorClass = "";
-  let colorBgClass = "";
+const _StatusBadge: React.FunctionComponent<IStatusBadgeProps> = ({ classes, children, className, severity, badge }) => {
+  const severityStatusMapped = STATUS_MAP[severity];
 
-  switch (color) {
-    case "normal":
-      colorClass = classes.normalColor;
-      colorBgClass = classes.normalBgColor;
-      break;
-    case "error":
-      colorClass = classes.errorColor;
-      colorBgClass = classes.errorBgColor;
-    default:
-      break;
-  }
+  return <div className={clsx(classes.root, className)}>
+    <span
+      className={badge ? classes.status : clsx(classes.status, classes[severityStatusMapped])}
+    >
+      {badge}
+    </span>
 
-  return (
-    <div className={clsx(classes.root, className)}>
-      <span
-        className={clsx(classes.status, colorBgClass)}
-      >
-        {badge}
-      </span>
-      <span className={clsx(classes.content, colorClass)}>{children}</span>
-    </div>
-  );
+    <span className={clsx(classes.content, classes[severity])}>{children}</span>
+  </div>;
 };
 
 const StatusBadge = withStyles(styles)(_StatusBadge);
