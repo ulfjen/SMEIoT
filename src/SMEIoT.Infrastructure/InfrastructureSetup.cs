@@ -49,7 +49,7 @@ namespace SMEIoT.Infrastructure
       services.AddSingleton<MosquittoMessageHandler>();
       services.AddTransient<IMosquittoClientService, MosquittoClientService>();
 
-      if (configuration.GetSection("SMEIoT").GetValue<bool>("UseMosquittoBackgroundClient")) {
+      if (configuration.GetSection("SMEIoT")?.GetValue<bool>("UseMosquittoBackgroundClient") == true) {
         services.AddHostedService<BackgroundMqttClientHostedService>();
       }
     }
