@@ -8,14 +8,14 @@ using SMEIoT.Core.Interfaces;
 
 namespace SMEIoT.Core.Services
 {
-  public class DeviceSensorIdentifierSuggestService : IDeviceSensorIdentifierSuggestService
+  public class MqttEntityIdentifierSuggestionService : IMqttEntityIdentifierSuggestionService
   {
     private readonly IMqttIdentifierService _mqttIdentifierService;
     private readonly List<string> _identifierCandidates;
     private readonly IApplicationDbConnection _dbConnection;
     private readonly Random _rand;
 
-    public DeviceSensorIdentifierSuggestService(
+    public MqttEntityIdentifierSuggestionService(
       IMqttIdentifierService mqttIdentifierService,
       IIdentifierDictionaryFileAccessor identifierDictionary,
       IApplicationDbConnection dbConnection)

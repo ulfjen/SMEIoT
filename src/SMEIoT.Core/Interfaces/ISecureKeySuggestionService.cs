@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 
 namespace SMEIoT.Core.Interfaces
 {
-  public interface ISecureKeySuggestService
+  public interface ISecureKeySuggestionService
   {
     Task<string> GenerateSecureKeyWithByteLengthAsync(int length);
   }

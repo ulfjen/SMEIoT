@@ -5,7 +5,7 @@ using SMEIoT.Core.Interfaces;
 
 namespace SMEIoT.Core.Services
 {
-  public class SecureKeySuggestService : ISecureKeySuggestService
+  public class SecureKeySuggestionService : ISecureKeySuggestionService
   {
     public const int ByteLengthLowerBound = 32;
     // RFC4279 requires the TLS library supporting arbitrary PSKs up to 64 octets in length, we can safely use this size.

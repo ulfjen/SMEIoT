@@ -41,7 +41,7 @@ namespace SMEIoT.Web.Api.V1
     public async Task<ActionResult<UserCredentialsUpdateApiModel>> EditPassword(string userName,
       [BindRequired] ConfirmedUserCredentialsUpdateBindingModel binding)
     {
-      await _userService.UpdateUserPassword(userName, binding.CurrentPassword, binding.NewPassword);
+      await _userService.UpdateUserPasswordAsync(userName, binding.CurrentPassword, binding.NewPassword);
       var (user, roles) = await _userService.GetUserAndRoleByName(userName);
       var res = new UserCredentialsUpdateApiModel(user, roles) {PasswordUpdated = true};
       return Ok(res);

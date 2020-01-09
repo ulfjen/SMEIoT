@@ -54,7 +54,7 @@ namespace SMEIoT.Web.Api.V1
     public async Task<ActionResult<UserCredentialsUpdateApiModel>> EditRoles(
       [FromBody] UserRolesBindingModel binding, [FromRoute] string userName)
     {
-      await _userService.UpdateUserRoles(userName, binding.Roles);
+      await _userService.UpdateUserRolesAsync(userName, binding.Roles);
       return Ok(await GetAdminUserResultAsync(userName));
     }
 

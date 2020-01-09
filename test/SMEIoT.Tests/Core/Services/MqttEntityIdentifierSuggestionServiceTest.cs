@@ -10,9 +10,9 @@ using Xunit;
 
 namespace SMEIoT.Tests.Core.Services
 {
-  public class DeviceSensorIdentifierSuggestServiceTest
+  public class MqttEntityIdentifierSuggestionServiceTest
   {
-    private static DeviceSensorIdentifierSuggestService BuildService()
+    private static MqttEntityIdentifierSuggestionService BuildService()
     {
       var mockedAccessor = new Mock<IIdentifierDictionaryFileAccessor>();
       mockedAccessor.Setup(x => x.ListIdentifiers()).Returns(new List<string> { "id1", "id2", "id3" });
@@ -23,33 +23,36 @@ namespace SMEIoT.Tests.Core.Services
 
       var mockedDb = new Mock<IApplicationDbConnection>(MockBehavior.Strict);
       mockedDb.Setup(x => x.ExecuteScalar<bool>("SELECT COUNT(DISTINCT 1) FROM devices WHERE normalized_name = @NormalizedName;", It.IsAny<object>(), null, null, null)).Returns(false);
-      return new DeviceSensorIdentifierSuggestService(identifierService, mockedAccessor.Object, mockedDb.Object);
+      return new MqttEntityIdentifierSuggestionService(identifierService, mockedAccessor.Object, mockedDb.Object);
     }
 
     [Fact]
-    public void GenerateRandomIdentifierForDevice_ReturnsIdentifier()
+    public async Task GenerateRandomIdentifierForDevice_ReturnsIdentifier()
     {
       // arrange
       var service = BuildService();
 
       // act
-      var res = service.GenerateRandomIdentifierForDevice(1);
+      var res = await service.GenerateRandomIdentifierForDeviceAsync(1);
 
       // assert
       Assert.True(res == "id1" || res == "id2" || res == "id3");
     }
 
     [Fact]
-    public void GenerateRandomIdentifierForDevice_ThrowsIfLessOneWord()
+    public async Task GenerateRandomIdentifierForDevice_ThrowsIfLessOneWord()
     {
       var service = BuildService();
 
-      Assert.Throws<ArgumentException>(() => service.GenerateRandomIdentifierForDevice(0));
+      Task Act() => service.GenerateRandomIdentifierForDeviceAsync(0);
+
+      var exce = await Record.ExceptionAsync(Act);
+      Assert.IsType<ArgumentException>(exce);
     }
 
 
     [Fact]
-    public void GetARandomIdentifierCandidatesForSensor_ReturnsCandidate()
+    public async Task GetARandomIdentifierCandidatesForSensor_ReturnsCandidate()
     {
       var service = BuildService();
 

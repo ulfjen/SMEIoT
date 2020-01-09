@@ -127,7 +127,7 @@ namespace SMEIoT.Core.Services
       }
     }
 
-    public async Task UpdateUserPassword(string userName, string currentPassword, string newPassword)
+    public async Task UpdateUserPasswordAsync(string userName, string currentPassword, string newPassword)
     {
       var user = await _userManager.FindByNameAsync(userName);
       if (user == null)
@@ -171,7 +171,7 @@ namespace SMEIoT.Core.Services
       }
     }
 
-    public async Task UpdateUserRoles(string userName, IEnumerable<string> roles)
+    public async Task UpdateUserRolesAsync(string userName, IEnumerable<string> roles)
     {
       var user = await _userManager.FindByNameAsync(userName);
       if (user == null)
@@ -216,7 +216,7 @@ namespace SMEIoT.Core.Services
 
     /// if roles are empty, we return every users
     /// otherwise we return the users have designated roles
-    public async IAsyncEnumerable<(User, IList<string>)> ListBasicUserResultAsync(int offset, int limit, IEnumerable<string>? roles)
+    public async IAsyncEnumerable<(User, IList<string>)> ListBasicUserResultAsync(int offset, int limit, IEnumerable<string>? roles = null)
     {
       if (offset < 0)
       {

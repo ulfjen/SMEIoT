@@ -48,7 +48,10 @@ namespace SMEIoT.Infrastructure
     {
       services.AddSingleton<MosquittoMessageHandler>();
       services.AddTransient<IMosquittoClientService, MosquittoClientService>();
-      services.AddHostedService<BackgroundMqttClientHostedService>();
+
+      if (configuration.GetSection("SMEIoT").GetValue<bool>("UseMosquittoBackgroundClient")) {
+        services.AddHostedService<BackgroundMqttClientHostedService>();
+      }
     }
 
     public static void AddInfrastructureServices(this IServiceCollection services, IHostEnvironment env)
@@ -67,7 +70,7 @@ namespace SMEIoT.Infrastructure
         return env.ContentRootFileProvider;
       });
       services.AddScoped<IIdentifierDictionaryFileAccessor, IdentifierDictionaryFileAccessor>();
-      services.AddScoped<IDeviceSensorIdentifierSuggestService, DeviceSensorIdentifierSuggestService>();
+      services.AddScoped<IMqttEntityIdentifierSuggestionService, MqttEntityIdentifierSuggestionService>();
     }
   }
 }

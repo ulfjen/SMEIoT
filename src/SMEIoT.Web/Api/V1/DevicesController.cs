@@ -21,8 +21,8 @@ namespace SMEIoT.Web.Api.V1
   {
     private readonly ILogger _logger;
     private readonly IDeviceService _service;
-    private readonly IDeviceSensorIdentifierSuggestService _identifierSuggestService;
-    private readonly ISecureKeySuggestService _secureKeySuggestService;
+    private readonly IMqttEntityIdentifierSuggestionService _identifierSuggestService;
+    private readonly ISecureKeySuggestionService _SecureKeySuggestionService;
     private readonly IMqttIdentifierService _mqttService;
     private const int DefaultDeviceNameSuggestWordLength = 2;
     private const int DefaultKeyByteLength = 64;
@@ -30,15 +30,15 @@ namespace SMEIoT.Web.Api.V1
     public DevicesController(
       ILogger<DevicesController> logger,
       IDeviceService service,
-      IDeviceSensorIdentifierSuggestService identifierSuggestService,
+      IMqttEntityIdentifierSuggestionService identifierSuggestService,
       IMqttIdentifierService mqttService,
-      ISecureKeySuggestService secureKeySuggestService)
+      ISecureKeySuggestionService SecureKeySuggestionService)
     {
       _logger = logger;
       _service = service;
       _mqttService = mqttService;
       _identifierSuggestService = identifierSuggestService;
-      _secureKeySuggestService = secureKeySuggestService;
+      _SecureKeySuggestionService = SecureKeySuggestionService;
     }
 
     [HttpPost("bootstrap")]
@@ -111,7 +111,7 @@ namespace SMEIoT.Web.Api.V1
       var device = await _service.GetARandomUnconnectedDeviceAsync();
       return Ok(new DeviceConfigSuggestApiModel(
         await _identifierSuggestService.GenerateRandomIdentifierForDeviceAsync(DefaultDeviceNameSuggestWordLength),
-        await _secureKeySuggestService.GenerateSecureKeyWithByteLengthAsync(DefaultKeyByteLength),
+        await _SecureKeySuggestionService.GenerateSecureKeyWithByteLengthAsync(DefaultKeyByteLength),
         device?.Name
       ));
     }
@@ -122,7 +122,7 @@ namespace SMEIoT.Web.Api.V1
     {
       return Ok(new DeviceConfigSuggestApiModel(
         null,
-        await _secureKeySuggestService.GenerateSecureKeyWithByteLengthAsync(DefaultKeyByteLength)
+        await _SecureKeySuggestionService.GenerateSecureKeyWithByteLengthAsync(DefaultKeyByteLength)
       ));
     }
 
