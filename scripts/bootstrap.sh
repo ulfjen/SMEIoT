@@ -81,10 +81,10 @@ function build_smeiot {
   cd $WEB_ROOT && rm -rf $BUILD_DIR && dotnet publish -c $SERVER_CONFIG -r $ARCH --self-contained true
   cd $JS_ROOT && npm run build && cp -r build/static/* $BUILD_DIR/wwwroot
   cd $WEB_ROOT && \
-      echo "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";" > $BUILD_DIR/00-db-extension.sql.parts && \
-      dotnet ef migrations script -o $BUILD_DIR/01-migrations.sql.parts && sed -i '1s/^\xEF\xBB\xBF//' $BUILD_DIR/01-migrations.sql.parts && \
-      cat $BUILD_DIR/*.sql.parts > $BUILD_DIR/db_migrate.sql && \
-      rm -rf $BUILD_DIR/*.sql.parts
+      echo "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";" > $BUILD_DIR/00-db-extension.sql.part && \
+      dotnet ef migrations script -o $BUILD_DIR/01-migrations.sql.part && sed -i '1s/^\xEF\xBB\xBF//' $BUILD_DIR/01-migrations.sql.part && \
+      cat $BUILD_DIR/*.sql.part > $BUILD_DIR/db_migrate.sql && \
+      rm -rf $BUILD_DIR/*.sql.part
 }
 
 function setup_db {
@@ -92,6 +92,7 @@ function setup_db {
   PG_CONF_PATH="${PG_CONF_DIRS##*$'\n'}"
 
   sudo mv $TMP_BOOTSTRAP_DIR/postgresql.conf.sample $PG_CONF_PATH
+  sudo chown postgres:postgres $PG_CONF_PATH
 
   cd $SMEIOT_ROOT
   sudo systemctl start postgresql && sudo systemctl enable postgresql
@@ -113,7 +114,7 @@ function setup_server_config {
   echo "Enter Your database password:" 
   read -s password
   echo
-  echo "connectionStrings__Password = $password" | sudo tee -a $SMEIOT_ROOT/server_env
+  echo "connectionStrings__Password=$password" | sudo tee -a $SMEIOT_ROOT/server_env
   echo 
   echo "Production or Staging? [Production]"
   read build_env
@@ -127,7 +128,7 @@ function setup_server_config {
   echo "We use LetsEncrypt (https://letsencrypt.org/) to make sure your server is safe."
   echo "But we need your hostname as where you want the server responds from browsers and an email."
   echo "* * * * * * * * * * * * * * * * * * * *"
-  echo "Enter your hostname (e.g. google.com):"
+  echo "Enter your hostname without http and slash (e.g. google.com instead of http://google.com/):"
   read smeiot_server_hostname
   echo 
   echo "LetsEncrypt__DomainNames__0=$smeiot_server_hostname" | sudo tee -a $SMEIOT_ROOT/server_env

@@ -5,6 +5,7 @@ Description=SMEIoT Web Server
 Documentation=https://github.com/ulfjen/SMEIoT/blob/master/samples/smeiot.service.sample
 After=network-online.target postgresql.service
 Wants=network-online.target postgresql.service
+StartLimitIntervalSec=0
 
 [Service]
 Type=exec
