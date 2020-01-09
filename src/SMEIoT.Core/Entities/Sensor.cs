@@ -1,30 +1,22 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using NodaTime;
 
 namespace SMEIoT.Core.Entities
 {
-  public class Sensor : IAuditTimestamp
+  public class Sensor : MqttEntityBase
   {
-    [Key]
-    public long Id { get; set; }
-    
-    public string Name { get; set; } = null!;
-    public string NormalizedName { get; set; } = null!;
-    
     [Required]
     public long DeviceId { get; set; }
-    public Device Device { get; set; } = null!;
-    public List<UserSensor> UserSensors { get; set; } = null!;
-
-    public List<SensorValue> SensorValues { get; set; } = null!;
-    
-    public Instant CreatedAt { get; set; }
-    public Instant UpdatedAt { get; set; }
-
-    public static string NormalizeName(string name)
+    private Device? _device = null;
+    public Device Device
     {
-      return name.ToUpperInvariant();
+      get => _device ?? throw new InvalidOperationException("Uninitialized property: " + nameof(Device));
+      set => _device = value;
     }
+    public List<UserSensor> UserSensors { get; set; } = new List<UserSensor>();
+
+    public List<SensorValue> SensorValues { get; set; } = new List<SensorValue>();
   }
 }

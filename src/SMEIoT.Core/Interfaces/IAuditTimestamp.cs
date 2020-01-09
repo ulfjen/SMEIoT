@@ -1,6 +1,6 @@
 ﻿using NodaTime;
 
-namespace SMEIoT.Core
+namespace SMEIoT.Core.Interfaces
 {
   public interface IAuditTimestamp
   {

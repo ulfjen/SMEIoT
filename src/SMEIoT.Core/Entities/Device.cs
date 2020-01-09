@@ -1,32 +1,14 @@
+using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using NodaTime;
+using SMEIoT.Core.Interfaces;
 
 namespace SMEIoT.Core.Entities
 {
-  public class Device : IAuditTimestamp
+  public class Device : MqttEntityBase
   {
-    [Key]
-    public long Id { get; set; }
-    
-    public string Name { get; set; } = null!;
-    public string NormalizedName { get; set; } = null!;
-    
-    public Instant CreatedAt { get; set; }
-    public Instant UpdatedAt { get; set; }
-
     public DeviceAuthenticationType AuthenticationType { get; set; }
     public string? PreSharedKey { get; set; }
-    /// Cached connection status for last 10 minutes
-    public bool Connected { get; set; }
-    public Instant? ConnectedAt { get; set; }
-    public Instant? LastMessageAt { get; set; }
 
-    public List<Sensor> Sensors { get; set; } = null!;
-
-    public static string NormalizeName(string name)
-    {
-      return name.ToUpperInvariant();
-    }
+    public List<Sensor> Sensors { get; set; } = new List<Sensor>();
   }
 }
