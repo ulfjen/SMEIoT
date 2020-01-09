@@ -22,11 +22,9 @@ import { GetDefaultApiConfig } from "../index";
 import LoadFactors from "../components/LoadFactors";
 import StatusBadge from "../components/StatusBadge";
 import { ReactComponent as Broker } from "../images/broker.svg";
+import CardContent from "@material-ui/core/CardContent";
 
 const styles = ({ transitions, spacing }: Theme) => createStyles({
-  root: {
-    padding: 16,
-  },
   media: {
     height: "60%",
     filter: "brightness(0) invert(1)"
@@ -90,7 +88,7 @@ const _BasicBrokerCard: React.FunctionComponent<IBasicBrokerCard> = ({ classes, 
   useInterval(updateBroker, 10000);
 
   return <Card>
-    <CardActionArea className={classes.root} component={ReachLink} to={"/dashboard/devices"}>
+    <CardActionArea component={ReachLink} to={"/dashboard/devices"}>
       <ExpandedCardHeader
         title={loading ? <Skeleton variant="rect" width={100} height={25} /> : <Typography variant="h5" color="primary" display="block">
           {intl.formatMessage(messages.title)}</Typography>}
@@ -102,6 +100,7 @@ const _BasicBrokerCard: React.FunctionComponent<IBasicBrokerCard> = ({ classes, 
         </StatusBadge>}
         avatar={avatar && <Broker className={classes.media} />}
       />
+      <CardContent>
       <div className={classes.secondary}>
         {loading ? <Skeleton variant="rect" width={200} height={10} /> : null}
       </div>
@@ -119,6 +118,8 @@ const _BasicBrokerCard: React.FunctionComponent<IBasicBrokerCard> = ({ classes, 
             />)
         }
       </Typography>
+      </CardContent>
+      
     </CardActionArea>
   </Card>;
 };

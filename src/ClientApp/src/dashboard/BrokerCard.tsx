@@ -37,9 +37,6 @@ const styles = ({ spacing, transitions }: Theme) => createStyles({
       duration: transitions.duration.shortest
     })
   },
-  header: {
-    padding: 16
-  },
   media: {
     height: "60%",
     filter: "brightness(0) invert(1)"
@@ -133,7 +130,6 @@ const _BrokerCard: React.FunctionComponent<IBrokerCard> = ({ classes }) => {
   return (
     <Card>
       <ExpandedCardHeader
-        className={classes.header}
         action={
           <IconButton
             aria-label={intl.formatMessage(messages.more)}

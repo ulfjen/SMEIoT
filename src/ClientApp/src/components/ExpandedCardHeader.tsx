@@ -9,6 +9,7 @@ import Typography from "@material-ui/core/Typography";
 
 const styles = ({ transitions, spacing }: Theme) => createStyles({
   root: {
+    padding: 16,
     display: 'flex',
     flexDirection: "column"
   },

@@ -3,36 +3,56 @@ import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
-import { emphasize } from "@material-ui/core/styles/colorManipulator";
-import { default as Typography, TypographyProps } from "@material-ui/core/Typography";
-import IconButton from "@material-ui/core/IconButton";
+import { TypographyProps } from "@material-ui/core/Typography";
 
-const styles = ({ palette, spacing, transitions, zIndex, mixins, breakpoints }: Theme) => createStyles({
+const styles = ({ palette, spacing, typography, transitions, zIndex, mixins, breakpoints }: Theme) => createStyles({
+  line: {
+    display: "flex",
+    alignItems: "center",
+  },
   root: {
+    display: "inline-block"
+  },
+  labels: {
+    display: "inline-block",
+    marginRight: 10,
+    fontSize: "1.15rem",
+    fontWeight: typography.fontWeightLight,
+    fontFamily: typography.fontFamily,
+    lineHeight: 1.5,
+    "& > span": {
+      "&:first-child": {
+        paddingLeft: 0
+      },
+      paddingLeft: 5
+    },
+  },
+  divider: {
+    color: palette.divider
   }
 });
 
 export interface ITwoLayerLabelActionProps extends WithStyles<typeof styles> {
-  firstLabel: string;
-  secondLabel: string;
-  firstLabelVariant?: TypographyProps["variant"];
-  actionIcon?: React.ReactNode;
-  actionIconDisabled?: boolean;
-  actionIconOnClick?: React.MouseEventHandler<HTMLButtonElement>;
+  first: string;
+  second: string;
+  firstVariant?: TypographyProps["variant"];
+  action?: React.ReactNode;
 }
 
 const _TwoLayerLabelAction: React.FunctionComponent<ITwoLayerLabelActionProps & WithStyles<typeof styles>> = ({
-  classes, firstLabel, secondLabel, firstLabelVariant, actionIcon, actionIconDisabled, actionIconOnClick
+  classes, first, second, firstVariant, action
 }) => {
-  let variant = firstLabelVariant || "inherit";
-  
+  let variant = firstVariant || "inherit";
+
   return <div className={classes.root}>
-    <Typography component="span" variant={variant}>{firstLabel}</Typography> / <Typography component="span">{secondLabel}</Typography>
-    {actionIconOnClick && actionIcon ?
-      <IconButton aria-label="toggle password visibility" disabled={actionIconDisabled} onClick={actionIconOnClick}>
-        {actionIcon}
-      </IconButton>: null}
-  </div>;
+    <div className={classes.line}>
+      <div className={classes.labels}>
+        <span>{first}</span>
+        <span className={classes.divider}>/</span>
+        <span>{second}</span>
+      </div>
+      {action}
+    </div></div>;
 };
 
 
