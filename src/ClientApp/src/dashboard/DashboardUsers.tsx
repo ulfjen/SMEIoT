@@ -40,7 +40,6 @@ import Avatar from '@material-ui/core/Avatar';
 import { UserAvatar } from "..";
 import IconButton from '@material-ui/core/IconButton';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import Measure from 'react-measure';
 
 const styles = ({ palette, spacing, transitions, zIndex, mixins, breakpoints }: Theme) => createStyles({
   container: {
@@ -104,8 +103,8 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({ classe
   const [focusedUserName, setFocusedUserName] = React.useState<null | string>(null);
   const [dialogOpen, setDiaglogOpen] = React.useState<boolean>(false);
   const [hasNextPage, setHasNextPage] = React.useState<boolean>(true);
-  const [menuAnchor, menuItem, handleMenuClose, openMenu] = useMenu();
-  const openMenucb = React.useCallback(openMenu, []);
+  const [menuAnchor, menuItem, handleMenuClose, openMenu1] = useMenu();
+  const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
 
   const handleEdit = React.useCallback(e => {
     e.stopPropagation();
@@ -128,9 +127,13 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({ classe
     setDiaglogOpen(false);
   }, [setDiaglogOpen]);
 
-  const innerListType = React.forwardRef((props, ref: React.Ref<HTMLUListElement>) => (
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const innerListType = React.useMemo(() => React.forwardRef((props, ref: React.Ref<HTMLUListElement>) => (
     <List ref={ref} {...props} />
-  ));
+  )), []);
   const isUserLoaded = (index: number) => !hasNextPage || index < users.length;
   const loadMoreUsers = (startIndex: number, stopIndex: number) => {
     return new AdminUsersApi(GetDefaultApiConfig()).apiAdminUsersGet({
@@ -140,6 +143,8 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({ classe
       if (!result.users) {
         return;
       }
+      handleClose();
+
       const newUsers = users.concat(result.users);
       setUsers(newUsers);
       if (result.total && newUsers.length >= result.total) {
@@ -152,23 +157,28 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({ classe
   // for loading indicator
   const userCount = hasNextPage ? users.length + 1 : users.length;
 
+  const openMenu = React.useCallback(e => {
+    e.stopPropagation();
+    setAnchorEl(e.currentTarget);
+    console.log("target", e.currentTarget);
+  }, []);
+
+  console.log("anchorEl", anchorEl);
+
+  const initialHeight = userCount * ITEM_SIZE;
   const containerRef = React.createRef<HTMLElement>();
   const measureRef = React.createRef<HTMLDivElement>();
-  const [listHeight, setListHeight] = React.useState(userCount * ITEM_SIZE);
-  const [listWidtih, setListWidth] = React.useState(-1);
-
-  const callback = () => {
+  const [width, setWidth] = React.useState(-1);
+  const [height, setHeight] = React.useState(initialHeight);
+  const measureAvailbleViewport = () => {
     if (measureRef.current && containerRef.current) {
-    const docHeight = containerRef.current.getBoundingClientRect().height;
-    setListHeight(Math.min(userCount * ITEM_SIZE, docHeight - measureRef.current.getBoundingClientRect().top - FRAME_PADDING));
-    setListWidth(measureRef.current.getBoundingClientRect().width);
+      const docHeight = containerRef.current.getBoundingClientRect().height;
+      const measureRect = measureRef.current.getBoundingClientRect();
+      setHeight(Math.min(userCount * ITEM_SIZE, docHeight - measureRect.top - FRAME_PADDING));
+      setWidth(measureRect.width);
     }
   }
-
-  React.useEffect(() => {
-    callback();
-
-  }, [callback]);
+  React.useEffect(() => measureAvailbleViewport(), [measureAvailbleViewport]);
 
   const userItemRenderer = React.useCallback(({ index, style }: {
     index: number,
@@ -176,25 +186,23 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({ classe
   }) => {
     console.log("rendering", index);
     return index === users.length ? <ListItem key={-1} style={style}>
-      <ListItemAvatar>
-        <Skeleton variant="circle" width={40} height={40} />
-      </ListItemAvatar>
-  
-      <ListItemText disableTypography primary={<Skeleton variant="rect" width={200} height={17} />} secondary={<Skeleton variant="text" />} />
-    </ListItem> :
-      <ListItem key={index} style={style} >
+        <ListItemAvatar>
+          <Skeleton variant="circle" width={40} height={40} />
+        </ListItemAvatar>
+
+        <ListItemText disableTypography primary={<Skeleton variant="rect" width={200} height={17} />} secondary={<Skeleton variant="text" />} />
+      </ListItem> :
+      <ListItem key={index} style={style} data-key={users[index].userName} >
         <ListItemAvatar>
           <Avatar>
             {UserAvatar.getInstance().getSvg(users[index].userName || "")}
           </Avatar>
         </ListItemAvatar>
-  
-        <ListItemText primary={users[index].userName} secondary={null} />
-        <div>
-          <IconButton edge="end" onClick={(event) => openMenu(event.currentTarget, index)}>
-            <MoreVertIcon />
-          </IconButton>
-        </div>
+
+        <ListItemText primary={users[index].userName} secondary={intl.formatMessage(messages.seen, { seen: moment(users[index].lastSeenAt).fromNow() })} />
+        <IconButton edge="end" onClick={openMenu}>
+          <MoreVertIcon />
+        </IconButton>
       </ListItem>;
   }, [users, openMenu]);
 
@@ -210,7 +218,7 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({ classe
           <Typography>Show:</Typography>
           <Chip label="Admin" />
         </Paper>
-        <div ref={measureRef} className={classes.card}>
+        <Paper ref={measureRef} className={classes.card}>
           <InfiniteLoader
             isItemLoaded={isUserLoaded}
             itemCount={userCount}
@@ -219,8 +227,8 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({ classe
             {({ onItemsRendered, ref }) => (
               <FixedSizeList
                 className={classes.list}
-                height={listHeight}
-                width={listWidtih}
+                height={height}
+                width={width}
                 itemCount={userCount}
                 itemSize={ITEM_SIZE}
                 onItemsRendered={onItemsRendered}
@@ -231,16 +239,15 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({ classe
               </FixedSizeList>
             )}
           </InfiniteLoader>
-          </div>
+        </Paper>
 
         <Menu
-          anchorEl={menuAnchor}
-          keepMounted
-          open={Boolean(menuAnchor)}
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
           className={classes.usersMenu}
-          onClose={handleMenuClose}
+          onClose={handleClose}
         >
-          <MenuItem onClick={handleMenuClose} to={`/dashboard/users/${focusedUserName}`} component={Link}>Edit</MenuItem>
+          <MenuItem onClick={handleClose} to={`/dashboard/users/${focusedUserName}`} component={Link}>Edit</MenuItem>
           <MenuItem className={classes.usersMenuDeleteItem} onClick={handleDelete}>Delete</MenuItem>
         </Menu>
         <Dialog
