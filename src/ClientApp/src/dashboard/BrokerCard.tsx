@@ -180,7 +180,6 @@ const _BrokerCard: React.FunctionComponent<IBrokerCard> = ({ classes }) => {
       </CardActions>
       <Menu
         anchorEl={anchorEl}
-        keepMounted
         open={Boolean(anchorEl)}
         onClose={handleClose}
       >

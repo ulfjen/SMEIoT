@@ -63,7 +63,6 @@ const _UserAvatarMenu: React.FunctionComponent<IUserAvatarMenuProps & WithStyles
         vertical: 'top',
         horizontal: 'right',
       }}
-      keepMounted
       transformOrigin={{
         vertical: 'top',
         horizontal: 'right',

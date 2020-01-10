@@ -40,6 +40,7 @@ import Avatar from '@material-ui/core/Avatar';
 import { UserAvatar } from "..";
 import IconButton from '@material-ui/core/IconButton';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
+import useModal from "../helpers/useModal";
 
 const styles = ({ palette, spacing, transitions, zIndex, mixins, breakpoints }: Theme) => createStyles({
   container: {
@@ -101,35 +102,29 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({ classe
 
   const [users, setUsers] = React.useState<Array<AdminUserApiModel>>([]);
   const [focusedUserName, setFocusedUserName] = React.useState<null | string>(null);
-  const [dialogOpen, setDiaglogOpen] = React.useState<boolean>(false);
   const [hasNextPage, setHasNextPage] = React.useState<boolean>(true);
-  const [menuAnchor, menuItem, handleMenuClose, openMenu1] = useMenu();
-  const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
+  const [menuOpen, menuAnchorEl, openMenu, closeMenu, menuUserName] = useMenu<string>();
+  const [dialogOpen, openDialog, closeDialog, dialogUserName] = useModal<string>();
 
   const handleEdit = React.useCallback(e => {
     e.stopPropagation();
-    handleMenuClose();
     window.location.href = `/dashboard/users/${focusedUserName}`;
-  }, [handleMenuClose]);
+  }, []);
 
   const handleDelete = React.useCallback(e => {
     e.stopPropagation();
-    handleMenuClose();
-    setDiaglogOpen(true);
-  }, [handleMenuClose, setDiaglogOpen]);
+    openDialog(menuUserName || "");
+    closeMenu();
+  }, [openDialog, closeMenu, menuUserName]);
 
   const handleDialogClose = React.useCallback(e => {
     e.stopPropagation();
-    setDiaglogOpen(false);
-  }, [setDiaglogOpen]);
+    closeDialog();
+  }, [closeDialog]);
 
   const handleDeleteClose = React.useCallback(async (e) => {
-    setDiaglogOpen(false);
-  }, [setDiaglogOpen]);
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+    closeDialog()
+  }, [closeDialog]);
 
   const innerListType = React.useMemo(() => React.forwardRef((props, ref: React.Ref<HTMLUListElement>) => (
     <List ref={ref} {...props} />
@@ -143,7 +138,7 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({ classe
       if (!result.users) {
         return;
       }
-      handleClose();
+      closeMenu();
 
       const newUsers = users.concat(result.users);
       setUsers(newUsers);
@@ -157,13 +152,7 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({ classe
   // for loading indicator
   const userCount = hasNextPage ? users.length + 1 : users.length;
 
-  const openMenu = React.useCallback(e => {
-    e.stopPropagation();
-    setAnchorEl(e.currentTarget);
-    console.log("target", e.currentTarget);
-  }, []);
-
-  console.log("anchorEl", anchorEl);
+  console.log("menu anchorEl", menuAnchorEl);
 
   const initialHeight = userCount * ITEM_SIZE;
   const containerRef = React.createRef<HTMLElement>();
@@ -192,7 +181,7 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({ classe
 
         <ListItemText disableTypography primary={<Skeleton variant="rect" width={200} height={17} />} secondary={<Skeleton variant="text" />} />
       </ListItem> :
-      <ListItem key={index} style={style} data-key={users[index].userName} >
+      <ListItem key={index} style={style}>
         <ListItemAvatar>
           <Avatar>
             {UserAvatar.getInstance().getSvg(users[index].userName || "")}
@@ -200,7 +189,7 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({ classe
         </ListItemAvatar>
 
         <ListItemText primary={users[index].userName} secondary={intl.formatMessage(messages.seen, { seen: moment(users[index].lastSeenAt).fromNow() })} />
-        <IconButton edge="end" onClick={openMenu}>
+        <IconButton edge="end" onClick={(event) => {console.log("opening menu with", users[index].userName); openMenu(event.currentTarget, users[index].userName)}}>
           <MoreVertIcon />
         </IconButton>
       </ListItem>;
@@ -242,12 +231,12 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({ classe
         </Paper>
 
         <Menu
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
+          anchorEl={menuAnchorEl}
+          open={menuOpen}
           className={classes.usersMenu}
-          onClose={handleClose}
+          onClose={closeMenu}
         >
-          <MenuItem onClick={handleClose} to={`/dashboard/users/${focusedUserName}`} component={Link}>Edit</MenuItem>
+          <MenuItem onClick={closeMenu} to={`/dashboard/users/${menuUserName}`} component={Link}>Edit</MenuItem>
           <MenuItem className={classes.usersMenuDeleteItem} onClick={handleDelete}>Delete</MenuItem>
         </Menu>
         <Dialog
@@ -256,10 +245,10 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({ classe
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
-          <DialogTitle>Delete account {focusedUserName}?</DialogTitle>
+          <DialogTitle>Delete account {dialogUserName}?</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              Delete the user will disable its access to the system and asscociated users.
+              Delete the user will disable its access to the system. And this may result in unexpected behaviour.
             </DialogContentText>
           </DialogContent>
           <DialogActions>

@@ -1,20 +1,19 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import useModal from "./useModal";
 
-export default function useMenu(): [HTMLElement | null, any | null, () => void, (anchorEl: HTMLElement, item: any) => void] {
-  const [anchorElement, handleModalClose, openModal] = useModal(null);
-  const [menuItem, setMenuItem] = useState<any | null>(null);
+export default function useMenu<T>(): [boolean, HTMLElement | null, (el: HTMLElement, value: T) => void, () => void, T | undefined] {
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [open, openModal, closeModal, value] = useModal<T>();
 
-  const handleMenuClose = () => {
-    handleModalClose();
-    setMenuItem(null);
-  };
+  const closeMenu = useCallback(() => {
+    closeModal();
+    setAnchorEl(null);
+  }, []);
 
-  const openMenu = (anchorEl: HTMLElement, item: any) => {
-    // openModal(anchorEl);
-    console.log(anchorEl);
-    setMenuItem(item);
-  };
+  const openMenu = useCallback((el: HTMLElement, value: T) => {
+    setAnchorEl(el);
+    openModal(value);
+  }, []);
 
-  return [anchorElement, menuItem, handleMenuClose, openMenu];
+  return [open, anchorEl, openMenu, closeMenu, value];
 }
