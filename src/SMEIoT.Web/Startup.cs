@@ -113,7 +113,6 @@ namespace SMEIoT.Web
           c.SwaggerDoc("v1", new OpenApiInfo { Title = "SMEIoT API", Version = "v1" });
         });
       }
-      services.AddRazorPages();
       services.AddSignalR();
       services.AddSingleton<MqttMessageHubDeliveryService>(provider =>
       {
@@ -189,7 +188,6 @@ namespace SMEIoT.Web
 
       app.UseEndpoints(endpoints =>
       {
-        endpoints.MapRazorPages();
         endpoints.MapControllerRoute("create_login", "/login", new { controller = "Sessions", action = "Create" });
         endpoints.MapControllerRoute("destroy_login", "/logout", new { controller = "Sessions", action = "Destroy" },
           new { httpMethod = new HttpMethodRouteConstraint(nameof(HttpMethod.Delete)) });
