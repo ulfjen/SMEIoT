@@ -239,7 +239,8 @@ namespace SMEIoT.Core.Services
     {
       var ids = new List<long>(); 
       if (roles == null) { return ids; }
-      await Task.WhenAll(roles.Select(async (roleName) => 
+      // model binding can return null!
+      await Task.WhenAll(roles.Where(s => s != null).Select(async (roleName) => 
       {
         var role = await _roleManager.FindByNameAsync(roleName);
         if (role == null) {

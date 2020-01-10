@@ -1,10 +1,12 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Extensions.Hosting;
 using SMEIoT.Core.Exceptions;
 
 namespace SMEIoT.Web.Api.Filters
@@ -16,10 +18,12 @@ namespace SMEIoT.Web.Api.Filters
   {
     public int Order { get; } = 1;
     private ProblemDetailsFactory _pdFactory;
+    private readonly IWebHostEnvironment _env;
 
-    public ActionExceptionFilter(ProblemDetailsFactory pdFactory)
+    public ActionExceptionFilter(ProblemDetailsFactory pdFactory, IWebHostEnvironment env)
     {
       _pdFactory = pdFactory;
+      _env = env;
     }
 
     public Task OnExceptionAsync(ExceptionContext context)
@@ -39,10 +43,12 @@ namespace SMEIoT.Web.Api.Filters
           context.Result = new UnprocessableEntityObjectResult(_pdFactory.CreateProblemDetails(context.HttpContext, StatusCodes.Status422UnprocessableEntity, null, null, exception.Message));
           break;
         case InternalException exception:
-          context.Result = new ObjectResult(_pdFactory.CreateProblemDetails(context.HttpContext, StatusCodes.Status500InternalServerError, null, null, exception.Message)) { StatusCode = StatusCodes.Status500InternalServerError };
+          goto default;
+          // context.Result = new ObjectResult(_pdFactory.CreateProblemDetails(context.HttpContext, StatusCodes.Status500InternalServerError, null, null, exception.Message)) { StatusCode = StatusCodes.Status500InternalServerError };
           break;
         default:
-          context.Result = new ObjectResult(_pdFactory.CreateProblemDetails(context.HttpContext, StatusCodes.Status500InternalServerError, null, null, "Unhandled exception.")) { StatusCode = StatusCodes.Status500InternalServerError };
+          var message = _env.IsProduction() ? "" : context.Exception.Message;
+          context.Result = new ObjectResult(_pdFactory.CreateProblemDetails(context.HttpContext, StatusCodes.Status500InternalServerError, null, null, $"Unhandled exception. {message}")) { StatusCode = StatusCodes.Status500InternalServerError };
           break;
       }
       
