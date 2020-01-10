@@ -1,4 +1,5 @@
 import * as React from "react";
+import clsx from "clsx";
 import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
@@ -38,14 +39,15 @@ const styles = ({ palette, typography }: Theme) => createStyles({
 export interface ITwoLayerLabelActionProps extends WithStyles<typeof styles> {
   first: string;
   second: string;
+  className?: string;
   greyoutFirst?: boolean;
   action?: React.ReactNode;
 }
 
 const _TwoLayerLabelAction: React.FunctionComponent<ITwoLayerLabelActionProps & WithStyles<typeof styles>> = ({
-  classes, first, second, greyoutFirst, action
+  classes, first, second, greyoutFirst, action, className
 }) => {
-  return <div className={classes.root}>
+  return <div className={clsx(classes.root, className)}>
     <div className={classes.line}>
       <div className={classes.labels}>
         <span className={greyoutFirst ? classes.greyout : undefined}>{first}</span>

@@ -5,15 +5,11 @@ import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Card from "@material-ui/core/Card";
 import CardActionArea from "@material-ui/core/CardActionArea";
-import Avatar from "@material-ui/core/Avatar";
-import IconButton from "@material-ui/core/IconButton";
 import Typography from "@material-ui/core/Typography";
 import Skeleton from "@material-ui/lab/Skeleton";
 import { defineMessages, useIntl, FormattedMessage } from "react-intl";
 import {
   Link as ReachLink,
-  LinkProps as ReachLinkProps,
-  RouteComponentProps
 } from "@reach/router";
 import useInterval from "../helpers/useInterval";
 import ExpandedCardHeader from "../components/ExpandedCardHeader";
@@ -97,7 +93,7 @@ const _BasicBrokerCard: React.FunctionComponent<IBasicBrokerCard> = ({ classes, 
         >
           {loading ? <Skeleton variant="rect" width={60} height={14} /> : intl.formatMessage(broker.running ? messages.running : messages.stopped)}
         </StatusBadge>}
-        avatar={avatar && <Broker className={classes.media} />}
+        avatar={avatar && (loading ? <Skeleton variant="circle" width={40} height={40} /> : <Broker className={classes.media} />)}
       />
       <CardContent>
         <div className={classes.secondary}>
@@ -110,11 +106,11 @@ const _BasicBrokerCard: React.FunctionComponent<IBasicBrokerCard> = ({ classes, 
               description="Running instruction on the broker card when the broker runs normally."
               defaultMessage="The broker is operating."
             /> : <FormattedMessage
-              id="dashboard.components.basic_broker_card.instruct_stopped"
-              description="Running instruction on the broker card when the broker stopped."
-              defaultMessage="The broker is stopped. Please wait a few seconds."
-            />}
-            </Typography>}
+                id="dashboard.components.basic_broker_card.instruct_stopped"
+                description="Running instruction on the broker card when the broker stopped."
+                defaultMessage="The broker is stopped. Please wait a few seconds."
+              />}
+          </Typography>}
 
       </CardContent>
 

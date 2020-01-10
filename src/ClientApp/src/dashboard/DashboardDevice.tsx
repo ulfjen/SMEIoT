@@ -50,6 +50,8 @@ import ListItem from "@material-ui/core/ListItem";
 import List from "@material-ui/core/List";
 import CardActions from "@material-ui/core/CardActions";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
 
 const styles = ({ typography, palette, spacing }: Theme) => createStyles({
   container: {
@@ -108,7 +110,7 @@ const styles = ({ typography, palette, spacing }: Theme) => createStyles({
     alignItems: 'center',
   },
   warning: {
-    color: palette.error.main
+    color: palette.text.secondary
   },
   list: {
     marginTop: 20
@@ -193,7 +195,7 @@ const messages = defineMessages({
       description: "Aria Label on sensor connection component's action",
       defaultMessage: "Connect sensor to the device"
     },
-    
+
   }
 });
 
@@ -249,7 +251,7 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
         className={classes.summary}
       >
         <div className={classes.column}>
-          <Typography className={classes.heading}>{sensor}</Typography>
+          <TwoLayerLabelAction className={classes.heading} greyoutFirst first={"masses-pavy"} second={sensor} />
         </div>
         <div className={classes.column} />
       </ExpansionPanelSummary>
@@ -270,7 +272,7 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
       <Divider />
       <ExpansionPanelActions>
         <Button size="small" className={classes.warning}>Disconnect</Button>
-        <Button size="small" color="primary">
+        <Button size="small" variant="contained" color="primary">
           Assign
       </Button>
       </ExpansionPanelActions>
@@ -328,6 +330,33 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
     }
     content={
       <Container maxWidth="lg" className={classes.container}>
+        {/* <Menu
+        anchorEl={anchorEl}
+        keepMounted
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
+      >
+        <MenuItem
+          button
+          to={`/dashboard/devices/${anchoredDeviceName}`}
+          component={ReachLink}
+          onClick={handleClose}
+        >
+        <MenuItem button onClick={handleClose}>
+          <FormattedMessage
+            id="dashboard.broker.actions.authenticate"
+            description="The action for device card."
+            defaultMessage="Manage authentication"
+          />
+        </MenuItem>
+        <MenuItem button onClick={handleClose}>
+          <FormattedMessage
+            id="dashboard.broker.actions.delete"
+            description="The action for device card."
+            defaultMessage="Delete"
+          />
+        </MenuItem>
+      </Menu> */}
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} aria-label="breadcrumb">
@@ -352,15 +381,15 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
               <ExpandedCardHeader
                 title={state.loading ? <Skeleton variant="rect" width={240} height={30} /> : state.value && state.value.name}
                 status={<StatusBadge
-                    severity={state.value !== undefined ? (state.value.connected ? "success" : "error") : "error"} 
-                    badge={state.loading && <Skeleton variant="circle" height={14} width={14} />}
-                  >
-                    {state.loading ? <Skeleton variant="rect" width={100} height={14} /> : state.value && intl.formatMessage(state.value.connected ? messages.status.connected : messages.status.notConnected)}
-                  </StatusBadge>}
+                  severity={state.value !== undefined ? (state.value.connected ? "success" : "error") : "error"}
+                  badge={state.loading && <Skeleton variant="circle" height={14} width={14} />}
+                >
+                  {state.loading ? <Skeleton variant="rect" width={100} height={14} /> : state.value && intl.formatMessage(state.value.connected ? messages.status.connected : messages.status.notConnected)}
+                </StatusBadge>}
                 action={
                   <IconButton
                     aria-label={intl.formatMessage(messages.moreAria)}
-                    onClick={() => {}}
+                    onClick={() => { }}
                   >
                     <MoreVertIcon />
                   </IconButton>
@@ -368,20 +397,18 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
               />
               <CardContent>
                 {state.loading ? <div><Skeleton variant="text" /><Skeleton variant="text" /><Skeleton variant="text" /></div> : <Typography variant="body2" color="textSecondary" component="p">
-                some instructions
+                  some instructions
               </Typography>}
               </CardContent>
-              <CardActions>
-        <Button size="small" className={classes.warning}>
-          Delete
-        </Button>
-        <Button size="small" color="primary">
-          Manage authentication
-        </Button>
-        <Button size="small" color="primary">
-          Logs
-        </Button>
-      </CardActions>
+              {!state.loading && state.value && <CardActions>
+                <Button size="small" color="primary" component={ReachLink} to={`/dashboard/broker/logs?device_name=${state.value.name}`}>
+                  <FormattedMessage
+                    id="dashboard.device.show.actions.logs"
+                    description="The action for device cards."
+                    defaultMessage="Logs"
+                  />
+                </Button>
+              </CardActions>}
             </Card>
           </Grid>
           <Grid item xs={12}>

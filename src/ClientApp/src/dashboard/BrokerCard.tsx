@@ -7,7 +7,7 @@ import Typography from "@material-ui/core/Typography";
 import Card from "@material-ui/core/Card";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
-import CardHeader from "@material-ui/core/CardHeader";
+import Box from "@material-ui/core/Box";
 import CardContent from "@material-ui/core/CardContent";
 import CardActions from "@material-ui/core/CardActions";
 import IconButton from "@material-ui/core/IconButton";
@@ -41,6 +41,12 @@ const styles = ({ spacing, transitions }: Theme) => createStyles({
     height: "60%",
     filter: "brightness(0) invert(1)"
   },
+  buttonLoading: {
+    "& > div": {
+      marginLeft: spacing(1),
+      display: "inline-block"
+    }
+  }
 });
 
 export interface IBrokerCard extends WithStyles<typeof styles> { }
@@ -131,6 +137,7 @@ const _BrokerCard: React.FunctionComponent<IBrokerCard> = ({ classes }) => {
     <Card>
       <ExpandedCardHeader
         action={
+          !loading &&
           <IconButton
             aria-label={intl.formatMessage(messages.more)}
             onClick={handleClick}
@@ -140,29 +147,36 @@ const _BrokerCard: React.FunctionComponent<IBrokerCard> = ({ classes }) => {
         }
         title={loading ? <Skeleton variant="rect" width={100} height={25} /> : intl.formatMessage(messages.title)}
         status={<StatusBadge
-          severity={running ? "success" : "error"} 
+          severity={running ? "success" : "error"}
           badge={loading && <Skeleton variant="circle" height={14} width={14} />}
         >
           {loading ? <Skeleton variant="rect" width={60} height={14} /> : intl.formatMessage(running ? messages.running : messages.stopped)}
         </StatusBadge>}
-        avatar={<Broker className={classes.media} />}
+        avatar={loading ? <Skeleton variant="circle" height={40} width={40} /> : <Broker className={classes.media} />}
       />
       <CardContent>
-        {/* <Typography variant="body2" color="textSecondary" component="p"> */}
-        <p>Received Messages {statistics.receivedMessages}</p>
-        {/* </Typography> */}
+        {loading ?
+          <div>
+            <Skeleton variant="text" /><Skeleton variant="text" /><Skeleton variant="text" />
+          </div>
+          : <p>Received Messages {statistics.receivedMessages}</p>
+        }
       </CardContent>
       <CardActions disableSpacing>
-        <Button
-          size="small"
-          component={ReachLink}
-          to="/dashboard/broker/statistics"
-        >
-          {intl.formatMessage(messages.statistics)}
-        </Button>
-        <Button size="small" component={ReachLink} to="/dashboard/broker/logs">
-          {intl.formatMessage(messages.logs)}
-        </Button>
+        {loading ? <div className={classes.buttonLoading}><Skeleton variant="rect" width={50} height={22} /><Skeleton variant="rect" width={50} height={22} /></div> :
+          <React.Fragment>
+            <Button
+              size="small"
+              component={ReachLink}
+              to="/dashboard/broker/statistics"
+            >
+              {intl.formatMessage(messages.statistics)}
+            </Button>
+            <Button size="small" component={ReachLink} to="/dashboard/broker/logs">
+              {intl.formatMessage(messages.logs)}
+            </Button>
+          </React.Fragment>
+        }
       </CardActions>
       <Menu
         anchorEl={anchorEl}
