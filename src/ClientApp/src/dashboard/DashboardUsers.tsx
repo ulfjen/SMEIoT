@@ -44,7 +44,6 @@ import Measure from 'react-measure';
 
 const styles = ({ palette, spacing, transitions, zIndex, mixins, breakpoints }: Theme) => createStyles({
   container: {
-    height: '90%'
   },
   list: {
   },
@@ -64,7 +63,6 @@ const styles = ({ palette, spacing, transitions, zIndex, mixins, breakpoints }: 
   item: {
   },
   card: {
-    height: "100%"
   }
 });
 
@@ -92,37 +90,10 @@ const messages = defineMessages({
 const USERS_PER_REQ = 10;
 
 
-const _userItemRenderer = ({ index, style, data }: {
-  index: number,
-  style: React.CSSProperties,
-  data: [Array<AdminUserApiModel>, (anchor: HTMLElement, item: any) => void]
-}) => {
-  console.log(index, data);
-  const [users, openMenu] = data;
-  return index === users.length ? <ListItem key={-1} style={style}>
-    <ListItemAvatar>
-      <Skeleton variant="circle" width={40} height={40} />
-    </ListItemAvatar>
 
-    <ListItemText disableTypography primary={<Skeleton variant="rect" width={200} height={17} />} secondary={<Skeleton variant="text" />} />
-  </ListItem> :
-    <ListItem key={index} style={style} >
-      <ListItemAvatar>
-        <Avatar>
-          {UserAvatar.getInstance().getSvg(users[index].userName || "")}
-        </Avatar>
-      </ListItemAvatar>
+const ITEM_SIZE = 72;
+const FRAME_PADDING = 24;
 
-      <ListItemText primary={users[index].userName} secondary={null} />
-      <div>
-        <IconButton edge="end" onClick={(event) => openMenu(event.currentTarget, index)}>
-          <MoreVertIcon />
-        </IconButton>
-      </div>
-    </ListItem>;
-};
-
-const userItemRenderer = React.memo(_userItemRenderer, areEqual);
 const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({ classes, navigate }) => {
   const intl = useIntl();
   const appCookie = useAppCookie();
@@ -170,26 +141,68 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({ classe
         return;
       }
       const newUsers = users.concat(result.users);
-      console.log(`setting newUser ${newUsers} `)
       setUsers(newUsers);
       if (result.total && newUsers.length >= result.total) {
         setHasNextPage(false);
       }
-      console.log(newUsers, result);
+      console.log("setting newUser", newUsers, result);
       return result;
     });
   }
   // for loading indicator
   const userCount = hasNextPage ? users.length + 1 : users.length;
 
-  const [dimensions, setDimensions] = React.useState({
-    width: -1,
-    height: -1,
-  });
+  const containerRef = React.createRef<HTMLElement>();
+  const measureRef = React.createRef<HTMLDivElement>();
+  const [listHeight, setListHeight] = React.useState(userCount * ITEM_SIZE);
+  const [listWidtih, setListWidth] = React.useState(-1);
+
+  const callback = () => {
+    if (measureRef.current && containerRef.current) {
+    const docHeight = containerRef.current.getBoundingClientRect().height;
+    setListHeight(Math.min(userCount * ITEM_SIZE, docHeight - measureRef.current.getBoundingClientRect().top - FRAME_PADDING));
+    setListWidth(measureRef.current.getBoundingClientRect().width);
+    }
+  }
+
+  React.useEffect(() => {
+    callback();
+
+  }, [callback]);
+
+  const userItemRenderer = React.useCallback(({ index, style }: {
+    index: number,
+    style: React.CSSProperties
+  }) => {
+    console.log("rendering", index);
+    return index === users.length ? <ListItem key={-1} style={style}>
+      <ListItemAvatar>
+        <Skeleton variant="circle" width={40} height={40} />
+      </ListItemAvatar>
+  
+      <ListItemText disableTypography primary={<Skeleton variant="rect" width={200} height={17} />} secondary={<Skeleton variant="text" />} />
+    </ListItem> :
+      <ListItem key={index} style={style} >
+        <ListItemAvatar>
+          <Avatar>
+            {UserAvatar.getInstance().getSvg(users[index].userName || "")}
+          </Avatar>
+        </ListItemAvatar>
+  
+        <ListItemText primary={users[index].userName} secondary={null} />
+        <div>
+          <IconButton edge="end" onClick={(event) => openMenu(event.currentTarget, index)}>
+            <MoreVertIcon />
+          </IconButton>
+        </div>
+      </ListItem>;
+  }, [users, openMenu]);
+
   return <DashboardFrame
     title={intl.formatMessage(messages.title)}
     direction="ltr"
     drawer
+    ref={containerRef}
     toolbarRight={<UserAvatarMenu appCookie={appCookie} navigate={navigate} />}
     content={
       <Container maxWidth="lg" className={classes.container}>
@@ -197,41 +210,28 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({ classe
           <Typography>Show:</Typography>
           <Chip label="Admin" />
         </Paper>
-        <Measure
-          bounds
-          onResize={contentRect => {
-            if (contentRect.bounds) {
-              setDimensions(contentRect.bounds);
-            }
-          }}
-        >
-          {({ measureRef }) => (
-            <Card ref={measureRef} className={classes.card}>
-              <InfiniteLoader
-
-                isItemLoaded={isUserLoaded}
+        <div ref={measureRef} className={classes.card}>
+          <InfiniteLoader
+            isItemLoaded={isUserLoaded}
+            itemCount={userCount}
+            loadMoreItems={loadMoreUsers}
+          >
+            {({ onItemsRendered, ref }) => (
+              <FixedSizeList
+                className={classes.list}
+                height={listHeight}
+                width={listWidtih}
                 itemCount={userCount}
-                loadMoreItems={loadMoreUsers}
+                itemSize={ITEM_SIZE}
+                onItemsRendered={onItemsRendered}
+                ref={ref}
+                innerElementType={innerListType}
               >
-                {({ onItemsRendered, ref }) => (
-                  <FixedSizeList
-                    className={classes.list}
-                    height={dimensions.height}
-                    width={dimensions.width}
-                    itemCount={userCount}
-                    itemSize={72}
-                    onItemsRendered={onItemsRendered}
-                    ref={ref}
-                    innerElementType={innerListType}
-                    itemData={[users, openMenucb]}
-                  >
-                    {userItemRenderer}
-                  </FixedSizeList>
-                )}
-              </InfiniteLoader>
-              )}
-          </Card>)}
-        </Measure>
+                {userItemRenderer}
+              </FixedSizeList>
+            )}
+          </InfiniteLoader>
+          </div>
 
         <Menu
           anchorEl={menuAnchor}

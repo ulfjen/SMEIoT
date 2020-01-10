@@ -72,7 +72,7 @@ export interface IDashboardFrameProps extends WithStyles<typeof styles> {
   drawer?: boolean;
 }
 
-const _DashboardFrame: React.FunctionComponent<IDashboardFrameProps> = ({ classes, title, direction, drawer, content, toolbarRight }) => {
+const _DashboardFrame = React.forwardRef<HTMLElement, IDashboardFrameProps>(({ classes, title, direction, drawer, content, toolbarRight }, ref) => {
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
   const handleDrawerToggle = () => {
@@ -94,7 +94,6 @@ const _DashboardFrame: React.FunctionComponent<IDashboardFrameProps> = ({ classe
     </Hidden>
     <DrawerList />
   </div>;
-
 
   return <div className={classes.root}>
     <CssBaseline />
@@ -148,12 +147,12 @@ const _DashboardFrame: React.FunctionComponent<IDashboardFrameProps> = ({ classe
       </Hidden>
     </nav>
       : null}
-    <main className={classes.content}>
+    <main ref={ref} className={classes.content}>
       <div className={classes.appBarSpacer} />
       {content}
     </main>
   </div>;
-};
+});
 
 const DashboardFrame = withStyles(styles)(_DashboardFrame);
 
