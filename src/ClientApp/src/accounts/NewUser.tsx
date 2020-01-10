@@ -20,8 +20,10 @@ import { FormattedMessage, defineMessages, useIntl } from "react-intl";
 import { useTitle } from 'react-use';
 import ValidationProblemDetails from "../models/ValidationProblemDetails";
 import ErrorBoundary from "../components/ErrorBoundary";
+import Backdrop from "@material-ui/core/Backdrop";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
-const styles = ({ palette, spacing }: Theme) => createStyles({
+const styles = ({ palette, spacing, zIndex }: Theme) => createStyles({
   paper: {
     marginTop: spacing(8),
     display: 'flex',
@@ -34,6 +36,10 @@ const styles = ({ palette, spacing }: Theme) => createStyles({
   },
   submit: {
     margin: spacing(3, 0, 2),
+  },
+  backdrop: {
+    zIndex: zIndex.drawer + 1,
+    color: '#fff',
   },
 });
 
@@ -53,13 +59,17 @@ const _NewUser: React.FunctionComponent<INewUserProps & WithStyles<typeof styles
   const uc = useUserCredentials();
 
   useTitle(intl.formatMessage(messages.title));
+
+  const [loading, setLoading] = React.useState(false);
+
   const handleSubmit = async (event: React.MouseEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (event.target === undefined) {
       return;
     }
     uc.setEntityError("");
-
+    setLoading(true);
+    
     try {
       const result = await new UsersApi(GetDefaultApiConfig()).apiUsersPost({
         validatedUserCredentialsBindingModel: {
@@ -90,12 +100,17 @@ const _NewUser: React.FunctionComponent<INewUserProps & WithStyles<typeof styles
           uc.setPasswordError(err["password"].join("\n"));
         }
       }
+    } finally {
+      setLoading(false);
     }
   };
 
   return <Container component="main" maxWidth="xs">
     <CssBaseline />
     <ErrorBoundary>
+      <Backdrop className={classes.backdrop} open={loading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <div className={classes.paper}>
         <Avatar className={classes.avatar}>
           <LockOutlinedIcon />
@@ -121,7 +136,7 @@ const _NewUser: React.FunctionComponent<INewUserProps & WithStyles<typeof styles
           </Button>
           <Grid container justify="flex-end">
             <Grid item>
-              <Link component={ReachLink} to="/login" variant="body2">
+              <Link color="textPrimary" component={ReachLink} to="/login" variant="body2">
                 <FormattedMessage
                   id="sessions.new.signup_action"
                   description="Action label for redirecting to log in page"
