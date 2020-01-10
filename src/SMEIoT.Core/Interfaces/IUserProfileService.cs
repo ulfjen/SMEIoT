@@ -5,6 +5,6 @@ namespace SMEIoT.Core.Interfaces
 {
   public interface IUserProfileService
   {
-    Task<bool> UpdateUserLastSeenAsync(long userId, DateTime seenAt);
+    Task UpdateUserLastSeenAsync(long userId, DateTime seenAt);
   }
 }

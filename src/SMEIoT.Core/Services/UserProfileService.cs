@@ -14,12 +14,11 @@ namespace SMEIoT.Core.Services
       _dbContext = dbContext;
     }
 
-    public async Task<bool> UpdateUserLastSeenAsync(long userId, DateTime seenAt)
+    public async Task UpdateUserLastSeenAsync(long userId, DateTime seenAt)
     {
       var user = await _dbContext.Users.FindAsync(userId);
       user.LastSeenAt = Instant.FromDateTimeUtc(seenAt);
       await _dbContext.SaveChangesAsync();
-      return true;
     }
   }
 }
