@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using SMEIoT.Core.Entities;
 
 namespace SMEIoT.Core.Interfaces
@@ -14,7 +15,9 @@ namespace SMEIoT.Core.Interfaces
     DbSet<SensorValue> SensorValues { get; set; }
     DbSet<UserSensor> UserSensors { get; set; }
     DbSet<IdentityUserRole<long>> UserRoles { get; set; }
+    DbSet<SettingItem> SettingItems { get; set; }
     DbSet<Device> Devices { get; set; }
+    DatabaseFacade Database { get; }
 
     int SaveChanges();
     Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,

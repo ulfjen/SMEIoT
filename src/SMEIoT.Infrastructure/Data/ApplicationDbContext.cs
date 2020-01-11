@@ -31,6 +31,8 @@ namespace SMEIoT.Infrastructure.Data
 
     public DbSet<UserSensor> UserSensors { get; set; } = null!;
 
+    public DbSet<SettingItem> SettingItems { get; set; } = null!;
+
     // public override DbSet<IdentityUserRole<long>> UserRoles { get; set; }
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IClock clock)

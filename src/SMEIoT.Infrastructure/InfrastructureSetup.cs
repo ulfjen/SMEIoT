@@ -5,6 +5,7 @@ using Microsoft.Extensions.Hosting;
 using NodaTime;
 using System;
 using SMEIoT.Core.Interfaces;
+using SMEIoT.Core.Entities;
 using SMEIoT.Infrastructure.Data;
 using Hangfire;
 using Hangfire.LiteDB;
@@ -69,6 +70,7 @@ namespace SMEIoT.Infrastructure
         services.AddLetsEncrypt();
       }
       services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
+      services.AddSingleton<ISettingsService<Settings>, SettingsService<Settings>>();
       services.AddSingleton<IMqttIdentifierService, MqttIdentifierService>();
       services.AddSingleton<IMosquittoBrokerPidAccessor, MosquittoBrokerPidAccessor>();
       services.AddSingleton<IMosquittoBrokerPluginPidService, MosquittoBrokerPluginPidService>();
