@@ -34,6 +34,8 @@ namespace SMEIoT.Tests.Core.Services
     {
       _dbContext.Database.ExecuteSqlInterpolated($"TRUNCATE user_roles, user_tokens, user_logins, user_claims, role_claims, roles, users RESTART IDENTITY CASCADE;");
       _dbContext.Dispose();
+      _userManager.Dispose();
+      _roleManager.Dispose();
     }
     
     private async Task SeedDefaultRolesAsync()
@@ -41,6 +43,33 @@ namespace SMEIoT.Tests.Core.Services
       foreach (var r in new[] {"roles1", "roles2", "roles3", "Admin"})
       {
         await _roleManager.CreateAsync(new IdentityRole<long>(r));
+      }
+    }
+
+    private async Task<(string, string)> SeedOneUserAsync()
+    {
+      const string userName = "normal-userName-1";
+      const string password = "a-normal-password";
+      await _userManager.CreateAsync(new User {UserName = userName, ConcurrencyStamp = Guid.NewGuid().ToString()},
+        password);
+      return (userName, password);
+    }
+
+    private async Task SeedDefaultUsersAsync()
+    {
+      for (var x = 0; x < 15; ++x)
+      {
+        var userName = $"normal-user-{x+1}";
+        var user = new User {UserName = userName, ConcurrencyStamp = Guid.NewGuid().ToString()};
+        await _userManager.CreateAsync(user,"a-password-1");
+        await _userManager.AddToRolesAsync(await _userManager.FindByNameAsync(userName), new[] {"roles1", "roles2" }); 
+      }
+      for (var x = 0; x < 10; ++x)
+      {
+        var userName = $"user-{x+101}";
+        var user = new User {UserName = userName, ConcurrencyStamp = Guid.NewGuid().ToString()};
+        await _userManager.CreateAsync(user,"a-password-1");
+        await _userManager.AddToRoleAsync(await _userManager.FindByNameAsync(userName), "roles3"); 
       }
     }
 
@@ -94,10 +123,9 @@ namespace SMEIoT.Tests.Core.Services
     [Fact]
     public async Task CreateUserWithPasswordAsync_ThrowsWhenDuplicateUser()
     {
-      const string userName1 = "normal-userName-1";
-      await _service.CreateUserWithPasswordAsync(userName1, "a-normal-password-1");
+      var (userName, _) = await SeedOneUserAsync();
       
-      Task Act() => _service.CreateUserWithPasswordAsync(userName1, "a-normal-password-2");
+      Task Act() => _service.CreateUserWithPasswordAsync(userName, "a-normal-password-2");
 
       var res = await Record.ExceptionAsync(Act);
       var details = Assert.IsType<InvalidUserInputException>(res);
@@ -146,8 +174,9 @@ namespace SMEIoT.Tests.Core.Services
     [Fact]
     public async Task UpdateUserPasswordAsync_ThrowsIfNoUser()
     {
-      
-      Task Act() => _service.GetUserAndRoleByNameAsync("not-exist-user");
+      var (_, password) = await SeedOneUserAsync();
+ 
+      Task Act() => _service.UpdateUserPasswordAsync("not-exist-user", password, "a-updated-password");
 
       var exce = await Record.ExceptionAsync(Act);
       Assert.NotNull(exce);
@@ -158,11 +187,8 @@ namespace SMEIoT.Tests.Core.Services
     [Fact]
     public async Task UpdateUserPasswordAsync_UpdatesPassword()
     {
-      const string userName = "normal-userName-1";
-      const string password = "a-normal-password";
+      var (userName, password) = await SeedOneUserAsync();
       const string newPassword = "a-updated-password";
-      await _userManager.CreateAsync(new User {UserName = userName, ConcurrencyStamp = Guid.NewGuid().ToString()},
-        password);
       
       Task Act() => _service.UpdateUserPasswordAsync(userName, password, newPassword);
 
@@ -175,11 +201,8 @@ namespace SMEIoT.Tests.Core.Services
     [Fact]
     public async Task UpdateUserPasswordAsync_ThrowsMismatchedPassword()
     {
-      const string userName = "normal-userName-1";
-      const string password = "a-normal-password";
+      var (userName, password) = await SeedOneUserAsync();
       const string newPassword = "a-updated-password";
-      await _userManager.CreateAsync(new User {UserName = userName, ConcurrencyStamp = Guid.NewGuid().ToString()},
-        password);
       
       Task Act() => _service.UpdateUserPasswordAsync(userName, "what's the password", newPassword);
 
@@ -192,11 +215,8 @@ namespace SMEIoT.Tests.Core.Services
     [Fact]
     public async Task UpdateUserPasswordAsync_ThrowsWhenPasswordTooShort()
     {
-      const string userName = "normal-userName-1";
-      const string password = "a-normal-password";
+      var (userName, password) = await SeedOneUserAsync();
       const string newPassword = "1short";
-      await _userManager.CreateAsync(new User {UserName = userName, ConcurrencyStamp = Guid.NewGuid().ToString()},
-        password);
       
       Task Act() => _service.UpdateUserPasswordAsync(userName, password, newPassword);
 
@@ -210,11 +230,8 @@ namespace SMEIoT.Tests.Core.Services
     [Fact]
     public async Task UpdateUserPasswordAsync_ThrowsWhenRequiredUniqueCharsNotMet()
     {
-      const string userName = "normal-userName-1";
-      const string password = "a-normal-password";
+      var (userName, password) = await SeedOneUserAsync();
       const string newPassword = "pppppppppppppppppppp";
-      await _userManager.CreateAsync(new User {UserName = userName, ConcurrencyStamp = Guid.NewGuid().ToString()},
-        password);
       
       Task Act() => _service.UpdateUserPasswordAsync(userName, password, newPassword);
 
@@ -228,11 +245,8 @@ namespace SMEIoT.Tests.Core.Services
     [Fact]
     public async Task UpdateUserPasswordAsync_ThrowsWhenTooCommon()
     {
-      const string userName = "normal-userName-1";
-      const string password = "a-normal-password";
+      var (userName, password) = await SeedOneUserAsync();      
       const string newPassword = "zxcvbnm123456789";
-      await _userManager.CreateAsync(new User {UserName = userName, ConcurrencyStamp = Guid.NewGuid().ToString()},
-        password);
       
       Task Act() => _service.UpdateUserPasswordAsync(userName, password, newPassword);
 
@@ -260,10 +274,8 @@ namespace SMEIoT.Tests.Core.Services
     [Fact]
     public async Task UpdateUserRolesAsync_ThrowsIfAnyRoleIsNull()
     {
-      const string userName = "normal-userName-1";
-      const string password = "a-normal-password";
-      await _userManager.CreateAsync(new User {UserName = userName, ConcurrencyStamp = Guid.NewGuid().ToString()},
-        password);
+      var (userName, _) = await SeedOneUserAsync();      
+    
       var user = await _userManager.FindByNameAsync(userName);
       var roles = new[] {"Admin", null, "TestRole1"};
 
@@ -279,9 +291,8 @@ namespace SMEIoT.Tests.Core.Services
     public async Task UpdateUserRolesAsync_UpdateNewRole()
     {
       await SeedDefaultRolesAsync();
+      var (userName, password) = await SeedOneUserAsync();
       
-      const string userName = "normal-userName-1";
-      const string password = "a-normal-password";
       var roles = new[] {"Admin", "roles1"};
       await _userManager.CreateAsync(new User {UserName = userName, ConcurrencyStamp = Guid.NewGuid().ToString()},
         password);
@@ -299,15 +310,12 @@ namespace SMEIoT.Tests.Core.Services
     [Fact]
     public async Task UpdateUserRolesAsync_ReplaceRoles()
     {
-      const string userName = "normal-userName-1";
-      const string password = "a-normal-password";
+      var (userName, password) = await SeedOneUserAsync();
       var roles = new[] {"AnotherRole", "TestRole1"};
       foreach (var r in roles)
       {
         await _roleManager.CreateAsync(new IdentityRole<long>(r));
       }
-      await _userManager.CreateAsync(new User {UserName = userName, ConcurrencyStamp = Guid.NewGuid().ToString()},
-        password);
       var user = await _userManager.FindByNameAsync(userName);
       await _userManager.AddToRolesAsync(user, new[] {"Admin"});
       
@@ -324,10 +332,7 @@ namespace SMEIoT.Tests.Core.Services
     [Fact]
     public async Task UpdateUserRolesAsync_ClearRolesWithEmpty()
     {
-      const string userName = "normal-userName-1";
-      const string password = "a-normal-password";
-      await _userManager.CreateAsync(new User { UserName = userName, ConcurrencyStamp = Guid.NewGuid().ToString() },
-        password);
+      var (userName, password) = await SeedOneUserAsync();
       var user = await _userManager.FindByNameAsync(userName);
       await _userManager.AddToRolesAsync(user, new[] { "Admin" });
 
@@ -339,25 +344,13 @@ namespace SMEIoT.Tests.Core.Services
     [Fact]
     public async Task UpdateUserRolesAsync_ClearRolesWithNull()
     {
-      const string userName = "normal-userName-1";
-      const string password = "a-normal-password";
-      await _userManager.CreateAsync(new User { UserName = userName, ConcurrencyStamp = Guid.NewGuid().ToString() },
-        password);
+      var (userName, password) = await SeedOneUserAsync();
       var user = await _userManager.FindByNameAsync(userName);
       await _userManager.AddToRolesAsync(user, new[] { "Admin" });
 
       await _service.UpdateUserRolesAsync(userName, null);
 
       Assert.False(await _userManager.IsInRoleAsync(user, "Admin"));
-    }
-
-    [Fact]
-    public async Task IsAdminAsync_FalseWhenNull()
-    {
-      
-      var res = await _service.IsAdminAsync(null);
-
-      Assert.False(res);
     }
 
     [Fact]
@@ -391,16 +384,7 @@ namespace SMEIoT.Tests.Core.Services
     public async Task ListBasicUserResultAsync_AllUsersWhenRoleIsNull()
     {
       await SeedDefaultRolesAsync();
-      for (var x = 1; x <= 12; ++x)
-      {
-        var userName = $"normal-user-{x}";
-        var user = new User {UserName = userName, ConcurrencyStamp = Guid.NewGuid().ToString()};
-        
-        await _userManager.CreateAsync(user,
-          "a-password-1");
-        await _userManager.AddToRolesAsync(await _userManager.FindByNameAsync(userName), new[] {"roles1", "roles2"}); 
-      }
-      await _dbContext.SaveChangesAsync();
+      await SeedDefaultUsersAsync();
       var res = new List<(User, IList<string>)>();
 
       await foreach (var (user, roles) in _service.ListBasicUserResultAsync(0, 20, null))
@@ -408,7 +392,7 @@ namespace SMEIoT.Tests.Core.Services
         res.Add((user, roles));
       }
 
-      Assert.Equal(12, res.Count);
+      Assert.Equal(20, res.Count);
     }
     
     
@@ -416,18 +400,7 @@ namespace SMEIoT.Tests.Core.Services
     public async Task ListBasicUserResultAsync_ThrowWhenSomeRoleIsNull()
     {
       await SeedDefaultRolesAsync();
-
-      for (var x = 1; x <= 12; ++x)
-      {
-        var userName = $"normal-user-{x}";
-        var user = new User {UserName = userName, ConcurrencyStamp = Guid.NewGuid().ToString()};
-        
-        await _userManager.CreateAsync(user,
-          "a-password-1");
-        await _userManager.AddToRolesAsync(await _userManager.FindByNameAsync(userName), new[] {"roles1", "roles2"}); 
-      }
-      await _dbContext.SaveChangesAsync();
-      var res = new List<(User, IList<string>)>();
+      await SeedDefaultUsersAsync();
 
       var details = await Assert.ThrowsAsync<InvalidArgumentException>(async () =>
       {
@@ -443,22 +416,7 @@ namespace SMEIoT.Tests.Core.Services
     public async Task ListBasicUserResultAsync_ReturnsUserAndRoles()
     {
       await SeedDefaultRolesAsync();
-
-      for (var x = 1; x <= 10; ++x)
-      {
-        var userName = $"normal-user-{x}";
-        var user = new User {UserName = userName, ConcurrencyStamp = Guid.NewGuid().ToString()};
-        await _userManager.CreateAsync(user,"a-password-1");
-        await _userManager.AddToRolesAsync(await _userManager.FindByNameAsync(userName), new[] {"roles1", "roles2"}); 
-      }
-      for (var x = 11; x <= 12; ++x)
-      {
-        var userName = $"user-{x}";
-        var user = new User {UserName = userName, ConcurrencyStamp = Guid.NewGuid().ToString()};
-        await _userManager.CreateAsync(user,"a-password-1");
-        await _userManager.AddToRolesAsync(await _userManager.FindByNameAsync(userName), new[] {"roles1", "roles3"}); 
-      }
-      await _dbContext.SaveChangesAsync();
+      await SeedDefaultUsersAsync();
       var res = new List<(User, IList<string>)>();
 
       await foreach (var (user, roles) in _service.ListBasicUserResultAsync(0, 20))
@@ -466,7 +424,7 @@ namespace SMEIoT.Tests.Core.Services
         res.Add((user, roles));
       }
 
-      Assert.Equal(12, res.Count);
+      Assert.Equal(20, res.Count);
       Assert.Contains(res, u => u.Item1.UserName == "normal-user-1" && u.Item2.Contains("roles1"));
       Assert.Contains(res, u => u.Item1.UserName == "normal-user-2");
     }
@@ -475,47 +433,24 @@ namespace SMEIoT.Tests.Core.Services
     public async Task ListBasicUserResultAsync_ReturnsUserAndRolesWithFilteringRole()
     {
       await SeedDefaultRolesAsync();
-
-      for (var x = 1; x <= 10; ++x)
-      {
-        var userName = $"normal-user-{x}";
-        var user = new User {UserName = userName, ConcurrencyStamp = Guid.NewGuid().ToString()};
-        await _userManager.CreateAsync(user,"a-password-1");
-        await _userManager.AddToRolesAsync(await _userManager.FindByNameAsync(userName), new[] {"roles1", "roles2" }); 
-      }
-      for (var x = 11; x <= 12; ++x)
-      {
-        var userName = $"user-{x}";
-        var user = new User {UserName = userName, ConcurrencyStamp = Guid.NewGuid().ToString()};
-        await _userManager.CreateAsync(user,"a-password-1");
-        await _userManager.AddToRoleAsync(await _userManager.FindByNameAsync(userName), "roles3"); 
-      }
-      await _dbContext.SaveChangesAsync();
+      await SeedDefaultUsersAsync();
       var res = new List<(User, IList<string>)>();
 
-      await foreach (var (user, roles) in _service.ListBasicUserResultAsync(0, 20, new [] { "roles3" }))
+      await foreach (var (user, roles) in _service.ListBasicUserResultAsync(0, 2, new [] { "roles3" }))
       {
         res.Add((user, roles));
       }
 
       Assert.Equal(2, res.Count);
-      Assert.Contains(res, u => u.Item1.UserName == "user-11" && u.Item2.Contains("roles3"));
-      Assert.Contains(res, u => u.Item1.UserName == "user-12");
+      Assert.Contains(res, u => u.Item1.UserName == "user-101" && u.Item2.Contains("roles3"));
+      Assert.Contains(res, u => u.Item1.UserName == "user-102");
     }
 
     [Fact]
     public async Task ListBasicUserResultAsync_ThrowsNegativeOffset()
     {
       await SeedDefaultRolesAsync();
-
-      for (var x = 1; x <= 12; ++x)
-      {
-        var userName = $"normal-user-{x}";
-        var user = new User {UserName = userName, ConcurrencyStamp = Guid.NewGuid().ToString()};
-        await _userManager.CreateAsync(user,"a-password-1");
-        await _userManager.AddToRolesAsync(await _userManager.FindByNameAsync(userName), new[] {"roles1", "roles2"}); 
-      }
-      await _dbContext.SaveChangesAsync();
+      await SeedDefaultUsersAsync();
       
       var details = await Assert.ThrowsAsync<InvalidArgumentException>(async () =>
       {
@@ -530,15 +465,7 @@ namespace SMEIoT.Tests.Core.Services
     public async Task ListBasicUserResultAsync_AllowZeroOffset()
     {
       await SeedDefaultRolesAsync();
-
-      for (var x = 1; x <= 12; ++x)
-      {
-        var userName = $"normal-user-{x}";
-        var user = new User {UserName = userName, ConcurrencyStamp = Guid.NewGuid().ToString()};
-        await _userManager.CreateAsync(user,"a-password-1");
-        await _userManager.AddToRolesAsync(await _userManager.FindByNameAsync(userName), new[] {"roles1", "roles2"}); 
-      }
-      await _dbContext.SaveChangesAsync();
+      await SeedDefaultUsersAsync();
       var res = new List<(User, IList<string>)>();
 
       await foreach (var (user, roles) in _service.ListBasicUserResultAsync(0, 12))
@@ -554,15 +481,7 @@ namespace SMEIoT.Tests.Core.Services
     public async Task ListBasicUserResultAsync_ThrowsNegativeLimit()
     {
       await SeedDefaultRolesAsync();
-
-      for (var x = 1; x <= 12; ++x)
-      {
-        var userName = $"normal-user-{x}";
-        var user = new User {UserName = userName, ConcurrencyStamp = Guid.NewGuid().ToString()};
-        await _userManager.CreateAsync(user,"a-password-1");
-        await _userManager.AddToRolesAsync(await _userManager.FindByNameAsync(userName), new[] {"roles1", "roles2"}); 
-      }
-      await _dbContext.SaveChangesAsync();
+      await SeedDefaultUsersAsync();
       
       var details = await Assert.ThrowsAsync<InvalidArgumentException>(async () =>
       {
@@ -577,15 +496,7 @@ namespace SMEIoT.Tests.Core.Services
     public async Task ListBasicUserResultAsync_AllowZeroLimit()
     {
       await SeedDefaultRolesAsync();
-
-      for (var x = 1; x <= 12; ++x)
-      {
-        var userName = $"normal-user-{x}";
-        var user = new User {UserName = userName, ConcurrencyStamp = Guid.NewGuid().ToString()};
-        await _userManager.CreateAsync(user,"a-password-1");
-        await _userManager.AddToRolesAsync(await _userManager.FindByNameAsync(userName), new[] {"roles1", "roles2"}); 
-      }
-      await _dbContext.SaveChangesAsync();
+      await SeedDefaultUsersAsync();
       var res = new List<(User, IList<string>)>();
 
       await foreach (var (user, roles) in _service.ListBasicUserResultAsync(0, 0))
@@ -600,19 +511,10 @@ namespace SMEIoT.Tests.Core.Services
     public async Task ListBasicUserResultAsync_ReturnsUserAndRolesWithOffset()
     {
       await SeedDefaultRolesAsync();
-
-      for (var x = 1; x <= 12; ++x)
-      {
-        var userName = $"normal-user-{x}";
-        var user = new User {UserName = userName, ConcurrencyStamp = Guid.NewGuid().ToString()};
-        await _userManager.CreateAsync(user,"a-password-1");
-        user = await _userManager.FindByNameAsync(userName);
-        await _userManager.AddToRolesAsync(user, new[] {"roles1", "roles2"}); 
-      }
-      await _dbContext.SaveChangesAsync();
+      await SeedDefaultUsersAsync();
       var res = new List<(User, IList<string>)>();
 
-      await foreach (var (user, roles) in _service.ListBasicUserResultAsync(10, 12))
+      await foreach (var (user, roles) in _service.ListBasicUserResultAsync(10, 2))
       {
         res.Add((user, roles));
       }
@@ -622,5 +524,39 @@ namespace SMEIoT.Tests.Core.Services
       Assert.Contains(res, u => u.Item1.UserName == "normal-user-12");
     }
 
+    [Fact]
+    public async Task NumberOfUsersAsync_AllUsersWhenRoleIsNull()
+    {
+      await SeedDefaultRolesAsync();
+      await SeedDefaultUsersAsync();
+
+      var res = await _service.NumberOfUsersAsync();
+
+      Assert.Equal(25, res);
+    }
+    
+    [Fact]
+    public async Task NumberOfUsersAsync_ThrowWhenSomeRoleIsNull()
+    {
+      await SeedDefaultRolesAsync();
+      await SeedDefaultUsersAsync();
+
+      Task Act() => _service.NumberOfUsersAsync(new[] {"roles1", null, "roles2"});
+
+      var ex = await Record.ExceptionAsync(Act);
+      var details = Assert.IsType<InvalidArgumentException>(ex);
+      Assert.Equal("roles", details.ParamName);
+    }
+
+    [Fact]
+    public async Task NumberOfUsersAsync_ReturnsWithFilteringRole()
+    {
+      await SeedDefaultRolesAsync();
+      await SeedDefaultUsersAsync();
+
+      var res = await _service.NumberOfUsersAsync(new[] {"roles3"});
+
+      Assert.Equal(10, res);
+    }
   }
 }

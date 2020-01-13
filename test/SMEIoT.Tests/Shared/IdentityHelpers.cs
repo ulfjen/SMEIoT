@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System;
 using System.IO;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -37,9 +38,11 @@ namespace SMEIoT.Tests.Shared
       var pwdValidators = new List<IPasswordValidator<User>>();
       pwdValidators.Add(passValidator);
 
+      var sp = new Mock<IServiceProvider>();
+
       var userManager = new UserManager(store, options.Object, new ClearTextPasswordHasher<User>(), 
           userValidators, pwdValidators, new CommonPasswordValidator(accessor), new UpperInvariantLookupNormalizer(),
-          new IdentityErrorDescriber(), null,
+          new IdentityErrorDescriber(), sp.Object,
           new NullLogger<UserManager>());
           
       return userManager;

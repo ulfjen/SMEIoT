@@ -152,6 +152,9 @@ namespace SMEIoT.Core.Services
 
     public async Task UpdateUserPasswordAsync(string userName, string currentPassword, string newPassword)
     {
+      if (userName == null) {
+        throw new InvalidArgumentException("username can't be null", "userName");
+      }
       var user = await _userManager.FindByNameAsync(userName);
       if (user == null)
       {
@@ -180,13 +183,13 @@ namespace SMEIoT.Core.Services
 
     private List<string> SanitizedRoles(IEnumerable<string?>? roles)
     {
-      var sanitized = roles == null ? new List<string>() : roles.ToList();
+      var sanitized = roles == null ? new List<string?>() : roles.ToList();
       if (sanitized.Exists(r => r == null))
       {
         throw new InvalidArgumentException("A invalid role is found.", "roles");
       }
 
-      return sanitized;
+      return sanitized.Select(s => s!).ToList();
     }
 
     public async Task UpdateUserRolesAsync(string userName, IEnumerable<string?>? roles = null)
