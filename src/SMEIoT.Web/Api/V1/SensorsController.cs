@@ -17,13 +17,15 @@ namespace SMEIoT.Web.Api.V1
   {
     private readonly ILogger _logger;
     private readonly IDeviceService _service;
+    private readonly ISensorValueService _valueService;
     private readonly IMqttIdentifierService _mqttService;
 
-    public SensorsController(ILogger<SensorsController> logger, IDeviceService service, IMqttIdentifierService mqttService)
+    public SensorsController(ILogger<SensorsController> logger, IDeviceService service, IMqttIdentifierService mqttService, ISensorValueService valueService)
     {
       _logger = logger;
       _service = service;
       _mqttService = mqttService;
+      _valueService = valueService;
     }
 
     [HttpGet("")]
@@ -36,7 +38,7 @@ namespace SMEIoT.Web.Api.V1
       await foreach (var sensor in _service.ListSensorsAsync(offset, limit))
       {
         var vals = new List<(double, Instant)>();
-        await foreach (var v in _service.GetNumberTimeSeriesByDeviceAndSensorAsync(sensor.Device, sensor, SystemClock.Instance.GetCurrentInstant()-Duration.FromSeconds(3600), Duration.FromSeconds(3600)))
+        await foreach (var v in _valueService.GetNumberTimeSeriesBySensorAsync(sensor, SystemClock.Instance.GetCurrentInstant()-Duration.FromSeconds(3600), Duration.FromSeconds(3600)))
         {
           vals.Add(v);
         }
@@ -55,7 +57,7 @@ namespace SMEIoT.Web.Api.V1
       var sensor = await _service.GetSensorByDeviceAndNameAsync(device, sensorName);   
       var values = new List<(double, Instant)>();
 
-      await foreach (var val in _service.GetNumberTimeSeriesByDeviceAndSensorAsync(device, sensor, SystemClock.Instance.GetCurrentInstant()-Duration.FromSeconds(3600), Duration.FromSeconds(3600)))
+      await foreach (var val in _valueService.GetNumberTimeSeriesBySensorAsync(sensor, SystemClock.Instance.GetCurrentInstant()-Duration.FromSeconds(3600), Duration.FromSeconds(3600)))
       {
         _logger.LogTrace($"add into list {val}");
         values.Add(val);

@@ -37,7 +37,10 @@ namespace SMEIoT.Tests.Shared
         .EnableSensitiveDataLogging()
         .Options;
 
-      return new ApplicationDbContext(dbContextOptions, new FakeClock(initial.Value));
+      var context = new ApplicationDbContext(dbContextOptions, new FakeClock(initial.Value));
+      context.Database.ExecuteSqlInterpolated($"CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";");
+
+      return context;
     }
   }
 }
