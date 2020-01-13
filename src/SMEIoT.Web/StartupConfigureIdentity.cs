@@ -7,21 +7,26 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SMEIoT.Web.Services;
+using SMEIoT.Core.Interfaces;
 
 namespace SMEIoT.Web
 {
   public static class StartupConfigureIdentity
   {
-    public static void Configure<TUser, TRole, TContext>(IServiceCollection services) 
+    public static void Configure<TUser, TRole, TContext>(IServiceCollection services, Action<IdentityBuilder> dep) 
             where TUser : class
             where TRole : class
             where TContext : DbContext
     {
       // ref ASP.NET Core 3.1 src/Identity/Extensions.Core/src/IdentityServiceCollectionExtensions.cs
-      AddCustomedIdentity<TUser, TRole>(services, ConfigureIdentityOptions)
-        .AddEntityFrameworkStores<TContext>()
+      var builder = AddCustomedIdentity<TUser, TRole>(services, ConfigureIdentityOptions)
+        .AddEntityFrameworkStores<TContext>();
+
+      dep(builder);
+
+      builder.AddUserManager<UserManager>()
         .AddSignInManager<SignInManager>();
-      
+
       services.Configure<CookiePolicyOptions>(options =>
       {
         // This lambda determines whether user consent for non-essential 
@@ -50,8 +55,8 @@ namespace SMEIoT.Web
       options.Password.RequireLowercase = false;
       options.Password.RequireNonAlphanumeric = false;
       options.Password.RequireUppercase = false;
-      options.Password.RequiredLength = 8;
-      options.Password.RequiredUniqueChars = 1;
+      options.Password.RequiredLength = 10;
+      options.Password.RequiredUniqueChars = 3;
 
       // Lockout settings.
       options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);

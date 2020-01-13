@@ -44,7 +44,6 @@ namespace SMEIoT.Web.Api.Filters
           break;
         case InternalException exception:
           goto default;
-          // context.Result = new ObjectResult(_pdFactory.CreateProblemDetails(context.HttpContext, StatusCodes.Status500InternalServerError, null, null, exception.Message)) { StatusCode = StatusCodes.Status500InternalServerError };
           break;
         default:
           var message = _env.IsProduction() ? "" : context.Exception.Message;

@@ -4,6 +4,6 @@ namespace SMEIoT.Core.Interfaces
 {
   public interface IIdentifierDictionaryFileAccessor
   {
-    List<string> ListIdentifiers();
+    IList<string> ListIdentifiers(string path);
   }
 }

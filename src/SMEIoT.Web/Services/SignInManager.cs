@@ -11,7 +11,7 @@ namespace SMEIoT.Web.Services
 {
   public class SignInManager : SignInManager<User>
   {
-    public SignInManager(UserManager<User> userManager,
+    public SignInManager(UserManager userManager,
         IHttpContextAccessor contextAccessor,
         IUserClaimsPrincipalFactory<User> claimsFactory,
         IOptions<IdentityOptions> optionsAccessor,

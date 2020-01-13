@@ -71,7 +71,9 @@ namespace SMEIoT.Web
 
       services.ConfigureMqttClient(Configuration);
 
-      StartupConfigureIdentity.Configure<User, IdentityRole<long>, ApplicationDbContext>(services);
+      StartupConfigureIdentity.Configure<User, IdentityRole<long>, ApplicationDbContext>(services, builder => {
+        services.AddScoped<ICommonPasswordValidator, CommonPasswordValidator>();
+      });
 
       services.AddVersionedApiExplorer(options => options.GroupNameFormat = "'v'VVV");
       services.AddApiVersioning(options =>
@@ -128,7 +130,7 @@ namespace SMEIoT.Web
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory,
-      IServiceProvider serviceProvider)
+      IServiceProvider serviceProvider, RoleManager<IdentityRole<long>> roleManager)
     {
       if (env.IsDevelopment())
       {
@@ -184,6 +186,7 @@ namespace SMEIoT.Web
       app.UseRouting();
 
       app.UseAuthentication();
+      StartupIdentityDataInitializer.SeedRoles(roleManager);
       app.UseAuthorization();
 
       app.UseEndpoints(endpoints =>

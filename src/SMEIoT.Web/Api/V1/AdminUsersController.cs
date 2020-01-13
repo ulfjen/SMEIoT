@@ -60,7 +60,7 @@ namespace SMEIoT.Web.Api.V1
 
     private async Task<AdminUserApiModel> GetAdminUserResultAsync(string userName)
     {
-      var (user, roles) = await _userService.GetUserAndRoleByName(userName);
+      var (user, roles) = await _userService.GetUserAndRoleByNameAsync(userName);
       return new AdminUserApiModel(user, roles);
     }
 

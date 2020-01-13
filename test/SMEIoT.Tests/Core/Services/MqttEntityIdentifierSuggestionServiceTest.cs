@@ -15,7 +15,7 @@ namespace SMEIoT.Tests.Core.Services
     private static MqttEntityIdentifierSuggestionService BuildService()
     {
       var mockedAccessor = new Mock<IIdentifierDictionaryFileAccessor>();
-      mockedAccessor.Setup(x => x.ListIdentifiers()).Returns(new List<string> { "id1", "id2", "id3" });
+      mockedAccessor.Setup(x => x.ListIdentifiers(It.IsAny<string>())).Returns(new List<string> { "id1", "id2", "id3" });
       var identifierService = new MqttIdentifierService(new FakeClock(Instant.FromUtc(2020, 1, 1, 0, 0)));
       identifierService.RegisterSensorNameWithDeviceName("sensor1", "device1");
       identifierService.RegisterSensorNameWithDeviceName("sensor2", "device1");

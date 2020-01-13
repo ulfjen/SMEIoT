@@ -18,7 +18,7 @@ namespace SMEIoT.Tests.Core.Services
     private static async Task<(SensorAssignmentService, ApplicationDbContext, UserManager<User>)> BuildService(bool fabricateData = true)
     {
       var dbContext = ApplicationDbContextHelper.BuildTestDbContext();
-      var userManager = MockHelpers.CreateUserManager();
+      var (userManager, roleManager) = MockHelpers.CreateUserManager();
 
       if (fabricateData)
       {

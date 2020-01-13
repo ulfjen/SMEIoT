@@ -3,18 +3,23 @@ using System.Collections.Generic;
 using System.IO;
 using Microsoft.Extensions.FileProviders;
 using SMEIoT.Core.Interfaces;
+using SMEIoT.Core.Exceptions;
 
 namespace SMEIoT.Infrastructure.Data
 {
   public class IdentifierDictionaryFileAccessor : IIdentifierDictionaryFileAccessor
   {
-    private readonly List<string> _identifiers;
+    private readonly IFileProvider _fileProvider;
 
     public IdentifierDictionaryFileAccessor(IFileProvider fileProvider)
     {
-      var fileInfo = fileProvider.GetFileInfo("identifier-candidates.txt");
+      _fileProvider = fileProvider;
+    }
 
-      _identifiers = new List<string>();
+    public IList<string> ListIdentifiers(string path)
+    {
+      var fileInfo = _fileProvider.GetFileInfo(path);
+      var identifiers = new List<string>();
       if (fileInfo.Exists)
       {
         using var stream = fileInfo.CreateReadStream();
@@ -26,25 +31,21 @@ namespace SMEIoT.Infrastructure.Data
             var line = reader.ReadLine();
             if (line != null)
             {
-              _identifiers.Add(line);
+              identifiers.Add(line);
             }
           }
           catch (IOException exception)
           {
-            throw new SystemException($"unexpected IO exception while reading identifiers: {exception.Message}");
+            throw new InternalException($"unexpected IO exception while reading identifiers: {exception.Message}");
           }
         }
       }
       else
       {
-        throw new SystemException("identifier-candidates.txt can't be found.");
+        throw new InternalException($"{path} can't be found.");
       }
 
-    }
-
-    public List<string> ListIdentifiers()
-    {
-      return _identifiers;
+      return identifiers;
     }
 
   }

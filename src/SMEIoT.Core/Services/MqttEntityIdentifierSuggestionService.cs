@@ -11,9 +11,10 @@ namespace SMEIoT.Core.Services
   public class MqttEntityIdentifierSuggestionService : IMqttEntityIdentifierSuggestionService
   {
     private readonly IMqttIdentifierService _mqttIdentifierService;
-    private readonly List<string> _identifierCandidates;
+    private readonly IList<string> _identifierCandidates;
     private readonly IApplicationDbConnection _dbConnection;
     private readonly Random _rand;
+    public const string IdentifierDictionaryFilePath = "identifier-candidates.txt";
 
     public MqttEntityIdentifierSuggestionService(
       IMqttIdentifierService mqttIdentifierService,
@@ -21,7 +22,7 @@ namespace SMEIoT.Core.Services
       IApplicationDbConnection dbConnection)
     {
       _mqttIdentifierService = mqttIdentifierService;
-      _identifierCandidates = identifierDictionary.ListIdentifiers();
+      _identifierCandidates = identifierDictionary.ListIdentifiers(IdentifierDictionaryFilePath);
       _dbConnection = dbConnection;
       _rand = new Random();
     }

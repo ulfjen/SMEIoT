@@ -8,7 +8,6 @@ using Microsoft.Extensions.Logging;
 using SMEIoT.Core.Entities;
 using SMEIoT.Core.Exceptions;
 using SMEIoT.Core.Interfaces;
-using System.Security.Claims;
 using System.Linq.Dynamic.Core;
 
 namespace SMEIoT.Core.Services
@@ -16,6 +15,13 @@ namespace SMEIoT.Core.Services
   // IdentityResult has an error catelog Identity/Extensions.Core/src/IdentityErrorDescriber.cs
   public class UserManagementService : IUserManagementService
   {
+    private const string TooCommonPasswordErrorCode = nameof(TooCommonPasswordError);
+    public static readonly IdentityError TooCommonPasswordError = new IdentityError
+    {
+      Code = TooCommonPasswordErrorCode,
+      Description = "You are trying to use a common password. Please choose a more complicated combination for the password."
+    };
+
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<IdentityRole<long>> _roleManager;
     private readonly ILogger _logger;
@@ -32,7 +38,7 @@ namespace SMEIoT.Core.Services
       _logger = logger;
     }
 
-    public async Task<(User, IList<string>)> GetUserAndRoleByName(string userName)
+    public async Task<(User, IList<string>)> GetUserAndRoleByNameAsync(string userName)
     {
       var user = await _userManager.FindByNameAsync(userName);
       if (user == null)
@@ -44,19 +50,7 @@ namespace SMEIoT.Core.Services
       return (user, roles);
     }
 
-    public async Task<(User, IList<string>)> GetUserAndRoleByPrincipal(ClaimsPrincipal principal)
-    {
-      var user = await _userManager.GetUserAsync(principal);
-      if (user == null)
-      {
-        throw new EntityNotFoundException($"cannot find the user.", "principal");
-      }
-
-      var roles = await _userManager.GetRolesAsync(user);
-      return (user, roles);
-    }
-
-    public async Task CreateUserWithPassword(string userName, string password)
+    public async Task CreateUserWithPasswordAsync(string userName, string password)
     {
       var result =
         await _userManager.CreateAsync(new User {UserName = userName, SecurityStamp = Guid.NewGuid().ToString()},
@@ -65,32 +59,17 @@ namespace SMEIoT.Core.Services
       {
         var passwordErrors = new List<string>();
         foreach (var err in result.Errors) {
-          switch (err.Code) {
-            case nameof(IdentityErrorDescriber.DuplicateUserName):
-              throw new InvalidUserInputException("There is something wrong with your username or password. Try another combination.");
-            case nameof(IdentityErrorDescriber.PasswordTooShort):
-              passwordErrors.Append(err.Description);
-              break;
-            case nameof(IdentityErrorDescriber.PasswordRequiresUniqueChars):
-              passwordErrors.Append(err.Description);
-              break;
-            case nameof(IdentityErrorDescriber.PasswordRequiresNonAlphanumeric):
-              passwordErrors.Append(err.Description);
-              break;
-            case nameof(IdentityErrorDescriber.PasswordRequiresDigit):
-              passwordErrors.Append(err.Description);
-              break;
-            case nameof(IdentityErrorDescriber.PasswordRequiresLower):
-              passwordErrors.Append(err.Description);
-              break;
-            case nameof(IdentityErrorDescriber.PasswordRequiresUpper):
-              passwordErrors.Append(err.Description);
-              break;
-            default:
+          if (err.Code == nameof(IdentityErrorDescriber.DuplicateUserName))
+          {
+            throw new InvalidUserInputException(
+              "There is something wrong with your username or password. Try another combination.");
+          }
+          else if (!HandleNewPasswordIdentityError(err, passwordErrors))
+          {
               throw new InvalidUserInputException(err.Description);
           }
         }
-        if (passwordErrors.Count != 0) {
+        if (passwordErrors.Count > 0) {
           throw new InvalidArgumentException(string.Join('\n', passwordErrors), "password");
         }
       }
@@ -104,9 +83,53 @@ namespace SMEIoT.Core.Services
         result = await _userManager.AddToRoleAsync(storedUser, "Admin");
         if (!result.Succeeded)
         {
-          HandleIdentityRoleErrors(result.Errors);
+          try {
+          　 HandleIdentityRoleErrors(result.Errors);
+          }
+          catch
+          {
+            throw new InternalException("Unable to set the first user as admin. Try reinstall.");
+          }
         }
       }
+    }
+    
+    private bool HandleNewPasswordIdentityError(IdentityError error, IList<string> errors)
+    {
+      var added = false;
+      switch (error.Code)
+      {
+        case nameof(IdentityErrorDescriber.PasswordTooShort):
+          errors.Add(error.Description);
+          added = true;
+          break;
+        case nameof(IdentityErrorDescriber.PasswordRequiresUniqueChars):
+          errors.Add(error.Description);
+          added = true;
+          break;
+        case nameof(IdentityErrorDescriber.PasswordRequiresNonAlphanumeric):
+          errors.Add(error.Description);
+          added = true;
+          break;
+        case nameof(IdentityErrorDescriber.PasswordRequiresDigit):
+          errors.Add(error.Description);
+          added = true;
+          break;
+        case nameof(IdentityErrorDescriber.PasswordRequiresLower):
+          errors.Add(error.Description);
+          added = true;
+          break;
+        case nameof(IdentityErrorDescriber.PasswordRequiresUpper):
+          errors.Add(error.Description);
+          added = true;
+          break;
+        case TooCommonPasswordErrorCode:
+          errors.Add(error.Description);
+          added = true;
+          break;
+      }
+
+      return added;
     }
     
     private void HandleIdentityRoleErrors(IEnumerable<IdentityError> errors)
@@ -114,13 +137,13 @@ namespace SMEIoT.Core.Services
       foreach (var err in errors) {
         switch (err.Code) {
           case nameof(IdentityErrorDescriber.InvalidRoleName):
-            goto case nameof(IdentityErrorDescriber.UserAlreadyInRole);
+            goto default;
           case nameof(IdentityErrorDescriber.DuplicateRoleName):
-            goto case nameof(IdentityErrorDescriber.UserAlreadyInRole);
+            goto default;
           case nameof(IdentityErrorDescriber.UserNotInRole):
-            goto case nameof(IdentityErrorDescriber.UserAlreadyInRole);
+            goto default;
           case nameof(IdentityErrorDescriber.UserAlreadyInRole):
-            throw new InternalException("Unable to set the first user as admin. Try reinstall.");
+            goto default;
           default:
             throw new InternalException(err.Description);
         }
@@ -140,38 +163,33 @@ namespace SMEIoT.Core.Services
       if (!result.Succeeded)
       {
         foreach (var err in result.Errors) {
-          switch (err.Code) {
-            case nameof(IdentityErrorDescriber.PasswordMismatch):
-              throw new InvalidArgumentException(err.Description, "password");
-            case nameof(IdentityErrorDescriber.PasswordTooShort):
-              passwordErrors.Append(err.Description);
-              break;
-            case nameof(IdentityErrorDescriber.PasswordRequiresUniqueChars):
-              passwordErrors.Append(err.Description);
-              break;
-            case nameof(IdentityErrorDescriber.PasswordRequiresNonAlphanumeric):
-              passwordErrors.Append(err.Description);
-              break;
-            case nameof(IdentityErrorDescriber.PasswordRequiresDigit):
-              passwordErrors.Append(err.Description);
-              break;
-            case nameof(IdentityErrorDescriber.PasswordRequiresLower):
-              passwordErrors.Append(err.Description);
-              break;
-            case nameof(IdentityErrorDescriber.PasswordRequiresUpper):
-              passwordErrors.Append(err.Description);
-              break;
-            default:
-              throw new InvalidUserInputException("Unhandled user password error.");
+          if (err.Code == nameof(IdentityErrorDescriber.PasswordMismatch))
+          {
+            throw new InvalidArgumentException(err.Description, "password");
+          }
+          else if (!HandleNewPasswordIdentityError(err, passwordErrors))
+          {
+            throw new InternalException(err.Description);
           }
         }
-        if (passwordErrors.Count != 0) {
-          throw new InvalidArgumentException(string.Join('\n', passwordErrors), "newPassword");
-        }
       }
+      if (passwordErrors.Count > 0) {
+        throw new InvalidArgumentException(string.Join('\n', passwordErrors), "newPassword");
+      } 
     }
 
-    public async Task UpdateUserRolesAsync(string userName, IEnumerable<string> roles)
+    private List<string> SanitizedRoles(IEnumerable<string?>? roles)
+    {
+      var sanitized = roles == null ? new List<string>() : roles.ToList();
+      if (sanitized.Exists(r => r == null))
+      {
+        throw new InvalidArgumentException("A invalid role is found.", "roles");
+      }
+
+      return sanitized;
+    }
+
+    public async Task UpdateUserRolesAsync(string userName, IEnumerable<string?>? roles = null)
     {
       var user = await _userManager.FindByNameAsync(userName);
       if (user == null)
@@ -179,31 +197,26 @@ namespace SMEIoT.Core.Services
         throw new EntityNotFoundException($"cannot find the user {userName}.", "userName");
       }
 
-      if (roles == null)
-      {
-        throw new InvalidArgumentException("cannot find the roles.", "roles");
-      }
+      var sanitized = SanitizedRoles(roles);
 
       var roleMap = new Dictionary<string, IdentityRole<long>>();
       var existingRoles = new HashSet<string>();
+      var normalizer = _roleManager.KeyNormalizer;
+
       foreach (var role in await _userManager.GetRolesAsync(user))
       {
-        existingRoles.Add(role);
+        existingRoles.Add(normalizer.NormalizeName(role));
       }
 
-      var normalizer = _roleManager.KeyNormalizer;
-      foreach (var roleName in roles)
+      foreach (var roleName in sanitized)
       {
         var role = await _roleManager.FindByNameAsync(roleName);
-        if (role == null) {
-          continue;
-        }
         roleMap[normalizer.NormalizeName(roleName)] = role;
       }
 
       var result = await _userManager.AddToRolesAsync(user, roleMap.Keys.Except(existingRoles));
       if (!result.Succeeded)
-      {       
+      {
         HandleIdentityRoleErrors(result.Errors);
       }
 
@@ -216,7 +229,7 @@ namespace SMEIoT.Core.Services
 
     /// if roles are empty, we return every users
     /// otherwise we return the users have designated roles
-    public async IAsyncEnumerable<(User, IList<string>)> ListBasicUserResultAsync(int offset, int limit, IEnumerable<string>? roles = null)
+    public async IAsyncEnumerable<(User, IList<string>)> ListBasicUserResultAsync(int offset, int limit, IEnumerable<string?>? roles = null)
     {
       if (offset < 0)
       {
@@ -226,7 +239,8 @@ namespace SMEIoT.Core.Services
       {
         throw new InvalidArgumentException("limit can't be negative", "limit"); 
       }
-      var roleIds = await GetRoleIdsFromNamesAsync(roles); 
+      var sanitized = SanitizedRoles(roles);
+      var roleIds = await GetRoleIdsFromNamesAsync(sanitized); 
       
       var query = GetUserQuery(roleIds);
       await foreach (var user in query.OrderBy(u => u.Id).Skip(offset).Take(limit).AsAsyncEnumerable())
@@ -235,18 +249,18 @@ namespace SMEIoT.Core.Services
       }
     }
 
-    private async Task<List<long>> GetRoleIdsFromNamesAsync(IEnumerable<string>? roles)
+    private async Task<IList<long>> GetRoleIdsFromNamesAsync(IList<string> roles)
     {
-      var ids = new List<long>(); 
-      if (roles == null) { return ids; }
-      // model binding can return null!
-      await Task.WhenAll(roles.Where(s => s != null).Select(async (roleName) => 
+      var ids = new List<long>();
+      var normalizer = _roleManager.KeyNormalizer;
+      await Task.WhenAll(roles.Select(async roleName =>
       {
-        var role = await _roleManager.FindByNameAsync(roleName);
+        var normalized = normalizer.NormalizeName(roleName);
+        var role = await _roleManager.FindByNameAsync(normalized);
         if (role == null) {
           throw new InvalidArgumentException($"Unknown role name {roleName}", "roles");
         }
-        if (long.TryParse(await _roleManager.GetRoleIdAsync(role), out long roleId)) {
+        if (long.TryParse(await _roleManager.GetRoleIdAsync(role), out var roleId)) {
           ids.Add(roleId);
         } else {
           throw new InternalException($"Internal role id mapping unknown. {role}");
@@ -255,22 +269,32 @@ namespace SMEIoT.Core.Services
       return ids;
     }
 
-    private IQueryable<User> GetUserQuery(List<long> roleIds)
+    private IQueryable<User> GetUserQuery(IList<long> roleIds)
     {
       return roleIds.Count == 0 ? _dbContext.Users.AsQueryable() : _dbContext.Users
           .Join(_dbContext.UserRoles.Where("@0.Contains(RoleId)", roleIds), user => user.Id, ur => ur.UserId, (user, userRole) => user).AsQueryable();
     }
 
-    public async Task<int> NumberOfUsersAsync(IEnumerable<string>? roles)
+    public async Task<int> NumberOfUsersAsync(IEnumerable<string?>? roles = null)
     {
-      var roleIds = await GetRoleIdsFromNamesAsync(roles); 
+      var sanitized = SanitizedRoles(roles);
+
+      var roleIds = await GetRoleIdsFromNamesAsync(sanitized); 
       var query = GetUserQuery(roleIds);
       return await query.CountAsync();
     }
 
-    public Task<bool> IsAdmin(IEnumerable<string> roles)
+    public Task<bool> IsAdminAsync(IList<string> roles)
     {
-      return Task.FromResult(roles.Contains("Admin"));
+      if (roles == null)
+      {
+        roles = new List<string>();
+      }
+      
+      var normalizer = _roleManager.KeyNormalizer;
+      var adminRoleName = normalizer.NormalizeName("Admin");
+      
+      return Task.FromResult(roles.Any(r => normalizer.NormalizeName(r) == adminRoleName));
     }
   }
 

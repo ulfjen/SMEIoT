@@ -41,9 +41,16 @@ namespace SMEIoT.Web.Services
         throw new InvalidOperationException("RequestServices is null.");
       }
 
+      var userManager = context.HttpContext.RequestServices.GetRequiredService<UserManager<User>>();
       var service = context.HttpContext.RequestServices.GetRequiredService<IUserManagementService>();
-      var (user, roles) = await service.GetUserAndRoleByPrincipal(context.Principal);
-      var isAdmin = await service.IsAdmin(roles);
+
+      var user = await userManager.GetUserAsync(context.Principal);
+      if (user == null) {
+        throw new InvalidOperationException("Cannot get user from cookie context.");
+      }
+      var roles = await userManager.GetRolesAsync(user);
+
+      var isAdmin = await service.IsAdminAsync(roles);
 
       var userCookie = new UserCookie(user.UserName, isAdmin);
       var serializeOptions = new JsonSerializerOptions

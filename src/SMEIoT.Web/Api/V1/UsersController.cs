@@ -29,7 +29,7 @@ namespace SMEIoT.Web.Api.V1
     [AllowAnonymous]
     public async Task<ActionResult<BasicUserApiModel>> Create([BindRequired] ValidatedUserCredentialsBindingModel user)
     {
-      await _userService.CreateUserWithPassword(user.UserName, user.Password);
+      await _userService.CreateUserWithPasswordAsync(user.UserName, user.Password);
       var result = await GetBasicUserResultAsync(user.UserName);
       return CreatedAtAction(nameof(Show), new { userName = result.UserName }, result);
     }
@@ -42,7 +42,7 @@ namespace SMEIoT.Web.Api.V1
       [BindRequired] ConfirmedUserCredentialsUpdateBindingModel binding)
     {
       await _userService.UpdateUserPasswordAsync(userName, binding.CurrentPassword, binding.NewPassword);
-      var (user, roles) = await _userService.GetUserAndRoleByName(userName);
+      var (user, roles) = await _userService.GetUserAndRoleByNameAsync(userName);
       var res = new UserCredentialsUpdateApiModel(user, roles) {PasswordUpdated = true};
       return Ok(res);
     }
@@ -59,7 +59,7 @@ namespace SMEIoT.Web.Api.V1
 
     private async Task<BasicUserApiModel> GetBasicUserResultAsync(string userName)
     {
-      var (user, roles) = await _userService.GetUserAndRoleByName(userName);
+      var (user, roles) = await _userService.GetUserAndRoleByNameAsync(userName);
       return new BasicUserApiModel(user, roles);
     }
   }

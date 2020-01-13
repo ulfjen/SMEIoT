@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace SMEIoT.Tests.Shared
 {
-  class InMemoryRoleStore : IRoleStore<IdentityRole<long>>
+  public class InMemoryRoleStore : IRoleStore<IdentityRole<long>>
   {
     private List<IdentityRole<long>> _roles = new List<IdentityRole<long>>();
     
@@ -19,6 +19,8 @@ namespace SMEIoT.Tests.Shared
         ));
       }
 
+      role.Id = _roles.Count + 1;
+      role.NormalizedName = role.Name.ToUpperInvariant();
       _roles.Add(role);
       return Task.FromResult(IdentityResult.Success);
     }
@@ -36,13 +38,13 @@ namespace SMEIoT.Tests.Shared
       return Task.FromResult(IdentityResult.Success);
     }
 
-    Task<IdentityRole<long>> IRoleStore<IdentityRole<long>>.FindByIdAsync(string roleId, CancellationToken cancellationToken)
+    public Task<IdentityRole<long>> FindByIdAsync(string roleId, CancellationToken cancellationToken)
     {
       var role = _roles.SingleOrDefault(r => r.Id.ToString() == roleId);
       return Task.FromResult(role);
     }
 
-    Task<IdentityRole<long>> IRoleStore<IdentityRole<long>>.FindByNameAsync(string normalizedRoleName, CancellationToken cancellationToken)
+    public Task<IdentityRole<long>> FindByNameAsync(string normalizedRoleName, CancellationToken cancellationToken)
     {
       var role = _roles.SingleOrDefault(r => r.NormalizedName == normalizedRoleName);
       return Task.FromResult(role);
@@ -50,7 +52,7 @@ namespace SMEIoT.Tests.Shared
 
     public Task<string> GetNormalizedRoleNameAsync(IdentityRole<long> role, CancellationToken cancellationToken)
     {
-      return Task.FromResult(role.NormalizedName);
+      return Task.FromResult(role.NormalizedName ?? role.Name.ToUpperInvariant());
     }
 
     public Task<string> GetRoleIdAsync(IdentityRole<long> role, CancellationToken cancellationToken)

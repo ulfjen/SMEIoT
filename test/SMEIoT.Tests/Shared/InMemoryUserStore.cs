@@ -12,45 +12,56 @@ namespace SMEIoT.Tests.Shared
 {
   public class InMemoryUserStore: IUserStore<User>, IUserPasswordStore<User>, IUserSecurityStampStore<User>, IUserRoleStore<User>
   {
-    private List<User> _users = new List<User>();
-    private Dictionary<string, List<string>> _roles = new Dictionary<string, List<string>>();
+    private readonly List<User> _users = new List<User>();
+    private readonly Dictionary<long, List<string>> _roles = new Dictionary<long, List<string>>();
+    private readonly InMemoryRoleStore _roleStore;
 
+    public InMemoryUserStore(InMemoryRoleStore roleStore)
+    {
+      _roleStore = roleStore;
+    }
+    
     public Task AddClaimsAsync(User user, IEnumerable<Claim> claims, CancellationToken cancellationToken)
     {
       throw new NotImplementedException();
     }
 
-    public Task AddToRoleAsync(User user, string roleName, CancellationToken cancellationToken)
+    public async Task AddToRoleAsync(User user, string roleName, CancellationToken cancellationToken)
     {
-      if (!_roles.ContainsKey(user.NormalizedUserName))
+      var name = user.NormalizedUserName ?? user.UserName.ToUpperInvariant();
+      var role = await _roleStore.FindByNameAsync(roleName.ToUpperInvariant(), cancellationToken);
+      if (role == null)
       {
-        _roles[user.NormalizedUserName] = new List<string>();
+        throw new SystemException("Can find IdentityRole. Forgot to add one?");
+      }
+      if (!_roles.ContainsKey(role.Id))
+      {
+        _roles[role.Id] = new List<string>();
       }
 
-      if (_roles[user.NormalizedUserName].Any(r => r == roleName))
+      if (_roles[role.Id].Any(u => u == user.NormalizedUserName))
       {
-        return Task.FromResult(IdentityResult.Failed(
-          new IdentityError {Description = "A role like that already exists"}
-        ));
+        throw new SystemException("A role like that already exists");
       }
 
-      _roles[user.NormalizedUserName].Add(roleName);
-            return Task.FromResult(IdentityResult.Success);
-
+      _roles[role.Id].Add(user.NormalizedUserName);
     }
 
-    public Task<IdentityResult> CreateAsync(User user, CancellationToken cancellationToken)
+    public async Task<IdentityResult> CreateAsync(User user, CancellationToken cancellationToken)
     {
-      if (_users.Any(u => (u.Id == user.Id) || (u.NormalizedUserName == user.NormalizedUserName)))
+      var name = user.NormalizedUserName ?? user.UserName.ToUpperInvariant();
+
+      if (await FindByNameAsync(name, cancellationToken) != null)
       {
-        return Task.FromResult(IdentityResult.Failed(
+        return IdentityResult.Failed(
           new IdentityError {Description = "A user like that already exists"}
-        ));
+        );
       }
 
       user.Id = _users.Count + 1;
+      user.NormalizedUserName = name;
       _users.Add(user);
-      return Task.FromResult(IdentityResult.Success);
+      return IdentityResult.Success;
 
     }
 
@@ -93,15 +104,30 @@ namespace SMEIoT.Tests.Shared
       return Task.FromResult(user.UserName.ToUpper());
     }
 
-    public Task<string> GetPasswordHashAsync(User user, CancellationToken cancellationToken)
+    public async Task<string> GetPasswordHashAsync(User user, CancellationToken cancellationToken)
     {
-      return Task.FromResult(user.PasswordHash);
+      var name = user.NormalizedUserName ?? user.UserName.ToUpperInvariant();
+      var stored = await FindByNameAsync(name, cancellationToken);
+      return stored.PasswordHash;
     }
 
-    public Task<IList<string>> GetRolesAsync(User user, CancellationToken cancellationToken)
+    public async Task<IList<string>> GetRolesAsync(User user, CancellationToken cancellationToken)
     {
-      IList<string> roles = !_roles.ContainsKey(user.NormalizedUserName) ? new List<string>() : _roles[user.NormalizedUserName];
-      return Task.FromResult(roles);
+      var roles = new List<string>();
+      foreach (var (roleId, names) in _roles)
+      {
+        if (names.Contains(user.NormalizedUserName))
+        {
+          var role = await _roleStore.FindByIdAsync(roleId.ToString(), cancellationToken);
+          if (role == null)
+          {
+            throw new SystemException("Can find IdentityRole. Forgot to add one?");
+          }
+          roles.Add(role.Name);
+        }
+      }
+
+      return roles;
     }
 
     public Task<string> GetUserIdAsync(User user, CancellationToken cancellationToken)
@@ -129,13 +155,14 @@ namespace SMEIoT.Tests.Shared
       throw new NotImplementedException();
     }
 
-    public Task<bool> IsInRoleAsync(User user, string roleName, CancellationToken cancellationToken)
+    public async Task<bool> IsInRoleAsync(User user, string roleName, CancellationToken cancellationToken)
     {
-      if (!_roles.ContainsKey(user.NormalizedUserName))
+      var role = await _roleStore.FindByNameAsync(roleName.ToUpperInvariant(), cancellationToken);
+      if (role == null)
       {
-        _roles[user.NormalizedUserName] = new List<string>();
+        throw new SystemException("Can find IdentityRole. Forgot to add one?");
       }
-      return Task.FromResult(_roles[user.NormalizedUserName].SingleOrDefault(r => r == roleName) != null);
+      return _roles.Keys.Contains(role.Id) && _roles[role.Id].Contains(user.NormalizedUserName);
     }
 
     public Task RemoveClaimsAsync(User user, IEnumerable<Claim> claims, CancellationToken cancellationToken)
@@ -143,15 +170,17 @@ namespace SMEIoT.Tests.Shared
       throw new NotImplementedException();
     }
 
-    public Task RemoveFromRoleAsync(User user, string roleName, CancellationToken cancellationToken)
+    public async Task RemoveFromRoleAsync(User user, string roleName, CancellationToken cancellationToken)
     {
-      if (!_roles.ContainsKey(user.NormalizedUserName))
+      var role = await _roleStore.FindByNameAsync(roleName.ToUpperInvariant(), cancellationToken);
+      if (role == null)
       {
-        _roles[user.NormalizedUserName] = new List<string>();
+        throw new SystemException("Can find IdentityRole. Forgot to add one?");
       }
-
-      _roles[user.NormalizedUserName].Remove(roleName);
-      return Task.FromResult(IdentityResult.Success);
+      if (_roles.Keys.Contains(role.Id))
+      {
+        _roles[role.Id].Remove(user.NormalizedUserName);
+      }
     }
 
     public Task ReplaceClaimAsync(User user, Claim claim, Claim newClaim, CancellationToken cancellationToken)
@@ -177,9 +206,13 @@ namespace SMEIoT.Tests.Shared
       return Task.CompletedTask;
     }
 
-    public Task<IdentityResult> UpdateAsync(User user, CancellationToken cancellationToken)
+    public async Task<IdentityResult> UpdateAsync(User user, CancellationToken cancellationToken)
     {
-      return Task.FromResult(IdentityResult.Success);
+      var name = user.NormalizedUserName ?? user.UserName.ToUpperInvariant();
+
+      var stored = await FindByNameAsync(name, cancellationToken);
+      _users.Remove(stored);
+      return await CreateAsync(user, cancellationToken);
     }
 
     public Task<string> GetSecurityStampAsync(User user, CancellationToken cancellationToken)
