@@ -13,6 +13,7 @@ using SMEIoT.Infrastructure.Services;
 
 namespace SMEIoT.Tests.Core.Services
 {
+  [Collection("Access device table")]
 #pragma warning disable CA1063 // Implement IDisposable Correctly
   public class MosquittoBrokerMessageServiceTest : IDisposable
 #pragma warning restore CA1063 // Implement IDisposable Correctly

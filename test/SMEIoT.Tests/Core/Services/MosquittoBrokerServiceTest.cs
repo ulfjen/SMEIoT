@@ -15,6 +15,7 @@ using System.Linq;
 using Microsoft.Extensions.FileProviders;
 using Moq;
 using SMEIoT.Infrastructure.Services;
+using SMEIoT.Core.Interfaces;
 
 namespace SMEIoT.Tests.Core.Services
 {
@@ -26,10 +27,10 @@ namespace SMEIoT.Tests.Core.Services
     public MosquittoBrokerServiceTest()
     {
       _initial = SystemClock.Instance.GetCurrentInstant();
-      var mock = new Mock<MosquittoBrokerPidAccessor>();
-      mock.Setup(a => a.BrokerPid).Returns(10000);
-      var mockPlugin = new Mock<MosquittoBrokerPluginPidService>();
-      mockPlugin.Setup(a => a.BrokerPidFromAuthPlugin).Returns(10000);
+      var mock = new Mock<IMosquittoBrokerPidAccessor>();
+      mock.SetupGet(a => a.BrokerPid).Returns(10000);
+      var mockPlugin = new Mock<IMosquittoBrokerPluginPidService>();
+      mockPlugin.SetupGet(a => a.BrokerPidFromAuthPlugin).Returns(10000);
       _service = new MosquittoBrokerService(new FakeClock(_initial), new NullLogger<MosquittoBrokerService>(), mock.Object, mockPlugin.Object);
     }
 
@@ -165,8 +166,7 @@ namespace SMEIoT.Tests.Core.Services
 
       var (min1, min5, min15) = await _service.GetBrokerLoadAsync();
 
-      var eps = 1e-7;
-      Assert.True(50.0 - eps < min1 && min1 < 50.0 + eps);
+      Assert.Null(min1);
       Assert.Null(min5);
       Assert.Null(min15);
     }
@@ -185,7 +185,7 @@ namespace SMEIoT.Tests.Core.Services
     public async Task BrokerRunning_IsRunningIfReceivedMessageInAWindow()
     {
 
-      await _service.RegisterBrokerStatisticsAsync("load/bytes/received/1min", "100", _initial-Duration.FromMinutes(1));
+      await _service.RegisterBrokerStatisticsAsync("load/bytes/received/1min", "100", _initial-Duration.FromSeconds(1));
 
       Assert.True(_service.BrokerRunning);
     }
@@ -199,7 +199,7 @@ namespace SMEIoT.Tests.Core.Services
       Assert.False(_service.BrokerRunning);
     }
 
-    private async Task<MosquittoBrokerService> SetupServiceWithPidAsync(Mock<MosquittoBrokerPidAccessor> mock, Mock<MosquittoBrokerPluginPidService> mockPlugin)
+    private async Task<MosquittoBrokerService> SetupServiceWithPidAsync(Mock<IMosquittoBrokerPidAccessor> mock, Mock<IMosquittoBrokerPluginPidService> mockPlugin)
     {
       var service = new MosquittoBrokerService(new FakeClock(_initial), new NullLogger<MosquittoBrokerService>(), mock.Object, mockPlugin.Object);
 
@@ -210,10 +210,10 @@ namespace SMEIoT.Tests.Core.Services
     [Fact]
     public async Task BrokerRunning_IsNotRunningWhenPidMismatch()
     {
-      var mock = new Mock<MosquittoBrokerPidAccessor>();
-      mock.Setup(a => a.BrokerPid).Returns(1000);
-      var mockPlugin = new Mock<MosquittoBrokerPluginPidService>();
-      mockPlugin.Setup(a => a.BrokerPidFromAuthPlugin).Returns(10000);
+      var mock = new Mock<IMosquittoBrokerPidAccessor>();
+      mock.SetupGet(a => a.BrokerPid).Returns(1000);
+      var mockPlugin = new Mock<IMosquittoBrokerPluginPidService>();
+      mockPlugin.SetupGet(a => a.BrokerPidFromAuthPlugin).Returns(10000);
 
       var service = await SetupServiceWithPidAsync(mock, mockPlugin);
 
@@ -223,10 +223,10 @@ namespace SMEIoT.Tests.Core.Services
     [Fact]
     public async Task BrokerRunning_IsNotRunningWhenPidNotSet()
     {
-      var mock = new Mock<MosquittoBrokerPidAccessor>();
-      mock.Setup(a => a.BrokerPid).Returns(1000);
-      var mockPlugin = new Mock<MosquittoBrokerPluginPidService>();
-      mockPlugin.Setup(a => a.BrokerPidFromAuthPlugin).Returns(10000);
+      var mock = new Mock<IMosquittoBrokerPidAccessor>();
+      mock.SetupGet(a => a.BrokerPid).Returns(() => null);
+      var mockPlugin = new Mock<IMosquittoBrokerPluginPidService>();
+      mockPlugin.SetupGet(a => a.BrokerPidFromAuthPlugin).Returns(10000);
 
       var service = await SetupServiceWithPidAsync(mock, mockPlugin);
 
@@ -236,11 +236,11 @@ namespace SMEIoT.Tests.Core.Services
     [Fact]
     public async Task BrokerRunning_IsNotRunningWhenPluginPidNotSet()
     {
-      var mock = new Mock<MosquittoBrokerPidAccessor>();
-      mock.Setup(a => a.BrokerPid).Returns(10000);
+      var mock = new Mock<IMosquittoBrokerPidAccessor>();
+      mock.SetupGet(a => a.BrokerPid).Returns(10000);
 
-      var mockPlugin = new Mock<MosquittoBrokerPluginPidService>();
-      mockPlugin.Setup(a => a.BrokerPidFromAuthPlugin).Returns<int?>(null);
+      var mockPlugin = new Mock<IMosquittoBrokerPluginPidService>();
+      mockPlugin.SetupGet(a => a.BrokerPidFromAuthPlugin).Returns(() => null);
 
       var service = await SetupServiceWithPidAsync(mock, mockPlugin);
 

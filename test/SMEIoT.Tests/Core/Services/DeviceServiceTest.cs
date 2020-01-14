@@ -12,6 +12,7 @@ using Xunit;
 
 namespace SMEIoT.Tests.Core.Services
 {
+  [Collection("Access device table")]
 #pragma warning disable CA1063 // Implement IDisposable Correctly
   public class DeviceServiceTest : IDisposable
 #pragma warning restore CA1063 // Implement IDisposable Correctly

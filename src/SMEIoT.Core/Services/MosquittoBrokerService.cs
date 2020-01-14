@@ -68,7 +68,14 @@ namespace SMEIoT.Core.Services
     public Task<bool> RegisterBrokerStatisticsAsync(string name, string value, Instant createdAt)
     {
       BrokerLastMessageAt = createdAt;
-      return Task.FromResult(_values.TryAdd(name, value));
+      if (_values.TryGetValue(name, out var stored))
+      {
+        return Task.FromResult(_values.TryUpdate(name, value, stored));
+      }
+      else
+      {
+        return Task.FromResult(_values.TryAdd(name, value)); 
+      }
     }
 
     public Task<string?> GetBrokerStatisticsAsync(string name)
