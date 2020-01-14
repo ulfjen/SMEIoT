@@ -5,6 +5,6 @@ namespace SMEIoT.Core.Interfaces
   public interface IMqttEntityIdentifierSuggestionService
   {
     Task<string> GenerateRandomIdentifierForDeviceAsync(int numWords);
-    string? GetARandomIdentifierCandidatesForSensor(string deviceName);
+    Task<string?> GetOneIdentifierCandidateForSensorAsync(string deviceName);
   }
 }

@@ -4,15 +4,22 @@ using System.Threading.Tasks;
 using Moq;
 using NodaTime;
 using NodaTime.Testing;
+using SMEIoT.Core.Entities;
+using SMEIoT.Core.Exceptions;
 using SMEIoT.Core.Interfaces;
 using SMEIoT.Core.Services;
+using SMEIoT.Infrastructure.Data;
+using SMEIoT.Tests.Shared;
 using Xunit;
 
 namespace SMEIoT.Tests.Core.Services
 {
   public class MqttEntityIdentifierSuggestionServiceTest
   {
-    private static MqttEntityIdentifierSuggestionService BuildService()
+    private readonly ApplicationDbContext _dbContext;
+    private readonly MqttEntityIdentifierSuggestionService _service;
+
+    public MqttEntityIdentifierSuggestionServiceTest()
     {
       var mockedAccessor = new Mock<IIdentifierDictionaryFileAccessor>();
       mockedAccessor.Setup(x => x.ListIdentifiers(It.IsAny<string>())).Returns(new List<string> { "id1", "id2", "id3" });
@@ -21,63 +28,77 @@ namespace SMEIoT.Tests.Core.Services
       identifierService.RegisterSensorNameWithDeviceName("sensor2", "device1");
       identifierService.RegisterSensorNameWithDeviceName("sensor3", "device2");
 
-      var mockedDb = new Mock<IApplicationDbConnection>(MockBehavior.Strict);
-      mockedDb.Setup(x => x.ExecuteScalar<bool>("SELECT COUNT(DISTINCT 1) FROM devices WHERE normalized_name = @NormalizedName;", It.IsAny<object>(), null, null, null)).Returns(false);
-      return new MqttEntityIdentifierSuggestionService(identifierService, mockedAccessor.Object, mockedDb.Object);
+      _dbContext = ApplicationDbContextHelper.BuildTestDbContext();
+      _service = new MqttEntityIdentifierSuggestionService(identifierService, mockedAccessor.Object, _dbContext);
     }
 
     [Fact]
     public async Task GenerateRandomIdentifierForDevice_ReturnsIdentifier()
     {
       // arrange
-      var service = BuildService();
 
       // act
-      var res = await service.GenerateRandomIdentifierForDeviceAsync(1);
+      var res = await _service.GenerateRandomIdentifierForDeviceAsync(1);
 
       // assert
       Assert.True(res == "id1" || res == "id2" || res == "id3");
     }
 
     [Fact]
-    public async Task GenerateRandomIdentifierForDevice_ThrowsIfLessOneWord()
+    public async Task GenerateRandomIdentifierForDevice_DontReturnDeviceName()
     {
-      var service = BuildService();
+      var mockedAccessor = new Mock<IIdentifierDictionaryFileAccessor>();
+      mockedAccessor.Setup(x => x.ListIdentifiers(It.IsAny<string>())).Returns(new List<string> { "id1", "id2" });
+      var identifierService = new MqttIdentifierService(new FakeClock(Instant.FromUtc(2020, 1, 1, 0, 0)));
+      identifierService.RegisterSensorNameWithDeviceName("sensor1", "device1");
+      identifierService.RegisterSensorNameWithDeviceName("sensor2", "device1");
+      identifierService.RegisterSensorNameWithDeviceName("sensor3", "device2");
 
-      Task Act() => service.GenerateRandomIdentifierForDeviceAsync(0);
+      var service = new MqttEntityIdentifierSuggestionService(identifierService, mockedAccessor.Object, _dbContext);
+      _dbContext.Devices.Add(new Device { Name = "id1", NormalizedName = Device.NormalizeName("id1") });
+      await _dbContext.SaveChangesAsync();
 
-      var exce = await Record.ExceptionAsync(Act);
-      Assert.IsType<ArgumentException>(exce);
+      var res = await service.GenerateRandomIdentifierForDeviceAsync(1);
+
+      Assert.True(res != "id1");
+      Assert.True(res == "id2");
     }
 
+    [Fact]
+    public async Task GenerateRandomIdentifierForDevice_ThrowsIfLessOneWord()
+    {
+
+      Task Act() => _service.GenerateRandomIdentifierForDeviceAsync(0);
+
+      var exce = await Record.ExceptionAsync(Act);
+      var details = Assert.IsType<InvalidArgumentException>(exce);
+      Assert.Equal("numWords", details.ParamName);
+    }
 
     [Fact]
-    public async Task GetARandomIdentifierCandidatesForSensor_ReturnsCandidate()
+    public async Task GetOneIdentifierCandidateForSensorAsync_ReturnsCandidate()
     {
-      var service = BuildService();
 
-      var cand = service.GetARandomIdentifierCandidatesForSensor("device2");
+      var cand = await _service.GetOneIdentifierCandidateForSensorAsync("device2");
 
       Assert.Equal("sensor3", cand);
     }
 
 
     [Fact]
-    public void GetARandomIdentifierCandidatesForSensor_ReturnsOneCandidate()
+    public async Task GetOneIdentifierCandidateForSensorAsync_ReturnsOneCandidate()
     {
-      var service = BuildService();
 
-      var cand = service.GetARandomIdentifierCandidatesForSensor("device1");
+      var cand = await _service.GetOneIdentifierCandidateForSensorAsync("device1");
 
       Assert.True(cand == "sensor1" || cand == "sensor2");
     }
 
     [Fact]
-    public void GetARandomIdentifierCandidatesForSensor_ReturnsNull()
+    public async Task GetOneIdentifierCandidateForSensorAsync_ReturnsNull()
     {
-      var service = BuildService();
 
-      var cand = service.GetARandomIdentifierCandidatesForSensor("device-not-existed");
+      var cand = await _service.GetOneIdentifierCandidateForSensorAsync("device-not-existed");
 
       Assert.Null(cand);
     }
