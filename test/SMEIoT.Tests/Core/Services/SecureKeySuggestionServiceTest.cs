@@ -8,30 +8,38 @@ namespace SMEIoT.Tests.Core.Services
 {
   public class SecureKeySuggestionServiceTest
   {
-    private static SecureKeySuggestionService BuildService()
+    private readonly SecureKeySuggestionService _service;
+
+    public SecureKeySuggestionServiceTest()
     {
-      return new SecureKeySuggestionService();
+      _service = new SecureKeySuggestionService();
     }
 
     [Fact]
     public async Task GenerateSecureKeyWithByteLength_ReturnsKey()
     {
       // arrange
-      var service = BuildService();
 
       // act
-      var key = await service.GenerateSecureKeyWithByteLengthAsync(SecureKeySuggestionService.ByteLengthUpperBound);
+      var key = await _service.GenerateSecureKeyWithByteLengthAsync(SecureKeySuggestionService.ByteLengthUpperBound);
 
       // assert
       Assert.Equal(SecureKeySuggestionService.ByteLengthUpperBound*2, key.Length);
     }
 
     [Fact]
+    public async Task GenerateSecureKeyWithByteLength_ReturnsKeyAtLowerBound()
+    {
+      var key = await _service.GenerateSecureKeyWithByteLengthAsync(SecureKeySuggestionService.ByteLengthLowerBound);
+
+      Assert.Equal(SecureKeySuggestionService.ByteLengthLowerBound * 2, key.Length);
+    }
+
+    [Fact]
     public async Task GenerateSecureKeyWithByteLength_ThrowsIfLargeThanUpperBound()
     {
-      var service = BuildService();
 
-      Task Act() => service.GenerateSecureKeyWithByteLengthAsync(SecureKeySuggestionService.ByteLengthUpperBound-1);
+      Task Act() => _service.GenerateSecureKeyWithByteLengthAsync(SecureKeySuggestionService.ByteLengthUpperBound+1);
 
       var exce = await Record.ExceptionAsync(Act);
       Assert.IsType<ArgumentOutOfRangeException>(exce);
@@ -40,9 +48,8 @@ namespace SMEIoT.Tests.Core.Services
     [Fact]
     public async Task GenerateSecureKeyWithByteLength_ThrowsIfLowerThanLowerBound()
     {
-      var service = BuildService();
 
-      Task Act() => service.GenerateSecureKeyWithByteLengthAsync(SecureKeySuggestionService.ByteLengthLowerBound-1);
+      Task Act() => _service.GenerateSecureKeyWithByteLengthAsync(SecureKeySuggestionService.ByteLengthLowerBound-1);
 
       var exce = await Record.ExceptionAsync(Act);
       Assert.IsType<ArgumentOutOfRangeException>(exce);
