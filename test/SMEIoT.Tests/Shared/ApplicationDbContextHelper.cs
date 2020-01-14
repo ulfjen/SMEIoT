@@ -11,13 +11,8 @@ namespace SMEIoT.Tests.Shared
 {
   public static class ApplicationDbContextHelper
   {
-    public static ApplicationDbContext BuildTestDbContext(string? databaseName = null, Instant? initial = null)
+    public static ApplicationDbContext BuildTestDbContext(Instant? initial = null)
     {
-      if (databaseName == null)
-      {
-        databaseName = Guid.NewGuid().ToString();
-      }
-
       if (initial == null)
       {
         initial = SystemClock.Instance.GetCurrentInstant();
