@@ -78,7 +78,7 @@ namespace SMEIoT.Web.Api.V1
         sensors.Add(new BasicSensorApiModel(sensor));
       }
 
-      var sensorNamesFromMqtt = _mqttService.ListSensorNamesByDeviceName(device.Name);
+      var sensorNamesFromMqtt = await _mqttService.ListSensorNamesByDeviceNameAsync(device.Name);
       sensors.AddRange(sensorNamesFromMqtt.Select(n => new BasicSensorApiModel(n)));
 
       var res = new DeviceDetailsApiModel(device, sensors);
@@ -100,7 +100,7 @@ namespace SMEIoT.Web.Api.V1
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<SensorCandidatesApiModel>> ListSensorCandidates(string name)
     {
-      var suggestSensorNames = _mqttService.ListSensorNamesByDeviceName(name);
+      var suggestSensorNames = await _mqttService.ListSensorNamesByDeviceNameAsync(name);
       return Ok(new SensorCandidatesApiModel(suggestSensorNames));
     }
 

@@ -64,15 +64,16 @@ namespace SMEIoT.Core.Services
       throw new SystemException("Can't generate device names after retried 3 times.");
     }
 
-    public Task<string?> GetOneIdentifierCandidateForSensorAsync(string deviceName)
+    public async Task<string?> GetOneIdentifierCandidateForSensorAsync(string deviceName)
     {
-      var candidates = _mqttIdentifierService.ListSensorNamesByDeviceName(deviceName).ToList();
+      var names = await _mqttIdentifierService.ListSensorNamesByDeviceNameAsync(deviceName);
+      var candidates = names.ToList();
       if (candidates.Count == 0)
       {
-        return Task.FromResult<string?>(null);
+        return null;
       }
       var idx = _rand.Next(candidates.Count);
-      return Task.FromResult<string?>(candidates[idx]);
+      return candidates[idx];
     }
   }
 }

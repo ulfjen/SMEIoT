@@ -18,18 +18,23 @@ namespace SMEIoT.Tests.Core.Services
   {
     private readonly ApplicationDbContext _dbContext;
     private readonly MqttEntityIdentifierSuggestionService _service;
+    private MqttIdentifierService _identifierService;
 
     public MqttEntityIdentifierSuggestionServiceTest()
     {
       var mockedAccessor = new Mock<IIdentifierDictionaryFileAccessor>();
       mockedAccessor.Setup(x => x.ListIdentifiers(It.IsAny<string>())).Returns(new List<string> { "id1", "id2", "id3" });
-      var identifierService = new MqttIdentifierService(new FakeClock(Instant.FromUtc(2020, 1, 1, 0, 0)));
-      identifierService.RegisterSensorNameWithDeviceName("sensor1", "device1");
-      identifierService.RegisterSensorNameWithDeviceName("sensor2", "device1");
-      identifierService.RegisterSensorNameWithDeviceName("sensor3", "device2");
+      _identifierService = new MqttIdentifierService(new FakeClock(Instant.FromUtc(2020, 1, 1, 0, 0)));
 
       _dbContext = ApplicationDbContextHelper.BuildTestDbContext();
-      _service = new MqttEntityIdentifierSuggestionService(identifierService, mockedAccessor.Object, _dbContext);
+      _service = new MqttEntityIdentifierSuggestionService(_identifierService, mockedAccessor.Object, _dbContext);
+    }
+    
+    private async Task SeedDefaultIdentifiers()
+    {
+      await _identifierService.RegisterSensorNameWithDeviceNameAsync("sensor1", "device1");
+      await _identifierService.RegisterSensorNameWithDeviceNameAsync("sensor2", "device1");
+      await _identifierService.RegisterSensorNameWithDeviceNameAsync("sensor3", "device2");
     }
 
     [Fact]
@@ -49,12 +54,8 @@ namespace SMEIoT.Tests.Core.Services
     {
       var mockedAccessor = new Mock<IIdentifierDictionaryFileAccessor>();
       mockedAccessor.Setup(x => x.ListIdentifiers(It.IsAny<string>())).Returns(new List<string> { "id1", "id2" });
-      var identifierService = new MqttIdentifierService(new FakeClock(Instant.FromUtc(2020, 1, 1, 0, 0)));
-      identifierService.RegisterSensorNameWithDeviceName("sensor1", "device1");
-      identifierService.RegisterSensorNameWithDeviceName("sensor2", "device1");
-      identifierService.RegisterSensorNameWithDeviceName("sensor3", "device2");
-
-      var service = new MqttEntityIdentifierSuggestionService(identifierService, mockedAccessor.Object, _dbContext);
+      await SeedDefaultIdentifiers();
+      var service = new MqttEntityIdentifierSuggestionService(_identifierService, mockedAccessor.Object, _dbContext);
       _dbContext.Devices.Add(new Device { Name = "id1", NormalizedName = Device.NormalizeName("id1") });
       await _dbContext.SaveChangesAsync();
 
@@ -78,6 +79,7 @@ namespace SMEIoT.Tests.Core.Services
     [Fact]
     public async Task GetOneIdentifierCandidateForSensorAsync_ReturnsCandidate()
     {
+      await SeedDefaultIdentifiers();
 
       var cand = await _service.GetOneIdentifierCandidateForSensorAsync("device2");
 
@@ -88,6 +90,7 @@ namespace SMEIoT.Tests.Core.Services
     [Fact]
     public async Task GetOneIdentifierCandidateForSensorAsync_ReturnsOneCandidate()
     {
+      await SeedDefaultIdentifiers();
 
       var cand = await _service.GetOneIdentifierCandidateForSensorAsync("device1");
 
@@ -97,12 +100,11 @@ namespace SMEIoT.Tests.Core.Services
     [Fact]
     public async Task GetOneIdentifierCandidateForSensorAsync_ReturnsNull()
     {
+      await SeedDefaultIdentifiers();
 
       var cand = await _service.GetOneIdentifierCandidateForSensorAsync("device-not-existed");
 
       Assert.Null(cand);
     }
-
-
   }
 }
