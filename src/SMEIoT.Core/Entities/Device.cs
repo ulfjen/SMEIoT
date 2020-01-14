@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using SMEIoT.Core.Interfaces;
 
 namespace SMEIoT.Core.Entities
 {

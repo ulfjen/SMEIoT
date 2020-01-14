@@ -13,6 +13,7 @@ using Xunit;
 
 namespace SMEIoT.Tests.Core.Services
 {
+  [Collection("Database collection")]
   public class MqttIdentifierServiceTest
   {
     private readonly MqttIdentifierService _service;

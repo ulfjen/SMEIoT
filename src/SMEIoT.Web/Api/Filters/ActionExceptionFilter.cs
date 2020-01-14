@@ -42,9 +42,11 @@ namespace SMEIoT.Web.Api.Filters
         case InvalidUserInputException exception:
           context.Result = new UnprocessableEntityObjectResult(_pdFactory.CreateProblemDetails(context.HttpContext, StatusCodes.Status422UnprocessableEntity, null, null, exception.Message));
           break;
+        case InvalidOperationException exception:
+          context.Result = new UnprocessableEntityObjectResult(_pdFactory.CreateProblemDetails(context.HttpContext, StatusCodes.Status400BadRequest, null, null, exception.Message));
+          break;
         case InternalException exception:
           goto default;
-          break;
         default:
           var message = _env.IsProduction() ? "" : context.Exception.Message;
           context.Result = new ObjectResult(_pdFactory.CreateProblemDetails(context.HttpContext, StatusCodes.Status500InternalServerError, null, null, $"Unhandled exception. {message}")) { StatusCode = StatusCodes.Status500InternalServerError };

@@ -15,6 +15,7 @@ using Xunit;
 
 namespace SMEIoT.Tests.Core.Services
 {
+  [Collection("Database collection")]
 #pragma warning disable CA1063 // Implement IDisposable Correctly
   public class UserManagementServiceTest: IDisposable
 #pragma warning restore CA1063 // Implement IDisposable Correctly

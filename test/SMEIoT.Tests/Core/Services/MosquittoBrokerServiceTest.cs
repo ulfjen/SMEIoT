@@ -1,20 +1,12 @@
 using System;
-using System.Text;
 using System.Threading.Tasks;
-using SMEIoT.Core.Entities;
-using SMEIoT.Core.Exceptions;
 using SMEIoT.Core.Services;
-using SMEIoT.Infrastructure.Data;
-using SMEIoT.Tests.Shared;
 using Xunit;
 using NodaTime;
 using NodaTime.Testing;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 using System.Linq;
-using Microsoft.Extensions.FileProviders;
 using Moq;
-using SMEIoT.Infrastructure.Services;
 using SMEIoT.Core.Interfaces;
 
 namespace SMEIoT.Tests.Core.Services

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
@@ -22,58 +23,26 @@ namespace SMEIoT.Core.Services
       _userManager = userManager;
     }
 
-    public async IAsyncEnumerable<UserSensor> ListAssignedUserSensorsBySensorName(string sensorName)
-    {
-      var sensor = await GetSensorByNameAsync(sensorName);
-      if (sensor == null)
-      {
-        throw new EntityNotFoundException("cannot find the sensor.", "sensorName");
-      }
-      foreach (var userSensor in _dbContext.UserSensors.Where(us => us.Sensor == sensor))
-      {
-        yield return userSensor;
-      }
-    }
-
-    public async Task<bool> AssignSensorToUserAsync(string sensorName, string userName)
+    public async Task AssignSensorToUserAsync(string sensorName, string userName)
     {
       var (sensor, user) = await GetUserAndSensor(sensorName, userName);
 
       _dbContext.UserSensors.Add(new UserSensor {UserId = user.Id, SensorId = sensor.Id});
       await _dbContext.SaveChangesAsync();
-      return true;
     }
 
-    public async Task<UserSensor> GetUserSensor(string userName, string sensorName)
+    public async Task RevokeSensorFromUserAsync(string sensorName, string userName)
     {
       var (sensor, user) = await GetUserAndSensor(sensorName, userName);
-      var us = await GetUserSensor(user, sensor);
+
+      var us = await _dbContext.UserSensors.SingleOrDefaultAsync(us => us.SensorId == sensor.Id && us.UserId == user.Id);
       if (us == null)
       {
-        throw new EntityNotFoundException("cannot be found.", "userSensor");
+        throw new InvalidOperationException("Assignment cannot be found.");
       }
 
-      return us;
-    }
-
-    public async Task<bool> RevokeSensorFromUserAsync(string sensorName, string userName)
-    {
-      var (sensor, user) = await GetUserAndSensor(sensorName, userName);
-
-      var userSensor = await GetUserSensor(user, sensor);
-      if (userSensor == null)
-      {
-        throw new EntityNotFoundException("cannot be found", "userSensor");
-      }
-
-      _dbContext.UserSensors.Remove(userSensor);
+      _dbContext.UserSensors.Remove(us);
       await _dbContext.SaveChangesAsync();
-      return true;
-    }
-
-    private Task<UserSensor> GetUserSensor(User user, Sensor sensor)
-    {
-      return _dbContext.UserSensors.SingleOrDefaultAsync(us => us.SensorId == sensor.Id && us.UserId == user.Id);
     }
 
     private async Task<(Sensor, User)> GetUserAndSensor(string sensorName, string userName)
@@ -81,26 +50,81 @@ namespace SMEIoT.Core.Services
       var sensor = await GetSensorByNameAsync(sensorName);
       if (sensor == null)
       {
-        throw new EntityNotFoundException("cannot be found.", "sensorName");
+        throw new EntityNotFoundException("Sensor cannot be found.", nameof(sensorName));
       }
 
       var user = await GetUserByNameAsync(userName);
       if (user == null)
       {
-        throw new EntityNotFoundException("cannot be found.", "userName");
+        throw new EntityNotFoundException("User cannot be found.", nameof(userName));
       }
 
       return (sensor, user);
     }
 
-    private Task<Sensor> GetSensorByNameAsync(string name)
+    private async Task<Sensor?> GetSensorByNameAsync(string name)
     {
-      return _dbContext.Sensors.Where("NormalizedName = @0", Sensor.NormalizeName(name)).FirstOrDefaultAsync();
+      var normalized = Sensor.NormalizeName(name);
+      return await _dbContext.Sensors.Where(s => s.NormalizedName == normalized).FirstOrDefaultAsync();
     }
 
-    private Task<User> GetUserByNameAsync(string name)
+    private async Task<User?> GetUserByNameAsync(string name)
     {
-      return _userManager.FindByNameAsync(name);
+      return await _userManager.FindByNameAsync(name);
+    }
+
+    public async IAsyncEnumerable<User> ListAllowedUsersBySensorNameAsync(string sensorName)
+    {
+      var sensor = await GetSensorByNameAsync(sensorName);
+      if (sensor == null)
+      {
+        throw new EntityNotFoundException("cannot find the sensor.", nameof(sensorName));
+      }
+      var admins = await _userManager.GetUsersInRoleAsync("Admin");
+      await foreach (var user in _dbContext.Users.Join(_dbContext.UserSensors, u => u.Id, us => us.UserId, (u, us) => u).Distinct().AsAsyncEnumerable())
+      {
+        admins.Remove(user);
+        yield return user;
+      }
+      foreach (var admin in admins)
+      {
+        yield return admin;
+      }
+    }
+
+    public async IAsyncEnumerable<Sensor> ListSensorsByUserNameAsync(string userName)
+    {
+      var user = await GetUserByNameAsync(userName);
+      if (user == null)
+      {
+        throw new EntityNotFoundException("User can't be found.", nameof(userName));
+      }
+
+      if (await _userManager.IsInRoleAsync(user, "Admin"))
+      {
+        await foreach (var s in _dbContext.Sensors)
+        {
+          yield return s;
+        }
+      }
+      else
+      {
+        var userSensors = _dbContext.UserSensors.Where(us => us.UserId == user.Id).AsQueryable();
+        await foreach (var s in _dbContext.Sensors.Join(userSensors, s => s.Id, us => us.SensorId, (s, us) => s).Distinct().AsAsyncEnumerable())
+        {
+          yield return s;
+        }
+      }
+    }
+
+    public async Task<bool> DoesUserAllowToSeeSensorAsync(string sensorName, string userName)
+    {
+      var (sensor, user) = await GetUserAndSensor(sensorName, userName);
+
+      if (await _userManager.IsInRoleAsync(user, "Admin")) { return true; }
+
+      var count = _dbContext.UserSensors.Where(us => us.SensorId == sensor.Id && us.UserId == user.Id).Count();
+      return count > 0;
     }
   }
 }

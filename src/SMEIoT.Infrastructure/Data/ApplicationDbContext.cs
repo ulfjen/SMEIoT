@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,7 +23,7 @@ namespace SMEIoT.Infrastructure.Data
   public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<long>, long, IdentityUserClaim<long>,
     IdentityUserRole<long>, IdentityUserLogin<long>, IdentityRoleClaim<long>, IdentityUserToken<long>>, IApplicationDbContext
   {
-    private IClock _clock;
+    private readonly IClock _clock;
     // inherited Users, UserRoles DbSet
     public DbSet<Sensor> Sensors { get; set; } = null!;
     public DbSet<SensorValue> SensorValues { get; set; } = null!;
@@ -119,7 +119,7 @@ namespace SMEIoT.Infrastructure.Data
       modelBuilder.Entity<UserSensor>()
         .HasOne(us => us.User)
         .WithMany(u => u.UserSensors)
-        .HasForeignKey(us => us.SensorId);
+        .HasForeignKey(us => us.UserId);
 
       modelBuilder.Entity<UserSensor>()
         .HasOne(us => us.Sensor)

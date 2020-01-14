@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using NodaTime;
 using NodaTime.Testing;
@@ -14,7 +15,9 @@ using Xunit;
 
 namespace SMEIoT.Tests.Core.Services
 {
-  public class MqttEntityIdentifierSuggestionServiceTest
+#pragma warning disable CA1063 // Implement IDisposable Correctly
+  public class MqttEntityIdentifierSuggestionServiceTest : IDisposable
+#pragma warning restore CA1063 // Implement IDisposable Correctly
   {
     private readonly ApplicationDbContext _dbContext;
     private readonly MqttEntityIdentifierSuggestionService _service;
@@ -29,9 +32,21 @@ namespace SMEIoT.Tests.Core.Services
       _dbContext = ApplicationDbContextHelper.BuildTestDbContext();
       _service = new MqttEntityIdentifierSuggestionService(_identifierService, mockedAccessor.Object, _dbContext);
     }
-    
+
+#pragma warning disable CA1063 // Implement IDisposable Correctly
+    public void Dispose()
+#pragma warning restore CA1063 // Implement IDisposable Correctly
+    {
+      _dbContext.Database.ExecuteSqlInterpolated($"TRUNCATE devices CASCADE;");
+      _dbContext.Dispose();
+    }
+
     private async Task SeedDefaultIdentifiers()
     {
+      foreach (var n in new[] { "device1", "device2"})
+      {
+        await _identifierService.RegisterDeviceNameAsync(n);
+      }
       await _identifierService.RegisterSensorNameWithDeviceNameAsync("sensor1", "device1");
       await _identifierService.RegisterSensorNameWithDeviceNameAsync("sensor2", "device1");
       await _identifierService.RegisterSensorNameWithDeviceNameAsync("sensor3", "device2");

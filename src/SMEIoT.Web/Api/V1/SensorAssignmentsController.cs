@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -30,9 +30,9 @@ namespace SMEIoT.Web.Api.V1
     public async Task<ActionResult<SensorAssignmentApiModel>> Create(string name, [BindRequired] AssignUserSensorBindingModel binding)
     {
       await _service.AssignSensorToUserAsync(name, binding.UserName);
-      var us = await _service.GetUserSensor(binding.UserName, name);
+      var result = new SensorAssignmentApiModel(name, binding.UserName);
 
-      return CreatedAtAction(nameof(Create), us);
+      return CreatedAtAction(nameof(Create), result);
     }
     
     [HttpGet("{name}/users")]
@@ -40,11 +40,11 @@ namespace SMEIoT.Web.Api.V1
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Authorize(Roles = "Admin")]
-    public async IAsyncEnumerable<UserSensor> Index(string name)
+    public async IAsyncEnumerable<User> Index(string name)
     {
-      await foreach (var userSensor in _service.ListAssignedUserSensorsBySensorName(name))
+      await foreach (var users in _service.ListAllowedUsersBySensorNameAsync(name))
       {
-        yield return userSensor;
+        yield return users;
       }
     }
 

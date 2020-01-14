@@ -13,3 +13,4 @@ sudo apt-get install -y build-essential \
     cmake
 build_mosquitto
 mkdir -p out && cd out && cmake .. -DCMAKE_BUILD_TYPE=Debug && make -j$(nproc)  && sudo make install
+setup_test_db
