@@ -15,7 +15,9 @@ using Xunit;
 
 namespace SMEIoT.Tests.Core.Services
 {
+#pragma warning disable CA1063 // Implement IDisposable Correctly
   public class UserManagementServiceTest: IDisposable
+#pragma warning restore CA1063 // Implement IDisposable Correctly
   {
     private readonly ApplicationDbContext _dbContext;
     private readonly UserManager _userManager;
@@ -29,8 +31,10 @@ namespace SMEIoT.Tests.Core.Services
       _roleManager = IdentityHelpers.BuildRoleManager(ApplicationDbContextHelper.BuildTestDbContext());
       _service = new UserManagementService(_dbContext, _userManager, _roleManager, new NullLogger<UserManagementService>());
     }
-    
+
+#pragma warning disable CA1063 // Implement IDisposable Correctly
     public void Dispose()
+#pragma warning restore CA1063 // Implement IDisposable Correctly
     {
       _dbContext.Database.ExecuteSqlInterpolated($"TRUNCATE user_roles, user_tokens, user_logins, user_claims, role_claims, roles, users RESTART IDENTITY CASCADE;");
       _dbContext.Dispose();

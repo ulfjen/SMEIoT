@@ -119,7 +119,7 @@ namespace SMEIoT.Core.EventHandlers
       if (value.EndsWith(SecondsPostfix)) {
         value = value.Slice(0, value.Length - SecondsPostfix.Length).TrimEnd();
       }
-      _brokerService.RegisterBrokerStatistics(parsed.ToString(), value.ToString());
+      _ = _brokerService.RegisterBrokerStatisticsAsync(parsed.ToString(), value.ToString(), message.ReceivedAt).GetAwaiter().GetResult();
 
       _brokerService.BrokerLastMessageAt = message.ReceivedAt;
     }

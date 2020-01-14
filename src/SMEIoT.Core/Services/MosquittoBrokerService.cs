@@ -2,10 +2,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
-using System.IO;
 using System.Linq;
 using NodaTime;
-using SMEIoT.Core.Entities;
 using SMEIoT.Core.Interfaces;
 using Microsoft.Extensions.Logging;
 using Mono.Unix.Native;
@@ -17,21 +15,20 @@ namespace SMEIoT.Core.Services
     private readonly ConcurrentDictionary<string, string> _values = new ConcurrentDictionary<string, string>();
     private readonly IClock _clock;
     private readonly ILogger _logger;
+    private readonly IMosquittoBrokerPidAccessor _accessor;
+    private readonly IMosquittoBrokerPluginPidService _pluginService;
 
     public bool BrokerRunning {
       get {
         var brokerSendingMessage = BrokerLastMessageAt != null && _clock.GetCurrentInstant() - BrokerLastMessageAt <= Duration.FromSeconds(45);
-        var brokerExist = BrokerPid != null && BrokerPid == BrokerPidFromAuthPlugin;
-        _logger.LogTrace($"Broker last message {BrokerLastMessageAt}; Pid {BrokerPid}; Plugin {BrokerPidFromAuthPlugin}");
+        var brokerExist = _accessor.BrokerPid != null && _accessor.BrokerPid == _pluginService.BrokerPidFromAuthPlugin;
+        _logger.LogTrace($"Broker last message {BrokerLastMessageAt}; Pid {_accessor.BrokerPid}; Plugin {_pluginService.BrokerPidFromAuthPlugin}");
         // ensure we are talking with the same process
         return brokerSendingMessage && brokerExist;
       }
     }
 
     public Instant? BrokerLastMessageAt { get; set; }
-    public int? BrokerPidFromAuthPlugin { get; set; }
-
-    public int? BrokerPid => GetBrokerPidFromPidFile("/var/run/smeiot.mosquitto.pid");
 
     private const string ByteLoadReceived1Min = "load/bytes/received/1min";
     private const string ByteLoadReceived5Min = "load/bytes/received/5min";
@@ -40,30 +37,23 @@ namespace SMEIoT.Core.Services
     private const string ByteLoadSent5Min = "load/bytes/sent/5min";
     private const string ByteLoadSent15Min = "load/bytes/sent/15min";
 
-    public MosquittoBrokerService(IClock clock, ILogger<MosquittoBrokerService> logger)
+    public MosquittoBrokerService(IClock clock, ILogger<MosquittoBrokerService> logger, IMosquittoBrokerPidAccessor accessor, IMosquittoBrokerPluginPidService pluginService)
     {
       _clock = clock;
       _logger = logger;
+      _accessor = accessor;
+      _pluginService = pluginService;
     }
 
-    public int? GetBrokerPidFromPidFile(string path)
-    {
-      try {
-        var txt = File.ReadAllText(path);
-        return int.Parse(txt);
-      } catch {
-        return null;
-      }
-    }
 
     private Task SendSignalAsync(Signum signal, bool ignoreAuthPluginPid)
     {
-      if (BrokerPid == null || (!ignoreAuthPluginPid && BrokerPidFromAuthPlugin == null)) {
-        return Task.FromException(new ArgumentException($"The broker is not running correctly. We get pid from the broker as {BrokerPid}. And the auth plugin says {BrokerPidFromAuthPlugin}."));
+      if (_accessor.BrokerPid == null || (!ignoreAuthPluginPid && _pluginService.BrokerPidFromAuthPlugin == null)) {
+        return Task.FromException(new ArgumentException($"The broker is not running correctly. We get pid from the broker as {_accessor.BrokerPid}. And the auth plugin says {_pluginService.BrokerPidFromAuthPlugin}."));
       }
       try {
-        _logger.LogInformation($"We are sending a signal {signal} to {BrokerPid}");
-        Syscall.kill(BrokerPid.Value, signal);
+        _logger.LogInformation($"We are sending a signal {signal} to {_accessor.BrokerPid}");
+        Syscall.kill(_accessor.BrokerPid.Value, signal);
         return Task.CompletedTask;
       } catch (Exception ex) {
         return Task.FromException(ex);
@@ -75,20 +65,20 @@ namespace SMEIoT.Core.Services
     // do it by kill it and wait for systemd to bring the service online
     public Task RestartBrokerBySignalAsync(bool ignoreAuthPluginPid = false) => SendSignalAsync(Signum.SIGKILL, ignoreAuthPluginPid);
 
-    public bool RegisterBrokerStatistics(string name, string value)
+    public Task<bool> RegisterBrokerStatisticsAsync(string name, string value, Instant createdAt)
     {
-      return _values.TryAdd(name, value);
+      BrokerLastMessageAt = createdAt;
+      return Task.FromResult(_values.TryAdd(name, value));
     }
 
-    public string? GetBrokerStatistics(string name)
+    public Task<string?> GetBrokerStatisticsAsync(string name)
     {
-      return GetStatisticsValue(name);
+      return Task.FromResult(GetStatisticsValue(name));
     }
 
     public Task<IEnumerable<KeyValuePair<string, string>>> ListBrokerStatisticsAsync()
     {
-      IEnumerable<KeyValuePair<string, string>> res = _values.ToArray();
-      return Task.FromResult(res);
+      return Task.FromResult(_values.ToArray().AsEnumerable());
     }
 
     private string? GetStatisticsValue(string name)

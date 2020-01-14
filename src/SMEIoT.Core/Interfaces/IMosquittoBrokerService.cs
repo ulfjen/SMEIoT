@@ -7,17 +7,20 @@ namespace SMEIoT.Core.Interfaces
 {
   public interface IMosquittoBrokerService
   {
-    bool RegisterBrokerStatistics(string name, string value);
-    string? GetBrokerStatistics(string name);
+    Task<bool> RegisterBrokerStatisticsAsync(string name, string value, Instant createdAt);
+    Task<string?> GetBrokerStatisticsAsync(string name);
     Task<IEnumerable<KeyValuePair<string, string>>> ListBrokerStatisticsAsync();
     Task<Tuple<double?, double?, double?>> GetBrokerLoadAsync();
-    int? GetBrokerPidFromPidFile(string path);
+
+    /// <summary>
+    /// reload/restart depends on the platform
+    /// </summary>
+    /// <param name="ignoreAuthPluginPid"></param>
+    /// <returns></returns>
     Task ReloadBrokerBySignalAsync(bool ignoreAuthPluginPid);
     Task RestartBrokerBySignalAsync(bool ignoreAuthPluginPid);
 
     bool BrokerRunning { get; }
-    int? BrokerPid { get; }
-    int? BrokerPidFromAuthPlugin { get; set; }
     Instant? BrokerLastMessageAt { get; set; }
   }
 }

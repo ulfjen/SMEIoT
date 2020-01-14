@@ -70,6 +70,8 @@ namespace SMEIoT.Infrastructure
       }
       services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
       services.AddSingleton<IMqttIdentifierService, MqttIdentifierService>();
+      services.AddSingleton<IMosquittoBrokerPidAccessor, MosquittoBrokerPidAccessor>();
+      services.AddSingleton<IMosquittoBrokerPluginPidService, MosquittoBrokerPluginPidService>();
       services.AddSingleton<IMosquittoBrokerService, MosquittoBrokerService>();
       services.AddSingleton<IMosquittoClientAuthenticationService, MosquittoClientAuthenticationService>();
       services.AddTransient<IMosquittoBrokerMessageService, MosquittoBrokerMessageService>();
@@ -77,6 +79,7 @@ namespace SMEIoT.Infrastructure
         return env.ContentRootFileProvider;
       });
       services.AddScoped<IIdentifierDictionaryFileAccessor, IdentifierDictionaryFileAccessor>();
+      services.AddScoped<IOneLineFileAccessor, OneLineFileAccessor>();
       services.AddScoped<IMqttEntityIdentifierSuggestionService, MqttEntityIdentifierSuggestionService>();
     }
   }

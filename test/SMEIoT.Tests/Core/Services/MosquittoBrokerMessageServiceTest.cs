@@ -1,8 +1,5 @@
 using System;
-using System.Text;
 using System.Threading.Tasks;
-using SMEIoT.Core.Entities;
-using SMEIoT.Core.Exceptions;
 using SMEIoT.Core.Services;
 using SMEIoT.Infrastructure.Data;
 using SMEIoT.Tests.Shared;
@@ -11,10 +8,14 @@ using NodaTime;
 using NodaTime.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
+using Moq;
+using SMEIoT.Infrastructure.Services;
 
 namespace SMEIoT.Tests.Core.Services
 {
+#pragma warning disable CA1063 // Implement IDisposable Correctly
   public class MosquittoBrokerMessageServiceTest : IDisposable
+#pragma warning restore CA1063 // Implement IDisposable Correctly
   {
     private readonly ApplicationDbContext _dbContext;
     private Instant _initial;
@@ -28,13 +29,14 @@ namespace SMEIoT.Tests.Core.Services
       _dbContext = ApplicationDbContextHelper.BuildTestDbContext(_initial);
       var keyService = new SecureKeySuggestionService();
       _clientAuthService = new MosquittoClientAuthenticationService(keyService);
-      var clock = new FakeClock(_initial);
-      var brokerService = new MosquittoBrokerService(clock, new NullLogger<MosquittoBrokerService>()); 
+      var mockPlugin = new Mock<MosquittoBrokerPluginPidService>();
       _deviceService = new DeviceService(_dbContext);
-      _service = new MosquittoBrokerMessageService(_clientAuthService, brokerService, _deviceService);
+      _service = new MosquittoBrokerMessageService(_clientAuthService, mockPlugin.Object, _deviceService);
     }
 
+#pragma warning disable CA1063 // Implement IDisposable Correctly
     public void Dispose()
+#pragma warning restore CA1063 // Implement IDisposable Correctly
     {
       _dbContext.Database.ExecuteSqlInterpolated($"TRUNCATE devices CASCADE;");
       _dbContext.Dispose();

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -12,7 +12,9 @@ using Xunit;
 
 namespace SMEIoT.Tests.Core.Services
 {
+#pragma warning disable CA1063 // Implement IDisposable Correctly
   public class DeviceServiceTest : IDisposable
+#pragma warning restore CA1063 // Implement IDisposable Correctly
   {
     private readonly ApplicationDbContext _dbContext;
     private readonly DeviceService _service;
@@ -23,7 +25,9 @@ namespace SMEIoT.Tests.Core.Services
       _service = new DeviceService(_dbContext);
     }
 
+#pragma warning disable CA1063 // Implement IDisposable Correctly
     public void Dispose()
+#pragma warning restore CA1063 // Implement IDisposable Correctly
     {
       _dbContext.Database.ExecuteSqlInterpolated($"TRUNCATE devices, sensors CASCADE;");
       _dbContext.Dispose();

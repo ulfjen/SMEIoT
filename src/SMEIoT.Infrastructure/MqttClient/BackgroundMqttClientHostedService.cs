@@ -12,7 +12,9 @@ namespace SMEIoT.Infrastructure.MqttClient
     private readonly IMosquittoClientService _client;
     private Timer? _timer;
     private ILogger _logger;
-    private readonly IMosquittoBrokerService _brokerService;
+    private readonly IMosquittoBrokerService _service;
+    private readonly IMosquittoBrokerPidAccessor _accessor;
+    private readonly IMosquittoBrokerPluginPidService _pluginService;
     private readonly IHostEnvironment _env;
     private readonly int _delay = 100;
     private bool _reconnect;
@@ -20,12 +22,16 @@ namespace SMEIoT.Infrastructure.MqttClient
     public BackgroundMqttClientHostedService(
       IMosquittoClientService client,
       ILogger<BackgroundMqttClientHostedService> logger,
-      IMosquittoBrokerService brokerService,
+      IMosquittoBrokerService service,
+      IMosquittoBrokerPidAccessor accessor,
+      IMosquittoBrokerPluginPidService pluginService,
       IHostEnvironment env)
     {
       _client = client;
       _logger = logger;
-      _brokerService = brokerService;
+      _service = service;
+      _accessor = accessor;
+      _pluginService = pluginService;
       _env = env;
     }
 
@@ -55,19 +61,19 @@ namespace SMEIoT.Infrastructure.MqttClient
     private void RestartBrokerIfBrokerWasRogue(bool ignoreAuthPluginPid)
     {
       // broker runs but not the same
-      _logger.LogDebug($"Broker pid = {_brokerService.BrokerPid}; auth plugin reports = {_brokerService.BrokerPidFromAuthPlugin} ");
-      if (_brokerService.BrokerPid != null && (_brokerService.BrokerPidFromAuthPlugin == null || _brokerService.BrokerPid.Value != _brokerService.BrokerPidFromAuthPlugin.Value)) { 
-        _brokerService.RestartBrokerBySignalAsync(true).GetAwaiter().GetResult();
+      _logger.LogDebug($"Broker pid = {_accessor.BrokerPid}; auth plugin reports = {_pluginService.BrokerPidFromAuthPlugin} ");
+      if (_accessor.BrokerPid != null && (_pluginService.BrokerPidFromAuthPlugin == null || _accessor.BrokerPid.Value != _pluginService.BrokerPidFromAuthPlugin.Value)) { 
+        _service.RestartBrokerBySignalAsync(true).GetAwaiter().GetResult();
         int waitingTurn = 5;
         while (waitingTurn-- > 0) {
-          if (_brokerService.BrokerPidFromAuthPlugin == null) {
+          if (_pluginService.BrokerPidFromAuthPlugin == null) {
             Thread.Sleep(TimeSpan.FromSeconds(5)); // waiting the broker to be set up. 
           } else {
             break;
           }
         }
-        _logger.LogDebug($"Broker pid = {_brokerService.BrokerPid}; auth plugin reports = {_brokerService.BrokerPidFromAuthPlugin} ");
-        if (_brokerService.BrokerPidFromAuthPlugin == null && !_env.IsProduction()) {
+        _logger.LogDebug($"Broker pid = {_accessor.BrokerPid}; auth plugin reports = {_pluginService.BrokerPidFromAuthPlugin} ");
+        if (_pluginService.BrokerPidFromAuthPlugin == null && !_env.IsProduction()) {
           throw new OperationCanceledException("Broker is not responding with our restart.");
         }
       }

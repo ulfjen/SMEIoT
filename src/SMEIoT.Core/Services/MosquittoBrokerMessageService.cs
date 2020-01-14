@@ -22,13 +22,13 @@ namespace SMEIoT.Core.Services
     public const string STATUS_FAIL = "FAIL";
 
     private readonly IMosquittoClientAuthenticationService _clientService; // we need to subscribe the client as well as authenticate ourselves.
-    private readonly IMosquittoBrokerService _brokerService;
+    private readonly IMosquittoBrokerPluginPidService _pluginService;
     private readonly IDeviceService _deviceService;
 
-    public MosquittoBrokerMessageService(IMosquittoClientAuthenticationService clientService, IMosquittoBrokerService brokerService, IDeviceService deviceService)
+    public MosquittoBrokerMessageService(IMosquittoClientAuthenticationService clientService, IMosquittoBrokerPluginPidService pluginService, IDeviceService deviceService)
     {
       _clientService = clientService;
-      _brokerService = brokerService;
+      _pluginService = pluginService;
       _deviceService = deviceService;
     }
 
@@ -39,7 +39,7 @@ namespace SMEIoT.Core.Services
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
       };
       var meta = JsonSerializer.Deserialize<BrokerMeta>(body, serializeOptions);
-      _brokerService.BrokerPidFromAuthPlugin = meta.Pid;
+      _pluginService.BrokerPidFromAuthPlugin = meta.Pid;
 
       return Task.FromResult(builder.Append(STATUS_OK));
     }
