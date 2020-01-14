@@ -1,23 +1,14 @@
-using System;
 using System.IO;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging.Abstractions;
-using SMEIoT.Core.Entities;
 using SMEIoT.Core.Exceptions;
-using SMEIoT.Core.Interfaces;
 using SMEIoT.Infrastructure.Data;
-using SMEIoT.Infrastructure.Services;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Xunit;
 
-namespace SMEIoT.Tests.Infrastructure.Services
+namespace SMEIoT.Tests.Infrastructure.Data
 {
   public class IdentifierDictionaryFileAccessorTest
   {
-    private readonly IIdentifierDictionaryFileAccessor _accessor;
+    private readonly IdentifierDictionaryFileAccessor _accessor;
     
     public IdentifierDictionaryFileAccessorTest()
     {
