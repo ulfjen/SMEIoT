@@ -26,10 +26,12 @@ import { defineMessages, useIntl, FormattedMessage } from "react-intl";
 import {
   Link as ReachLink,
   LinkProps as ReachLinkProps,
-  RouteComponentProps
+  RouteComponentProps,
+  NavigateFn
 } from "@reach/router";
 import { GetDefaultApiConfig } from "../index";
 import { DeviceApiModelList } from "smeiot-client/dist/models/DeviceApiModelList";
+import DashboardDeviceMenu from "./DashboardDeviceMenu";
 
 const styles = ({
   palette,
@@ -80,14 +82,14 @@ const styles = ({
   }
 });
 
-export interface IDashboardDeviceBoard
-  extends WithStyles<typeof styles> {
+export interface IDashboardDeviceBoard extends WithStyles<typeof styles> {
+  navigate?: NavigateFn;
 }
 
 const messages = defineMessages({});
 
 const _DashboardDeviceBoard: React.FunctionComponent<IDashboardDeviceBoard> = ({
-  classes,
+  classes, navigate
 }) => {
   const intl = useIntl();
 
@@ -211,39 +213,13 @@ const _DashboardDeviceBoard: React.FunctionComponent<IDashboardDeviceBoard> = ({
         </Grid>
       )}
       {state.loading ? renderDevice(undefined, "") : renderDevices()}
-      <Menu
-        anchorEl={anchorEl}
-        keepMounted
+      <DashboardDeviceMenu
         open={Boolean(anchorEl)}
-        onClose={handleClose}
-      >
-        <MenuItem
-          button
-          to={`/dashboard/devices/${anchoredDeviceName}`}
-          component={ReachLink}
-          onClick={handleClose}
-        >
-          <FormattedMessage
-            id="dashboard.device.actions.configure"
-            description="The action for device card."
-            defaultMessage="Configure"
-          />
-        </MenuItem>
-        <MenuItem button onClick={handleClose}>
-          <FormattedMessage
-            id="dashboard.broker.actions.authenticate"
-            description="The action for device card."
-            defaultMessage="Manage authentication"
-          />
-        </MenuItem>
-        <MenuItem button onClick={handleClose}>
-          <FormattedMessage
-            id="dashboard.broker.actions.delete"
-            description="The action for device card."
-            defaultMessage="Delete"
-          />
-        </MenuItem>
-      </Menu>
+        anchorEl={anchorEl}
+        deviceName={anchoredDeviceName}
+        closeMenu={handleClose}
+        navigate={navigate}
+      />
     </React.Fragment>
   );
 };

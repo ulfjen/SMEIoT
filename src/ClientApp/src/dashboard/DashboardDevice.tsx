@@ -52,6 +52,8 @@ import CardActions from "@material-ui/core/CardActions";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
+import useMenu from "../helpers/useMenu";
+import DashboardDeviceMenu from "./DashboardDeviceMenu";
 
 const styles = ({ typography, palette, spacing }: Theme) => createStyles({
   container: {
@@ -121,9 +123,9 @@ export interface IDashboardDeviceRouteParams {
   deviceName: string;
 }
 
-export interface IDashboardDeviceProps
-  extends RouteComponentProps<IDashboardDeviceRouteParams>,
-  WithStyles<typeof styles> { }
+export interface IDashboardDeviceProps extends RouteComponentProps<IDashboardDeviceRouteParams>, WithStyles<typeof styles> {
+
+}
 
 const messages = defineMessages({
   title: {
@@ -195,7 +197,18 @@ const messages = defineMessages({
       description: "Aria Label on sensor connection component's action",
       defaultMessage: "Connect sensor to the device"
     },
-
+  },
+  instructions: {
+    sensor: {
+      id: "dashboard.devices.edit.sensor.instruction.primary",
+      description: "Instruction text on sensor panel",
+      defaultMessage: "Allow some users to watch the sensor graph by clicking \"Assign\" button or"
+    },
+    sensorLink: {
+      id: "dashboard.devices.edit.sensor.instruction.link",
+      description: "Instruction link on sensor panel",
+      defaultMessage: "See graph"
+    }
   }
 });
 
@@ -213,11 +226,7 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
   const [sensorNames, setSensorNames] = React.useState<string[] | undefined>();
   // const [deviceName, setDeviceName] = React.useState<string>("");
   const [handlingNext, setHandlingNext] = React.useState<boolean>(false);
-  const [loading, setLoading] = React.useState<boolean>(true);
-  const [unconnectedDeviceName, setUnconnectedDeviceName] = React.useState<
-    string | null
-  >(null);
-  const api = new SensorsApi(GetDefaultApiConfig());
+  const [menuOpen, anchorEl, openMenu, closeMenu, menuDeviceName] = useMenu<string>();
 
   // const renderActionList = (deviceName: string, names: string[]) => {
   //   return names.map(name => <TwoLayerLabelAction
@@ -257,24 +266,34 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
       </ExpansionPanelSummary>
       <ExpansionPanelDetails className={classes.details}>
         <div className={classes.twoColumnSpan}>
-          1
-          </div>
+          graph placeholder
+        </div>
         <div className={clsx(classes.column, classes.helper)}>
           <Typography variant="caption">
-            Allow some users to watch the sensor graph by clicking "Assign" button or
+            {intl.formatMessage(messages.instructions.sensor)}
             <br />
             <a href="#secondary-heading-and-columns" className={classes.link}>
-              See graph
+              {intl.formatMessage(messages.instructions.sensorLink)}
             </a>
           </Typography>
         </div>
       </ExpansionPanelDetails>
       <Divider />
       <ExpansionPanelActions>
-        <Button size="small" className={classes.warning}>Disconnect</Button>
+        <Button size="small" className={classes.warning}>
+          <FormattedMessage
+            id="dashboard.devices.edit.sensor.actions.disconnect"
+            description="Action for sensor"
+            defaultMessage="Disconnect"
+          /> 
+        </Button>
         <Button size="small" variant="contained" color="primary">
-          Assign
-      </Button>
+          <FormattedMessage
+            id="dashboard.devices.edit.sensor.actions.assign"
+            description="Action for sensor"
+            defaultMessage="Assign"
+          />
+        </Button>
       </ExpansionPanelActions>
     </ExpansionPanel>);
   }
@@ -291,23 +310,8 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
       </ListItem>);
   }
 
-  React.useEffect(() => {
-    (async () => {
-      const api = new DevicesApi(GetDefaultApiConfig());
-      if (deviceName) {
-        const res = await api.apiDevicesNameSensorCandidatesGet({
-          name: deviceName
-        });
-        if (res !== null) {
-          setSensorNames(res.names);
-        }
-      }
-      setLoading(false);
-    })();
-  }, []);
-
   const deviceApi = new DevicesApi(GetDefaultApiConfig());
-  const state: AsyncState<DeviceDetailsApiModel> = useAsync(async () => {
+  let state: AsyncState<DeviceDetailsApiModel> = useAsync(async () => {
     return await deviceApi.apiDevicesNameGet({
       name: deviceName
     });
@@ -322,7 +326,7 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
         edge="end"
         color="inherit"
         aria-label={intl.formatMessage(messages.closeAriaLabel)}
-        to={"../.."}
+        to={".."}
         component={ReachLink}
       >
         <CloseIcon />
@@ -330,33 +334,14 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
     }
     content={
       <Container maxWidth="lg" className={classes.container}>
-        {/* <Menu
-        anchorEl={anchorEl}
-        keepMounted
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
-      >
-        <MenuItem
-          button
-          to={`/dashboard/devices/${anchoredDeviceName}`}
-          component={ReachLink}
-          onClick={handleClose}
-        >
-        <MenuItem button onClick={handleClose}>
-          <FormattedMessage
-            id="dashboard.broker.actions.authenticate"
-            description="The action for device card."
-            defaultMessage="Manage authentication"
-          />
-        </MenuItem>
-        <MenuItem button onClick={handleClose}>
-          <FormattedMessage
-            id="dashboard.broker.actions.delete"
-            description="The action for device card."
-            defaultMessage="Delete"
-          />
-        </MenuItem>
-      </Menu> */}
+        <DashboardDeviceMenu
+          open={menuOpen}
+          anchorEl={anchorEl}
+          deviceName={menuDeviceName}
+          closeMenu={closeMenu}
+          hideConfigureItem
+          navigate={navigate}
+        />
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} aria-label="breadcrumb">
@@ -389,7 +374,7 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
                 action={
                   <IconButton
                     aria-label={intl.formatMessage(messages.moreAria)}
-                    onClick={() => { }}
+                    onClick={(e) => openMenu(e.currentTarget, state.value ? state.value.name : "")}
                   >
                     <MoreVertIcon />
                   </IconButton>
