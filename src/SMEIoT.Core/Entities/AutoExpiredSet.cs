@@ -35,6 +35,11 @@ namespace SMEIoT.Core.Entities
       return result;
     }
 
+    public bool ContainsKey(T item)
+    {
+      return _set.ContainsKey(item);
+    }
+
     public bool TryAdd(T item, Instant now)
     {
       return _set.TryAdd(item, now);

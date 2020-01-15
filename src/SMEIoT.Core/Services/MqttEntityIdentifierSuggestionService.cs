@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using SMEIoT.Core.Entities;
 using SMEIoT.Core.Interfaces;
+using SMEIoT.Core.Exceptions;
 
 namespace SMEIoT.Core.Services
 {
@@ -12,18 +13,18 @@ namespace SMEIoT.Core.Services
   {
     private readonly IMqttIdentifierService _mqttIdentifierService;
     private readonly IList<string> _identifierCandidates;
-    private readonly IApplicationDbConnection _dbConnection;
+    private readonly IApplicationDbContext _dbContext;
     private readonly Random _rand;
     public const string IdentifierDictionaryFilePath = "identifier-candidates.txt";
 
     public MqttEntityIdentifierSuggestionService(
       IMqttIdentifierService mqttIdentifierService,
       IIdentifierDictionaryFileAccessor identifierDictionary,
-      IApplicationDbConnection dbConnection)
+      IApplicationDbContext dbContext)
     {
       _mqttIdentifierService = mqttIdentifierService;
       _identifierCandidates = identifierDictionary.ListIdentifiers(IdentifierDictionaryFilePath);
-      _dbConnection = dbConnection;
+      _dbContext = dbContext;
       _rand = new Random();
     }
 
@@ -46,14 +47,16 @@ namespace SMEIoT.Core.Services
     {
       if (numWords < 1)
       {
-        throw new ArgumentException($"Impossible to generate {numWords} words. Should be positive");
+        throw new InvalidArgumentException($"Impossible to generate {numWords} words. Should be positive", "numWords");
       }
 
       var retries = 3;
       while (retries-- > 0)
       {
         var name = GenerateRandomIdentifier(numWords);
-        if (!_dbConnection.ExecuteScalar<bool>("SELECT COUNT(DISTINCT 1) FROM devices WHERE normalized_name = @NormalizedName;", new {NormalizedName = Device.NormalizeName(name)}))
+        var normalized = Device.NormalizeName(name);
+        var count = _dbContext.Devices.Where(d => d.NormalizedName == normalized).Count();
+        if (count == 0)
         {
           return Task.FromResult(name);
         }
@@ -61,9 +64,10 @@ namespace SMEIoT.Core.Services
       throw new SystemException("Can't generate device names after retried 3 times.");
     }
 
-    public string? GetARandomIdentifierCandidatesForSensor(string deviceName)
+    public async Task<string?> GetOneIdentifierCandidateForSensorAsync(string deviceName)
     {
-      var candidates = _mqttIdentifierService.ListSensorNamesByDeviceName(deviceName).ToList();
+      var names = await _mqttIdentifierService.ListSensorNamesByDeviceNameAsync(deviceName);
+      var candidates = names.ToList();
       if (candidates.Count == 0)
       {
         return null;

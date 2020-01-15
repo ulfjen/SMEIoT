@@ -13,60 +13,118 @@ using Xunit;
 
 namespace SMEIoT.Tests.Core.Services
 {
+  [Collection("Database collection")]
   public class MqttIdentifierServiceTest
   {
-    private static async Task<MqttIdentifierService> BuildService()
-    {
-      var dbContext = ApplicationDbContextHelper.BuildTestDbContext();
+    private readonly MqttIdentifierService _service;
 
-      return new MqttIdentifierService(new FakeClock(Instant.FromUtc(2020, 1, 1, 0, 0)));
+    public MqttIdentifierServiceTest()
+    {
+      _service = new MqttIdentifierService(new FakeClock(Instant.FromUtc(2020, 1, 1, 0, 0)));
+    }
+
+    private async Task SeedDefaultDeviceNames()
+    {
+      await _service.RegisterDeviceNameAsync("L401");
+      await _service.RegisterDeviceNameAsync("L427");
     }
 
     [Fact]
-    public async Task RegisterDeviceNameAsync_ReturnsSuccess()
+    public async Task RegisterDeviceNameAsync_Returns()
     {
       // arrange
-      var service = await BuildService();
 
       // act
-      var res = service.RegisterDeviceName("L401");
+      await _service.RegisterDeviceNameAsync("L401");
 
       // assert
-      Assert.True(res);
+      // no throws
     }
 
     [Fact]
-    public async Task RegisterDeviceName_ReturnsFalseWhenEmpty()
+    public async Task RegisterDeviceNameAsync_ThrowsWhenEmpty()
     {
-      var service = await BuildService();
 
-      var res = service.RegisterDeviceName("");
+      Task Act() => _service.RegisterDeviceNameAsync("");
 
-      Assert.False(res);
+      var exce = await Record.ExceptionAsync(Act);
+      var details = Assert.IsType<InvalidArgumentException>(exce);
+      Assert.Equal("name", details.ParamName);
     }
 
-
     [Fact]
-    public async Task ListDeviceNames_ListNothing()
+    public async Task ListDeviceNamesAsync_ListNothing()
     {
-      var service = await BuildService();
 
-      var list = service.ListDeviceNames();
+      var list = await _service.ListDeviceNamesAsync();
 
       Assert.Empty(list);
     }
 
     [Fact]
-    public async Task ListDeviceNames_ListAddedDevice()
+    public async Task RegisterSensorNameWithDeviceNameAsync_Returns()
     {
-      var service = await BuildService();
-      service.RegisterDeviceName("L401");
-      service.RegisterDeviceName("L427");
+      await SeedDefaultDeviceNames();
 
-      var list = service.ListDeviceNames();
+      await _service.RegisterSensorNameWithDeviceNameAsync("temp", "L401");
 
-      Assert.Contains("L401", list);
-      Assert.Contains("L427", list);
     }
+
+    [Fact]
+    public async Task RegisterSensorNameWithDeviceNameAsync_ThrowsIfEmptySensorName()
+    {
+      await SeedDefaultDeviceNames();
+
+      Task Act() => _service.RegisterSensorNameWithDeviceNameAsync("", "L401");
+
+      var exce = await Record.ExceptionAsync(Act);
+      var details = Assert.IsType<InvalidArgumentException>(exce);
+      Assert.Equal("name", details.ParamName);
+    }
+
+    [Fact]
+    public async Task RegisterSensorNameWithDeviceNameAsync_ThrowsIfNotRegisteredDeviceName()
+    {
+      await SeedDefaultDeviceNames();
+
+      Task Act() => _service.RegisterSensorNameWithDeviceNameAsync("temp", "L");
+
+      var exce = await Record.ExceptionAsync(Act);
+      var details = Assert.IsType<InvalidArgumentException>(exce);
+      Assert.Equal("deviceName", details.ParamName);
+    }
+
+    [Fact]
+    public async Task ListSensorNamesByDeviceNameAsync_ListNothing()
+    {
+      await SeedDefaultDeviceNames();
+
+      var list = await _service.ListSensorNamesByDeviceNameAsync("L401");
+
+      Assert.Empty(list);
+    }
+
+    [Fact]
+    public async Task ListSensorNamesByDeviceNameAsync_ListNothingWhenWrongIdentifierProvided()
+    {
+      await SeedDefaultDeviceNames();
+
+      var list = await _service.ListSensorNamesByDeviceNameAsync("");
+
+      Assert.Empty(list);
+    }
+
+    [Fact]
+    public async Task ListSensorNamesByDeviceNameAsync_Lists()
+    {
+      await SeedDefaultDeviceNames();
+      await _service.RegisterSensorNameWithDeviceNameAsync("temp", "L401");
+
+      var list = await _service.ListSensorNamesByDeviceNameAsync("L401");
+
+      Assert.Single(list);
+      Assert.Equal("temp", list.First());
+    }
+
   }
 }

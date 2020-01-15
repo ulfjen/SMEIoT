@@ -186,6 +186,12 @@ function build_smeiot_with_remote_tars {
   sudo rm -rf $TMP_BOOTSTRAP_DIR && sudo rm -rf /tmp/smeiot*.tar.gz && echo "SMEIoT is up." && cd $SMEIOT_ROOT
 }
 
+function setup_test_db {
+  cd $REPO_ROOT/src/SMEIoT.Infrastructure && \
+      ASPNETCORE_ENVIRONMENT=Test dotnet ef database update && \
+      echo "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";" | psql -U smeiot smeiot_test
+}
+
 function nuke_smeiot {
   sudo systemctl disable mosquitto && \
   sudo systemctl disable smeiot && \

@@ -1,5 +1,5 @@
-using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SMEIoT.Core.Interfaces
 {
@@ -10,9 +10,9 @@ namespace SMEIoT.Core.Interfaces
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
-    bool RegisterSensorNameWithDeviceName(string name, string deviceName);
+    Task RegisterSensorNameWithDeviceNameAsync(string name, string deviceName);
 
-    IEnumerable<string> ListSensorNamesByDeviceName(string deviceName);
+    Task<IEnumerable<string>> ListSensorNamesByDeviceNameAsync(string deviceName);
 
 
     /// <summary>
@@ -20,9 +20,9 @@ namespace SMEIoT.Core.Interfaces
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
-    bool RegisterDeviceName(string name);
+    Task RegisterDeviceNameAsync(string name);
 
 
-    IEnumerable<string> ListDeviceNames();
+    Task<IEnumerable<string>> ListDeviceNamesAsync();
   }
 }

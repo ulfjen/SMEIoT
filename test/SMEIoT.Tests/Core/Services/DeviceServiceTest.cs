@@ -67,6 +67,8 @@ namespace SMEIoT.Tests.Core.Services
           AuthenticationType = DeviceAuthenticationType.PreSharedKey,
           PreSharedKey = "key"
         };
+        _dbContext.Devices.Add(device);
+
         for (var i = 0; i < 5; ++i)
         {
           var sensorName = $"sensor-{x+1}-{i+1}";
@@ -75,9 +77,8 @@ namespace SMEIoT.Tests.Core.Services
             NormalizedName = Sensor.NormalizeName(sensorName),
             Device = device
           };
-          _dbContext.Add(sensor);
+          _dbContext.Sensors.Add(sensor);
         }
-        _dbContext.Add(device);
       }
       await _dbContext.SaveChangesAsync();
     }
