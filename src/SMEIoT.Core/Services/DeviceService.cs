@@ -22,11 +22,42 @@ namespace SMEIoT.Core.Services
       _identifierService = identifierService;
     } 
     
-    public async Task<string> BootstrapDeviceWithPreSharedKeyAsync(string name, string key)
+    private Task ValidateDeviceNameAsync(string name)
     {
       if (ForbiddenDeviceNames.Contains(name)) {
-        throw new InvalidArgumentException($"Reserverd device name {name}.", "name");
+        throw new InvalidArgumentException($"Reserverd device name {name}.", nameof(name));
       }
+      if (name.Length > 1000) {
+        throw new InvalidArgumentException($"Device name can't be longer than 1000.", nameof(name));
+      }
+      if (name.Length < 3) {
+        throw new InvalidArgumentException($"Device name can't be shorter than 3.", nameof(name));
+      }
+      return Task.CompletedTask;
+    }
+
+    private static HashSet<char> AllowedCharsInKey = new HashSet<char>("0123456789ABCDEF");
+
+    private Task ValidateDeviceKeyAsync(string key)
+    {
+      if (key.Length > SecureKeySuggestionService.ByteLengthUpperBound*2) {
+        throw new InvalidArgumentException($"Device key can't be longer than {SecureKeySuggestionService.ByteLengthUpperBound*2}.", nameof(key));
+      }
+      if (key.Length < SecureKeySuggestionService.ByteLengthLowerBound*2) {
+        throw new InvalidArgumentException($"Device key can't be shorter than {SecureKeySuggestionService.ByteLengthLowerBound*2}.", nameof(key));
+      }
+      var chars = new HashSet<char>(key.ToUpperInvariant());
+      if (!chars.IsProperSubsetOf(AllowedCharsInKey)) {
+        throw new InvalidArgumentException($"Device key must be hex value.", nameof(key));
+      }
+      return Task.CompletedTask;
+    }
+
+    public async Task<string> BootstrapDeviceWithPreSharedKeyAsync(string name, string key)
+    {
+      await ValidateDeviceNameAsync(name);
+      await ValidateDeviceKeyAsync(key);
+
       _dbContext.Devices.Add(new Device
         {
           Name = name,
@@ -72,6 +103,14 @@ namespace SMEIoT.Core.Services
         yield return device;
       }
     }
+
+    public async Task UpdateDeviceConfigAsync(Device device, string key)
+    {
+      await ValidateDeviceKeyAsync(key);
+      device.PreSharedKey = key;
+      _dbContext.Devices.Update(device);
+      await _dbContext.SaveChangesAsync();
+    } 
 
     public async IAsyncEnumerable<Sensor> ListSensorsAsync(int offset, int limit)
     {

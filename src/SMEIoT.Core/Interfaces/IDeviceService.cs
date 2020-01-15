@@ -21,5 +21,7 @@ namespace SMEIoT.Core.Interfaces
     Task RemoveSensorByDeviceAndNameAsync(Device device, string sensorName);
     // will also delete sensors, user_sensors records
     Task RemoveDeviceByNameAsync(string deviceName);
+  
+    Task UpdateDeviceConfigAsync(Device device, string config);
   }
 }

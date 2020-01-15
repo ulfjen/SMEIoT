@@ -56,10 +56,11 @@ namespace SMEIoT.Web.Api.V1
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult<BasicDeviceApiModel>> Update(string name, [BindRequired] DeviceConfigBindingModel key)
+    public async Task<ActionResult<BasicDeviceApiModel>> Update(string name, [BindRequired] DeviceConfigBindingModel config)
     {
-      throw new NotImplementedException();
       var device = await _service.GetDeviceByNameAsync(name);
+      await _service.UpdateDeviceConfigAsync(device, config.Key);
+      device = await _service.GetDeviceByNameAsync(name);
       var res = new BasicDeviceApiModel(device);
       return Ok(res);
     }

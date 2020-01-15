@@ -67,11 +67,11 @@ namespace SMEIoT.Tests.Core.Services
     [Fact]
     public async Task ProcessDecodedMessageAsync_RespondsToExistDevice()
     {
-      await _deviceService.BootstrapDeviceWithPreSharedKeyAsync("normal-device", "psk1");
+      await _deviceService.BootstrapDeviceWithPreSharedKeyAsync("normal-device", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa11111111111111");
 
       var builder = await _service.ProcessDecodedMessageAsync("GETPSK normal-device");
 
-      Assert.Equal("psk1", builder.ToString()); 
+      Assert.Equal("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa11111111111111", builder.ToString()); 
     }
 
     [Fact]

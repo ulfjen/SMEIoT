@@ -90,7 +90,7 @@ namespace SMEIoT.Tests.Core.Services
           Name = deviceName,
           NormalizedName = Device.NormalizeName(deviceName),
           AuthenticationType = DeviceAuthenticationType.PreSharedKey,
-          PreSharedKey = "key"
+          PreSharedKey = ""
         };
       _dbContext.Add(device);
       await _dbContext.SaveChangesAsync();
@@ -103,7 +103,7 @@ namespace SMEIoT.Tests.Core.Services
     public async Task BootstrapDeviceWithPreSharedKeyAsync_ReturnsPopulatedDevice()
     {
       
-      var deviceName = await _service.BootstrapDeviceWithPreSharedKeyAsync("identity", "key");
+      var deviceName = await _service.BootstrapDeviceWithPreSharedKeyAsync("identity", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa11111111111111");
       
       Assert.NotEmpty(deviceName);
     }
@@ -111,13 +111,31 @@ namespace SMEIoT.Tests.Core.Services
     [Fact]
     public async Task BootstrapDeviceWithPreSharedKeyAsync_PopulatesADevice()
     {
+      var key = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa11111111111111";
       
-      var deviceName = await _service.BootstrapDeviceWithPreSharedKeyAsync("Name", "key");
+      var deviceName = await _service.BootstrapDeviceWithPreSharedKeyAsync("Name", key);
 
       var device = await _service.GetDeviceByNameAsync(deviceName);
       Assert.Equal("Name", device.Name);
       Assert.NotEmpty(device.NormalizedName);
-      Assert.Equal("key", device.PreSharedKey);
+      Assert.Equal(key, device.PreSharedKey);
+      Assert.Equal(DeviceAuthenticationType.PreSharedKey, device.AuthenticationType);
+      Assert.False(device.Connected);
+      Assert.Null(device.ConnectedAt);
+      Assert.Null(device.LastMessageAt);
+    }
+
+    [Fact]
+    public async Task BootstrapDeviceWithPreSharedKeyAsync_OkWithMixedCase()
+    {
+      var key = "aaaFaAaaaa1aaafaab33223cdefa456789aaABCDEFaaaaa23aa11111111111111";
+      
+      var deviceName = await _service.BootstrapDeviceWithPreSharedKeyAsync("Name", key);
+
+      var device = await _service.GetDeviceByNameAsync(deviceName);
+      Assert.Equal("Name", device.Name);
+      Assert.NotEmpty(device.NormalizedName);
+      Assert.Equal(key, device.PreSharedKey);
       Assert.Equal(DeviceAuthenticationType.PreSharedKey, device.AuthenticationType);
       Assert.False(device.Connected);
       Assert.Null(device.ConnectedAt);
@@ -128,7 +146,7 @@ namespace SMEIoT.Tests.Core.Services
     public async Task BootstrapDeviceWithPreSharedKeyAsync_ForbidsSomeName()
     {
       foreach (var name in DeviceService.ForbiddenDeviceNames) {
-        Task Act() => _service.BootstrapDeviceWithPreSharedKeyAsync(name, "key");
+        Task Act() => _service.BootstrapDeviceWithPreSharedKeyAsync(name, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa11111111111111");
 
         var exce = await Record.ExceptionAsync(Act);
         Assert.NotNull(exce);
@@ -136,7 +154,129 @@ namespace SMEIoT.Tests.Core.Services
         Assert.Equal("name", details.ParamName);
       }
     }
+
+    [Fact]
+    public async Task BootstrapDeviceWithPreSharedKeyAsync_ThrowsIfNotHex()
+    {
+      
+      Task Act() => _service.BootstrapDeviceWithPreSharedKeyAsync("Name", "is-this-is-not-hex-this-is-not-hex-this-is-not-hex-this-is-not-hex");
+
+      var exce = await Record.ExceptionAsync(Act);
+      Assert.NotNull(exce);
+      var details = Assert.IsType<InvalidArgumentException>(exce);
+      Assert.Equal("key", details.ParamName);
+      Assert.Contains("hex", details.Message);
+    }
+
+    [Fact]
+    public async Task BootstrapDeviceWithPreSharedKeyAsync_ThrowsIfKeyTooShort()
+    {
+
+      Task Act() => _service.BootstrapDeviceWithPreSharedKeyAsync("Name", new string('1', 63));
+
+      var exce = await Record.ExceptionAsync(Act);
+      Assert.NotNull(exce);
+      var details = Assert.IsType<InvalidArgumentException>(exce);
+      Assert.Equal("key", details.ParamName);
+      Assert.Contains("short", details.Message);
+    }
+
+    [Fact]
+    public async Task BootstrapDeviceWithPreSharedKeyAsync_ThrowsIfKeyTooLong()
+    {
+
+      Task Act() => _service.BootstrapDeviceWithPreSharedKeyAsync("Name", new string('1', 129));
+
+      var exce = await Record.ExceptionAsync(Act);
+      Assert.NotNull(exce);
+      var details = Assert.IsType<InvalidArgumentException>(exce);
+      Assert.Equal("key", details.ParamName);
+      Assert.Contains("long", details.Message);
+    }
+
+    [Fact]
+    public async Task BootstrapDeviceWithPreSharedKeyAsync_ThrowsIfNameTooShort()
+    {
+
+      Task Act() => _service.BootstrapDeviceWithPreSharedKeyAsync("na", "aaaaaaaaaaaaaaaaaa11111111111111");
+
+      var exce = await Record.ExceptionAsync(Act);
+      Assert.NotNull(exce);
+      var details = Assert.IsType<InvalidArgumentException>(exce);
+      Assert.Equal("name", details.ParamName);
+      Assert.Contains("short", details.Message);
+    }
+
+    [Fact]
+    public async Task BootstrapDeviceWithPreSharedKeyAsync_ThrowsIfNameTooLong()
+    {
+
+      Task Act() => _service.BootstrapDeviceWithPreSharedKeyAsync(new string('n', 1001), "aaaaaaaaaaaaaaaaaa11111111111111");
+
+      var exce = await Record.ExceptionAsync(Act);
+      Assert.NotNull(exce);
+      var details = Assert.IsType<InvalidArgumentException>(exce);
+      Assert.Equal("name", details.ParamName);
+      Assert.Contains("long", details.Message);
+    }
+
+    [Fact]
+    public async Task UpdateDeviceConfigAsync_OkWithMixedCase()
+    {
+      var device = await SeedOneDeviceAsync();
+      var key = "aaaFaAaaaa1aaafaab33223cdefa456789aaABCDEFaaaaa23aa11111111111111";
+      
+      await _service.UpdateDeviceConfigAsync(device, key);
+
+      var stored = await _service.GetDeviceByNameAsync(device.Name);
+      Assert.Equal(key, stored.PreSharedKey);
+    }
     
+    [Fact]
+    public async Task UpdateDeviceConfigAsync_ThrowsIfNotHex()
+    {
+      var device = await SeedOneDeviceAsync();
+      var key = "is-this-is-not-hex-this-is-not-hex-this-is-not-hex-this-is-not-hex";
+      
+      Task Act() => _service.UpdateDeviceConfigAsync(device, key);
+
+      var exce = await Record.ExceptionAsync(Act);
+      Assert.NotNull(exce);
+      var details = Assert.IsType<InvalidArgumentException>(exce);
+      Assert.Equal("key", details.ParamName);
+      Assert.Contains("hex", details.Message);
+    }
+
+    [Fact]
+    public async Task UpdateDeviceConfigAsync_ThrowsIfKeyTooShort()
+    {
+      var device = await SeedOneDeviceAsync();
+      var key = new string('1', 63);
+      
+      Task Act() => _service.UpdateDeviceConfigAsync(device, key);
+
+      var exce = await Record.ExceptionAsync(Act);
+      Assert.NotNull(exce);
+      var details = Assert.IsType<InvalidArgumentException>(exce);
+      Assert.Equal("key", details.ParamName);
+      Assert.Contains("short", details.Message);
+    }
+
+    [Fact]
+    public async Task UpdateDeviceConfigAsync_ThrowsIfKeyTooLong()
+    {
+      var device = await SeedOneDeviceAsync();
+      var key = new string('1', 129);
+      
+      Task Act() => _service.UpdateDeviceConfigAsync(device, key);
+
+      var exce = await Record.ExceptionAsync(Act);
+      Assert.NotNull(exce);
+      var details = Assert.IsType<InvalidArgumentException>(exce);
+      Assert.Equal("key", details.ParamName);
+      Assert.Contains("long", details.Message);
+    }
+
     [Fact]
     public async Task GetDeviceByNameAsync_ThrowsIfNoDevice()
     {
