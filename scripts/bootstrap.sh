@@ -192,7 +192,7 @@ function install_dotnet_ef {
 
 function setup_test_db {
   cd $REPO_ROOT/src/SMEIoT.Infrastructure && \
-      ASPNETCORE_ENVIRONMENT=Test $HOME/.dotnet/tools/dotnet-ef database update && \
+      ASPNETCORE_ENVIRONMENT=Test $HOME/.dotnet/tools/dotnet-ef database update -v && \
       echo "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";" | psql -U smeiot smeiot_test
 }
 
