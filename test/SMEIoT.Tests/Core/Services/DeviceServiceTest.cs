@@ -94,18 +94,17 @@ namespace SMEIoT.Tests.Core.Services
         };
       _dbContext.Add(device);
       await _dbContext.SaveChangesAsync();
+      await _identifierService.RegisterDeviceNameAsync("device-1");
+      await _identifierService.RegisterSensorNameWithDeviceNameAsync("sensor-1", "device-1");
       return device;
     }
 
     [Fact]
     public async Task BootstrapDeviceWithPreSharedKeyAsync_ReturnsPopulatedDevice()
     {
-      // arrange
       
-      // act
       var deviceName = await _service.BootstrapDeviceWithPreSharedKeyAsync("identity", "key");
       
-      // assert
       Assert.NotEmpty(deviceName);
     }
 

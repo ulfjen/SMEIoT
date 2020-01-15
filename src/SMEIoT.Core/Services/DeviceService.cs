@@ -91,7 +91,7 @@ namespace SMEIoT.Core.Services
 
     public async Task CreateSensorByDeviceAndNameAsync(Device device, string sensorName)
     {
-      var legalNames = _identifierService.ListSensorNamesByDeviceName(device.Name).ToList();
+      var legalNames = await _identifierService.ListSensorNamesByDeviceNameAsync(device.Name);
       if (!legalNames.Contains(sensorName)) {
         throw new EntityNotFoundException($"We can't find messages from sensor {device.Name}/{sensorName}.", nameof(sensorName));
       }
