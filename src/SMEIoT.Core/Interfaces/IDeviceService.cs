@@ -17,5 +17,9 @@ namespace SMEIoT.Core.Interfaces
     IAsyncEnumerable<Sensor> ListSensorsByDeviceAsync(Device device);
     Task CreateSensorByDeviceAndNameAsync(Device device, string sensorName);
     Task<Sensor> GetSensorByDeviceAndNameAsync(Device device, string sensorName);
+    // will also delete user_sensors records
+    Task RemoveSensorByDeviceAndNameAsync(Device device, string sensorName);
+    // will also delete sensors, user_sensors records
+    Task RemoveDeviceByNameAsync(string deviceName);
   }
 }

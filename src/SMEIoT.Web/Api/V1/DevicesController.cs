@@ -149,5 +149,22 @@ namespace SMEIoT.Web.Api.V1
       return Ok(new BasicDeviceApiModelList(list));
     }
 
+    [HttpDelete("{name}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task Delete(string name)
+    {
+      await _service.RemoveDeviceByNameAsync(name);
+    }
+
+
+    [HttpDelete("{deviceName}/{sensorName}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task DeleteSensor(string deviceName, string sensorName)
+    {
+      var device = await _service.GetDeviceByNameAsync(deviceName);
+      await _service.RemoveSensorByDeviceAndNameAsync(device, sensorName);
+    }
   }
 }

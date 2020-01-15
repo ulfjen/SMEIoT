@@ -67,8 +67,9 @@ namespace SMEIoT.Tests.Core.Services
     [Fact]
     public async Task GenerateRandomIdentifierForDevice_DontReturnDeviceName()
     {
+      var ids = new List<string> { "id1", "id2", "id3", "id4" };
       var mockedAccessor = new Mock<IIdentifierDictionaryFileAccessor>();
-      mockedAccessor.Setup(x => x.ListIdentifiers(It.IsAny<string>())).Returns(new List<string> { "id1", "id2" });
+      mockedAccessor.Setup(x => x.ListIdentifiers(It.IsAny<string>())).Returns(ids);
       await SeedDefaultIdentifiers();
       var service = new MqttEntityIdentifierSuggestionService(_identifierService, mockedAccessor.Object, _dbContext);
       _dbContext.Devices.Add(new Device { Name = "id1", NormalizedName = Device.NormalizeName("id1") });
@@ -76,8 +77,7 @@ namespace SMEIoT.Tests.Core.Services
 
       var res = await service.GenerateRandomIdentifierForDeviceAsync(1);
 
-      Assert.True(res != "id1");
-      Assert.True(res == "id2");
+      Assert.True(res != "id1" && ids.Contains(res));
     }
 
     [Fact]

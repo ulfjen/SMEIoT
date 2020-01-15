@@ -362,15 +362,80 @@ namespace SMEIoT.Tests.Core.Services
       Assert.Equal("sensorName", notFound.ParamName);
     }
 
-    [Fact]
-    public async Task GetSensorByDeviceAndNameAsync_GetsSensor()
+    private async Task<Device> SeedOneSensorAsync()
     {
       var device = await SeedOneDeviceAsync();
       await _service.CreateSensorByDeviceAndNameAsync(device, "sensor-1");
+      return device;
+    }
+
+    [Fact]
+    public async Task GetSensorByDeviceAndNameAsync_GetsSensor()
+    {
+      var device = await SeedOneSensorAsync();
 
       var fetched = await _service.GetSensorByDeviceAndNameAsync(device, "sensor-1");
 
       Assert.Equal("sensor-1", fetched.Name);
+    }
+
+    [Fact]
+    public async Task GetSensorByDeviceAndNameAsync_ThrowsIfSensorCanNotBeFound()
+    {
+      var device = await SeedOneSensorAsync();
+
+      Task Act() => _service.GetSensorByDeviceAndNameAsync(device, "sensor-not-exist");
+
+      var exce = await Record.ExceptionAsync(Act);
+      Assert.NotNull(exce);
+      var notFound = Assert.IsType<EntityNotFoundException>(exce);
+      Assert.Equal("sensorName", notFound.ParamName);
+    }
+
+    [Fact]
+    public async Task RemoveSensorByDeviceAndNameAsync_ThrowsIfNameDoesNotFound()
+    {
+      var device = await SeedOneSensorAsync();
+
+      Task Act() => _service.RemoveSensorByDeviceAndNameAsync(device, "sensor-not-exists");
+
+      var exce = await Record.ExceptionAsync(Act);
+      Assert.NotNull(exce);
+      var notFound = Assert.IsType<EntityNotFoundException>(exce);
+      Assert.Equal("sensorName", notFound.ParamName);
+    }
+
+    [Fact]
+    public async Task RemoveSensorByNameAsync_RemovesSensor()
+    {
+      var device = await SeedOneSensorAsync();
+
+      await _service.RemoveSensorByDeviceAndNameAsync(device, "sensor-1");
+
+      Assert.Empty(_dbContext.Sensors);
+    }
+
+    [Fact]
+    public async Task RemoveDeviceByNameAsync_RemovesDevice()
+    {
+      await SeedOneDeviceAsync();
+
+      await _service.RemoveDeviceByNameAsync("device-1");
+
+      Assert.Empty(_dbContext.Devices);
+    }
+
+    [Fact]
+    public async Task RemoveDeviceByNameAsync_ThrowsIfNameDoesNotFound()
+    {
+      await SeedOneDeviceAsync();
+
+      Task Act() =>  _service.RemoveDeviceByNameAsync("device-not-exists");
+
+      var exce = await Record.ExceptionAsync(Act);
+      Assert.NotNull(exce);
+      var notFound = Assert.IsType<EntityNotFoundException>(exce);
+      Assert.Equal("deviceName", notFound.ParamName);
     }
   }
 }

@@ -113,7 +113,7 @@ namespace SMEIoT.Core.Services
       var sensor = await _dbContext.Sensors.Where(s => s.NormalizedName == Sensor.NormalizeName(sensorName) && s.DeviceId == device.Id).FirstOrDefaultAsync();
       if (sensor == null)
       {
-        throw new EntityNotFoundException("cannot find the sensor.", "sensorName");
+        throw new EntityNotFoundException($"Cannot find the sensor {sensorName}.", nameof(sensorName));
       }
 
       return sensor;
@@ -127,6 +127,26 @@ namespace SMEIoT.Core.Services
       await foreach (var sv in query.AsAsyncEnumerable()) {
         yield return (sv.Value, sv.CreatedAt);
       }
+    }
+
+    public async Task RemoveSensorByDeviceAndNameAsync(Device device, string sensorName)
+    {
+      var sensor = await _dbContext.Sensors.FirstOrDefaultAsync(s => s.NormalizedName == Sensor.NormalizeName(sensorName));
+      if (sensor == null) {
+        throw new EntityNotFoundException($"Cannot find the sensor {sensorName}.", nameof(sensorName));
+      }
+      _dbContext.Sensors.Remove(sensor);
+      await _dbContext.SaveChangesAsync();
+    }
+    
+    public async Task RemoveDeviceByNameAsync(string deviceName)
+    {
+      var device = await _dbContext.Devices.FirstOrDefaultAsync(s => s.NormalizedName == Device.NormalizeName(deviceName));
+      if (device == null) {
+        throw new EntityNotFoundException($"Cannot find the device {deviceName}.", nameof(deviceName));
+      }
+      _dbContext.Devices.Remove(device);
+      await _dbContext.SaveChangesAsync();
     }
   }
 }
