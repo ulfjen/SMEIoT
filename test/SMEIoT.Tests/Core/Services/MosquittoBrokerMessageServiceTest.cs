@@ -13,6 +13,7 @@ using SMEIoT.Infrastructure.Services;
 
 namespace SMEIoT.Tests.Core.Services
 {
+  [Collection("Database collection")]
 #pragma warning disable CA1063 // Implement IDisposable Correctly
   public class MosquittoBrokerMessageServiceTest : IDisposable
 #pragma warning restore CA1063 // Implement IDisposable Correctly
@@ -30,7 +31,8 @@ namespace SMEIoT.Tests.Core.Services
       var keyService = new SecureKeySuggestionService();
       _clientAuthService = new MosquittoClientAuthenticationService(keyService);
       var mockPlugin = new Mock<MosquittoBrokerPluginPidService>();
-      _deviceService = new DeviceService(_dbContext);
+      var identifierSerivce = new MqttIdentifierService(new FakeClock(_initial));
+      _deviceService = new DeviceService(_dbContext, identifierSerivce);
       _service = new MosquittoBrokerMessageService(_clientAuthService, mockPlugin.Object, _deviceService);
     }
 

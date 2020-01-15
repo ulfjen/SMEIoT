@@ -9,20 +9,27 @@ using SMEIoT.Infrastructure.Data;
 using SMEIoT.Tests.Shared;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
+using NodaTime;
+using NodaTime.Testing;
 
 namespace SMEIoT.Tests.Core.Services
 {
+  [Collection("Database collection")]
 #pragma warning disable CA1063 // Implement IDisposable Correctly
   public class DeviceServiceTest : IDisposable
 #pragma warning restore CA1063 // Implement IDisposable Correctly
   {
     private readonly ApplicationDbContext _dbContext;
+    private readonly MqttIdentifierService _identifierService;
     private readonly DeviceService _service;
+    private Instant _initial;
 
     public DeviceServiceTest()
     {
       _dbContext = ApplicationDbContextHelper.BuildTestDbContext();
-      _service = new DeviceService(_dbContext);
+      _initial = SystemClock.Instance.GetCurrentInstant();
+      _identifierService = new MqttIdentifierService(new FakeClock(_initial));
+      _service = new DeviceService(_dbContext, _identifierService);
     }
 
 #pragma warning disable CA1063 // Implement IDisposable Correctly
@@ -340,6 +347,19 @@ namespace SMEIoT.Tests.Core.Services
       await _service.CreateSensorByDeviceAndNameAsync(device, "sensor-1");
 
       Assert.Single(_dbContext.Sensors.ToList());
+    }
+
+    [Fact]
+    public async Task CreateSensorByDeviceAndNameAsync_ThrowsWhenSensorDoesNotSendMessages()
+    {
+      var device = await SeedOneDeviceAsync();
+
+      Task Act() => _service.CreateSensorByDeviceAndNameAsync(device, "sensor-not-working");
+
+      var exce = await Record.ExceptionAsync(Act);
+      Assert.NotNull(exce);
+      var notFound = Assert.IsType<EntityNotFoundException>(exce);
+      Assert.Equal("sensorName", notFound.ParamName);
     }
 
     [Fact]

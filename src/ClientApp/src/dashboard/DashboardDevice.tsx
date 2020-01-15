@@ -18,8 +18,12 @@ import {
 } from "react-intl";
 import {
   SensorsApi,
+  BasicSensorApiModel,
   DevicesApi,
-  DeviceDetailsApiModel
+  DeviceDetailsApiModel,
+  SensorDetailsApiModel,
+  SensorStatus,
+  BasicSensorApiModelFromJSON
 } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
 import Tooltip from "@material-ui/core/Tooltip";
@@ -56,6 +60,8 @@ import useMenu from "../helpers/useMenu";
 import useModal from "../helpers/useModal";
 import DashboardDeviceMenu from "./DashboardDeviceMenu";
 import DashboardDeviceDialog from "./DashboardDeviceDialog";
+import Backdrop from "@material-ui/core/Backdrop";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 const styles = ({ typography, palette, spacing, zIndex }: Theme) => createStyles({
   container: {
@@ -118,10 +124,6 @@ const styles = ({ typography, palette, spacing, zIndex }: Theme) => createStyles
   },
   list: {
     marginTop: 20
-  },
-  backdrop: {
-    zIndex: zIndex.drawer + 1,
-    color: '#fff',
   },
 });
 
@@ -259,15 +261,22 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
   //   />);
   // }
 
-  const sensors = ["object", "primary"];
-  const renderPanel = () => {
-    return sensors.map((sensor, index) => <ExpansionPanel className={index === 0 ? clsx(classes.panel, classes.firstPanel) : classes.panel} key={index} square elevation={0} defaultExpanded={index === 0} TransitionProps={{ unmountOnExit: true }}>
+  const renderPanels = (sensors: Array<BasicSensorApiModel>) => {
+    return sensors.length === 0 ? <CardContent>
+      <Typography variant="body2" color="textSecondary" component="p">
+        <FormattedMessage
+          id="dashboard.devices.edit.sensors.empty"
+          description="The text when no sensors"
+          defaultMessage="You haven't added any sensors yet."
+        />  
+      </Typography>
+    </CardContent> : sensors.map((sensor, index) => <ExpansionPanel className={index === 0 ? clsx(classes.panel, classes.firstPanel) : classes.panel} key={index} square elevation={0} defaultExpanded={index === 0} TransitionProps={{ unmountOnExit: true }}>
       <ExpansionPanelSummary
         expandIcon={<ExpandMoreIcon />}
         className={classes.summary}
       >
         <div className={classes.column}>
-          <TwoLayerLabelAction className={classes.heading} greyoutFirst first={"masses-pavy"} second={sensor} />
+          <TwoLayerLabelAction className={classes.heading} greyoutFirst first={state.value ? state.value.name : ""} second={sensor.sensorName} />
         </div>
         <div className={classes.column} />
       </ExpansionPanelSummary>
@@ -305,23 +314,73 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
     </ExpansionPanel>);
   }
 
-  const renderOtherSensors = () => {
-    return sensors.map(sensor =>
-      <ListItem disableGutters key={sensor}>
-        <TwoLayerLabelAction greyoutFirst first={"masses-pavy"} second={"b"} action={
-          <Tooltip title={intl.formatMessage(messages.sensor.connect)} aria-label={intl.formatMessage(messages.sensor.connect)}>
-            <IconButton aria-label={intl.formatMessage(messages.sensor.buttonLabel)} disabled={false} onClick={() => { }}>
-              <AddIcon />
-            </IconButton>
-          </Tooltip>} />
-      </ListItem>);
+  const deviceApi = new DevicesApi(GetDefaultApiConfig());
+  const [sensors, setSensors] = React.useState<Array<BasicSensorApiModel>>([]);
+  const [notRegisteredSensors, setNotRegisteredSensors] = React.useState<Array<BasicSensorApiModel>>([BasicSensorApiModelFromJSON({
+    sensorName: "dummy"
+  })]);
+  const [notConnectedSensors, setNotConnectedSensors] = React.useState<Array<BasicSensorApiModel>>([BasicSensorApiModelFromJSON({
+    sensorName: "dummy2"
+  })]);
+  
+  const sensorApi = new SensorsApi(GetDefaultApiConfig());
+  const renderOtherSensors = (sensorsToRender: Array<BasicSensorApiModel>, disableAction: boolean) => {
+    if (sensorsToRender.length === 0) {
+      return <div></div>;
+    } else {
+      const [loading, setLoading] = React.useState<boolean>(false);
+      const [tooltipOpen, setTooltipOpen] = React.useState<boolean>(false);
+
+      const handleSensorRegisterationOnClick = React.useCallback(async (sensorName: string) => {
+        setLoading(true);
+        setTooltipOpen(false);
+        const res = await sensorApi.apiSensorsPost({
+          sensorLocatorBindingModel: {
+            deviceName,
+            name: sensorName
+          }
+        });
+        setLoading(false);
+        setSensors(sensors.concat(res));
+        setNotRegisteredSensors(notRegisteredSensors.filter(s => s.sensorName == sensorName));
+        // setNotRegisteredSensors(res.sensors.filter(s => s.status === SensorStatus.NUMBER_0)); // not registered
+        // setNotConnectedSensors(res.sensors.filter(s => s.status === SensorStatus.NUMBER_1)); // not connected
+        // setSensors(res.filter(s => s.status === SensorStatus.NUMBER_2)); // connected
+      }, [deviceName, sensors, notRegisteredSensors]);
+  
+      return <List className={classes.list}>
+        {sensorsToRender.map(sensor =>
+          <ListItem disableGutters key={sensor.sensorName}>
+            <TwoLayerLabelAction greyoutFirst first={state.value ? state.value.name : ""} second={sensor.sensorName} action={
+              !disableAction &&
+              <Tooltip
+                title={intl.formatMessage(messages.sensor.connect)}
+                aria-label={intl.formatMessage(messages.sensor.connect)}
+                open={tooltipOpen}
+                onOpen={() => setTooltipOpen(true)}
+              >
+                <IconButton
+                  aria-label={intl.formatMessage(messages.sensor.buttonLabel)}
+                  disabled={loading}
+                  onClick={() => handleSensorRegisterationOnClick(sensor.sensorName)}>
+                  <AddIcon />
+                </IconButton>
+              </Tooltip>} />
+          </ListItem>)}
+      </List>
+    }
   }
 
-  const deviceApi = new DevicesApi(GetDefaultApiConfig());
-  let state: AsyncState<DeviceDetailsApiModel> = useAsync(async () => {
-    return await deviceApi.apiDevicesNameGet({
+  const state: AsyncState<DeviceDetailsApiModel> = useAsync(async () => {
+    const res = await deviceApi.apiDevicesNameGet({
       name: deviceName
     });
+
+    // setNotRegisteredSensors(res.sensors.filter(s => s.status === SensorStatus.NUMBER_0)); // not registered
+    // setNotConnectedSensors(res.sensors.filter(s => s.status === SensorStatus.NUMBER_1)); // not connected
+    setSensors(res.sensors.filter(s => s.status === SensorStatus.NUMBER_2)); // connected
+
+    return res;
   })
 
   return <DashboardFrame
@@ -416,7 +475,9 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
                 title={state.loading ? <Skeleton variant="rect" width={240} height={26} /> : intl.formatMessage(messages.connected.title)}
                 titleTypographyProps={{ color: "secondary", variant: "h6" }}
               />
-              {state.loading ? <CardContent><Skeleton variant="text" /><Skeleton variant="text" /><Skeleton variant="text" /></CardContent> : renderPanel()}
+              {state.loading ?
+                <CardContent><Skeleton variant="text" /><Skeleton variant="text" /><Skeleton variant="text" /></CardContent> :
+                renderPanels(sensors)}
             </Paper>
           </Grid>
           <Grid item xs={12}>
@@ -426,12 +487,15 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
                 titleTypographyProps={{ color: "secondary", variant: "h6" }}
               />
               <CardContent>
-
                 {state.loading ? <Skeleton variant="text" /> :
-                  <Typography variant="body2" color="textSecondary" component="p">
-                    We have found some sensors that can be connected to this device. After connecting, you can assign the sensor to users.
-              </Typography>}
-                {renderOtherSensors()}
+                  <Typography variant="body2" color="textSecondary">
+                    <FormattedMessage
+                      id="dashboard.device.show.not_registered_sensors.instructions"
+                      description="The instruction for device cards."
+                      defaultMessage="We have found some sensors that can be connected to this device. After connecting, you can assign the sensor to users."
+                    />
+                  </Typography>}
+                {renderOtherSensors(notRegisteredSensors, false)}
               </CardContent>
             </Paper>
           </Grid>
@@ -443,12 +507,13 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
               />
               <CardContent>
                 {state.loading ? <div><Skeleton variant="text" /><Skeleton variant="text" /><Skeleton variant="text" /></div> : <Typography variant="body2" color="textSecondary" component="p">
-                  These sensors are not connected to the broker. Please check connection and configuration on the device. They appear here because they were connected.
-              </Typography>}
-                <List className={classes.list}>
-                  {renderOtherSensors()}
-
-                </List>
+                  <FormattedMessage
+                    id="dashboard.device.show.not_connected_sensors.instructions"
+                    description="The instruction for device cards."
+                    defaultMessage="These sensors are not connected to the broker. Please check connection and configuration on the device. They appear here because they were connected."
+                  />
+                </Typography>}
+                {renderOtherSensors(notConnectedSensors, true)}
               </CardContent>
             </Paper>
           </Grid>
