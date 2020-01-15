@@ -186,6 +186,10 @@ function build_smeiot_with_remote_tars {
   sudo rm -rf $TMP_BOOTSTRAP_DIR && sudo rm -rf /tmp/smeiot*.tar.gz && echo "SMEIoT is up." && cd $SMEIOT_ROOT
 }
 
+function install_dotnet_ef {
+  dotnet tool install --global dotnet-ef
+}
+
 function setup_test_db {
   cd $REPO_ROOT/src/SMEIoT.Infrastructure && \
       ASPNETCORE_ENVIRONMENT=Test dotnet ef database update && \
