@@ -89,7 +89,26 @@ export interface IDashboardDeviceBoard extends WithStyles<typeof styles> {
   navigate?: NavigateFn;
 }
 
-const messages = defineMessages({});
+const messages = defineMessages({
+  connected: {
+    timed: {
+      id: "dashboard.devices.index.card.connected.timed",
+      description: "The text for device instaruction",
+      defaultMessage: "Running normally. Last message {ago}"
+    },
+    notYet: {
+      id: "dashboard.devices.index.card.connected.not_yet",
+      description: "The text for device instaruction",
+      defaultMessage: "Running normally. We haven't received its messages yet."
+    }
+  },
+  notConnected: {
+    id: "dashboard.devices.index.card.connected.timed",
+    description: "The text for device instaruction",
+    defaultMessage: "The device is disconnected."
+  }
+
+});
 
 const _DashboardDeviceBoard: React.FunctionComponent<IDashboardDeviceBoard> = ({
   classes, navigate
@@ -123,7 +142,6 @@ const _DashboardDeviceBoard: React.FunctionComponent<IDashboardDeviceBoard> = ({
                 </IconButton>
               }
               title={device.name}
-              subheader={summary}
             />
         }
 
@@ -132,8 +150,8 @@ const _DashboardDeviceBoard: React.FunctionComponent<IDashboardDeviceBoard> = ({
             !device ?
               <div><Skeleton variant="text" /><Skeleton variant="text" /><Skeleton variant="text" /></div>
               :
-              <Typography variant="body2" color="textSecondary" component="p">
-                instruction space
+              <Typography variant="body2" color="textSecondary">
+                {summary}
         </Typography>
           }
 
@@ -160,13 +178,15 @@ const _DashboardDeviceBoard: React.FunctionComponent<IDashboardDeviceBoard> = ({
 
   const renderDevices = () => {
     return devices.map((d: BasicDeviceApiModel) => {
-      var summary = "";
-      if (d.name === "L401") {
-        summary = "Connected with temp1";
-      } else if (d.name === "L402") {
-        summary = "No sensor connected.";
+      let summary = "";
+      if (d.connected) {
+        if (d.lastMessageAt) {
+          summary = intl.formatMessage(messages.connected.timed, { ago: moment(d.lastMessageAt).fromNow() });
+        } else {
+          summary = intl.formatMessage(messages.connected.notYet);
+        }
       } else {
-        summary = "Device is not configured.";
+        summary = intl.formatMessage(messages.notConnected);
       }
       return renderDevice(d, summary);
     });
