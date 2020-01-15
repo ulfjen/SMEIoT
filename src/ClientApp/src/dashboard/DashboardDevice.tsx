@@ -276,6 +276,7 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
       sensors.setNotRegistered(res.sensors.filter(s => s.status === SensorStatus.NUMBER_0)); // not registered
       sensors.setNotConnected(res.sensors.filter(s => s.status === SensorStatus.NUMBER_1)); // not connected
       sensors.setRunning(res.sensors.filter(s => s.status === SensorStatus.NUMBER_2)); // connected
+      return res;
     });
 
     return res;
@@ -304,6 +305,7 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
           deviceName={menuDeviceName}
           closeMenu={closeMenu}
           hideConfigureItem
+          pathPrefix=".."
           navigate={navigate}
           openDialog={openDialog}
         />
@@ -316,7 +318,7 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} aria-label="breadcrumb">
-              <Link component={ReachLink} color="inherit" to="../..">
+              <Link component={ReachLink} color="inherit" to="..">
                 <FormattedMessage
                   id="dashboard.devices.edit.breadcrumb.devices"
                   description="The label at the breadcrumb for devices"
@@ -354,7 +356,7 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
               <CardContent>
                 {state.loading ? <div><Skeleton variant="text" /><Skeleton variant="text" /><Skeleton variant="text" /></div> : <Typography variant="body2" color="textSecondary">
                 <FormattedMessage
-                  id="dashboard.device.show.instructions"
+                  id="dashboard.device.edit.instructions"
                   description="The instruction for device."
                   defaultMessage="Configured sensors will show here. But if a device is reconfigured or you believe it sends messages while this page doesn't show anything, refresh the page."
                 />
@@ -363,7 +365,7 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
               {!state.loading && state.value && <CardActions>
                 <Button size="small" color="primary" component={ReachLink} to={`/dashboard/broker/logs?device_name=${state.value.name}`}>
                   <FormattedMessage
-                    id="dashboard.device.show.actions.logs"
+                    id="dashboard.device.edit.actions.logs"
                     description="The action for device cards."
                     defaultMessage="Logs"
                   />
@@ -392,7 +394,7 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
                 {state.loading ? <Skeleton variant="text" /> :
                   <Typography variant="body2" color="textSecondary">
                     <FormattedMessage
-                      id="dashboard.device.show.not_registered_sensors.instructions"
+                      id="dashboard.device.edit.not_registered_sensors.instructions"
                       description="The instruction for device cards."
                       defaultMessage="We have found some sensors that can be connected to this device. After connecting, you can assign the sensor to users."
                     />
@@ -414,7 +416,7 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
               <CardContent>
                 {state.loading ? <div><Skeleton variant="text" /><Skeleton variant="text" /><Skeleton variant="text" /></div> : <Typography variant="body2" color="textSecondary" component="p">
                   <FormattedMessage
-                    id="dashboard.device.show.not_connected_sensors.instructions"
+                    id="dashboard.device.edit.not_connected_sensors.instructions"
                     description="The instruction for device cards."
                     defaultMessage="These sensors are not connected to the broker. Please check connection and configuration on the device. They appear here because they were connected."
                   />

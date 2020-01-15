@@ -12,6 +12,7 @@ import DashboardDevice from "./dashboard/DashboardDevice";
 import DashboardSensorDetails from "./dashboard/DashboardSensorDetails";
 import DashboardNewDeviceConnect from "./dashboard/DashboardNewDeviceConnect";
 import DashboardNewDeviceConnectSensors from "./dashboard/DashboardNewDeviceConnectSensors";
+import DashboardDeviceCredential from "./dashboard/DashboardDeviceCredential";
 import DashboardBrokerStatistics from "./dashboard/DashboardBrokerStatistics";
 
 export interface IDashboardApp extends RouteComponentProps {
@@ -28,6 +29,7 @@ const DashboardApp: React.FunctionComponent<IDashboardApp> = ({
     <DashboardNewDeviceConnect path="devices/wait_connection" />
     <DashboardNewDeviceConnectSensors path="devices/finialize_sensors" />
     <DashboardDevice path="devices/:deviceName" />
+    <DashboardDeviceCredential path="devices/:deviceName/credentials" />
     <DashboardSensors path="sensors" />
     <DashboardNewSensor path="sensors/new" />
     <DashboardSensorDetails path="sensors/:deviceName/:sensorName" />

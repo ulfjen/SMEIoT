@@ -33,6 +33,7 @@ export interface IDashboardDeviceMenuProps extends WithStyles<typeof styles> {
   closeMenu: () => void;
   deviceName?: string;
   hideConfigureItem?: boolean;
+  pathPrefix?: string;
   navigate?: NavigateFn;
   openDialog: (value: string) => void;
 }
@@ -41,10 +42,12 @@ const messages = defineMessages({
 });
 
 const _DashboardDeviceMenu: React.FunctionComponent<IDashboardDeviceMenuProps> = ({
-  classes, open, anchorEl, closeMenu, deviceName, navigate, hideConfigureItem, openDialog
+  classes, open, anchorEl, closeMenu, deviceName, navigate, hideConfigureItem, openDialog, pathPrefix
 }) => {
   const intl = useIntl();
-
+  if (!pathPrefix) {
+    pathPrefix = ".";
+  }
 
   const onCloseClick = (e: React.MouseEvent<HTMLUListElement, MouseEvent>) => {
     e.preventDefault();
@@ -54,13 +57,13 @@ const _DashboardDeviceMenu: React.FunctionComponent<IDashboardDeviceMenuProps> =
   const configureOnClick = (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
     e.preventDefault();
     closeMenu();
-    navigate && navigate(`/dashboard/devices/${deviceName}`);
+    navigate && navigate(`${pathPrefix}/${deviceName}`);
   }
 
   const credentialsOnClick = (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
     e.preventDefault();
     closeMenu();
-    navigate && navigate(`/dashboard/devices/${deviceName}/credentials`);
+    navigate && navigate(`${pathPrefix}/${deviceName}/credentials`);
   }
 
   const removeOnClick = (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
