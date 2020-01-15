@@ -32,12 +32,12 @@ const styles = ({ spacing }: Theme) =>
       overflow: "auto",
       flexDirection: "column"
     },
-    loadingPanel: {
-      height: 200
-    },
     blockCode: {
       whiteSpace: "pre-wrap",
       wordWrap: "break-word"
+    },
+    actions: {
+      marginTop: spacing(1)
     }
   });
 
@@ -94,7 +94,7 @@ const _DashboardNewDeviceConnect: React.FunctionComponent<IDashboardNewDeviceCon
       <Grid item xs={12}>
         <Paper className={classes.paper}>
         {state.loading ? (
-            <Skeleton variant="rect" className={classes.loadingPanel} />
+            <div><Skeleton variant="text"/><Skeleton variant="text"/><Skeleton variant="text"/></div>
           ) : (
             <div>
 
@@ -128,10 +128,10 @@ const _DashboardNewDeviceConnect: React.FunctionComponent<IDashboardNewDeviceCon
                 }}
               />
             }
-            <div>
+            <div className={classes.actions}>
               <Button
                 component={ReachLink}
-                to={`sensors?name=${device.name}`}
+                to={`../finialize_sensors?name=${device.name}`}
                 variant="contained"
                 color="primary"
                 disabled={!connected}

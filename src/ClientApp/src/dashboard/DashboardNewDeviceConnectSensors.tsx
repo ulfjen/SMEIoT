@@ -30,8 +30,11 @@ const styles = ({ spacing }: Theme) =>
       overflow: "auto",
       flexDirection: "column"
     },
-    loadingPanel: {
-      height: 200
+    actions: {
+      marginTop: spacing(1),
+      "& > a": {
+        marginRight: spacing(1)
+      }
     }
   });
 
@@ -85,8 +88,8 @@ const _DashboardNewDeviceConnectSensors: React.FunctionComponent<IDashboardNewDe
       <Grid item xs={12}>
         <Paper className={classes.paper}>
           {loading ? (
-            <Skeleton variant="rect" className={classes.loadingPanel} />
-          ) : (
+            <div><Skeleton variant="text"/><Skeleton variant="text"/><Skeleton variant="text"/></div>
+            ) : (
             loadingError && device ?
               (device.name ? 
               <FormattedMessage
@@ -103,22 +106,20 @@ const _DashboardNewDeviceConnectSensors: React.FunctionComponent<IDashboardNewDe
                 }}
               />) :
               <div>
-                <p>
-                  <FormattedMessage
-                    id="dashboard.devices.new.step3.notice"
-                    description="Notice related when we add new sensors"
-                    defaultMessage="The device is now installed. You can start to connect sensors. You can also add sensors in the device details page later."
-                  />
-                </p>
-                <div>
-                  <Button variant="contained" color="primary" component={Link} to="/dashboard/devices">
+                <FormattedMessage
+                  id="dashboard.devices.new.step3.notice"
+                  description="Notice related when we add new sensors"
+                  defaultMessage="The device is now installed. You can start to connect sensors. You can also add sensors in the device details page later."
+                />
+                <div className={classes.actions}>
+                  <Button variant="contained" color="primary" component={Link} to="..">
                     <FormattedMessage
                       id="dashboard.devices.new.control.finish"
                       description="The button text for going to finish adding"
                       defaultMessage="Finish"
                     />
                   </Button>
-                  <Button component={Link} to="/dashboard/devices/new">
+                  <Button component={Link} to="../new">
                     <FormattedMessage
                       id="dashboard.devices.new.control.create_new"
                       description="Control for adding new device (reset the wizard)"

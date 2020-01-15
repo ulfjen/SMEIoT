@@ -6,24 +6,25 @@ import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
-const styles = ({ palette, spacing }: Theme) =>
-  createStyles({
-    progress: {
-      position: "absolute",
-      top: "50%",
-      left: "50%",
-      marginTop: -12,
-      marginLeft: -12
-    },
-    wrapper: {
-      position: "relative"
-    }
-  });
+const styles = ({ palette, spacing }: Theme) => createStyles({
+  progress: {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    marginTop: -12,
+    marginLeft: -12
+  },
+  wrapper: {
+    display: "inline-block",
+    position: "relative"
+  }
+});
 
 export interface IProgressButtonProps extends WithStyles<typeof styles> {
   children: JSX.Element;
   onClick: React.MouseEventHandler<HTMLButtonElement>;
   loading: boolean;
+  disabled?: boolean;
   variant?: "text" | "outlined" | "contained";
   color?: "default" | "inherit" | "primary" | "secondary";
 }
@@ -35,11 +36,12 @@ const _ProgressButton: React.FunctionComponent<IProgressButtonProps &
   children,
   onClick,
   variant,
+  disabled,
   color
 }) => {
   return (
     <div className={classes.wrapper}>
-      <Button variant={variant} onClick={onClick} disabled={loading} color={color}>
+      <Button variant={variant} onClick={onClick} disabled={loading || disabled} color={color}>
         {children}
       </Button>
       {loading && <CircularProgress size={24} className={classes.progress} />}
