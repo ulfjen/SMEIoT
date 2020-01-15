@@ -11,8 +11,7 @@ solution: SMEIoT.sln
 before_script:
     - sh -c scripts/travis.sh
 script:
-    - ls -l /usr/share/dotnet/dotnet
-    - ls -alh /home/travis/build
+    - mkdir -p /home/travis/build/ulfjen/SMEIoT/src/SMEIoT.Infrastructure/bin/Debug/netcoreapp3.1/
     - dotnet --version
     - dotnet restore
     - dotnet build
