@@ -1,5 +1,5 @@
 import * as React from "react";
-import Button from "@material-ui/core/Button";
+import IconButton from "@material-ui/core/IconButton";
 import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
@@ -9,10 +9,9 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 const styles = ({ palette, spacing }: Theme) => createStyles({
   progress: {
     position: "absolute",
-    top: "50%",
-    left: "50%",
-    marginTop: -12,
-    marginLeft: -12
+    top: 0,
+    left: 0,
+    zIndex: 1
   },
   wrapper: {
     display: "inline-block",
@@ -20,33 +19,41 @@ const styles = ({ palette, spacing }: Theme) => createStyles({
   }
 });
 
-export interface IProgressButtonProps extends WithStyles<typeof styles> {
+export interface IProgressIconButtonProps extends WithStyles<typeof styles> {
   children: JSX.Element;
-  onClick: React.MouseEventHandler<HTMLButtonElement>;
+  onClick: React.MouseEventHandler<HTMLAnchorElement>;
   loading: boolean;
+  ariaLabel?: string;
   disabled?: boolean;
   variant?: "text" | "outlined" | "contained";
   color?: "default" | "inherit" | "primary" | "secondary";
 }
 
-const _ProgressButton: React.FunctionComponent<IProgressButtonProps> = ({
+const _ProgressIconButton = React.forwardRef(({
   classes,
   loading,
   children,
   onClick,
   variant,
   disabled,
+  ariaLabel,
   color
-}) => {
+}: IProgressIconButtonProps, ref: React.Ref<HTMLDivElement>) => {
   return (
-    <div className={classes.wrapper}>
-      <Button variant={variant} onClick={onClick} disabled={loading || disabled} color={color}>
+    <div className={classes.wrapper} ref={ref}>
+      <IconButton
+        variant={variant}
+        color={color}
+        aria-label={ariaLabel}
+        disabled={loading || disabled}
+        onClick={onClick}
+      >
         {children}
-      </Button>
-      {loading && <CircularProgress size={24} className={classes.progress} />}
+      </IconButton>
+      {loading && <CircularProgress size={48} className={classes.progress} />}
     </div>
   );
-};
-
-const ProgressButton = withStyles(styles)(_ProgressButton);
-export default ProgressButton;
+});
+ 
+const ProgressIconButton = withStyles(styles)(_ProgressIconButton);
+export default ProgressIconButton;
