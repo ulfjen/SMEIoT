@@ -123,6 +123,19 @@ namespace SMEIoT.Tests.Core.Services
       Assert.Null(device.ConnectedAt);
       Assert.Null(device.LastMessageAt);
     }
+
+    [Fact]
+    public async Task BootstrapDeviceWithPreSharedKeyAsync_ForbidsSomeName()
+    {
+      foreach (var name in DeviceService.ForbiddenDeviceNames) {
+        Task Act() => _service.BootstrapDeviceWithPreSharedKeyAsync(name, "key");
+
+        var exce = await Record.ExceptionAsync(Act);
+        Assert.NotNull(exce);
+        var details = Assert.IsType<InvalidArgumentException>(exce);
+        Assert.Equal("name", details.ParamName);
+      }
+    }
     
     [Fact]
     public async Task GetDeviceByNameAsync_ThrowsIfNoDevice()
