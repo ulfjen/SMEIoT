@@ -31,7 +31,10 @@ import {
 } from "@reach/router";
 import { GetDefaultApiConfig } from "../index";
 import { DeviceApiModelList } from "smeiot-client/dist/models/DeviceApiModelList";
+import useMenu from "../helpers/useMenu";
+import useModal from "../helpers/useModal";
 import DashboardDeviceMenu from "./DashboardDeviceMenu";
+import DashboardDeviceDialog from "./DashboardDeviceDialog";
 
 const styles = ({
   palette,
@@ -93,17 +96,12 @@ const _DashboardDeviceBoard: React.FunctionComponent<IDashboardDeviceBoard> = ({
 }) => {
   const intl = useIntl();
 
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [anchoredDeviceName, setAnchoredDeviceName] = React.useState<string>("");
-  const handleMoreClicked = (event: React.MouseEvent<HTMLButtonElement>, deviceName?: string) => {
-    setAnchorEl(event.currentTarget);
-    if (deviceName) {
-      setAnchoredDeviceName(deviceName);
-    }
-  };
+  const [menuOpen, anchorEl, openMenu, closeMenu, menuDeviceName] = useMenu<string>();
+  const [dialogOpen, openDialog, closeDialog, dialogDeviceName] = useModal<string>();
 
-  const handleClose = () => {
-    setAnchorEl(null);
+  const handleMoreClicked = (e: React.MouseEvent<HTMLButtonElement>, deviceName?: string) => {
+    e.preventDefault();
+    openMenu(e.currentTarget, deviceName || "");
   };
 
   const renderDevice = (device: BasicDeviceApiModel | undefined, summary: string) => {
@@ -198,7 +196,7 @@ const _DashboardDeviceBoard: React.FunctionComponent<IDashboardDeviceBoard> = ({
     <React.Fragment>
       {unconnectedDeviceNames.length > 0 && (
         <Grid item xs={12}>
-          <BannerNotice to={`/dashboard/devices/new/connect?name=${unconnectedDeviceNames[0]}`}>
+          <BannerNotice to={`/dashboard/devices/wait_connection?name=${unconnectedDeviceNames[0]}`}>
             <Typography component="p">
               <FormattedMessage
                 id="dashboard.devices.index.unconnected_notice"
@@ -214,10 +212,17 @@ const _DashboardDeviceBoard: React.FunctionComponent<IDashboardDeviceBoard> = ({
       )}
       {state.loading ? renderDevice(undefined, "") : renderDevices()}
       <DashboardDeviceMenu
-        open={Boolean(anchorEl)}
+        open={menuOpen}
         anchorEl={anchorEl}
-        deviceName={anchoredDeviceName}
-        closeMenu={handleClose}
+        deviceName={menuDeviceName}
+        closeMenu={closeMenu}
+        navigate={navigate}
+        openDialog={openDialog}
+      />
+      <DashboardDeviceDialog
+        open={dialogOpen}
+        deviceName={dialogDeviceName}
+        closeDialog={closeDialog}
         navigate={navigate}
       />
     </React.Fragment>

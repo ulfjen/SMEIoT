@@ -53,9 +53,11 @@ import MoreVertIcon from "@material-ui/icons/MoreVert";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import useMenu from "../helpers/useMenu";
+import useModal from "../helpers/useModal";
 import DashboardDeviceMenu from "./DashboardDeviceMenu";
+import DashboardDeviceDialog from "./DashboardDeviceDialog";
 
-const styles = ({ typography, palette, spacing }: Theme) => createStyles({
+const styles = ({ typography, palette, spacing, zIndex }: Theme) => createStyles({
   container: {
   },
   instructions: {
@@ -116,7 +118,11 @@ const styles = ({ typography, palette, spacing }: Theme) => createStyles({
   },
   list: {
     marginTop: 20
-  }
+  },
+  backdrop: {
+    zIndex: zIndex.drawer + 1,
+    color: '#fff',
+  },
 });
 
 export interface IDashboardDeviceRouteParams {
@@ -227,6 +233,7 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
   // const [deviceName, setDeviceName] = React.useState<string>("");
   const [handlingNext, setHandlingNext] = React.useState<boolean>(false);
   const [menuOpen, anchorEl, openMenu, closeMenu, menuDeviceName] = useMenu<string>();
+  const [dialogOpen, openDialog, closeDialog, dialogDeviceName] = useModal<string>();
 
   // const renderActionList = (deviceName: string, names: string[]) => {
   //   return names.map(name => <TwoLayerLabelAction
@@ -282,9 +289,9 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
       <ExpansionPanelActions>
         <Button size="small" className={classes.warning}>
           <FormattedMessage
-            id="dashboard.devices.edit.sensor.actions.disconnect"
+            id="dashboard.devices.edit.sensor.actions.remove"
             description="Action for sensor"
-            defaultMessage="Disconnect"
+            defaultMessage="Remove"
           /> 
         </Button>
         <Button size="small" variant="contained" color="primary">
@@ -341,6 +348,13 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
           closeMenu={closeMenu}
           hideConfigureItem
           navigate={navigate}
+          openDialog={openDialog}
+        />
+        <DashboardDeviceDialog
+          open={dialogOpen}
+          deviceName={dialogDeviceName}
+          closeDialog={closeDialog}
+          navigate={navigate}
         />
         <Grid container spacing={3}>
           <Grid item xs={12}>
@@ -371,7 +385,7 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
                 >
                   {state.loading ? <Skeleton variant="rect" width={100} height={14} /> : state.value && intl.formatMessage(state.value.connected ? messages.status.connected : messages.status.notConnected)}
                 </StatusBadge>}
-                action={
+                action={!state.loading &&
                   <IconButton
                     aria-label={intl.formatMessage(messages.moreAria)}
                     onClick={(e) => openMenu(e.currentTarget, state.value ? state.value.name : "")}

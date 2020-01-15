@@ -30,19 +30,21 @@ const styles = ({ typography, palette, spacing }: Theme) => createStyles({
 export interface IDashboardDeviceMenuProps extends WithStyles<typeof styles> {
   open: boolean;
   anchorEl: HTMLElement | null;
-  closeMenu: () => void
+  closeMenu: () => void;
   deviceName?: string;
   hideConfigureItem?: boolean;
   navigate?: NavigateFn;
+  openDialog: (value: string) => void;
 }
 
 const messages = defineMessages({
 });
 
 const _DashboardDeviceMenu: React.FunctionComponent<IDashboardDeviceMenuProps> = ({
-  classes, open, anchorEl, closeMenu, deviceName, navigate, hideConfigureItem
+  classes, open, anchorEl, closeMenu, deviceName, navigate, hideConfigureItem, openDialog
 }) => {
   const intl = useIntl();
+
 
   const onCloseClick = (e: React.MouseEvent<HTMLUListElement, MouseEvent>) => {
     e.preventDefault();
@@ -64,47 +66,49 @@ const _DashboardDeviceMenu: React.FunctionComponent<IDashboardDeviceMenuProps> =
   const removeOnClick = (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
     e.preventDefault();
     closeMenu();
+    if (deviceName) { openDialog(deviceName) }
   }
 
+
   return <Menu
-    anchorEl={anchorEl}
-    keepMounted
-    open={open}
-    onClose={onCloseClick}
-  >
-    {!hideConfigureItem && <MenuItem
-      button
-      onClick={configureOnClick}
+      anchorEl={anchorEl}
+      keepMounted
+      open={open}
+      onClose={onCloseClick}
     >
-      <FormattedMessage
-        id="dashboard.components.device_menu.configure"
-        description="The action in device menu."
-        defaultMessage="Configure"
-      />
-    </MenuItem>
-    }
-    <MenuItem
-      button
-      onClick={credentialsOnClick}
-    >
-      <FormattedMessage
-        id="dashboard.components.device_menu.configure_credentials"
-        description="The action in device menu."
-        defaultMessage="Credentials"
-      />
-    </MenuItem>
-    <MenuItem
-      button
-      className={classes.removeAction}
-      onClick={removeOnClick}
-    >
-      <FormattedMessage
-        id="dashboard.components.device_menu.remove"
-        description="The action in device menu."
-        defaultMessage="Remove"
-      />
-    </MenuItem>
-  </Menu>;
+      {!hideConfigureItem && <MenuItem
+        button
+        onClick={configureOnClick}
+      >
+        <FormattedMessage
+          id="dashboard.components.device_menu.configure"
+          description="The action in device menu."
+          defaultMessage="Configure"
+        />
+      </MenuItem>
+      }
+      <MenuItem
+        button
+        onClick={credentialsOnClick}
+      >
+        <FormattedMessage
+          id="dashboard.components.device_menu.configure_credentials"
+          description="The action in device menu."
+          defaultMessage="Credentials"
+        />
+      </MenuItem>
+      <MenuItem
+        button
+        className={classes.removeAction}
+        onClick={removeOnClick}
+      >
+        <FormattedMessage
+          id="dashboard.components.device_menu.remove"
+          description="The action in device menu."
+          defaultMessage="Remove"
+        />
+      </MenuItem>
+    </Menu>;
 };
 
 const DashboardDeviceMenu = withStyles(styles)(_DashboardDeviceMenu);
