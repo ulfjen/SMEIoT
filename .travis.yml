@@ -11,6 +11,8 @@ solution: SMEIoT.sln
 before_script:
     - sh -c scripts/travis.sh
 script:
+    - ls -l /usr/share/dotnet/dotnet
+    - ls -alh /home/travis/build
     - dotnet --version
     - dotnet restore
     - dotnet build
