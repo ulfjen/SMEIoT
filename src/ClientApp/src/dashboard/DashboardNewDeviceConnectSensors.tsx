@@ -8,10 +8,10 @@ import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
 import Skeleton from "@material-ui/lab/Skeleton";
 import { Link, RouteComponentProps } from "@reach/router";
-import { useTitle } from 'react-use';
+import { useTitle, useAsync } from 'react-use';
 import {
   DevicesApi,
-  BasicDeviceApiModel
+  SensorStatus,
 } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
 import DashboardNewDeviceFrame from "./DashboardNewDeviceFrame";
@@ -21,6 +21,8 @@ import {
   useIntl,
   FormattedMessage
 } from "react-intl";
+import DashboardDeviceOtherSensors from "./DashboardDeviceOtherSensors";
+import useSensorByStatus from "../helpers/useSensorsByStatus";
 
 const styles = ({ spacing }: Theme) =>
   createStyles({
@@ -57,59 +59,48 @@ const _DashboardNewDeviceConnectSensors: React.FunctionComponent<IDashboardNewDe
   const intl = useIntl();
   useTitle(intl.formatMessage(messages.title));
 
-  const [loading, setLoading] = React.useState<boolean>(true);
-  const [loadingError, setLoadingError] = React.useState<boolean>(false);
-  const [device, setDevice] = React.useState<BasicDeviceApiModel>();
+  const api = new DevicesApi(GetDefaultApiConfig());
+  const sensors = useSensorByStatus();
 
-  React.useEffect(() => {
-    (async () => {
-      const name = extractParamFromQuery(location);
-      if (name === null) {
-        setLoadingError(true);
-        return;
-      }
+  const name = extractParamFromQuery(location);
+  if (name === null) {
+    throw new Error("Device name is required.");
+  }
 
-      setLoading(true);
-      const api = new DevicesApi(GetDefaultApiConfig());
-      var res = await api.apiDevicesNameGet({
-        name
-      });
-      if (res !== null) {
-        setDevice(res);
-      } else {
-        setLoadingError(true);
-      }
-      setLoading(false);
-    })();
-  }, []);
-
+  const state = useAsync(async () => {
+    return await api.apiDevicesNameGet({
+      name
+    }).then(res => {
+      sensors.setNotRegistered(res.sensors.filter(s => s.status === SensorStatus.NUMBER_0)); // not registered
+      sensors.setNotConnected(res.sensors.filter(s => s.status === SensorStatus.NUMBER_1)); // not connected
+      sensors.setRunning(res.sensors.filter(s => s.status === SensorStatus.NUMBER_2)); // connected
+      return res;
+    });
+  }, [name]);
+  
   return (
     <DashboardNewDeviceFrame activeStep={2}>
       <Grid item xs={12}>
         <Paper className={classes.paper}>
-          {loading ? (
+          {state.loading ? (
             <div><Skeleton variant="text"/><Skeleton variant="text"/><Skeleton variant="text"/></div>
             ) : (
-            loadingError && device ?
-              (device.name ? 
+            state.error ?
               <FormattedMessage
-                id="dashboard.devices.new.errors.loading_error_without_name"
+                id="dashboard.devices.new.errors.something_wrong"
                 description="Error related when we wait for new connection"
-                defaultMessage="We can not find your device. Please try to add your new device again."
+                defaultMessage="Something is wrong. We can't continue."
               /> :
-              <FormattedMessage
-                id="dashboard.devices.new.errors.loading_error"
-                description="Error related when we wait for new connection"
-                defaultMessage="We can not find your device {name}. Please try later."
-                values={{
-                  name: device.name
-                }}
-              />) :
               <div>
                 <FormattedMessage
                   id="dashboard.devices.new.step3.notice"
                   description="Notice related when we add new sensors"
                   defaultMessage="The device is now installed. You can start to connect sensors. You can also add sensors in the device details page later."
+                />
+                <DashboardDeviceOtherSensors
+                  deviceName={state.value ? state.value.name : ""}
+                  sensorsToRender={sensors.notRegistered}
+                  sensors={sensors}
                 />
                 <div className={classes.actions}>
                   <Button variant="contained" color="primary" component={Link} to="..">

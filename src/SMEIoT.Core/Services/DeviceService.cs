@@ -14,7 +14,7 @@ namespace SMEIoT.Core.Services
   {
     private readonly IApplicationDbContext _dbContext;
     private readonly IMqttIdentifierService _identifierService;
-    public static readonly List<string> ForbiddenDeviceNames = new List<string> { "config_suggest", "bootstrap", "wait_connection", "finialize_sensors", "new" }; 
+    public static readonly List<string> ForbiddenDeviceNames = new List<string> { "config_suggest", "bootstrap", "wait_connection", "configure_sensors", "new" }; 
 
     public DeviceService(IApplicationDbContext dbContext, IMqttIdentifierService identifierService)
     {
