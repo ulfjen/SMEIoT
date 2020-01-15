@@ -26,10 +26,15 @@ import { defineMessages, useIntl, FormattedMessage } from "react-intl";
 import {
   Link as ReachLink,
   LinkProps as ReachLinkProps,
-  RouteComponentProps
+  RouteComponentProps,
+  NavigateFn
 } from "@reach/router";
 import { GetDefaultApiConfig } from "../index";
 import { DeviceApiModelList } from "smeiot-client/dist/models/DeviceApiModelList";
+import useMenu from "../helpers/useMenu";
+import useModal from "../helpers/useModal";
+import DashboardDeviceMenu from "./DashboardDeviceMenu";
+import DashboardDeviceDialog from "./DashboardDeviceDialog";
 
 const styles = ({
   palette,
@@ -80,28 +85,23 @@ const styles = ({
   }
 });
 
-export interface IDashboardDeviceBoard
-  extends WithStyles<typeof styles> {
+export interface IDashboardDeviceBoard extends WithStyles<typeof styles> {
+  navigate?: NavigateFn;
 }
 
 const messages = defineMessages({});
 
 const _DashboardDeviceBoard: React.FunctionComponent<IDashboardDeviceBoard> = ({
-  classes,
+  classes, navigate
 }) => {
   const intl = useIntl();
 
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [anchoredDeviceName, setAnchoredDeviceName] = React.useState<string>("");
-  const handleMoreClicked = (event: React.MouseEvent<HTMLButtonElement>, deviceName?: string) => {
-    setAnchorEl(event.currentTarget);
-    if (deviceName) {
-      setAnchoredDeviceName(deviceName);
-    }
-  };
+  const [menuOpen, anchorEl, openMenu, closeMenu, menuDeviceName] = useMenu<string>();
+  const [dialogOpen, openDialog, closeDialog, dialogDeviceName] = useModal<string>();
 
-  const handleClose = () => {
-    setAnchorEl(null);
+  const handleMoreClicked = (e: React.MouseEvent<HTMLButtonElement>, deviceName?: string) => {
+    e.preventDefault();
+    openMenu(e.currentTarget, deviceName || "");
   };
 
   const renderDevice = (device: BasicDeviceApiModel | undefined, summary: string) => {
@@ -196,7 +196,7 @@ const _DashboardDeviceBoard: React.FunctionComponent<IDashboardDeviceBoard> = ({
     <React.Fragment>
       {unconnectedDeviceNames.length > 0 && (
         <Grid item xs={12}>
-          <BannerNotice to={`/dashboard/devices/new/connect?name=${unconnectedDeviceNames[0]}`}>
+          <BannerNotice to={`/dashboard/devices/wait_connection?name=${unconnectedDeviceNames[0]}`}>
             <Typography component="p">
               <FormattedMessage
                 id="dashboard.devices.index.unconnected_notice"
@@ -211,39 +211,20 @@ const _DashboardDeviceBoard: React.FunctionComponent<IDashboardDeviceBoard> = ({
         </Grid>
       )}
       {state.loading ? renderDevice(undefined, "") : renderDevices()}
-      <Menu
+      <DashboardDeviceMenu
+        open={menuOpen}
         anchorEl={anchorEl}
-        keepMounted
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
-      >
-        <MenuItem
-          button
-          to={`/dashboard/devices/${anchoredDeviceName}`}
-          component={ReachLink}
-          onClick={handleClose}
-        >
-          <FormattedMessage
-            id="dashboard.device.actions.configure"
-            description="The action for device card."
-            defaultMessage="Configure"
-          />
-        </MenuItem>
-        <MenuItem button onClick={handleClose}>
-          <FormattedMessage
-            id="dashboard.broker.actions.authenticate"
-            description="The action for device card."
-            defaultMessage="Manage authentication"
-          />
-        </MenuItem>
-        <MenuItem button onClick={handleClose}>
-          <FormattedMessage
-            id="dashboard.broker.actions.delete"
-            description="The action for device card."
-            defaultMessage="Delete"
-          />
-        </MenuItem>
-      </Menu>
+        deviceName={menuDeviceName}
+        closeMenu={closeMenu}
+        navigate={navigate}
+        openDialog={openDialog}
+      />
+      <DashboardDeviceDialog
+        open={dialogOpen}
+        deviceName={dialogDeviceName}
+        closeDialog={closeDialog}
+        navigate={navigate}
+      />
     </React.Fragment>
   );
 };

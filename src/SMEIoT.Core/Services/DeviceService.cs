@@ -13,11 +13,13 @@ namespace SMEIoT.Core.Services
   public class DeviceService : IDeviceService
   {
     private readonly IApplicationDbContext _dbContext;
+    private readonly IMqttIdentifierService _identifierService;
     private static readonly List<string> ForbiddenDeviceNames = new List<string> { "config_suggest", "bootstrap" }; 
 
-    public DeviceService(IApplicationDbContext dbContext)
+    public DeviceService(IApplicationDbContext dbContext, IMqttIdentifierService identifierService)
     {
       _dbContext = dbContext;
+      _identifierService = identifierService;
     } 
     
     public async Task<string> BootstrapDeviceWithPreSharedKeyAsync(string name, string key)
@@ -89,6 +91,10 @@ namespace SMEIoT.Core.Services
 
     public async Task CreateSensorByDeviceAndNameAsync(Device device, string sensorName)
     {
+      var legalNames = _identifierService.ListSensorNamesByDeviceName(device.Name).ToList();
+      if (!legalNames.Contains(sensorName)) {
+        throw new EntityNotFoundException($"We can't find messages from sensor {device.Name}/{sensorName}.", nameof(sensorName));
+      }
       _dbContext.Sensors.Add(new Sensor { Name = sensorName, NormalizedName = Sensor.NormalizeName(sensorName), DeviceId = device.Id });
       await _dbContext.SaveChangesAsync();
     }

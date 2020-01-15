@@ -18,8 +18,12 @@ import {
 } from "react-intl";
 import {
   SensorsApi,
+  BasicSensorApiModel,
   DevicesApi,
-  DeviceDetailsApiModel
+  DeviceDetailsApiModel,
+  SensorDetailsApiModel,
+  SensorStatus,
+  BasicSensorApiModelFromJSON
 } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
 import Tooltip from "@material-ui/core/Tooltip";
@@ -52,8 +56,14 @@ import CardActions from "@material-ui/core/CardActions";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
+import useMenu from "../helpers/useMenu";
+import useModal from "../helpers/useModal";
+import DashboardDeviceMenu from "./DashboardDeviceMenu";
+import DashboardDeviceDialog from "./DashboardDeviceDialog";
+import Backdrop from "@material-ui/core/Backdrop";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
-const styles = ({ typography, palette, spacing }: Theme) => createStyles({
+const styles = ({ typography, palette, spacing, zIndex }: Theme) => createStyles({
   container: {
   },
   instructions: {
@@ -114,16 +124,16 @@ const styles = ({ typography, palette, spacing }: Theme) => createStyles({
   },
   list: {
     marginTop: 20
-  }
+  },
 });
 
 export interface IDashboardDeviceRouteParams {
   deviceName: string;
 }
 
-export interface IDashboardDeviceProps
-  extends RouteComponentProps<IDashboardDeviceRouteParams>,
-  WithStyles<typeof styles> { }
+export interface IDashboardDeviceProps extends RouteComponentProps<IDashboardDeviceRouteParams>, WithStyles<typeof styles> {
+
+}
 
 const messages = defineMessages({
   title: {
@@ -195,7 +205,18 @@ const messages = defineMessages({
       description: "Aria Label on sensor connection component's action",
       defaultMessage: "Connect sensor to the device"
     },
-
+  },
+  instructions: {
+    sensor: {
+      id: "dashboard.devices.edit.sensor.instruction.primary",
+      description: "Instruction text on sensor panel",
+      defaultMessage: "Allow some users to watch the sensor graph by clicking \"Assign\" button or"
+    },
+    sensorLink: {
+      id: "dashboard.devices.edit.sensor.instruction.link",
+      description: "Instruction link on sensor panel",
+      defaultMessage: "See graph"
+    }
   }
 });
 
@@ -213,11 +234,8 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
   const [sensorNames, setSensorNames] = React.useState<string[] | undefined>();
   // const [deviceName, setDeviceName] = React.useState<string>("");
   const [handlingNext, setHandlingNext] = React.useState<boolean>(false);
-  const [loading, setLoading] = React.useState<boolean>(true);
-  const [unconnectedDeviceName, setUnconnectedDeviceName] = React.useState<
-    string | null
-  >(null);
-  const api = new SensorsApi(GetDefaultApiConfig());
+  const [menuOpen, anchorEl, openMenu, closeMenu, menuDeviceName] = useMenu<string>();
+  const [dialogOpen, openDialog, closeDialog, dialogDeviceName] = useModal<string>();
 
   // const renderActionList = (deviceName: string, names: string[]) => {
   //   return names.map(name => <TwoLayerLabelAction
@@ -243,74 +261,126 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
   //   />);
   // }
 
-  const sensors = ["object", "primary"];
-  const renderPanel = () => {
-    return sensors.map((sensor, index) => <ExpansionPanel className={index === 0 ? clsx(classes.panel, classes.firstPanel) : classes.panel} key={index} square elevation={0} defaultExpanded={index === 0} TransitionProps={{ unmountOnExit: true }}>
+  const renderPanels = (sensors: Array<BasicSensorApiModel>) => {
+    return sensors.length === 0 ? <CardContent>
+      <Typography variant="body2" color="textSecondary" component="p">
+        <FormattedMessage
+          id="dashboard.devices.edit.sensors.empty"
+          description="The text when no sensors"
+          defaultMessage="You haven't added any sensors yet."
+        />  
+      </Typography>
+    </CardContent> : sensors.map((sensor, index) => <ExpansionPanel className={index === 0 ? clsx(classes.panel, classes.firstPanel) : classes.panel} key={index} square elevation={0} defaultExpanded={index === 0} TransitionProps={{ unmountOnExit: true }}>
       <ExpansionPanelSummary
         expandIcon={<ExpandMoreIcon />}
         className={classes.summary}
       >
         <div className={classes.column}>
-          <TwoLayerLabelAction className={classes.heading} greyoutFirst first={"masses-pavy"} second={sensor} />
+          <TwoLayerLabelAction className={classes.heading} greyoutFirst first={state.value ? state.value.name : ""} second={sensor.sensorName} />
         </div>
         <div className={classes.column} />
       </ExpansionPanelSummary>
       <ExpansionPanelDetails className={classes.details}>
         <div className={classes.twoColumnSpan}>
-          1
-          </div>
+          graph placeholder
+        </div>
         <div className={clsx(classes.column, classes.helper)}>
           <Typography variant="caption">
-            Allow some users to watch the sensor graph by clicking "Assign" button or
+            {intl.formatMessage(messages.instructions.sensor)}
             <br />
             <a href="#secondary-heading-and-columns" className={classes.link}>
-              See graph
+              {intl.formatMessage(messages.instructions.sensorLink)}
             </a>
           </Typography>
         </div>
       </ExpansionPanelDetails>
       <Divider />
       <ExpansionPanelActions>
-        <Button size="small" className={classes.warning}>Disconnect</Button>
+        <Button size="small" className={classes.warning}>
+          <FormattedMessage
+            id="dashboard.devices.edit.sensor.actions.remove"
+            description="Action for sensor"
+            defaultMessage="Remove"
+          /> 
+        </Button>
         <Button size="small" variant="contained" color="primary">
-          Assign
-      </Button>
+          <FormattedMessage
+            id="dashboard.devices.edit.sensor.actions.assign"
+            description="Action for sensor"
+            defaultMessage="Assign"
+          />
+        </Button>
       </ExpansionPanelActions>
     </ExpansionPanel>);
   }
 
-  const renderOtherSensors = () => {
-    return sensors.map(sensor =>
-      <ListItem disableGutters key={sensor}>
-        <TwoLayerLabelAction greyoutFirst first={"masses-pavy"} second={"b"} action={
-          <Tooltip title={intl.formatMessage(messages.sensor.connect)} aria-label={intl.formatMessage(messages.sensor.connect)}>
-            <IconButton aria-label={intl.formatMessage(messages.sensor.buttonLabel)} disabled={false} onClick={() => { }}>
-              <AddIcon />
-            </IconButton>
-          </Tooltip>} />
-      </ListItem>);
+  const deviceApi = new DevicesApi(GetDefaultApiConfig());
+  const [sensors, setSensors] = React.useState<Array<BasicSensorApiModel>>([]);
+  const [notRegisteredSensors, setNotRegisteredSensors] = React.useState<Array<BasicSensorApiModel>>([BasicSensorApiModelFromJSON({
+    sensorName: "dummy"
+  })]);
+  const [notConnectedSensors, setNotConnectedSensors] = React.useState<Array<BasicSensorApiModel>>([BasicSensorApiModelFromJSON({
+    sensorName: "dummy2"
+  })]);
+  
+  const sensorApi = new SensorsApi(GetDefaultApiConfig());
+  const renderOtherSensors = (sensorsToRender: Array<BasicSensorApiModel>, disableAction: boolean) => {
+    if (sensorsToRender.length === 0) {
+      return <div></div>;
+    } else {
+      const [loading, setLoading] = React.useState<boolean>(false);
+      const [tooltipOpen, setTooltipOpen] = React.useState<boolean>(false);
+
+      const handleSensorRegisterationOnClick = React.useCallback(async (sensorName: string) => {
+        setLoading(true);
+        setTooltipOpen(false);
+        const res = await sensorApi.apiSensorsPost({
+          sensorLocatorBindingModel: {
+            deviceName,
+            name: sensorName
+          }
+        });
+        setLoading(false);
+        setSensors(sensors.concat(res));
+        setNotRegisteredSensors(notRegisteredSensors.filter(s => s.sensorName == sensorName));
+        // setNotRegisteredSensors(res.sensors.filter(s => s.status === SensorStatus.NUMBER_0)); // not registered
+        // setNotConnectedSensors(res.sensors.filter(s => s.status === SensorStatus.NUMBER_1)); // not connected
+        // setSensors(res.filter(s => s.status === SensorStatus.NUMBER_2)); // connected
+      }, [deviceName, sensors, notRegisteredSensors]);
+  
+      return <List className={classes.list}>
+        {sensorsToRender.map(sensor =>
+          <ListItem disableGutters key={sensor.sensorName}>
+            <TwoLayerLabelAction greyoutFirst first={state.value ? state.value.name : ""} second={sensor.sensorName} action={
+              !disableAction &&
+              <Tooltip
+                title={intl.formatMessage(messages.sensor.connect)}
+                aria-label={intl.formatMessage(messages.sensor.connect)}
+                open={tooltipOpen}
+                onOpen={() => setTooltipOpen(true)}
+              >
+                <IconButton
+                  aria-label={intl.formatMessage(messages.sensor.buttonLabel)}
+                  disabled={loading}
+                  onClick={() => handleSensorRegisterationOnClick(sensor.sensorName)}>
+                  <AddIcon />
+                </IconButton>
+              </Tooltip>} />
+          </ListItem>)}
+      </List>
+    }
   }
 
-  React.useEffect(() => {
-    (async () => {
-      const api = new DevicesApi(GetDefaultApiConfig());
-      if (deviceName) {
-        const res = await api.apiDevicesNameSensorCandidatesGet({
-          name: deviceName
-        });
-        if (res !== null) {
-          setSensorNames(res.names);
-        }
-      }
-      setLoading(false);
-    })();
-  }, []);
-
-  const deviceApi = new DevicesApi(GetDefaultApiConfig());
   const state: AsyncState<DeviceDetailsApiModel> = useAsync(async () => {
-    return await deviceApi.apiDevicesNameGet({
+    const res = await deviceApi.apiDevicesNameGet({
       name: deviceName
     });
+
+    // setNotRegisteredSensors(res.sensors.filter(s => s.status === SensorStatus.NUMBER_0)); // not registered
+    // setNotConnectedSensors(res.sensors.filter(s => s.status === SensorStatus.NUMBER_1)); // not connected
+    setSensors(res.sensors.filter(s => s.status === SensorStatus.NUMBER_2)); // connected
+
+    return res;
   })
 
   return <DashboardFrame
@@ -322,7 +392,7 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
         edge="end"
         color="inherit"
         aria-label={intl.formatMessage(messages.closeAriaLabel)}
-        to={"../.."}
+        to={".."}
         component={ReachLink}
       >
         <CloseIcon />
@@ -330,33 +400,21 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
     }
     content={
       <Container maxWidth="lg" className={classes.container}>
-        {/* <Menu
-        anchorEl={anchorEl}
-        keepMounted
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
-      >
-        <MenuItem
-          button
-          to={`/dashboard/devices/${anchoredDeviceName}`}
-          component={ReachLink}
-          onClick={handleClose}
-        >
-        <MenuItem button onClick={handleClose}>
-          <FormattedMessage
-            id="dashboard.broker.actions.authenticate"
-            description="The action for device card."
-            defaultMessage="Manage authentication"
-          />
-        </MenuItem>
-        <MenuItem button onClick={handleClose}>
-          <FormattedMessage
-            id="dashboard.broker.actions.delete"
-            description="The action for device card."
-            defaultMessage="Delete"
-          />
-        </MenuItem>
-      </Menu> */}
+        <DashboardDeviceMenu
+          open={menuOpen}
+          anchorEl={anchorEl}
+          deviceName={menuDeviceName}
+          closeMenu={closeMenu}
+          hideConfigureItem
+          navigate={navigate}
+          openDialog={openDialog}
+        />
+        <DashboardDeviceDialog
+          open={dialogOpen}
+          deviceName={dialogDeviceName}
+          closeDialog={closeDialog}
+          navigate={navigate}
+        />
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} aria-label="breadcrumb">
@@ -386,10 +444,10 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
                 >
                   {state.loading ? <Skeleton variant="rect" width={100} height={14} /> : state.value && intl.formatMessage(state.value.connected ? messages.status.connected : messages.status.notConnected)}
                 </StatusBadge>}
-                action={
+                action={!state.loading &&
                   <IconButton
                     aria-label={intl.formatMessage(messages.moreAria)}
-                    onClick={() => { }}
+                    onClick={(e) => openMenu(e.currentTarget, state.value ? state.value.name : "")}
                   >
                     <MoreVertIcon />
                   </IconButton>
@@ -417,7 +475,9 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
                 title={state.loading ? <Skeleton variant="rect" width={240} height={26} /> : intl.formatMessage(messages.connected.title)}
                 titleTypographyProps={{ color: "secondary", variant: "h6" }}
               />
-              {state.loading ? <CardContent><Skeleton variant="text" /><Skeleton variant="text" /><Skeleton variant="text" /></CardContent> : renderPanel()}
+              {state.loading ?
+                <CardContent><Skeleton variant="text" /><Skeleton variant="text" /><Skeleton variant="text" /></CardContent> :
+                renderPanels(sensors)}
             </Paper>
           </Grid>
           <Grid item xs={12}>
@@ -427,12 +487,15 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
                 titleTypographyProps={{ color: "secondary", variant: "h6" }}
               />
               <CardContent>
-
                 {state.loading ? <Skeleton variant="text" /> :
-                  <Typography variant="body2" color="textSecondary" component="p">
-                    We have found some sensors that can be connected to this device. After connecting, you can assign the sensor to users.
-              </Typography>}
-                {renderOtherSensors()}
+                  <Typography variant="body2" color="textSecondary">
+                    <FormattedMessage
+                      id="dashboard.device.show.not_registered_sensors.instructions"
+                      description="The instruction for device cards."
+                      defaultMessage="We have found some sensors that can be connected to this device. After connecting, you can assign the sensor to users."
+                    />
+                  </Typography>}
+                {renderOtherSensors(notRegisteredSensors, false)}
               </CardContent>
             </Paper>
           </Grid>
@@ -444,12 +507,13 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
               />
               <CardContent>
                 {state.loading ? <div><Skeleton variant="text" /><Skeleton variant="text" /><Skeleton variant="text" /></div> : <Typography variant="body2" color="textSecondary" component="p">
-                  These sensors are not connected to the broker. Please check connection and configuration on the device. They appear here because they were connected.
-              </Typography>}
-                <List className={classes.list}>
-                  {renderOtherSensors()}
-
-                </List>
+                  <FormattedMessage
+                    id="dashboard.device.show.not_connected_sensors.instructions"
+                    description="The instruction for device cards."
+                    defaultMessage="These sensors are not connected to the broker. Please check connection and configuration on the device. They appear here because they were connected."
+                  />
+                </Typography>}
+                {renderOtherSensors(notConnectedSensors, true)}
               </CardContent>
             </Paper>
           </Grid>

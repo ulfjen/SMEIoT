@@ -28,10 +28,6 @@ const styles = ({ spacing }: Theme) =>
   createStyles({
     container: {
     },
-    instructions: {
-      marginTop: spacing(1),
-      marginBottom: spacing(1)
-    },
     paper: {
       padding: spacing(2),
       display: "flex",
@@ -40,7 +36,7 @@ const styles = ({ spacing }: Theme) =>
     },
     loadingPanel: {
       height: 200
-    }
+    },
   });
 
 export interface IDashboardNewDeviceProps
@@ -88,7 +84,7 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
     });
     if (res !== null) {
       if (navigate) {
-        navigate(`connect?name=${res.name}`);
+        navigate(`../wait_connection?name=${res.name}`);
       }
     }
   };
@@ -137,7 +133,7 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
     event: React.MouseEvent<HTMLButtonElement>
   ) => {
     if (navigate) {
-      navigate(`connect?name=${unconnectedDeviceName}`);
+      navigate(`../wait_connection?name=${unconnectedDeviceName}`);
     }
   }
 
@@ -173,20 +169,17 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
 
       <Grid item xs={12}>
         <Paper className={classes.paper}>
-          {loading ? (
-            <Skeleton variant="rect" className={classes.loadingPanel} />
-          ) : (
+          {loading ?
+            <div><Skeleton variant="text"/><Skeleton variant="text"/><Skeleton variant="text"/></div> :
             <div>
-              <p>
-                <FormattedMessage
-                  id="dashboard.devices.new.step1.notice"
-                  description="Notice related with how we can add a new device"
-                  defaultMessage="We create a pre-shared key (PSK) for your new device and install it in our MQTT broker. 
-              When your device connects with the broker with this key, you can add its sensor values in the dashboard.
-              Registed and unused keys are shown on the devices page. 
-              Notice: the MQTT broker will be reloaded to install the key."
-                />
-              </p>
+              <FormattedMessage
+                id="dashboard.devices.new.step1.notice"
+                description="Notice related with how we can add a new device"
+                defaultMessage="We create a pre-shared key (PSK) for your new device and install it in our MQTT broker. 
+                  When your device connects with the broker with this key, you can add its sensor values in the dashboard.
+                  Registed and unused keys are shown on the devices page. 
+                  Notice: the MQTT broker will be reloaded to install the key."
+              />
               <SuggestTextField
                 label={intl.formatMessage(messages.nameLabel)}
                 autoFocus
@@ -206,6 +199,7 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
                 <ProgressButton
                   onClick={handleNext}
                   loading={handlingNext}
+                  disabled={suggestingKey || suggestingDeviceName}
                   variant="contained"
                   color="primary"
                 >
@@ -217,7 +211,7 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
                 </ProgressButton>
               </div>
             </div>
-          )}
+          }
         </Paper>
       </Grid>
     </DashboardNewDeviceFrame>

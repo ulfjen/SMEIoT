@@ -111,7 +111,7 @@ const _DashboardDevices: React.FunctionComponent<IDashboardDevices> = ({
               <Grid item xs={12}>
                 <BrokerCard />
               </Grid>
-              <DashboardDeviceBoard />
+              <DashboardDeviceBoard navigate={navigate} />
             </Grid>
             <Tooltip
               title={intl.formatMessage(messages.fabTooltip)}

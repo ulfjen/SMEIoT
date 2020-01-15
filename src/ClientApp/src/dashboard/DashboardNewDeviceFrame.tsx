@@ -58,7 +58,7 @@ const _DashboardNewDeviceFrame: React.FunctionComponent<IDashboardNewDeviceFrame
           edge="end"
           color="inherit"
           aria-label={intl.formatMessage(messages.closeAriaLabel)}
-          to={"../../devices"}
+          to={".."}
           component={ReachLink}
         >
           <CloseIcon />
@@ -69,7 +69,7 @@ const _DashboardNewDeviceFrame: React.FunctionComponent<IDashboardNewDeviceFrame
           <Grid container spacing={3}>
             <Grid item xs={12}>
               <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} aria-label="breadcrumb">
-                <Link component={ReachLink} color="inherit" to="../../devices">
+                <Link component={ReachLink} color="inherit" to="..">
                   <FormattedMessage
                     id="dashboard.devices.new.breadcrumb.devices"
                     description="The label at the breadcrumb for devices"

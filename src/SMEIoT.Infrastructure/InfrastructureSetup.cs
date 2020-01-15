@@ -78,9 +78,8 @@ namespace SMEIoT.Infrastructure
       services.AddSingleton<IFileProvider>(provider => {
         return env.ContentRootFileProvider;
       });
-      services.AddScoped<IIdentifierDictionaryFileAccessor, IdentifierDictionaryFileAccessor>();
-      services.AddScoped<IOneLineFileAccessor, OneLineFileAccessor>();
-      services.AddScoped<IMqttEntityIdentifierSuggestionService, MqttEntityIdentifierSuggestionService>();
+      services.AddTransient<IIdentifierDictionaryFileAccessor, IdentifierDictionaryFileAccessor>();
+      services.AddTransient<IOneLineFileAccessor, OneLineFileAccessor>();
     }
   }
 }

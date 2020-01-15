@@ -11,6 +11,6 @@ mkdir -p $TMP_BOOTSTRAP_DIR
 sudo apt-get install -y build-essential \
     libc-ares-dev \
     cmake
-build_mosquitto
-mkdir -p out && cd out && cmake .. -DCMAKE_BUILD_TYPE=Debug && make -j$(nproc)  && sudo make install
 setup_test_db
+cd $REPO_ROOT && mkdir -p out && cd out && cmake .. -DCMAKE_BUILD_TYPE=Debug && make -j$(nproc)  && sudo make install
+cd $REPO_ROOT
