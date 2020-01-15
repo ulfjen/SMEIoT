@@ -9,7 +9,8 @@ import {
 } from "react-intl";
 import {
   SensorsApi,
-  BasicSensorApiModel
+  BasicSensorApiModel,
+  ProblemDetails
 } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
 import Tooltip from "@material-ui/core/Tooltip";
@@ -18,6 +19,12 @@ import ProgressIconButton from "../components/ProgressIconButton";
 import AddIcon from "@material-ui/icons/Add";
 import ListItem from "@material-ui/core/ListItem";
 import List from "@material-ui/core/List";
+import { SensorListing } from "../helpers/useSensorsByStatus";
+import Snackbar from "@material-ui/core/Snackbar";
+import Alert from "@material-ui/lab/Alert";
+import ValidationProblemDetails from "../models/ValidationProblemDetails";
+
+
 const styles = ({ spacing }: Theme) => createStyles({
   list: {
     marginTop: 20
@@ -27,10 +34,7 @@ const styles = ({ spacing }: Theme) => createStyles({
 export interface IDashboardDeviceOtherSensorsProps extends WithStyles<typeof styles> {
   deviceName: string;
   sensorsToRender: Array<BasicSensorApiModel>;
-  sensors: Array<BasicSensorApiModel>;
-  setSensors: React.Dispatch<React.SetStateAction<BasicSensorApiModel[]>>;
-  notRegisteredSensors: Array<BasicSensorApiModel>;
-  setNotRegisteredSensors: React.Dispatch<React.SetStateAction<BasicSensorApiModel[]>>;
+  sensors: SensorListing;
   disableAction?: boolean;
 }
 
@@ -47,17 +51,19 @@ const messages = defineMessages({
       defaultMessage: "Connect sensor to the device"
     },
   },
+  defaultError: {
+    id: "dashboard.devices.edit.sensor.error_adding_sensor",
+    description: "Message on snackbar",
+    defaultMessage: "Something went wrong."
+  }
 });
 
 const _DashboardDeviceOtherSensors: React.FunctionComponent<IDashboardDeviceOtherSensorsProps> = ({
   classes,
   deviceName,
   sensors,
-  setSensors,
   sensorsToRender,
-  disableAction,
-  notRegisteredSensors,
-  setNotRegisteredSensors
+  disableAction
 }) => {
   const intl = useIntl();
 
@@ -65,20 +71,44 @@ const _DashboardDeviceOtherSensors: React.FunctionComponent<IDashboardDeviceOthe
   const [tooltipOpen, setTooltipOpen] = React.useState<boolean>(false);
 
   const sensorApi = new SensorsApi(GetDefaultApiConfig());
+  const [snackbarOpen, setSnackbarOpen] = React.useState<boolean>(false);
+  const [snackbarMessage, setSnackbarMessage] = React.useState<string>("");
   
-  const handleSensorRegisterationOnClick = React.useCallback(async (sensorName: string) => {
+  const handleSensorRegistrationOnClick = React.useCallback(async (sensorName: string) => {
     setLoading(true);
     setTooltipOpen(false);
-    const res = await sensorApi.apiSensorsPost({
+    await sensorApi.apiSensorsPost({
       sensorLocatorBindingModel: {
         deviceName,
         name: sensorName
       }
+    }).then((res) => {
+      sensors.setRunning(sensors.running.concat(res));
+      sensors.setNotRegistered(sensors.notRegistered.filter(s => s.sensorName !== sensorName));
+    }).catch((pd: ValidationProblemDetails) => {
+      setSnackbarOpen(true);
+      let msg = "";
+      if (pd.errors) {
+        if (pd.errors.hasOwnProperty("sensorName")) {
+          msg += pd.errors["sensorName"].join(" ");
+        }
+        if (pd.errors.hasOwnProperty("deviceName")) {
+          msg += pd.errors["deviceName"].join(" ");
+        }
+      }
+      if (msg.length === 0) {
+        msg = intl.formatMessage(messages.defaultError);
+      }
+      setSnackbarMessage(msg);
+    }).finally(() => {
+      setLoading(false);
     });
-    setLoading(false);
-    setSensors(sensors.concat(res));
-    setNotRegisteredSensors(notRegisteredSensors.filter(s => s.sensorName !== sensorName));
-  }, [deviceName, sensors, notRegisteredSensors]);
+  }, [deviceName, sensors.running, sensors.notRegistered]);
+
+  const closeSnackbar = (e: React.SyntheticEvent<Element, Event> | null) => {
+    if (e) { e.preventDefault() }
+    setSnackbarOpen(false);
+  };
 
   if (sensorsToRender.length === 0) {
     return <div></div>;
@@ -98,12 +128,17 @@ const _DashboardDeviceOtherSensors: React.FunctionComponent<IDashboardDeviceOthe
               <ProgressIconButton
                 ariaLabel={intl.formatMessage(messages.sensor.buttonLabel)}
                 loading={loading}
-                onClick={() => handleSensorRegisterationOnClick(sensor.sensorName)}>
+                onClick={() => handleSensorRegistrationOnClick(sensor.sensorName)}>
                 <AddIcon />
               </ProgressIconButton>
             </Tooltip>} />
         </ListItem>
       )}
+      <Snackbar anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }} open={snackbarOpen} autoHideDuration={5000} onClose={closeSnackbar}>
+        <Alert onClose={closeSnackbar} severity="error">
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </List>
   }
 };

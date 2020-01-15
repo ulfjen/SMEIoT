@@ -80,10 +80,10 @@ namespace SMEIoT.Core.EventHandlers
       if (splitP != -1) {
         var deviceName = parsed.Slice(0, splitP).ToString();
         _mqttService.RegisterDeviceNameAsync(deviceName).GetAwaiter().GetResult();
-          // TODO: report device registeration failed
+          // TODO: report device Registration failed
         var sensorName = parsed.Slice(splitP+1).ToString();
         _mqttService.RegisterSensorNameWithDeviceNameAsync(sensorName, deviceName).GetAwaiter().GetResult();
-          // TODO: report sensor registeration failed
+          // TODO: report sensor Registration failed
         using (var scope = _scopeFactory.CreateScope())
         {
           var service = scope.ServiceProvider.GetService<IDeviceService>();

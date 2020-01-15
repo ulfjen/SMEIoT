@@ -4,7 +4,7 @@ import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
-import { darken, lighten } from '@material-ui/core/styles';
+import { darken } from '@material-ui/core/styles';
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import Skeleton from "@material-ui/lab/Skeleton";
@@ -17,22 +17,18 @@ import {
   FormattedMessage
 } from "react-intl";
 import {
-  SensorsApi,
   BasicSensorApiModel,
   DevicesApi,
   DeviceDetailsApiModel,
-  SensorDetailsApiModel,
   SensorStatus,
-  BasicSensorApiModelFromJSON
 } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
-import Tooltip from "@material-ui/core/Tooltip";
 import TwoLayerLabelAction from "../components/TwoLayerLabelAction";
 import DashboardFrame from "./DashboardFrame";
 import Container from "@material-ui/core/Container";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
-import AddIcon from "@material-ui/icons/Add";
+import MoreVertIcon from "@material-ui/icons/MoreVert";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { Link as ReachLink } from "@reach/router";
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
@@ -50,19 +46,13 @@ import ExpansionPanel from "@material-ui/core/ExpansionPanel";
 import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
 import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
 import ExpansionPanelActions from "@material-ui/core/ExpansionPanelActions";
-import ListItem from "@material-ui/core/ListItem";
-import List from "@material-ui/core/List";
-import CardActions from "@material-ui/core/CardActions";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
-import Menu from "@material-ui/core/Menu";
-import MenuItem from "@material-ui/core/MenuItem";
 import useMenu from "../helpers/useMenu";
 import useModal from "../helpers/useModal";
 import DashboardDeviceMenu from "./DashboardDeviceMenu";
 import DashboardDeviceDialog from "./DashboardDeviceDialog";
 import DashboardDeviceOtherSensors from "./DashboardDeviceOtherSensors";
-import Backdrop from "@material-ui/core/Backdrop";
-import CircularProgress from "@material-ui/core/CircularProgress";
+import useSensorByStatus from "../helpers/useSensorsByStatus";
+import CardActions from "@material-ui/core/CardActions";
 
 const styles = ({ typography, palette, spacing, zIndex }: Theme) => createStyles({
   container: {
@@ -195,18 +185,6 @@ const messages = defineMessages({
       defaultMessage: "Inactive Sensors"
     },
   },
-  sensor: {
-    connect: {
-      id: "dashboard.devices.edit.sensor.connect",
-      description: "Label on sensor connection component's action",
-      defaultMessage: "Connect"
-    },
-    buttonLabel: {
-      id: "dashboard.devices.edit.sensor.label",
-      description: "Aria Label on sensor connection component's action",
-      defaultMessage: "Connect sensor to the device"
-    },
-  },
   instructions: {
     sensor: {
       id: "dashboard.devices.edit.sensor.instruction.primary",
@@ -232,35 +210,8 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
   const intl = useIntl();
   useTitle(intl.formatMessage(messages.title));
 
-  const [sensorNames, setSensorNames] = React.useState<string[] | undefined>();
-  // const [deviceName, setDeviceName] = React.useState<string>("");
-  const [handlingNext, setHandlingNext] = React.useState<boolean>(false);
   const [menuOpen, anchorEl, openMenu, closeMenu, menuDeviceName] = useMenu<string>();
   const [dialogOpen, openDialog, closeDialog, dialogDeviceName] = useModal<string>();
-
-  // const renderActionList = (deviceName: string, names: string[]) => {
-  //   return names.map(name => <TwoLayerLabelAction
-  //     first={deviceName}
-  //     key={name}
-  //     second={name}
-  //     firstVariant="inherit"
-  //     actionIconOnClick={async (event) => {
-  //       let parent = event.currentTarget.parentElement
-  //       if (!parent) { return; }
-  //       // .parentElement.children;
-  //       let deviceName = parent.childNodes[0].textContent;
-  //       let sensorName = parent.childNodes[2].textContent;
-  //       if (deviceName === null || sensorName === null) { return; }
-  //       let sensor = await api.apiSensorsPost({
-  //         sensorLocatorBindingModel: {
-  //           deviceName: deviceName,
-  //           name: sensorName
-  //         }
-  //       });
-  //       console.log(sensor);
-  //     }}
-  //   />);
-  // }
 
   const renderPanels = (sensors: Array<BasicSensorApiModel>) => {
     return sensors.length === 0 ? <CardContent>
@@ -316,23 +267,16 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
   }
 
   const deviceApi = new DevicesApi(GetDefaultApiConfig());
-  const [sensors, setSensors] = React.useState<Array<BasicSensorApiModel>>([]);
-  const [notRegisteredSensors, setNotRegisteredSensors] = React.useState<Array<BasicSensorApiModel>>([BasicSensorApiModelFromJSON({
-    sensorName: "dummy"
-  })]);
-  const [notConnectedSensors, setNotConnectedSensors] = React.useState<Array<BasicSensorApiModel>>([BasicSensorApiModelFromJSON({
-    sensorName: "dummy2"
-  })]);
-  
+  const sensors = useSensorByStatus();
 
   const state: AsyncState<DeviceDetailsApiModel> = useAsync(async () => {
     const res = await deviceApi.apiDevicesNameGet({
       name: deviceName
+    }).then(res => {
+      sensors.setNotRegistered(res.sensors.filter(s => s.status === SensorStatus.NUMBER_0)); // not registered
+      sensors.setNotConnected(res.sensors.filter(s => s.status === SensorStatus.NUMBER_1)); // not connected
+      sensors.setRunning(res.sensors.filter(s => s.status === SensorStatus.NUMBER_2)); // connected
     });
-
-    // setNotRegisteredSensors(res.sensors.filter(s => s.status === SensorStatus.NUMBER_0)); // not registered
-    // setNotConnectedSensors(res.sensors.filter(s => s.status === SensorStatus.NUMBER_1)); // not connected
-    setSensors(res.sensors.filter(s => s.status === SensorStatus.NUMBER_2)); // connected
 
     return res;
   })
@@ -435,7 +379,7 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
               />
               {state.loading ?
                 <CardContent><Skeleton variant="text" /><Skeleton variant="text" /><Skeleton variant="text" /></CardContent> :
-                renderPanels(sensors)}
+                renderPanels(sensors.running)}
             </Paper>
           </Grid>
           <Grid item xs={12}>
@@ -455,11 +399,8 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
                   </Typography>}
                 <DashboardDeviceOtherSensors
                   deviceName={state.value ? state.value.name : ""}
-                  sensorsToRender={notRegisteredSensors}
+                  sensorsToRender={sensors.notRegistered}
                   sensors={sensors}
-                  setSensors={setSensors}
-                  notRegisteredSensors={notRegisteredSensors}
-                  setNotRegisteredSensors={setNotRegisteredSensors}
                 />
               </CardContent>
             </Paper>
@@ -480,11 +421,8 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
                 </Typography>}
                 <DashboardDeviceOtherSensors
                   deviceName={state.value ? state.value.name : ""}
-                  sensorsToRender={notConnectedSensors}
+                  sensorsToRender={sensors.notConnected}
                   sensors={sensors}
-                  setSensors={setSensors}
-                  notRegisteredSensors={notRegisteredSensors}
-                  setNotRegisteredSensors={setNotRegisteredSensors}
                   disableAction
                 />
               </CardContent>

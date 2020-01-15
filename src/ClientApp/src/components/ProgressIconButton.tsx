@@ -21,7 +21,7 @@ const styles = ({ palette, spacing }: Theme) => createStyles({
 
 export interface IProgressIconButtonProps extends WithStyles<typeof styles> {
   children: JSX.Element;
-  onClick: React.MouseEventHandler<HTMLAnchorElement>;
+  onClick: React.MouseEventHandler<HTMLButtonElement>;
   loading: boolean;
   ariaLabel?: string;
   disabled?: boolean;
@@ -42,7 +42,6 @@ const _ProgressIconButton = React.forwardRef(({
   return (
     <div className={classes.wrapper} ref={ref}>
       <IconButton
-        variant={variant}
         color={color}
         aria-label={ariaLabel}
         disabled={loading || disabled}
