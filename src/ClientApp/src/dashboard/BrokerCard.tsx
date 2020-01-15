@@ -67,11 +67,6 @@ const messages = defineMessages({
     description: "The action for viewing logs on the broker block.",
     defaultMessage: "Logs"
   },
-  config: {
-    id: "dashboard.broker.actions.config",
-    description: "The action for editing config file on the broker block.",
-    defaultMessage: "Config"
-  },
   reload: {
     id: "dashboard.broker.actions.reload",
     description: "The action for reloading config file on the broker block.",
@@ -136,15 +131,16 @@ const _BrokerCard: React.FunctionComponent<IBrokerCard> = ({ classes }) => {
   return (
     <Card>
       <ExpandedCardHeader
-        action={
-          !loading &&
-          <IconButton
-            aria-label={intl.formatMessage(messages.more)}
-            onClick={handleClick}
-          >
-            <MoreVertIcon />
-          </IconButton>
-        }
+        // reload/restart is problematic with auth plugin. don't need to show the menu. stash the code here.
+        // action={
+        //   !loading &&
+        //   <IconButton
+        //     aria-label={intl.formatMessage(messages.more)}
+        //     onClick={handleClick}
+        //   >
+        //     <MoreVertIcon />
+        //   </IconButton>
+        // }
         title={loading ? <Skeleton variant="rect" width={100} height={25} /> : intl.formatMessage(messages.title)}
         status={<StatusBadge
           severity={running ? "success" : "error"}
@@ -183,18 +179,6 @@ const _BrokerCard: React.FunctionComponent<IBrokerCard> = ({ classes }) => {
         open={Boolean(anchorEl)}
         onClose={handleClose}
       >
-        <MenuItem
-          button
-          to="/dashboard/broker/config"
-          component={ReachLink}
-          onClick={handleClose}
-        >
-          <FormattedMessage
-            id="dashboard.broker.actions.config"
-            description="The action for editing config file on the broker block."
-            defaultMessage="Config"
-          />
-        </MenuItem>
         <MenuItem button onClick={handleClose}>
           <FormattedMessage
             id="dashboard.broker.actions.reload"
