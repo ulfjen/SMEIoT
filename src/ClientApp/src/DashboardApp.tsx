@@ -22,22 +22,31 @@ export interface IDashboardApp extends RouteComponentProps {
 const DashboardApp: React.FunctionComponent<IDashboardApp> = ({ location }) => {
   const cookie = useAppCookie();
 
-  return !cookie.userName && (location && location.pathname !== "/") ? <Redirect noThrow to="/" /> : <Router>
-    <DashboardIndex path="/" />
-    <DashboardDevices path="/devices" />
-    <DashboardBrokerStatistics path="broker/statistics" />
-    <DashboardNewDevice path="devices/new" />
-    <DashboardNewDeviceConnect path="devices/wait_connection" />
-    <DashboardNewDeviceConnectSensors path="devices/configure_sensors" />
-    <DashboardDevice path="devices/:deviceName" />
-    <DashboardDeviceCredential path="devices/:deviceName/credentials" />
-    <DashboardSensors path="sensors" />
-    <DashboardNewSensor path="sensors/new" />
-    <DashboardSensorDetails path="sensors/:deviceName/:sensorName" />
-    <DashboardMqttLogs path="broker/logs" />
-    <DashboardUsers path="users" />
-    <DashboardEditUser path="users/:userName" />
-  </Router>;
+  if (!cookie.userName) {
+    if (location && location.pathname !== "/") {
+      return <Redirect noThrow to="/" />;
+    }
+  } else {
+    if (!cookie.admin && location && location.pathname && !location.pathname.startsWith("/dashboard/sensors")) {
+      return <Redirect noThrow to="/dashboard/sensors" />;
+    }
+  }
+  return <Router>
+        <DashboardIndex path="/" />
+        <DashboardDevices path="/devices" />
+        <DashboardBrokerStatistics path="broker/statistics" />
+        <DashboardNewDevice path="devices/new" />
+        <DashboardNewDeviceConnect path="devices/wait_connection" />
+        <DashboardNewDeviceConnectSensors path="devices/configure_sensors" />
+        <DashboardDevice path="devices/:deviceName" />
+        <DashboardDeviceCredential path="devices/:deviceName/credentials" />
+        <DashboardSensors path="sensors" />
+        <DashboardNewSensor path="sensors/new" />
+        <DashboardSensorDetails path="sensors/:deviceName/:sensorName" />
+        <DashboardMqttLogs path="broker/logs" />
+        <DashboardUsers path="users" />
+        <DashboardEditUser path="users/:userName" />
+      </Router>;
 };
 
 export default DashboardApp;

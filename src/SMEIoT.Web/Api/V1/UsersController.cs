@@ -50,7 +50,7 @@ namespace SMEIoT.Web.Api.V1
     [HttpGet("{userName}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     public async Task<ActionResult<BasicUserApiModel>> Show(string userName)
     {
       var model = await GetBasicUserResultAsync(userName);

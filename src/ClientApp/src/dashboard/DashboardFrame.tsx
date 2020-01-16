@@ -18,7 +18,7 @@ import { NavigateFn } from '@reach/router';
 
 const drawerWidth = 240;
 
-const styles = ({ spacing, transitions, zIndex, mixins }: Theme) => createStyles({
+const styles = ({ spacing, transitions, zIndex, mixins, breakpoints }: Theme) => createStyles({
   root: {
     display: 'flex',
   },
@@ -47,8 +47,10 @@ const styles = ({ spacing, transitions, zIndex, mixins }: Theme) => createStyles
     flexGrow: 1,
   },
   drawer: {
-    width: drawerWidth,
-    flexShrink: 0,
+    [breakpoints.up('sm')]: {
+      width: drawerWidth,
+      flexShrink: 0,
+    },
   },
   drawerPaper: {
     width: drawerWidth,
@@ -70,9 +72,10 @@ export interface IDashboardFrameProps extends WithStyles<typeof styles> {
   toolbarRight?: React.ReactNode;
   navigate?: NavigateFn;
   drawer?: boolean;
+  hideHamburgerIcon?: boolean;
 }
 
-const _DashboardFrame = React.forwardRef<HTMLElement, IDashboardFrameProps>(({ classes, title, direction, drawer, content, toolbarRight }, ref) => {
+const _DashboardFrame = React.forwardRef<HTMLElement, IDashboardFrameProps>(({ classes, title, direction, drawer, content, toolbarRight, hideHamburgerIcon }, ref) => {
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
   const handleDrawerToggle = () => {
@@ -99,7 +102,7 @@ const _DashboardFrame = React.forwardRef<HTMLElement, IDashboardFrameProps>(({ c
     <CssBaseline />
     <AppBar position="fixed" className={classes.appBar}>
       <Toolbar className={classes.toolbar}>
-        <Hidden smUp implementation="css">
+        {!hideHamburgerIcon && <Hidden smUp implementation="css">
           <IconButton
             edge="start"
             color="inherit"
@@ -109,7 +112,7 @@ const _DashboardFrame = React.forwardRef<HTMLElement, IDashboardFrameProps>(({ c
           >
             <MenuIcon />
           </IconButton>
-        </Hidden>
+        </Hidden>}
 
         <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
           {title}

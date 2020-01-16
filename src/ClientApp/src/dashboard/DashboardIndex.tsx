@@ -39,7 +39,7 @@ const _DashboardIndex: React.FunctionComponent<IDashboardIndexProps> = ({ classe
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
   const appCookie = useAppCookie();
-  return !appCookie.admin ? <Redirect noThrow to="dashboard/sensors"/> : <DashboardFrame title="Dashboard" direction="ltr"
+  return <DashboardFrame title="Dashboard" direction="ltr"
     drawer
     toolbarRight={<UserAvatarMenu appCookie={appCookie} navigate={navigate}/>}
     content={

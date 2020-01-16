@@ -120,7 +120,7 @@ const _DashboardDeviceBoard: React.FunctionComponent<IDashboardDeviceBoard> = ({
     const deviceClass = device && !device.connected ? clsx(classes.card, classes.notConnected) : classes.card;
     const key = device && device.name;
 
-    return <Grid item key={key} xs={4} sm={6}>
+    return <Grid item key={key} xs={12} md={4}>
       <Card className={deviceClass}>
         {
           !device ?

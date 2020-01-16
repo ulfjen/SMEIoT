@@ -70,13 +70,13 @@ const _DashboardSensors: React.FunctionComponent<IDashboardSensors> = ({
 
   const appCookie = useAppCookie();
 
-  const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
   return (
     <DashboardFrame
       title="Sensors"
       drawer={appCookie.admin}
       direction="ltr"
       toolbarRight={<UserAvatarMenu appCookie={appCookie} navigate={navigate} />}
+      hideHamburgerIcon={!appCookie.admin}
       content={
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={3}>

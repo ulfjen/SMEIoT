@@ -13,21 +13,22 @@ const RootApp: React.FunctionComponent<IRootApp> = ({
   path, location
 }) => {
   const cookie = useAppCookie();
-  
+
   if (cookie.userName) {
-    return <Redirect noThrow to="/dashboard" />;
+    if (location && location.pathname !== "/account") {
+      return <Redirect noThrow to="/dashboard" />;
+    }
   } else {
     if (location && location.pathname === "/account") {
       return <Redirect noThrow to="/login" />;
-    } else {
-      return <Router>
+    }
+  }
+  return <Router>
         <Redirect noThrow from="/" to="/login" />
         <NewSession path="/login" />
         <NewUser path="/signup" />
         <EditUser path="/account" />
       </Router>;
-    } 
-  }
   
 };
 
