@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Router, RouteComponentProps } from "@reach/router";
+import { Router, RouteComponentProps, Redirect } from "@reach/router";
 import DashboardUsers from "./dashboard/DashboardUsers";
 import DashboardSensors from "./dashboard/DashboardSensors";
 import DashboardDevices from "./dashboard/DashboardDevices";
@@ -14,14 +14,15 @@ import DashboardNewDeviceConnect from "./dashboard/DashboardNewDeviceConnect";
 import DashboardNewDeviceConnectSensors from "./dashboard/DashboardNewDeviceConnectSensors";
 import DashboardDeviceCredential from "./dashboard/DashboardDeviceCredential";
 import DashboardBrokerStatistics from "./dashboard/DashboardBrokerStatistics";
+import { useAppCookie } from "./helpers/useCookie";
 
 export interface IDashboardApp extends RouteComponentProps {
 }
 
-const DashboardApp: React.FunctionComponent<IDashboardApp> = ({
-}) => {
+const DashboardApp: React.FunctionComponent<IDashboardApp> = ({ location }) => {
+  const cookie = useAppCookie();
 
-  return <Router>
+  return !cookie.userName && (location && location.pathname !== "/") ? <Redirect noThrow to="/" /> : <Router>
     <DashboardIndex path="/" />
     <DashboardDevices path="/devices" />
     <DashboardBrokerStatistics path="broker/statistics" />

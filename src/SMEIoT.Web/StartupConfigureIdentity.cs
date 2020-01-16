@@ -91,7 +91,7 @@ namespace SMEIoT.Web
         o.LoginPath = new PathString("/login");
         o.Events = new CookieAuthenticationEvents
         {
-          OnValidatePrincipal = SecurityStampValidator.ValidatePrincipalAsync,
+          OnValidatePrincipal = SecurityStampValidatorHelper.ValidatePrincipalAsync,
           OnSignedIn = UserCookieManagementService.UserSignedInAsync,
           OnSigningOut = UserCookieManagementService.UserSigningOutAsync
         };
@@ -107,7 +107,7 @@ namespace SMEIoT.Web
       services.TryAddScoped<IRoleValidator<TRole>, RoleValidator<TRole>>();
       // No interface for the error describer so we can add errors without rev'ing the interface
       services.TryAddScoped<IdentityErrorDescriber>();
-      services.TryAddScoped<ISecurityStampValidator, SecurityStampValidator<TUser>>();
+      // services.TryAddScoped<ISecurityStampValidator, SecurityStampValidator>();
       // services.TryAddScoped<ITwoFactorSecurityStampValidator, TwoFactorSecurityStampValidator<TUser>>();
       services.TryAddScoped<IUserClaimsPrincipalFactory<TUser>, UserClaimsPrincipalFactory<TUser, TRole>>();
       services.TryAddScoped<IUserConfirmation<TUser>, DefaultUserConfirmation<TUser>>();

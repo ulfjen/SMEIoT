@@ -74,6 +74,7 @@ namespace SMEIoT.Web
 
       StartupConfigureIdentity.Configure<User, IdentityRole<long>, ApplicationDbContext>(services, builder => {
         services.AddScoped<ICommonPasswordValidator, CommonPasswordValidator>();
+        services.AddScoped<SecurityStampValidator<User>, StrictSecurityStampValidator>();
       });
 
       services.AddVersionedApiExplorer(options => options.GroupNameFormat = "'v'VVV");
