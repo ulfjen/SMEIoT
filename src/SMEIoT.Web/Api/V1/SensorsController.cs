@@ -10,6 +10,7 @@ using SMEIoT.Core.Entities;
 using SMEIoT.Core.Interfaces;
 using SMEIoT.Web.ApiModels;
 using SMEIoT.Web.BindingModels;
+using System;
 
 namespace SMEIoT.Web.Api.V1
 {
@@ -31,17 +32,19 @@ namespace SMEIoT.Web.Api.V1
     [HttpGet("")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     public async Task<ActionResult<SensorDetailsApiModelList>> Index([FromQuery] int offset = 0, [FromQuery] int limit = 10)
     {
       var list = new List<SensorDetailsApiModel>();
       await foreach (var sensor in _service.ListSensorsAsync(offset, limit))
       {
         var vals = new List<(double, Instant)>();
-        await foreach (var v in _valueService.GetNumberTimeSeriesBySensorAsync(sensor, SystemClock.Instance.GetCurrentInstant()-Duration.FromSeconds(3600), Duration.FromSeconds(3600)))
-        {
-          vals.Add(v);
-        }
+        // await foreach (var v in _valueService.GetNumberTimeSeriesBySensorAsync(sensor, SystemClock.Instance.GetCurrentInstant()-Duration.FromSeconds(3600), Duration.FromSeconds(3600)))
+        // {
+        //  vals.Add(v);
+        // }
+                Console.WriteLine("--------------------------------------------------");
+        Console.WriteLine(sensor.Name);
         list.Add(new SensorDetailsApiModel(sensor, vals));
       }
 
@@ -51,6 +54,7 @@ namespace SMEIoT.Web.Api.V1
     [HttpGet("{deviceName}/{sensorName}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize]
     public async Task<ActionResult<SensorDetailsApiModel>> Show(string deviceName, string sensorName)
     {
       var device = await _service.GetDeviceByNameAsync(deviceName);
