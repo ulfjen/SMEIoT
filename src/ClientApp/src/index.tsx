@@ -12,17 +12,6 @@ export function GetDefaultApiConfig() {
   return new Configuration({
     basePath: window.location.origin,
     credentials: "same-origin",
-    middleware: [{
-      post: (context: ResponseContext) => {
-        return new Promise<Response | void>((resolve, reject) => {
-          if (context.response.status === 403) {
-            console.log(context.response.headers);
-          }
-          console.log(context);
-          resolve(context.response);
-        });
-      }
-    }]
   });
 }
 

@@ -32,6 +32,7 @@ using SMEIoT.Web.Hubs;
 using SMEIoT.Web.Api.Config;
 using SMEIoT.Web.Services;
 using SMEIoT.Web.Middlewares;
+using System.Net.Mime;
 
 namespace SMEIoT.Web
 {
@@ -91,14 +92,33 @@ namespace SMEIoT.Web
       services.AddControllersWithViews(options => {
         options.Filters.Add(typeof(ActionExceptionFilter));
         options.Filters.Add(typeof(LastSeenFilter));
-        })
-        .AddJsonOptions(options =>
+      })
+      .AddJsonOptions(options =>
+      {
+        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+        options.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
+        options.JsonSerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
+      })
+      .ConfigureApiBehaviorOptions(options =>
+      {
+        options.InvalidModelStateResponseFactory = context =>
         {
-          options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
-          options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-          options.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
-          options.JsonSerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
-        });
+          if (context.HttpContext.RequestServices == null)
+          {
+            throw new InvalidOperationException("RequestServices is null.");
+          }
+
+          var pdFactory = context.HttpContext.RequestServices.GetRequiredService<ProblemDetailsFactory>();
+          
+          var result = new UnprocessableEntityObjectResult(pdFactory.CreateValidationProblemDetails(context.HttpContext, context.ModelState, StatusCodes.Status422UnprocessableEntity));
+
+          result.ContentTypes.Add(MediaTypeNames.Application.Json);
+          result.ContentTypes.Add(MediaTypeNames.Application.Xml);
+
+          return result;
+        };
+      });
       services.AddRouting(options =>
       {
         options.LowercaseUrls = true;

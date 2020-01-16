@@ -13,7 +13,7 @@ const RootApp: React.FunctionComponent<IRootApp> = ({
   path, location
 }) => {
   const cookie = useAppCookie();
-  console.log(cookie);
+  
   if (cookie.userName) {
     return <Redirect noThrow to="/dashboard" />;
   } else {

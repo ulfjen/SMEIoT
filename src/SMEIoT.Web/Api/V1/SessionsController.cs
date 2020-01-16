@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using SMEIoT.Core.Entities;
 using SMEIoT.Web.ApiModels;
 using SMEIoT.Web.BindingModels;
+using SMEIoT.Core.Exceptions;
 
 namespace SMEIoT.Web.Api.V1
 {
@@ -31,42 +32,21 @@ namespace SMEIoT.Web.Api.V1
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult<LoginedApiModel>> Create([BindRequired] LoginBindingModel model)
     {
-//      ViewData["ReturnUrl"] = model.ReturnUrl;
-//      if (!ModelState.IsValid)
-//      {
-//        return View(model);
-//      }
-
-//      return NotFound();
-
       var result =
         await _signInManager.PasswordSignInAsync(model.UserName, model.Password, isPersistent: true,
           lockoutOnFailure: false);
-      if (!result.Succeeded)
-      {
-        // FIX: use the right authentication schema
-        return Forbid(result.ToString());
+      
+      if (result.IsLockedOut) {
+        throw new InvalidUserInputException("Your account is locked");
+      } else if (result.IsNotAllowed) {
+        throw new InvalidUserInputException("Your can't log in.");
+      } else if (result.RequiresTwoFactor) {
+        throw new InternalException("No 2FA should be used.");
+      } else if (!result.Succeeded) {
+        throw new InvalidUserInputException($"Your username or password is not correct.");
       }
 
       return Ok(new LoginedApiModel("/dashboard"));
-
-#if false
-        if (result.RequiresTwoFactor)
-        {
-          return RedirectToAction(nameof(SendCode), new {ReturnUrl = returnUrl, RememberMe = model.RememberMe});
-        }
-
-      if (result.IsLockedOut)
-      {
-        _logger.LogWarning(2, "User account locked out.");
-        return View("Lockout");
-      }
-      else
-      {
-        ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-        return View(model);
-      }
-#endif
     }
 
   }

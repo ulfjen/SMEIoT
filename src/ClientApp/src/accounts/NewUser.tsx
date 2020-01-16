@@ -62,7 +62,7 @@ const _NewUser: React.FunctionComponent<INewUserProps & WithStyles<typeof styles
 
   const [loading, setLoading] = React.useState(false);
 
-  const handleSubmit = async (event: React.MouseEvent<HTMLFormElement>) => {
+  const handleSubmit = React.useCallback(async (event: React.MouseEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (event.target === undefined) {
       return;
@@ -70,23 +70,24 @@ const _NewUser: React.FunctionComponent<INewUserProps & WithStyles<typeof styles
     uc.setEntityError("");
     setLoading(true);
     
-    try {
-      const result = await new UsersApi(GetDefaultApiConfig()).apiUsersPost({
-        validatedUserCredentialsBindingModel: {
-          userName: uc.userName,
-          password: uc.password
-        }
-      });
-
-      const login = await new SessionsApi(GetDefaultApiConfig()).apiSessionsPost({
+    await new UsersApi(GetDefaultApiConfig()).apiUsersPost({
+      validatedUserCredentialsBindingModel: {
+        userName: uc.userName,
+        password: uc.password
+      }
+    }).then(async res => {
+      await new SessionsApi(GetDefaultApiConfig()).apiSessionsPost({
         loginBindingModel: {
           userName: uc.userName,
           password: uc.password
         }
+      }).then(res => {
+        navigate && navigate(res.returnUrl || "/");
+        return res;
       });
 
-      navigate && navigate(login.returnUrl || "/");
-    } catch (response) {
+      return res;
+    }).catch(async response => {
       const details: ValidationProblemDetails = await response.json();
       if (details.detail) {
         uc.setEntityError(details.detail);
@@ -100,10 +101,10 @@ const _NewUser: React.FunctionComponent<INewUserProps & WithStyles<typeof styles
           uc.setPasswordError(err["password"].join("\n"));
         }
       }
-    } finally {
+    }).finally(() => {
       setLoading(false);
-    }
-  };
+    });
+  }, [uc]);
 
   return <Container component="main" maxWidth="xs">
     <CssBaseline />

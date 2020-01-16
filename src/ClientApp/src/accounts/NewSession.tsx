@@ -62,7 +62,7 @@ const _NewSession: React.FunctionComponent<INewSessionProps & WithStyles<typeof 
 
   const [loading, setLoading] = React.useState(false);
 
-  const handleSubmit = async (event: React.MouseEvent<HTMLFormElement>) => {
+  const handleSubmit = React.useCallback(async (event: React.MouseEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (event.target === undefined) {
       return;
@@ -70,16 +70,15 @@ const _NewSession: React.FunctionComponent<INewSessionProps & WithStyles<typeof 
     uc.setEntityError("");
     setLoading(true);
 
-    try {
-      const login = await new SessionsApi(GetDefaultApiConfig()).apiSessionsPost({
-        loginBindingModel: {
-          userName: uc.userName,
-          password: uc.password
-        }
-      });
-
-      navigate && navigate(login.returnUrl || "/");
-    } catch (response) {
+    await new SessionsApi(GetDefaultApiConfig()).apiSessionsPost({
+      loginBindingModel: {
+        userName: uc.userName,
+        password: uc.password
+      }
+    }).then(res => {
+      navigate && navigate(res.returnUrl || "/");
+      return res;
+    }).catch(async response => {
       const details: ValidationProblemDetails = await response.json();
       if (details.detail) {
         uc.setEntityError(details.detail);
@@ -93,10 +92,10 @@ const _NewSession: React.FunctionComponent<INewSessionProps & WithStyles<typeof 
           uc.setPasswordError(err["password"].join("\n"));
         }
       }
-    } finally {
+    }).finally(() => {
       setLoading(false);
-    }
-  };
+    });
+  }, [uc]);
 
   return <Container component="main" maxWidth="xs">
     <CssBaseline />

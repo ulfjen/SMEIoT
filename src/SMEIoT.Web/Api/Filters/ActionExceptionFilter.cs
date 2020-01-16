@@ -37,13 +37,13 @@ namespace SMEIoT.Web.Api.Filters
           break;
         case InvalidArgumentException exception:
           errors.AddModelError(exception.ParamName, exception.Message);
-          context.Result = new BadRequestObjectResult(_pdFactory.CreateValidationProblemDetails(context.HttpContext, errors, StatusCodes.Status422UnprocessableEntity));
+          context.Result = new BadRequestObjectResult(_pdFactory.CreateValidationProblemDetails(context.HttpContext, errors, StatusCodes.Status400BadRequest));
           break;
         case InvalidUserInputException exception:
           context.Result = new UnprocessableEntityObjectResult(_pdFactory.CreateProblemDetails(context.HttpContext, StatusCodes.Status422UnprocessableEntity, null, null, exception.Message));
           break;
         case InvalidOperationException exception:
-          context.Result = new UnprocessableEntityObjectResult(_pdFactory.CreateProblemDetails(context.HttpContext, StatusCodes.Status400BadRequest, null, null, exception.Message));
+          context.Result = new UnprocessableEntityObjectResult(_pdFactory.CreateProblemDetails(context.HttpContext, StatusCodes.Status422UnprocessableEntity, null, null, exception.Message));
           break;
         case InternalException exception:
           goto default;
