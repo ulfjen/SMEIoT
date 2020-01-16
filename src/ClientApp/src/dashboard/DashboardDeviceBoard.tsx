@@ -1,8 +1,5 @@
 import Grid from "@material-ui/core/Grid";
-import Menu from "@material-ui/core/Menu";
-import MenuItem from "@material-ui/core/MenuItem";
 import * as React from "react";
-import AddIcon from "@material-ui/icons/Add";
 import Typography from "@material-ui/core/Typography";
 import Skeleton from "@material-ui/lab/Skeleton";
 import { WithStyles } from "@material-ui/styles/withStyles";
@@ -10,8 +7,7 @@ import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import clsx from "clsx";
-import { useTitle, useAsync } from 'react-use';
-import BrokerCard from "./BrokerCard";
+import { useAsync } from 'react-use';
 import Card from "@material-ui/core/Card";
 import CardHeader from "@material-ui/core/CardHeader";
 import CardContent from "@material-ui/core/CardContent";
@@ -20,17 +16,14 @@ import BannerNotice from "../components/BannerNotice";
 import IconButton from "@material-ui/core/IconButton";
 import Button from "@material-ui/core/Button";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
-import { BasicDeviceApiModel, BasicDeviceApiModelFromJSON, DevicesApi } from "smeiot-client";
+import { BasicDeviceApiModel, BasicDeviceApiModelList, DevicesApi } from "smeiot-client";
 import moment from "moment";
 import { defineMessages, useIntl, FormattedMessage } from "react-intl";
 import {
   Link as ReachLink,
-  LinkProps as ReachLinkProps,
-  RouteComponentProps,
   NavigateFn
 } from "@reach/router";
 import { GetDefaultApiConfig } from "../index";
-import { DeviceApiModelList } from "smeiot-client/dist/models/DeviceApiModelList";
 import useMenu from "../helpers/useMenu";
 import useModal from "../helpers/useModal";
 import DashboardDeviceMenu from "./DashboardDeviceMenu";
@@ -202,7 +195,7 @@ const _DashboardDeviceBoard: React.FunctionComponent<IDashboardDeviceBoard> = ({
   const state = useAsync(async () => {
     return new DevicesApi(GetDefaultApiConfig()).apiDevicesGet({
       // start, limit
-    }).then((res: DeviceApiModelList) => {
+    }).then((res: BasicDeviceApiModelList) => {
       if (!res.devices) {
         return;
       }

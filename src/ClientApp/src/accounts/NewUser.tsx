@@ -138,7 +138,7 @@ const _NewUser: React.FunctionComponent<INewUserProps & WithStyles<typeof styles
             <Grid item>
               <Link color="textPrimary" component={ReachLink} to="/login" variant="body2">
                 <FormattedMessage
-                  id="sessions.new.signup_action"
+                  id="sessions.new.login_action"
                   description="Action label for redirecting to log in page"
                   defaultMessage="Already have an account? Log in"
                 />
