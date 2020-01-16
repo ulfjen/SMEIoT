@@ -42,7 +42,7 @@ namespace SMEIoT.Web
         options.ExpireTimeSpan = TimeSpan.FromDays(99999);
 
         options.LoginPath = "/login";
-        options.AccessDeniedPath = "/denied";
+        options.AccessDeniedPath = "/login"; // we usually don't expect a redirect happen as we are overwriting this to 404 at CookieAuthenticationEvents.
         options.SlidingExpiration = false;
       });
 
@@ -93,7 +93,8 @@ namespace SMEIoT.Web
         {
           OnValidatePrincipal = SecurityStampValidatorHelper.ValidatePrincipalAsync,
           OnSignedIn = UserCookieManagementService.UserSignedInAsync,
-          OnSigningOut = UserCookieManagementService.UserSigningOutAsync
+          OnSigningOut = UserCookieManagementService.UserSigningOutAsync,
+          OnRedirectToAccessDenied = ForbidEventHandler.OnRedirectToAccessDenied
         };
       });
 

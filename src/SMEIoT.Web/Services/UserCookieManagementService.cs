@@ -29,7 +29,7 @@ namespace SMEIoT.Web.Services
 
   public static class UserCookieManagementService
   {
-    private static string UserCookieKey = "currentUser";
+    public static string UserCookieKey = "currentUser";
 
     /// <summary>
     /// Serialized some attributes about the current user for our web app to work
