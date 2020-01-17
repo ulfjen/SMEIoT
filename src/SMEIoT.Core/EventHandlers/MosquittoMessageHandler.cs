@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -65,6 +66,12 @@ namespace SMEIoT.Core.EventHandlers
       _logger.LogTrace($"Received {decoded}");
 
       var message = new MqttMessage(topic, decoded, _clock.GetCurrentInstant());
+
+      // do something to send messages
+      // 1. maintain internal logs, and maybe store it
+      // 2. log in to the user on the web
+      ThreadPool.QueueUserWorkItem(async (o) => {
+      });
       Notify(message);
     }
 
