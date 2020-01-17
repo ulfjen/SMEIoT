@@ -187,5 +187,34 @@ namespace SMEIoT.Core.Services
       _dbContext.Devices.Remove(device);
       await _dbContext.SaveChangesAsync();
     }
+
+    public async Task UpdateDeviceTimestampsAndStatusAsync(Device device, Instant receivedAt)
+    {
+      device.Connected = true;
+      if (device.ConnectedAt == null) {
+        device.ConnectedAt = receivedAt;
+      }
+      device.LastMessageAt = receivedAt;
+      _dbContext.Devices.Update(device);
+      await _dbContext.SaveChangesAsync();
+    }
+
+    public async Task UpdateSensorAndDeviceTimestampsAndStatusAsync(Sensor sensor, Instant receivedAt)
+    {
+      sensor.Connected = true;
+      if (sensor.ConnectedAt == null) {
+        sensor.ConnectedAt = receivedAt;
+      }
+      sensor.LastMessageAt = receivedAt;
+
+      sensor.Device.Connected = true;
+      if (sensor.Device.ConnectedAt == null) {
+        sensor.Device.ConnectedAt = receivedAt;
+      }
+      sensor.Device.LastMessageAt = receivedAt;
+
+      _dbContext.Sensors.Update(sensor);
+      await _dbContext.SaveChangesAsync();
+    }
   }
 }

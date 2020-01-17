@@ -23,5 +23,8 @@ namespace SMEIoT.Core.Interfaces
     Task RemoveDeviceByNameAsync(string deviceName);
   
     Task UpdateDeviceConfigAsync(Device device, string config);
+
+    Task UpdateDeviceTimestampsAndStatusAsync(Device device, Instant receivedAt);
+    Task UpdateSensorAndDeviceTimestampsAndStatusAsync(Sensor sensor, Instant receivedAt);
   }
 }

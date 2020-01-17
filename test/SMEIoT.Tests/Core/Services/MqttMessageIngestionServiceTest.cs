@@ -61,7 +61,7 @@ namespace SMEIoT.Tests.Core.Services
       _dbContext.Dispose();
     }
 
-    private async Task SeedDefaultSensor()
+    private async Task<Device> SeedDefaultSensor()
     {
       var deviceName = "device-alpha";
       var device = new Device {
@@ -80,6 +80,7 @@ namespace SMEIoT.Tests.Core.Services
       };
       _dbContext.Sensors.Add(sensor);
       await _dbContext.SaveChangesAsync();
+      return device;
     }
 
     [Fact]
@@ -208,10 +209,99 @@ namespace SMEIoT.Tests.Core.Services
     }
 
     [Fact]
-    public async Task ProcessCommonMessageAsync_QueuesUpdatingTimestampInJob()
+    public async Task ProcessCommonMessageAsync_UpdateTimestamps()
     {
-      throw new NotImplementedException(); 
+      await SeedDefaultSensor();
+      var future = _clock.GetCurrentInstant() + Duration.FromDays(1);
+      var message = new MqttMessage("iot/device-alpha/sensor-beta", "120.9", future);
+
+      await _service.ProcessCommonMessageAsync(message); 
+
+      var device = await _dbContext.Devices.FirstOrDefaultAsync();
+      var sensor = await _dbContext.Sensors.FirstOrDefaultAsync();
+      Assert.True(device.Connected);
+      Assert.Equal(device.ConnectedAt, future);
+      Assert.Equal(device.LastMessageAt, future);
+      Assert.True(sensor.Connected);
+      Assert.Equal(sensor.ConnectedAt, future);
+      Assert.Equal(sensor.LastMessageAt, future);
     }
 
+    [Fact]
+    public async Task ProcessCommonMessageAsync_UpdateDeviceTimestamps()
+    {
+      await SeedDefaultSensor();
+      var future = _clock.GetCurrentInstant() + Duration.FromDays(1);
+      var message = new MqttMessage("iot/device-alpha/sensor-1", "120.9", future);
+
+      await _service.ProcessCommonMessageAsync(message); 
+
+      var device = await _dbContext.Devices.FirstOrDefaultAsync();
+      var sensor = await _dbContext.Sensors.FirstOrDefaultAsync();
+      Assert.True(device.Connected);
+      Assert.Equal(device.ConnectedAt, future);
+      Assert.Equal(device.LastMessageAt, future);
+      Assert.False(sensor.Connected);
+      Assert.Null(sensor.ConnectedAt);
+      Assert.Null(sensor.LastMessageAt);
+    }
+
+    [Fact]
+    public async Task ProcessCommonMessageAsync_UpdateDeviceTimestampsWhenNullSensorName()
+    {
+      await SeedDefaultSensor();
+      var future = _clock.GetCurrentInstant() + Duration.FromDays(1);
+      var message = new MqttMessage("iot/device-alpha/", "120.9", future);
+
+      await _service.ProcessCommonMessageAsync(message); 
+
+      var device = await _dbContext.Devices.FirstOrDefaultAsync();
+      var sensor = await _dbContext.Sensors.FirstOrDefaultAsync();
+      Assert.True(device.Connected);
+      Assert.Equal(device.ConnectedAt, future);
+      Assert.Equal(device.LastMessageAt, future);
+      Assert.False(sensor.Connected);
+      Assert.Null(sensor.ConnectedAt);
+      Assert.Null(sensor.LastMessageAt);
+    }
+
+    [Fact]
+    public async Task ProcessCommonMessageAsync_UpdateTwoSensorTimestamps()
+    {
+      var device = await SeedDefaultSensor();
+      var sensorName = "sensor-1";
+      var sensor = new Sensor {
+        Name = sensorName,
+        NormalizedName = Sensor.NormalizeName(sensorName),
+        Device = device
+      };
+      _dbContext.Sensors.Add(sensor);
+      await _dbContext.SaveChangesAsync();
+
+      var future1 = _clock.GetCurrentInstant() + Duration.FromDays(1);
+      var message = new MqttMessage("iot/device-alpha/sensor-beta", "120.9", future1);
+      var future2 = future1 + Duration.FromSeconds(1);
+      var message2 = new MqttMessage("iot/device-alpha/sensor-1", "120.9", future2);
+      var future3 = future1 + Duration.FromDays(2);
+      var message3 = new MqttMessage("iot/device-alpha/sensor-1", "200.9", future3);
+
+      await _service.ProcessCommonMessageAsync(message); 
+      await _service.ProcessCommonMessageAsync(message2); 
+      await _service.ProcessCommonMessageAsync(message3); 
+
+
+      var device1 = await _dbContext.Devices.FirstOrDefaultAsync();
+      var sensorB = await _dbContext.Sensors.Where(s => s.Name == "sensor-beta").FirstOrDefaultAsync();
+      var sensor1 = await _dbContext.Sensors.Where(s => s.Name == "sensor-1").FirstOrDefaultAsync();
+      Assert.True(device1.Connected);
+      Assert.Equal(device1.ConnectedAt, future1);
+      Assert.Equal(device1.LastMessageAt, future3);
+      Assert.True(sensorB.Connected);
+      Assert.Equal(sensorB.ConnectedAt, future1);
+      Assert.Equal(sensorB.LastMessageAt, future1);
+      Assert.True(sensor1.Connected);
+      Assert.Equal(sensor1.ConnectedAt, future2);
+      Assert.Equal(sensor1.LastMessageAt, future3);
+    }
   }
 }

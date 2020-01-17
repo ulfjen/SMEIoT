@@ -92,11 +92,19 @@ namespace SMEIoT.Tests.Core.Services
           AuthenticationType = DeviceAuthenticationType.PreSharedKey,
           PreSharedKey = ""
         };
-      _dbContext.Add(device);
+      _dbContext.Devices.Add(device);
       await _dbContext.SaveChangesAsync();
       await _identifierService.RegisterDeviceNameAsync("device-1");
       await _identifierService.RegisterSensorNameWithDeviceNameAsync("sensor-1", "device-1");
       return device;
+    }
+
+    private async Task<(Device, Sensor)> SeedOneSensorAsync()
+    {
+      var device = await SeedOneDeviceAsync();
+      await _service.CreateSensorByDeviceAndNameAsync(device, "sensor-1");
+      var sensor = await _service.GetSensorByDeviceAndNameAsync(device, "sensor-1");
+      return (device, sensor);
     }
 
     [Fact]
@@ -521,17 +529,10 @@ namespace SMEIoT.Tests.Core.Services
       Assert.Equal("sensorName", notFound.ParamName);
     }
 
-    private async Task<Device> SeedOneSensorAsync()
-    {
-      var device = await SeedOneDeviceAsync();
-      await _service.CreateSensorByDeviceAndNameAsync(device, "sensor-1");
-      return device;
-    }
-
     [Fact]
     public async Task GetSensorByDeviceAndNameAsync_GetsSensor()
     {
-      var device = await SeedOneSensorAsync();
+      var (device, _) = await SeedOneSensorAsync();
 
       var fetched = await _service.GetSensorByDeviceAndNameAsync(device, "sensor-1");
 
@@ -541,7 +542,7 @@ namespace SMEIoT.Tests.Core.Services
     [Fact]
     public async Task GetSensorByDeviceAndNameAsync_ThrowsIfSensorCanNotBeFound()
     {
-      var device = await SeedOneSensorAsync();
+      var (device, _) = await SeedOneSensorAsync();
 
       Task Act() => _service.GetSensorByDeviceAndNameAsync(device, "sensor-not-exist");
 
@@ -554,7 +555,7 @@ namespace SMEIoT.Tests.Core.Services
     [Fact]
     public async Task RemoveSensorByDeviceAndNameAsync_ThrowsIfNameDoesNotFound()
     {
-      var device = await SeedOneSensorAsync();
+      var (device, _) = await SeedOneSensorAsync();
 
       Task Act() => _service.RemoveSensorByDeviceAndNameAsync(device, "sensor-not-exists");
 
@@ -567,7 +568,7 @@ namespace SMEIoT.Tests.Core.Services
     [Fact]
     public async Task RemoveSensorByNameAsync_RemovesSensor()
     {
-      var device = await SeedOneSensorAsync();
+      var (device, _) = await SeedOneSensorAsync();
 
       await _service.RemoveSensorByDeviceAndNameAsync(device, "sensor-1");
 
@@ -595,6 +596,72 @@ namespace SMEIoT.Tests.Core.Services
       Assert.NotNull(exce);
       var notFound = Assert.IsType<EntityNotFoundException>(exce);
       Assert.Equal("deviceName", notFound.ParamName);
+    }
+
+    [Fact]
+    public async Task UpdateDeviceTimestampsAndStatusAsync_UpdatesEverythingWithFirstInstant()
+    {
+      var device = await SeedOneDeviceAsync();
+
+      await _service.UpdateDeviceTimestampsAndStatusAsync(device, _initial);
+
+      Assert.True(device.Connected);
+      Assert.Equal(_initial, device.ConnectedAt);
+      Assert.Equal(_initial, device.LastMessageAt);
+    }
+
+    [Fact]
+    public async Task UpdateDeviceTimestampsAndStatusAsync_UpdatesConnectedAndLastMessageTimestampWithSecondInstant()
+    {
+      var device = await SeedOneDeviceAsync();
+      var future = _initial + Duration.FromDays(1);
+      await _service.UpdateDeviceTimestampsAndStatusAsync(device, _initial);
+      device.Connected = false;
+      _dbContext.Devices.Update(device);
+      await _dbContext.SaveChangesAsync();
+
+      await _service.UpdateDeviceTimestampsAndStatusAsync(device, future);
+
+      Assert.True(device.Connected);
+      Assert.Equal(_initial, device.ConnectedAt);
+      Assert.Equal(future, device.LastMessageAt);
+    }
+
+
+    [Fact]
+    public async Task UpdateSensorAndDeviceTimestampsAndStatusAsync_UpdatesEverythingWithFirstMessage()
+    {
+      var (device, sensor) = await SeedOneSensorAsync();
+
+      await _service.UpdateSensorAndDeviceTimestampsAndStatusAsync(sensor, _initial);
+
+      Assert.True(sensor.Connected);
+      Assert.Equal(_initial, sensor.ConnectedAt);
+      Assert.Equal(_initial, sensor.LastMessageAt);
+      Assert.True(device.Connected);
+      Assert.Equal(_initial, device.ConnectedAt);
+      Assert.Equal(_initial, device.LastMessageAt);
+    }
+
+    [Fact]
+    public async Task UpdateSensorAndDeviceTimestampsAndStatusAsync_UpdatesDeviceWithSecondMessage()
+    {
+      var (device, sensor) = await SeedOneSensorAsync();
+      var future = _initial + Duration.FromDays(1);
+      await _service.UpdateSensorAndDeviceTimestampsAndStatusAsync(sensor, _initial);
+      sensor.Connected = false;
+      sensor.Device.Connected = false;
+      _dbContext.Sensors.Update(sensor);
+      await _dbContext.SaveChangesAsync();
+
+      await _service.UpdateSensorAndDeviceTimestampsAndStatusAsync(sensor, future);
+
+      Assert.True(sensor.Connected);
+      Assert.Equal(_initial, sensor.ConnectedAt);
+      Assert.Equal(future, sensor.LastMessageAt);
+      Assert.True(device.Connected);
+      Assert.Equal(_initial, device.ConnectedAt);
+      Assert.Equal(future, device.LastMessageAt);
     }
   }
 }

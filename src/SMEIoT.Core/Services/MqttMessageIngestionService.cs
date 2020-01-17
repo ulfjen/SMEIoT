@@ -60,18 +60,31 @@ namespace SMEIoT.Core.Services
         await _mqttIdentifierService.RegisterSensorNameWithDeviceNameAsync(sensorName, deviceName);
       }
       catch (InvalidArgumentException exception) {
-        _logger.LogError($"We can't parse the device or sensor name presented in message {message.Topic}. {exception.Message}");
-        return;
+        _logger.LogWarning($"We can't parse the device or sensor name presented in message {message.Topic}. {exception.Message}");
       }
     
       Device device = null!;
+      bool sensorFound = false;
       Sensor sensor = null!;
 
       try {
         device = await _deviceService.GetDeviceByNameAsync(deviceName);
-        sensor = await _deviceService.GetSensorByDeviceAndNameAsync(device, sensorName);
       } catch (EntityNotFoundException exception) {
-        _logger.LogError($"We can't find the device or sensor in message {message.Topic}. {exception.Message}");
+        _logger.LogError($"We can't find the device in message {message.Topic}. {exception.Message}");
+        return;
+      }
+
+      try {
+        sensor = await _deviceService.GetSensorByDeviceAndNameAsync(device, sensorName);
+        sensorFound = true;
+      } catch (EntityNotFoundException exception) {
+        _logger.LogError($"We can't find the sensor in message {message.Topic}. {exception.Message}");
+      }
+
+      if (sensorFound) {
+        await _deviceService.UpdateSensorAndDeviceTimestampsAndStatusAsync(sensor, message.ReceivedAt);
+      } else {
+        await _deviceService.UpdateDeviceTimestampsAndStatusAsync(device, message.ReceivedAt);
         return;
       }
 
