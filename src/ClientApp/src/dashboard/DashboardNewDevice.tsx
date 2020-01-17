@@ -9,7 +9,7 @@ import Paper from "@material-ui/core/Paper";
 import Skeleton from "@material-ui/lab/Skeleton";
 import Typography from "@material-ui/core/Typography";
 import { Link as ReachLink, RouteComponentProps } from "@reach/router";
-import { useTitle } from 'react-use';
+import { useTitle, useAsync } from 'react-use';
 import {
   defineMessages,
   useIntl,
@@ -23,6 +23,9 @@ import {
   DeviceBootstrapConfigBindingModel
 } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
+import ValidationProblemDetails from "../models/ValidationProblemDetails";
+import FormControl from "@material-ui/core/FormControl";
+import FormHelperText from '@material-ui/core/FormHelperText';
 
 const styles = ({ spacing }: Theme) =>
   createStyles({
@@ -70,23 +73,38 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
 
   const [config, setConfig] = React.useState<DeviceBootstrapConfigBindingModel>({name: "", key: ""});
   const [handlingNext, setHandlingNext] = React.useState<boolean>(false);
-  const [loading, setLoading] = React.useState<boolean>(true);
   const [unconnectedDeviceName, setUnconnectedDeviceName] = React.useState<
     string | null
   >(null);
   const api = new DevicesApi(GetDefaultApiConfig());
 
+  const [nameError, setNameError] = React.useState<string>("");
+  const [keyError, setKeyError] = React.useState<string>("");
+  const [entityError, setEntityError] = React.useState<string>("");
+
   const handleNext = async () => {
     setHandlingNext(true);
-    const api = new DevicesApi(GetDefaultApiConfig());
-    const res = await api.apiDevicesBootstrapPost({
+    setEntityError("");
+
+    await api.apiDevicesBootstrapPost({
       deviceBootstrapConfigBindingModel: config
-    });
-    if (res !== null) {
-      if (navigate) {
-        navigate(`../wait_connection?name=${res.name}`);
+    }).then(res => {
+      if (res !== null) {
+        if (navigate) {
+          navigate(`../wait_connection?name=${res.name}`);
+        }
       }
-    }
+      return res;
+    }).catch(async res => {
+      const pd = await res.json();
+      if (pd.detail) { setEntityError(entityError); }
+      const err = pd.errors;
+      if (!err) { return; }
+      if (err.hasOwnProperty("name")) { setNameError(err["name"].join("\n")); }
+      if (err.hasOwnProperty("key")) { setKeyError(err["key"].join("\n")); }
+    }).finally(() => {
+      setHandlingNext(false);
+    });
   };
 
   const [suggestingDeviceName, setSuggestDeviceName] = React.useState<boolean>(
@@ -99,15 +117,18 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
 
     if (res.deviceName !== null) {
       setConfig({ ...config, name: res.deviceName });
+      setNameError("");
     }
 
     setSuggestDeviceName(false);
+    setNameError("");
   };
 
   const onDeviceNameChange: React.ChangeEventHandler<
     HTMLInputElement | HTMLTextAreaElement
   > = event => {
     setConfig({ ...config, name: event.target.value });
+    setNameError("");
   };
 
   const [suggestingKey, setSuggestKey] = React.useState<boolean>(false);
@@ -118,15 +139,18 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
 
     if (res.key !== null) {
       setConfig({ ...config, key: res.key });
+      setKeyError("");
     }
 
     setSuggestKey(false);
+    setKeyError("");
   };
 
   const onKeyChange: React.ChangeEventHandler<
     HTMLInputElement | HTMLTextAreaElement
   > = event => {
     setConfig({ ...config, key: event.target.value });
+    setKeyError("");
   };
 
   const onBannerClick = async (
@@ -137,20 +161,18 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
     }
   }
 
-  React.useEffect(() => {
-    (async () => {
-      let res = await api.apiDevicesConfigSuggestBootstrapGet();
+  const state = useAsync(async () => {
+    return await api.apiDevicesConfigSuggestBootstrapGet().then((res) => {
       setConfig({ ...config, name: res.deviceName, key: res.key });
       if (res.continuedConfigurationDevice) {
         setUnconnectedDeviceName(res.continuedConfigurationDevice);
       }
-      setLoading(false);
-    })();
+    });
   }, []);
 
   return (
     <DashboardNewDeviceFrame activeStep={0}>
-      {!loading && unconnectedDeviceName && (
+      {!state.loading && unconnectedDeviceName && (
         <Grid item xs={12}>
           <BannerNotice onClick={onBannerClick}>
             <Typography component="p">
@@ -169,7 +191,7 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
 
       <Grid item xs={12}>
         <Paper className={classes.paper}>
-          {loading ?
+          {state.loading ?
             <div><Skeleton variant="text"/><Skeleton variant="text"/><Skeleton variant="text"/></div> :
             <div>
               <FormattedMessage
@@ -180,6 +202,9 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
                   Registed and unused keys are shown on the devices page. 
                   Notice: the MQTT broker will be reloaded to install the key."
               />
+              <FormControl error={true}>
+                <FormHelperText>{entityError}</FormHelperText>
+              </FormControl>
               <SuggestTextField
                 label={intl.formatMessage(messages.nameLabel)}
                 autoFocus
@@ -187,6 +212,7 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
                 onChange={onDeviceNameChange}
                 onSuggest={onSuggestDeviceName}
                 suggesting={suggestingDeviceName}
+                error={nameError}
               />
               <SuggestTextField
                 label={intl.formatMessage(messages.keyLabel)}
@@ -194,6 +220,7 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
                 onChange={onKeyChange}
                 onSuggest={onSuggestKey}
                 suggesting={suggestingKey}
+                error={keyError}
               />
               <div>
                 <ProgressButton

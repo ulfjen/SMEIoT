@@ -177,6 +177,7 @@ const _DashboardDeviceCredential: React.FunctionComponent<IDashboardDeviceCreden
   const deviceApi = new DevicesApi(GetDefaultApiConfig());
   const sensors = useSensorByStatus();
   const [key, setKey] = React.useState<string>("");
+  const [keyError, setKeyError] = React.useState<string>("");
 
   const state: AsyncState<DeviceDetailsApiModel> = useAsync(async () => {
     return await deviceApi.apiDevicesNameGet({
@@ -191,12 +192,15 @@ const _DashboardDeviceCredential: React.FunctionComponent<IDashboardDeviceCreden
   const onSuggestKey: React.MouseEventHandler<HTMLButtonElement> = async event => {
     setSuggestKey(true);
 
-    const res = await deviceApi.apiDevicesConfigSuggestKeyGet();
+    await deviceApi.apiDevicesConfigSuggestKeyGet().then(res => {
+      if (res.key !== null) {
+        setKey(res.key);
+      }
 
-    if (res.key !== null) {
-      setKey(res.key);
-    }
+      return res;
+    });
 
+    setKeyError("");
     setSuggestKey(false);
   };
 
@@ -204,6 +208,7 @@ const _DashboardDeviceCredential: React.FunctionComponent<IDashboardDeviceCreden
     HTMLInputElement | HTMLTextAreaElement
   > = event => {
     setKey(event.target.value);
+    setKeyError("");
   };
 
   const [handlingEdit, setHandlingEdit] = React.useState<boolean>(false);
@@ -211,13 +216,21 @@ const _DashboardDeviceCredential: React.FunctionComponent<IDashboardDeviceCreden
   const handleEdit = async () => {
     setHandlingEdit(true);
     const api = new DevicesApi(GetDefaultApiConfig());
-    const res = await api.apiDevicesNamePut({
+    await api.apiDevicesNamePut({
       name: deviceName,
       deviceConfigBindingModel: {
         key
       }
+    }).then(res => {
+      return res;
+    }).catch(async res => {
+      const pd = await res.json();
+      const err = pd.errors;
+      if (!err) { return; }
+      if (err.hasOwnProperty("key")) { setKeyError(err["key"].join("\n")); }
+    }).finally(() => {
+      setHandlingEdit(false);
     });
-    setHandlingEdit(false);
   };
 
   return <DashboardFrame
@@ -304,6 +317,7 @@ const _DashboardDeviceCredential: React.FunctionComponent<IDashboardDeviceCreden
                     onChange={onKeyChange}
                     onSuggest={onSuggestKey}
                     suggesting={suggestingKey}
+                    error={keyError}
                   />
                   
                 </React.Fragment>}

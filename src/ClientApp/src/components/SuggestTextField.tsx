@@ -34,6 +34,7 @@ export interface ISuggestTextFieldProps extends WithStyles<typeof styles> {
   onSuggest: React.MouseEventHandler<HTMLButtonElement>;
   suggesting: boolean;
   autoFocus?: boolean;
+  error?: string;
 }
 
 const _SuggestTextField: React.FunctionComponent<ISuggestTextFieldProps &
@@ -44,8 +45,13 @@ const _SuggestTextField: React.FunctionComponent<ISuggestTextFieldProps &
   suggesting,
   onChange,
   onSuggest,
-  autoFocus
+  autoFocus,
+  error
 }) => {
+  if (!error) {
+    error = "";
+  }
+  
   return (
     <TextField
       variant="outlined"
@@ -56,6 +62,8 @@ const _SuggestTextField: React.FunctionComponent<ISuggestTextFieldProps &
       label={label}
       value={value}
       onChange={onChange}
+      error={error.length > 0}
+      helperText={error}
       InputProps={{
         endAdornment: (
           <InputAdornment position="end">
