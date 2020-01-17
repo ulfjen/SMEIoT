@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace SMEIoT.Core.EventHandlers
 {
-  public class MosquittoMessageHandler : IMqttMessageObserver
+  public class MosquittoMessageHandler : IMosquittoMessageHandler, IMqttMessageObserver
   {
     public const string SensorTopicPrefix = "iot/";
     public const string BrokerTopicPrefix = "$SYS/broker/";
@@ -35,6 +35,7 @@ namespace SMEIoT.Core.EventHandlers
       _brokerService = brokerService;
       _scopeFactory = scopeFactory;
       _logger = logger;
+      _logger.LogTrace($"Attaching self {this}");
       Attach(this);
     }
 
@@ -61,6 +62,7 @@ namespace SMEIoT.Core.EventHandlers
       var copied = new byte[payloadlen];
       Marshal.Copy(payload, copied, 0, payloadlen);
       var decoded = Encoding.UTF8.GetString(copied, 0, copied.Length);
+      _logger.LogTrace($"Received {decoded}");
 
       var message = new MqttMessage(topic, decoded, _clock.GetCurrentInstant());
       Notify(message);
@@ -115,9 +117,8 @@ namespace SMEIoT.Core.EventHandlers
       if (value.EndsWith(SecondsPostfix)) {
         value = value.Slice(0, value.Length - SecondsPostfix.Length).TrimEnd();
       }
-      _ = _brokerService.RegisterBrokerStatisticsAsync(parsed.ToString(), value.ToString(), message.ReceivedAt).GetAwaiter().GetResult();
-
-      _brokerService.BrokerLastMessageAt = message.ReceivedAt;
+      var res = _brokerService.RegisterBrokerStatisticsAsync(parsed.ToString(), value.ToString(), message.ReceivedAt).GetAwaiter().GetResult();
+      _logger.LogTrace($"processing broker message: {parsed.ToString()} = {value.ToString()} {message.ReceivedAt} {res}");
     }
 
     public void Update(MqttMessage message)

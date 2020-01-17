@@ -53,7 +53,7 @@ namespace SMEIoT.Infrastructure
 
     public static void ConfigureMqttClient(this IServiceCollection services, IConfiguration configuration)
     {
-      services.AddSingleton<MosquittoMessageHandler>();
+      services.AddSingleton<IMosquittoMessageHandler, MosquittoMessageHandler>();
       services.AddTransient<IMosquittoClientService, MosquittoClientService>();
 
       if (configuration.GetSection("SMEIoT")?.GetValue<bool>("UseMosquittoBackgroundClient") == true) {

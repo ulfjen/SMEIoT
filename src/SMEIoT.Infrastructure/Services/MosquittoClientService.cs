@@ -23,7 +23,7 @@ namespace SMEIoT.Infrastructure.Services
     public int Port { get; internal set; }
     public int KeepAlive { get; internal set; }
     public string? Ciphers { get; internal set; }
-    public List<string> Topics { get; internal set; } = new List<string>();
+    public List<string> Topics { get; internal set; } = new List<string> { BrokerTopic, SensorTopic };
     public int Timeout { get; internal set; }
     public int MaxPackets { get; internal set; }
     public int SleepOnReconnect { get; internal set; }
@@ -33,7 +33,7 @@ namespace SMEIoT.Infrastructure.Services
     
     private readonly IMosquittoClientAuthenticationService _authService;
 
-    public MosquittoClientService(IMosquittoClientAuthenticationService authService, IConfiguration config, MosquittoMessageHandler handler)
+    public MosquittoClientService(IMosquittoClientAuthenticationService authService, IConfiguration config, IMosquittoMessageHandler handler)
     {
       _authService = authService;
       Host = config.GetConnectionString("MqttHost");

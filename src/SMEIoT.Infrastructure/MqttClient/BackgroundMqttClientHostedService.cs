@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SMEIoT.Core.Interfaces;
+using Microsoft.Extensions.Configuration;
+
 
 namespace SMEIoT.Infrastructure.MqttClient
 {
@@ -16,7 +18,7 @@ namespace SMEIoT.Infrastructure.MqttClient
     private readonly IMosquittoBrokerPidAccessor _accessor;
     private readonly IMosquittoBrokerPluginPidService _pluginService;
     private readonly IHostEnvironment _env;
-    private readonly int _delay = 100;
+    private int _delay;
     private bool _reconnect;
 
     public BackgroundMqttClientHostedService(
@@ -25,7 +27,8 @@ namespace SMEIoT.Infrastructure.MqttClient
       IMosquittoBrokerService service,
       IMosquittoBrokerPidAccessor accessor,
       IMosquittoBrokerPluginPidService pluginService,
-      IHostEnvironment env)
+      IHostEnvironment env,
+      IConfiguration config)
     {
       _client = client;
       _logger = logger;
@@ -33,6 +36,13 @@ namespace SMEIoT.Infrastructure.MqttClient
       _accessor = accessor;
       _pluginService = pluginService;
       _env = env;
+
+      var interval = config.GetSection("SMEIoT")?.GetValue<int>("MosquittoBackgroundClientRunloopInteval");
+      if (interval.HasValue && interval.Value > 0) {
+         _delay = interval.Value;
+      } else {
+        throw new InvalidOperationException("SMEIoT__MosquittoBackgroundClientRunloopInteval must be set to a positive millis.");
+      }
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)

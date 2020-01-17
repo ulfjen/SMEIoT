@@ -85,14 +85,6 @@ const _DashboardIndex: React.FunctionComponent<IDashboardIndexProps> = ({ classe
           <Grid item xs={12}>
             <BasicBrokerCard />
           </Grid>
-          <Grid item xs={12}>
-            <Paper className={classes.paper}>
-              <Link color="primary" to="/dashboard/broker/logs" component={ReachLink}>
-                View mqtt
-                  </Link>
-              <p>placeholder</p>
-            </Paper>
-          </Grid>
         </Grid>
       </Container>
     } />;
