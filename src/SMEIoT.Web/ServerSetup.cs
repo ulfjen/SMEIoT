@@ -13,18 +13,14 @@ namespace SMEIoT.Web
       var unixSocket = "/var/SMEIoT/run/smeiot.auth.broker";
       if (File.Exists(unixSocket))
       {
-        // try
         File.Delete(unixSocket);
       }
+      // TODO: don't use this address in dev. might be tricky to config
       options.ListenUnixSocket(unixSocket, builder =>
       {
         builder.Protocols = HttpProtocols.None;
         builder.UseConnectionHandler<MosquittoBrokerAuthHandler>();
       });
-      // options.ListenLocalhost(5000);
-      // options.ListenLocalhost(5001, builder => {
-      //   builder.UseHttps();
-      // });
     }
   }
 }

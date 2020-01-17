@@ -15,6 +15,7 @@ namespace SMEIoT.Tests.Core.Services
   {
     private readonly Instant _initial;
     private readonly MosquittoBrokerService _service;
+    private readonly Mock<IMqttClientConfigService> _configMock;
     
     public MosquittoBrokerServiceTest()
     {
@@ -23,7 +24,11 @@ namespace SMEIoT.Tests.Core.Services
       mock.SetupGet(a => a.BrokerPid).Returns(10000);
       var mockPlugin = new Mock<IMosquittoBrokerPluginPidService>();
       mockPlugin.SetupGet(a => a.BrokerPidFromAuthPlugin).Returns(10000);
-      _service = new MosquittoBrokerService(new FakeClock(_initial), new NullLogger<MosquittoBrokerService>(), mock.Object, mockPlugin.Object);
+      _configMock = new Mock<IMqttClientConfigService>();
+      _configMock.Setup(c => c.GetHost()).Returns("127.0.0.1");
+      _configMock.Setup(c => c.GetPort()).Returns(12345);
+
+      _service = new MosquittoBrokerService(new FakeClock(_initial), new NullLogger<MosquittoBrokerService>(), mock.Object, mockPlugin.Object, _configMock.Object);
     }
 
     [Fact]
@@ -73,6 +78,14 @@ namespace SMEIoT.Tests.Core.Services
       Assert.Equal(_initial, _service.BrokerLastMessageAt);
     }
 
+    [Fact]
+    public async Task GetClientConnectionInfoAsync_ReturnsConfig()
+    {
+      var (host, port) = await _service.GetClientConnectionInfoAsync();
+
+      Assert.Equal("127.0.0.1", host);
+      Assert.Equal(12345, port);
+    }
 
     [Fact]
     public async Task GetBrokerStatisticsAsync_ReturnsNullWhenNoKeyRegisters()
@@ -193,7 +206,7 @@ namespace SMEIoT.Tests.Core.Services
 
     private async Task<MosquittoBrokerService> SetupServiceWithPidAsync(Mock<IMosquittoBrokerPidAccessor> mock, Mock<IMosquittoBrokerPluginPidService> mockPlugin)
     {
-      var service = new MosquittoBrokerService(new FakeClock(_initial), new NullLogger<MosquittoBrokerService>(), mock.Object, mockPlugin.Object);
+      var service = new MosquittoBrokerService(new FakeClock(_initial), new NullLogger<MosquittoBrokerService>(), mock.Object, mockPlugin.Object, _configMock.Object);
 
       await service.RegisterBrokerStatisticsAsync("load/bytes/received/1min", "100", _initial);
       return service;

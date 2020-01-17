@@ -19,7 +19,7 @@ namespace SMEIoT.Infrastructure.Services
     public const string BrokerTopic = "$SYS/broker/#";
     public const string SensorTopic = "iot/#";
 
-    public string? Host { get; internal set; }
+    public string Host { get; internal set; }
     public int Port { get; internal set; }
     public int KeepAlive { get; internal set; }
     public string? Ciphers { get; internal set; }
@@ -33,27 +33,23 @@ namespace SMEIoT.Infrastructure.Services
     
     private readonly IMosquittoClientAuthenticationService _authService;
 
-    public MosquittoClientService(IMosquittoClientAuthenticationService authService, IConfiguration config, IMosquittoMessageHandler handler)
+    public MosquittoClientService(IMosquittoClientAuthenticationService authService, IMqttClientConfigService config, IMosquittoMessageHandler handler)
     {
       _authService = authService;
-      Host = config.GetConnectionString("MqttHost");
-      int port;
-      var portStr = config.GetConnectionString("MqttPort");
-      if (!int.TryParse(portStr, out port)) {
-        throw new InvalidOperationException($"MqttPort is not set to a correct value. Got {portStr} but expect a number");
-      }
-      Port = port;
+      Host = config.GetHost();
+      Port = config.GetPort();
       KeepAlive = 60;
       Timeout = -1;
       MaxPackets = 1; // document says it's unused and should be set to 1 for future compatibility
       SleepOnReconnect = 10;
       MessageCallback = handler.HandleMessage;
-
-      MosquittoWrapper.mosq_init();   
     }
 
     public async Task Connect()
     {
+      // the service is registered as transient, but double invoke this can cause trouble.
+      MosquittoWrapper.mosq_init();   
+
       var psk = await _authService.GetClientPskAsync();
       var identity = await _authService.GetClientNameAsync();
       var res = MosquittoWrapper.mosq_set_tls_psk(psk, identity, Ciphers);
@@ -63,12 +59,7 @@ namespace SMEIoT.Infrastructure.Services
       }
       MosquittoWrapper.mosq_set_callback(ConnectCallback, MessageCallback);
 
-      if (Host == null)
-      {
-        throw new ArgumentException($"Mosquitto host is null");
-      }
-
-      res = MosquittoWrapper.mosq_connect(Host!, Port, KeepAlive);
+      res = MosquittoWrapper.mosq_connect(Host, Port, KeepAlive);
       if (res != 0)
       {
         throw new TimeoutException($"Mosquitto mosq_connect returned {res}");

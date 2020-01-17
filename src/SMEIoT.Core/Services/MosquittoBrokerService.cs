@@ -17,6 +17,7 @@ namespace SMEIoT.Core.Services
     private readonly ILogger _logger;
     private readonly IMosquittoBrokerPidAccessor _accessor;
     private readonly IMosquittoBrokerPluginPidService _pluginService;
+    private readonly IMqttClientConfigService _clientConfigService;
 
     public bool BrokerRunning {
       get {
@@ -37,12 +38,23 @@ namespace SMEIoT.Core.Services
     private const string ByteLoadSent5Min = "load/bytes/sent/5min";
     private const string ByteLoadSent15Min = "load/bytes/sent/15min";
 
-    public MosquittoBrokerService(IClock clock, ILogger<MosquittoBrokerService> logger, IMosquittoBrokerPidAccessor accessor, IMosquittoBrokerPluginPidService pluginService)
+    public MosquittoBrokerService(
+      IClock clock,
+      ILogger<MosquittoBrokerService> logger,
+      IMosquittoBrokerPidAccessor accessor,
+      IMosquittoBrokerPluginPidService pluginService,
+      IMqttClientConfigService clientConfigService)
     {
       _clock = clock;
       _logger = logger;
       _accessor = accessor;
       _pluginService = pluginService;
+      _clientConfigService = clientConfigService;
+    }
+
+    public Task<(string, int)> GetClientConnectionInfoAsync()
+    {
+      return Task.FromResult((_clientConfigService.GetHost(), _clientConfigService.GetPort()));
     }
 
     private Task SendSignalAsync(Signum signal, bool ignoreAuthPluginPid)

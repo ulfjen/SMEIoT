@@ -20,6 +20,8 @@ namespace SMEIoT.Core.Interfaces
     Task ReloadBrokerBySignalAsync(bool ignoreAuthPluginPid);
     Task RestartBrokerBySignalAsync(bool ignoreAuthPluginPid);
 
+    Task<(string, int)> GetClientConnectionInfoAsync();
+
     bool BrokerRunning { get; }
     Instant? BrokerLastMessageAt { get; set; }
   }

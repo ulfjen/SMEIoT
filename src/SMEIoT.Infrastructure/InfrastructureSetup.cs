@@ -75,6 +75,7 @@ namespace SMEIoT.Infrastructure
       services.AddSingleton<IMosquittoBrokerService, MosquittoBrokerService>();
       services.AddSingleton<IMosquittoClientAuthenticationService, MosquittoClientAuthenticationService>();
       services.AddTransient<IMosquittoBrokerMessageService, MosquittoBrokerMessageService>();
+      services.AddTransient<IMqttClientConfigService, MqttClientConfigService>();
       services.AddSingleton<IMqttMessageDispatchService, MqttMessageDispatchService>();
       services.AddSingleton<IMqttMessageIngestionService, MqttMessageIngestionService>();
       services.AddSingleton<IFileProvider>(provider => {
