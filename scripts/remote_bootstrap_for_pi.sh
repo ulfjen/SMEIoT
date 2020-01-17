@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# The script runs on a workstation and connect via ssh to a Pi and set it up
+# The script runs on a workstation and then one can connect via ssh to a Pi and set it up
 
 set -ex
 
@@ -23,5 +23,5 @@ Then ssh into the <remote> for deployment, do:
   bash -c 'source /tmp/smeiot_build/scripts/bootstrap.sh; build_smeiot_with_remote_tars'
 "
 
-# To clear the existing project
+# To clear the existing project and data
 #   bash -c 'source /tmp/smeiot_build/scripts/bootstrap.sh; nuke_smeiot'

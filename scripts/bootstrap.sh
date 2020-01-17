@@ -79,7 +79,8 @@ function build_smeiot {
   echo "--------------------------------------"
 
   cd $WEB_ROOT && rm -rf $BUILD_DIR && dotnet publish -c $SERVER_CONFIG -r $ARCH --self-contained true
-  cd $JS_ROOT && npm run build && cp -r build/static/* $BUILD_DIR/wwwroot
+  cp $WEB_ROOT/*.txt $BUILD_DIR
+  cd $JS_ROOT && npm run build && cp -r build/* $BUILD_DIR/wwwroot
   cd $WEB_ROOT && \
       echo "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";" > $BUILD_DIR/00-db-extension.sql.part && \
       dotnet ef migrations script -o $BUILD_DIR/01-migrations.sql.part && sed -i '1s/^\xEF\xBB\xBF//' $BUILD_DIR/01-migrations.sql.part && \
@@ -87,29 +88,10 @@ function build_smeiot {
       rm -rf $BUILD_DIR/*.sql.part
 }
 
-function setup_db {
-  PG_CONF_DIRS=$(find /etc/postgresql -name postgresql.conf)
-  PG_CONF_PATH="${PG_CONF_DIRS##*$'\n'}"
-
-  sudo mv $TMP_BOOTSTRAP_DIR/postgresql.conf.sample $PG_CONF_PATH
-  sudo chown postgres:postgres $PG_CONF_PATH
-
-  cd $SMEIOT_ROOT
-  sudo systemctl start postgresql && sudo systemctl enable postgresql
-  sudo su postgres -c 'dropdb smeiot --if-exists'
-  sudo su postgres -c 'dropuser smeiot --if-exists'
+function setup_server_config_and_db {
   echo "* * * * * * * * * * * * * * * * * * * *"
-  echo "You must remember the database password for futher configuration and data export."
-  echo "* * * * * * * * * * * * * * * * * * * *"
-  sudo su postgres -c 'createuser smeiot -P'
-  sudo su postgres -c 'createdb smeiot -T template1 -O smeiot'
-  sudo su postgres -c "psql smeiot < $SMEIOT_ROOT/db_migrate.sql"
-}
-
-function setup_server_config {
-  echo "* * * * * * * * * * * * * * * * * * * *"
-  echo "The database is congfigured. Now we want to store your password locally to start the server."
   echo "Appending $SMEIOT_ROOT/server_env"
+  echo "You must remember the database password for futher configuration and data export."
   echo "* * * * * * * * * * * * * * * * * * * *"
   echo "Enter Your database password:" 
   read -s password
@@ -139,11 +121,31 @@ function setup_server_config {
   echo "LetsEncrypt__EmailAddress=$smeiot_letsencrypt_email" | sudo tee -a $SMEIOT_ROOT/server_env
   echo 
   echo "We generated the server config based on what you provided."
+  echo "Setting up database"
+
+  PG_CONF_DIRS=$(find /etc/postgresql -name postgresql.conf)
+  PG_CONF_PATH="${PG_CONF_DIRS##*$'\n'}"
+
+  sudo mv $TMP_BOOTSTRAP_DIR/postgresql.conf.sample $PG_CONF_PATH
+  sudo chown postgres:postgres $PG_CONF_PATH
+
+  cd $SMEIOT_ROOT
+  sudo systemctl start postgresql && sudo systemctl enable postgresql
+  sudo su postgres -c 'dropdb smeiot --if-exists'
+  sudo su postgres -c 'dropuser smeiot --if-exists'
+  sudo su postgres -c "psql -c \"CREATE ROLE smeiot WITH SUPERUSER LOGIN PASSWORD '$password'\""
+  sudo su postgres -c 'createdb -T template1 -O smeiot smeiot'
+  sudo su postgres -c "PGPASSWORD=$password psql -U smeiot < $SMEIOT_ROOT/db_migrate.sql"
+
+  echo "* * * * * * * * * * * * * * * * * * * *"
+  echo "The database is up."
+  echo "* * * * * * * * * * * * * * * * * * * *"
 }
 
 function setup_smeiot_with_tar {
   sudo rm -rf $SMEIOT_ROOT && sudo mkdir -p $SMEIOT_ROOT
   sudo tar xf /tmp/smeiot.tar.gz -C $SMEIOT_ROOT
+  sudo mkdir -p $SMEIOT_ROOT/run
   sudo chown -R smeiot:smeiot $SMEIOT_ROOT
 }
 
@@ -180,8 +182,7 @@ function build_smeiot_with_remote_tars {
   build_mosquitto
   setup_smeiot_with_tar
   build_mosquitto_plugins
-  setup_db
-  setup_server_config
+  setup_server_config_and_db
   configure_system
   sudo rm -rf $TMP_BOOTSTRAP_DIR && sudo rm -rf /tmp/smeiot*.tar.gz && echo "SMEIoT is up." && cd $SMEIOT_ROOT
 }

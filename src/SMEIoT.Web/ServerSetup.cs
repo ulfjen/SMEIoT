@@ -10,7 +10,7 @@ namespace SMEIoT.Web
   {
     public static void ConfigureKestrel(KestrelServerOptions options)
     {
-      var unixSocket = "/tmp/smeiot.auth.broker";
+      var unixSocket = "/var/SMEIoT/run/smeiot.auth.broker";
       if (File.Exists(unixSocket))
       {
         // try

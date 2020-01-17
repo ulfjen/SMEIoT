@@ -11,7 +11,7 @@ namespace SMEIoT.Infrastructure.Data
       _accessor = accessor;
     }
 
-    public int? BrokerPid => GetBrokerPidFromPidFile("/var/run/smeiot.mosquitto.pid");
+    public int? BrokerPid => GetBrokerPidFromPidFile("/var/SMEIoT/run/smeiot.mosquitto.pid");
 
     public int? GetBrokerPidFromPidFile(string path)
     {

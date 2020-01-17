@@ -6,8 +6,8 @@ After=smeiot.service
 JoinsNamespaceOf=smeiot.service
 
 [Service]
-Type=exec
-ExecStart=/usr/local/sbin/mosquitto -c /etc/mosquitto/mosquitto.conf
+Type=forking
+ExecStart=/usr/local/sbin/mosquitto -c /etc/mosquitto/mosquitto.conf -d
 User=smeiot
 Group=smeiot
 ProtectSystem=full
@@ -15,6 +15,7 @@ ProtectHome=tmpfs
 KillMode=process
 Restart=on-failure
 RestartSec=3
+PIDFile=/var/SMEIoT/run/smeiot.mosquitto.pid
 
 [Install]
 WantedBy=multi-user.target
