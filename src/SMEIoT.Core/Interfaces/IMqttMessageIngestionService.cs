@@ -3,11 +3,14 @@ using SMEIoT.Core.Entities;
 
 namespace SMEIoT.Core.Interfaces
 {
-  // a singleton service to process messages
   public interface IMqttMessageIngestionService
   {
-    // update last message timestamps
     // store sensor value if registered
-    Task ProcessAsync(MqttMessage message);
+    // register device/sensor name for identification
+    // update last message timestamps
+    Task ProcessCommonMessageAsync(MqttMessage message);
+
+    // stores broker values
+    Task ProcessBrokerMessageAsync(MqttMessage message);
   }
 }

@@ -45,7 +45,6 @@ namespace SMEIoT.Core.Services
       _pluginService = pluginService;
     }
 
-
     private Task SendSignalAsync(Signum signal, bool ignoreAuthPluginPid)
     {
       if (_accessor.BrokerPid == null || (!ignoreAuthPluginPid && _pluginService.BrokerPidFromAuthPlugin == null)) {

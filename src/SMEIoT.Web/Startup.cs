@@ -138,16 +138,7 @@ namespace SMEIoT.Web
         });
       }
       services.AddSignalR();
-      services.AddSingleton<MqttMessageHubDeliveryService>(provider =>
-      {
-        var deliveryService = new MqttMessageHubDeliveryService(
-          provider.GetRequiredService<Microsoft.AspNetCore.SignalR.IHubContext<MqttHub>>()
-        );
-        var handler = provider.GetService<Core.EventHandlers.MosquittoMessageHandler>();
-        handler.Attach(deliveryService);
-        return deliveryService;
-      });
-
+      services.AddSingleton<IMqttMessageRelayService, MqttMessageRelayService>();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
