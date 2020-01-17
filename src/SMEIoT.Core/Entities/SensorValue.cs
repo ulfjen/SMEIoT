@@ -6,9 +6,6 @@ namespace SMEIoT.Core.Entities
 {
   public class SensorValue
   {
-    [Key]
-    public long Id { get; set; }
-
     [Required]
     public long SensorId { get; set; }
     private Sensor? _sensor = null;

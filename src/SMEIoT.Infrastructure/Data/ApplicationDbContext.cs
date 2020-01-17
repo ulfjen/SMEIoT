@@ -148,6 +148,9 @@ namespace SMEIoT.Infrastructure.Data
         .HasForeignKey(s => s.SensorId);
 
       modelBuilder.Entity<SensorValue>()
+        .HasKey(s => new { s.SensorId, s.CreatedAt });
+
+      modelBuilder.Entity<SensorValue>()
         .HasIndex(s => s.CreatedAt);
     }
   }
