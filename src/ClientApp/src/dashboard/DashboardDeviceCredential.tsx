@@ -129,7 +129,7 @@ const messages = defineMessages({
   title: {
     id: "dashboard.devices.edit_credentials.title",
     description: "Used as title in the edit device credentials page on the dashboard",
-    defaultMessage: "Configure device's credentials"
+    defaultMessage: "Credentials"
   },
   keyLabel: {
     id: "dashboard.devices.edit_credentials.key_label",

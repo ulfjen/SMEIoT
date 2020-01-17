@@ -47,7 +47,7 @@ namespace SMEIoT.Core.Services
         throw new InvalidArgumentException($"Device key can't be shorter than {SecureKeySuggestionService.ByteLengthLowerBound*2}.", nameof(key));
       }
       var chars = new HashSet<char>(key.ToUpperInvariant());
-      if (!chars.IsProperSubsetOf(AllowedCharsInKey)) {
+      if (!chars.IsSubsetOf(AllowedCharsInKey)) {
         throw new InvalidArgumentException($"Device key must be hex value.", nameof(key));
       }
       return Task.CompletedTask;

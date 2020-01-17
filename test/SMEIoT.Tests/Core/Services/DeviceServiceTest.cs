@@ -49,7 +49,7 @@ namespace SMEIoT.Tests.Core.Services
           Name = deviceName,
           NormalizedName = Device.NormalizeName(deviceName),
           AuthenticationType = DeviceAuthenticationType.PreSharedKey,
-          PreSharedKey = "key"
+          PreSharedKey = "1584E92E7BD84D5C2D155D61807929DE89DC2CCC2D0221191D2B68E7A1494A3AAF3C8F7395CB0BEB1CDA1651102E7CBCEE769F292E9FD72A54FD1FBADF7FF802"
         };
         _dbContext.Add(device);
       }
@@ -65,7 +65,7 @@ namespace SMEIoT.Tests.Core.Services
           Name = deviceName,
           NormalizedName = Device.NormalizeName(deviceName),
           AuthenticationType = DeviceAuthenticationType.PreSharedKey,
-          PreSharedKey = "key"
+          PreSharedKey = "1584E92E7BD84D5C2D155D61807929DE89DC2CCC2D0221191D2B68E7A1494A3AAF3C8F7395CB0BEB1CDA1651102E7CBCEE769F292E9FD72A54FD1FBADF7FF802"
         };
         _dbContext.Devices.Add(device);
 
@@ -166,6 +166,12 @@ namespace SMEIoT.Tests.Core.Services
       var details = Assert.IsType<InvalidArgumentException>(exce);
       Assert.Equal("key", details.ParamName);
       Assert.Contains("hex", details.Message);
+    }
+
+    [Fact]
+    public async Task BootstrapDeviceWithPreSharedKeyAsync_WorksForOneGeneratedKey()
+    {
+      await _service.BootstrapDeviceWithPreSharedKeyAsync("Name", "1584E92E7BD84D5C2D155D61807929DE89DC2CCC2D0221191D2B68E7A1494A3AAF3C8F7395CB0BEB1CDA1651102E7CBCEE769F292E9FD72A54FD1FBADF7FF802");
     }
 
     [Fact]
