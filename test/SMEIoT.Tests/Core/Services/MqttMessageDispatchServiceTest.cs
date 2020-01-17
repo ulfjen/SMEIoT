@@ -53,7 +53,7 @@ namespace SMEIoT.Tests.Core.Services
       await _service.ProcessAsync(message);
 
       _scopeFactoryMock.Verify(s => s.CreateScope(), Times.Once());
-      _scopeMock.Verify(s => s.ServiceProvider, Times.Exactly(2));
+      _scopeMock.Verify(s => s.ServiceProvider, Times.AtLeast(2));
     }
 
     [Fact]
@@ -66,6 +66,39 @@ namespace SMEIoT.Tests.Core.Services
       _ingestMock.Verify(s => s.ProcessCommonMessageAsync(message), Times.Once());
       _ingestMock.Verify(s => s.ProcessBrokerMessageAsync(message), Times.Once());
       _relayMock.Verify(s => s.RelayAsync(message), Times.Once());
+    }
+
+    [Fact]
+    public async Task ProcessAsync_DoesNotThrowWhenProcessCommonMessageAsyncThrows()
+    {
+      _ingestMock.Setup(i => i.ProcessCommonMessageAsync(It.IsAny<MqttMessage>())).Throws(new Exception());
+      var service = new MqttMessageDispatchService(_scopeFactoryMock.Object);
+      var message = new MqttMessage("iot/device-alpha/sensor-beta", "120", _clock.GetCurrentInstant());
+
+      await service.ProcessAsync(message);
+
+    }
+
+    [Fact]
+    public async Task ProcessAsync_DoesNotThrowWhenProcessBrokerMessageAsyncThrows()
+    {
+      _ingestMock.Setup(i => i.ProcessBrokerMessageAsync(It.IsAny<MqttMessage>())).Throws(new Exception());
+      var service = new MqttMessageDispatchService(_scopeFactoryMock.Object);
+      var message = new MqttMessage("iot/device-alpha/sensor-beta", "120", _clock.GetCurrentInstant());
+
+      await service.ProcessAsync(message);
+
+    }
+    
+    [Fact]
+    public async Task ProcessAsync_DoesNotThrowWhenRelayAsyncThrows()
+    {
+      _relayMock.Setup(i => i.RelayAsync(It.IsAny<MqttMessage>())).Throws(new Exception());
+      var service = new MqttMessageDispatchService(_scopeFactoryMock.Object);
+      var message = new MqttMessage("iot/device-alpha/sensor-beta", "120", _clock.GetCurrentInstant());
+
+      await service.ProcessAsync(message);
+
     }
   }
 }
