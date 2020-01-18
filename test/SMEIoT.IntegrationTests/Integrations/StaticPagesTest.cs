@@ -4,17 +4,18 @@ using Xunit;
 
 namespace SMEIoT.IntegrationTests.Integrations
 {
-  public class StaticPagesTest: IClassFixture<SeedWebApplicationFactory<Startup>>
+  public class StaticPagesTest: IClassFixture<SeedWebApplicationFactory<TestStartup>>
   {
-    private readonly SeedWebApplicationFactory<Startup> _factory;
+    private readonly SeedWebApplicationFactory<TestStartup> _factory;
 
-    public StaticPagesTest(SeedWebApplicationFactory<Startup> factory)
+    public StaticPagesTest(SeedWebApplicationFactory<TestStartup> factory)
     {
       _factory = factory;
     }
 
     [Theory]
-    [InlineData("/Privacy")]
+    [InlineData("/")]
+    [InlineData("/dashboard")]
     public async Task Show_EndpointsReturnSuccessAndCorrectContentType(string url)
     {
       // Arrange
@@ -25,8 +26,7 @@ namespace SMEIoT.IntegrationTests.Integrations
 
       // Assert
       response.EnsureSuccessStatusCode();
-      Assert.Equal("text/html; charset=utf-8", 
-        response.Content.Headers.ContentType.ToString());
+      Assert.Equal("text/html", response.Content.Headers.ContentType.ToString());
     }
     
  
