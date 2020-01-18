@@ -7,8 +7,12 @@ language: csharp
 mono: none
 dotnet: 3.1
 solution: SMEIoT.sln
+services:
+  - postgresql
 
 before_script:
+    - psql -c "CREATE ROLE smeiot WITH SUPERUSER LOGIN PASSWORD 'smeiot';" -U postgres
+    - createdb -T template1 -O smeiot smeiot_test -U postgres
     - sh -c scripts/travis.sh
 script:
     - mkdir -p /home/travis/build/ulfjen/SMEIoT/src/SMEIoT.Infrastructure/bin/Debug/netcoreapp3.1/
