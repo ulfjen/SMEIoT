@@ -12,6 +12,10 @@ struct mosqauth_aux {
   int pid;
 };
 
+#ifdef ENABLE_DEBUG_MACRO
+const char* mosqauth_socket_path = "/tmp/smeiot.auth.broker";
+#else
 const char* mosqauth_socket_path = "/var/SMEIoT/run/smeiot.auth.broker";
+#endif
 
 #endif // MOSQUITTO_PLUGIN_AUTH_H_

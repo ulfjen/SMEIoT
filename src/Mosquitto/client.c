@@ -43,7 +43,9 @@ void _connect_callback(struct mosquitto* mosq, void* obj, int result)
 {
     struct callback_delegates* delegates = obj;
     CONNECT_CALLBACK cb = delegates->connect_callback_delegate;
+    #ifdef ENABLE_DEBUG_MACRO
     printf("connect callback %p invoked with result: %d\n", cb, result);
+    #endif
 
     cb(result);
 }
@@ -52,7 +54,9 @@ void _message_callback(struct mosquitto* mosq, void* obj, const struct mosquitto
 {
     struct callback_delegates* delegates = obj;
     MESSAGE_CALLBACK cb = delegates->message_callback_delegate;
+    #ifdef ENABLE_DEBUG_MACRO
     printf("message callback %p called with a message.\n", cb);
+    #endif
 
     cb(message->mid, message->topic, message->payload, message->payloadlen, message->qos, message->retain);
 }
@@ -61,7 +65,9 @@ void mosq_set_callback(CONNECT_CALLBACK connect_callback_delegate, MESSAGE_CALLB
 {
     delegates.connect_callback_delegate = connect_callback_delegate;
     delegates.message_callback_delegate = message_callback_delegate;
+    #ifdef ENABLE_DEBUG_MACRO
     printf("connect cb delegate %p\n", connect_callback_delegate);
+    #endif
     if (delegates.connect_callback_delegate != NULL) {
         mosquitto_connect_callback_set(mosq, _connect_callback);
     }
@@ -73,7 +79,9 @@ void mosq_set_callback(CONNECT_CALLBACK connect_callback_delegate, MESSAGE_CALLB
 
 int mosq_connect(char* host, int port, int keepalive)
 {
+    #ifdef ENABLE_DEBUG_MACRO
     printf("connects to %s:%d with keep alive %d\n", host, port, keepalive);
+    #endif
     int remaining_retries = 10;
     int rc = MOSQ_ERR_INVAL;
     while (remaining_retries-- > 0) {

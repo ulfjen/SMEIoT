@@ -3,6 +3,9 @@
 #
 cmake_minimum_required (VERSION 3.8)
 
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DENABLE_DEBUG_MACRO")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DENABLE_DEBUG_MACRO")
+
 add_library(mosqauth SHARED "auth.c" "auth.h")
 if (${CMAKE_SYSTEM_NAME} EQUAL "Windows")
   target_include_directories(mosqauth PUBLIC "C:\\Dev\\vcpkg\\installed\\x64-windows\\include")

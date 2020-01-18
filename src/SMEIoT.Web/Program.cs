@@ -28,6 +28,6 @@ namespace SMEIoT.Web
           }
         })
         .UseStartup<Startup>()
-        .ConfigureKestrel(ServerSetup.ConfigureKestrel);
+        .UseKestrel(ServerSetup.ConfigureKestrel);
   }
 }

@@ -14,4 +14,4 @@ sudo apt-get install -y build-essential \
 install_dotnet_ef
 setup_test_db
 cd $REPO_ROOT && mkdir -p out && cd out && cmake .. -DCMAKE_BUILD_TYPE=Debug && make -j$(nproc)  && sudo make install
-cd $REPO_ROOT
+cd $REPO_ROOT/src/ClientApp && npm install && npm run build && cp -r build $REPO_ROOT/src/SMEIoT.Web/wwwroot
