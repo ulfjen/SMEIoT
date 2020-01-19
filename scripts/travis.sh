@@ -17,3 +17,5 @@ build_mosquitto
 cd $REPO_ROOT && mkdir -p out && cd out && cmake .. -DCMAKE_BUILD_TYPE=Debug && make -j$(nproc)  && sudo make install
 cd $REPO_ROOT/src/ClientApp/vendor/smeiot-client && npm install && npm run build
 cd $REPO_ROOT/src/ClientApp && npm install && npm run build && cp -r build $REPO_ROOT/src/SMEIoT.Web/wwwroot
+mkdir -p $REPO_ROOT/src/SMEIoT.Infrastructure/bin/Debug/netcoreapp3.1 && \
+mkdir -p $REPO_ROOT/src/SMEIoT.Web/bin/Debug/netcoreapp3.1
