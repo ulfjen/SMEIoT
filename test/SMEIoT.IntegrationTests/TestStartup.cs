@@ -49,7 +49,7 @@ namespace SMEIoT.IntegrationTests
         try
         {
           // Seed the database with test data.
-          Utilities.InitializeDbForTests(db, userManager);
+          Utilities.InitializeDbForTestsAsync(db, userManager).GetAwaiter().GetResult();
         }
         catch (Exception ex)
         {
