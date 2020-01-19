@@ -49,6 +49,7 @@ namespace SMEIoT.IntegrationsTests.Integrations
       response.EnsureSuccessStatusCode();
       Assert.Equal("application/json", response.Content.Headers.ContentType.ToString());
     }
-  }
 #endif
+
+  }
 }
