@@ -9,8 +9,7 @@ import {
 } from "react-intl";
 import {
   SensorsApi,
-  BasicSensorApiModel,
-  ProblemDetails
+  BasicSensorApiModel
 } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
 import Tooltip from "@material-ui/core/Tooltip";
@@ -70,14 +69,14 @@ const _DashboardDeviceOtherSensors: React.FunctionComponent<IDashboardDeviceOthe
   const [loading, setLoading] = React.useState<boolean>(false);
   const [tooltipOpen, setTooltipOpen] = React.useState<boolean>(false);
 
-  const sensorApi = new SensorsApi(GetDefaultApiConfig());
   const [snackbarOpen, setSnackbarOpen] = React.useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = React.useState<string>("");
   
   const handleSensorRegistrationOnClick = React.useCallback(async (sensorName: string) => {
     setLoading(true);
     setTooltipOpen(false);
-    await sensorApi.apiSensorsPost({
+    const api = new SensorsApi(GetDefaultApiConfig());
+    await api.apiSensorsPost({
       sensorLocatorBindingModel: {
         deviceName,
         name: sensorName
@@ -103,7 +102,7 @@ const _DashboardDeviceOtherSensors: React.FunctionComponent<IDashboardDeviceOthe
     }).finally(() => {
       setLoading(false);
     });
-  }, [deviceName, sensors.running, sensors.notRegistered]);
+  }, [deviceName, sensors, intl]);
 
   const closeSnackbar = (e: React.SyntheticEvent<Element, Event> | null) => {
     if (e) { e.preventDefault() }

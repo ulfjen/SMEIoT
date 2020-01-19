@@ -95,7 +95,7 @@ const _NewSession: React.FunctionComponent<INewSessionProps & WithStyles<typeof 
     }).finally(() => {
       setLoading(false);
     });
-  }, [uc]);
+  }, [uc, navigate]);
 
   return <Container component="main" maxWidth="xs">
     <CssBaseline />

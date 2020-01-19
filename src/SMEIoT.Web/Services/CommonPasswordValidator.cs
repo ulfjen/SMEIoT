@@ -23,14 +23,14 @@ namespace SMEIoT.Web.Services
       _forbiddenPasswords = fileAccessor.ListIdentifiers(CommonPasswordPath);
     }
     
-    public async Task<IdentityResult> ValidateAsync(UserManager<User> manager, User user, string password)
+    public Task<IdentityResult> ValidateAsync(UserManager<User> manager, User user, string password)
     {
       var errors = new List<IdentityError>();
       if (_forbiddenPasswords.Contains(password)) {
         errors.Add(UserManagementService.TooCommonPasswordError);
-        return IdentityResult.Failed(errors.ToArray());
+        return Task.FromResult(IdentityResult.Failed(errors.ToArray()));
       }
-      return IdentityResult.Success;
+      return Task.FromResult(IdentityResult.Success);
     }
   }
 }

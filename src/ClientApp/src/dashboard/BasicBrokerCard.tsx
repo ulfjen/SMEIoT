@@ -15,7 +15,6 @@ import useInterval from "../helpers/useInterval";
 import ExpandedCardHeader from "../components/ExpandedCardHeader";
 import { BrokerApi, BasicBrokerApiModel } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
-import LoadFactors from "../components/LoadFactors";
 import StatusBadge from "../components/StatusBadge";
 import { ReactComponent as Broker } from "../images/broker.svg";
 import CardContent from "@material-ui/core/CardContent";

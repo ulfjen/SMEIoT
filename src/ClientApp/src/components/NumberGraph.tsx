@@ -1,5 +1,4 @@
 import * as React from 'react';
-import {curveCatmullRom} from 'd3-shape';
 
 import {
   XYPlot,

@@ -8,7 +8,7 @@ import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import Skeleton from "@material-ui/lab/Skeleton";
 import Typography from "@material-ui/core/Typography";
-import { Link as ReachLink, RouteComponentProps } from "@reach/router";
+import { RouteComponentProps } from "@reach/router";
 import { useTitle, useAsync } from 'react-use';
 import {
   defineMessages,
@@ -23,7 +23,6 @@ import {
   DeviceBootstrapConfigBindingModel
 } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
-import ValidationProblemDetails from "../models/ValidationProblemDetails";
 import FormControl from "@material-ui/core/FormControl";
 import FormHelperText from '@material-ui/core/FormHelperText';
 

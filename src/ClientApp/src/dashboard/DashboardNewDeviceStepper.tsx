@@ -7,7 +7,7 @@ import Paper from "@material-ui/core/Paper";
 import Stepper from "@material-ui/core/Stepper";
 import Step from "@material-ui/core/Step";
 import StepLabel from "@material-ui/core/StepLabel";
-import { defineMessages, useIntl, IntlShape } from "react-intl";
+import { defineMessages, useIntl } from "react-intl";
 
 const styles = ({ spacing }: Theme) =>
   createStyles({

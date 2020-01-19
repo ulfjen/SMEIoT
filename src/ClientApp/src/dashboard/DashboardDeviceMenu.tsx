@@ -1,23 +1,12 @@
 import * as React from "react";
-import clsx from "clsx";
 import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
-import { useTitle, useAsync } from 'react-use';
 import {
-  defineMessages,
-  useIntl,
   FormattedMessage
 } from "react-intl";
-import {
-  SensorsApi,
-  DevicesApi,
-  DeviceDetailsApiModel
-} from "smeiot-client";
-import { GetDefaultApiConfig } from "../index";
-import { Link as ReachLink, NavigateFn } from "@reach/router";
-import { AsyncState } from "react-use/lib/useAsync";
+import { NavigateFn } from "@reach/router";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 
@@ -38,13 +27,9 @@ export interface IDashboardDeviceMenuProps extends WithStyles<typeof styles> {
   openDialog: (value: string) => void;
 }
 
-const messages = defineMessages({
-});
-
 const _DashboardDeviceMenu: React.FunctionComponent<IDashboardDeviceMenuProps> = ({
   classes, open, anchorEl, closeMenu, deviceName, navigate, hideConfigureItem, openDialog, pathPrefix
 }) => {
-  const intl = useIntl();
   if (!pathPrefix) {
     pathPrefix = ".";
   }

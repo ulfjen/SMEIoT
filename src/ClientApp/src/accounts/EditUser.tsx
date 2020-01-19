@@ -29,7 +29,6 @@ import ErrorBoundary from "../components/ErrorBoundary";
 import Avatar from "@material-ui/core/Avatar";
 import Snackbar from "@material-ui/core/Snackbar";
 import Slide from "@material-ui/core/Slide";
-import useInterval from "../helpers/useInterval";
 import { TransitionProps } from "@material-ui/core/transitions";
 import Paper from "@material-ui/core/Paper";
 import IconButton from "@material-ui/core/IconButton";
@@ -139,7 +138,7 @@ const _EditUser: React.FunctionComponent<IEditUserProps> = ({ classes, navigate 
       throw new Error("user can not be found. Try to clean the cookie and refresh.");
     }
     try {
-      const result = await new UsersApi(GetDefaultApiConfig()).apiUsersUserNamePasswordPut({
+      await new UsersApi(GetDefaultApiConfig()).apiUsersUserNamePasswordPut({
         userName: state.value.userName,
         confirmedUserCredentialsUpdateBindingModel: {
           currentPassword: uc.password,

@@ -1,6 +1,5 @@
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
-import Paper from "@material-ui/core/Paper";
 import Tooltip from "@material-ui/core/Tooltip";
 import Fab from "@material-ui/core/Fab";
 import * as React from "react";
@@ -14,15 +13,9 @@ import { useTitle } from 'react-use';
 import ErrorBoundary from "../components/ErrorBoundary";
 import BrokerCard from "./BrokerCard";
 import DashboardDeviceBoard from "./DashboardDeviceBoard";
-import {
-  BasicDeviceApiModel,
-  DevicesApi
-} from "smeiot-client";
-import { GetDefaultApiConfig } from "../index";
 import { defineMessages, useIntl } from "react-intl";
 import {
   Link as ReachLink,
-  LinkProps as ReachLinkProps,
   RouteComponentProps
 } from "@reach/router";
 import { useAppCookie } from "../helpers/useCookie";
@@ -93,9 +86,6 @@ const _DashboardDevices: React.FunctionComponent<IDashboardDevices> = ({
   const intl = useIntl();
   useTitle(intl.formatMessage(messages.title));
   
-  const [loading, setLoading] = React.useState<boolean>(true);
-  const [loadingError, setLoadingError] = React.useState<boolean>(false);
-
   const appCookie = useAppCookie();
 
   return (

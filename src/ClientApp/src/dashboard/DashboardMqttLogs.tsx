@@ -3,16 +3,12 @@ import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
-import Frame from "./DashboardFrame";
-import Container from "@material-ui/core/Container";
 import Paper from "@material-ui/core/Paper";
-import ListItemLine from "../components/ListItemLine";
 import Grid from "@material-ui/core/Grid";
-import { useTitle } from 'react-use';
-import { Link, RouteComponentProps } from '@reach/router';
+import { RouteComponentProps } from '@reach/router';
 import * as SignalR from "@microsoft/signalr";
-import { FixedSizeList, areEqual, ListChildComponentProps } from 'react-window';
-import { defineMessages, useIntl, FormattedMessage } from "react-intl";
+import { FixedSizeList, ListChildComponentProps } from 'react-window';
+import { defineMessages, useIntl } from "react-intl";
 import DashboardBrokerFrame from "./DashboardBrokerFrame";
 
 const styles = ({ palette, spacing, transitions, zIndex, mixins, breakpoints }: Theme) => createStyles({
@@ -45,7 +41,6 @@ const messages = defineMessages({
 const _DashboardMqttLogs: React.FunctionComponent<IDashboardMqttLogsProps> = ({ classes }) => {
   const intl = useIntl();
 
-  const [hubConnection, setHubConnection] = React.useState<SignalR.HubConnection>();
   const [logs, setLogs] = React.useState<string[]>([]);
   const [length, setLength] = React.useState<number>(0);
 
@@ -68,11 +63,10 @@ const _DashboardMqttLogs: React.FunctionComponent<IDashboardMqttLogsProps> = ({ 
       catch (err) {
         alert(err);
       }
-      setHubConnection(hubConnect);
     }
 
     createHubConnection();
-  }, []);
+  }, [logs]);
 
   return <DashboardBrokerFrame
     title={intl.formatMessage(messages.title)}>

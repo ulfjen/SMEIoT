@@ -14,7 +14,6 @@ namespace SMEIoT.Core.EventHandlers
   public class MosquittoMessageHandler : IMosquittoMessageHandler
   {
     private readonly IMqttMessageDispatchService _service;
-    private readonly IServiceScopeFactory _scopeFactory;
     private readonly ILogger _logger;
     private readonly IClock _clock;
 

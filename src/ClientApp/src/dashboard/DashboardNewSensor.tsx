@@ -5,21 +5,9 @@ import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import DashboardFrame from "./DashboardFrame";
-import Typography from "@material-ui/core/Typography";
-import Skeleton from "@material-ui/lab/Skeleton";
-import {GetDefaultApiConfig} from "../index";
-import Card from "@material-ui/core/Card";
-import { AdminUserApiModel, AdminUsersApi, UsersApi} from "smeiot-client";
-import moment from "moment";
-import Avatar from "@material-ui/core/Avatar";
-import CardHeader from "@material-ui/core/CardHeader";
-import CardContent from "@material-ui/core/CardContent";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from '@material-ui/icons/Close';
 import { Link, RouteComponentProps } from '@reach/router';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Switch from '@material-ui/core/Switch';
-import { SensorsApi } from 'smeiot-client';
 
 const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Theme) => createStyles({
   container: {

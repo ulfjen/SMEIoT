@@ -1,12 +1,10 @@
 import * as React from "react";
-import clsx from "clsx";
 import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import { darken } from '@material-ui/core/styles';
 import Grid from "@material-ui/core/Grid";
-import Paper from "@material-ui/core/Paper";
 import Skeleton from "@material-ui/lab/Skeleton";
 import Typography from "@material-ui/core/Typography";
 import { RouteComponentProps } from "@reach/router";
@@ -17,40 +15,27 @@ import {
   FormattedMessage
 } from "react-intl";
 import {
-  BasicSensorApiModel,
   DevicesApi,
   DeviceDetailsApiModel,
-  SensorStatus,
 } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
-import TwoLayerLabelAction from "../components/TwoLayerLabelAction";
 import DashboardFrame from "./DashboardFrame";
 import Container from "@material-ui/core/Container";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { Link as ReachLink } from "@reach/router";
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import Link from '@material-ui/core/Link';
-import Divider from '@material-ui/core/Divider';
-import Button from '@material-ui/core/Button';
 import NavigateNextIcon from "@material-ui/icons/NavigateNext";
 import { AsyncState } from "react-use/lib/useAsync";
 import StatusBadge from "../components/StatusBadge";
 import ExpandedCardHeader from "../components/ExpandedCardHeader";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
-import CardHeader from "@material-ui/core/CardHeader";
-import ExpansionPanel from "@material-ui/core/ExpansionPanel";
-import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
-import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
-import ExpansionPanelActions from "@material-ui/core/ExpansionPanelActions";
 import useMenu from "../helpers/useMenu";
 import useModal from "../helpers/useModal";
 import DashboardDeviceMenu from "./DashboardDeviceMenu";
 import DashboardDeviceDialog from "./DashboardDeviceDialog";
-import DashboardDeviceOtherSensors from "./DashboardDeviceOtherSensors";
 import useSensorByStatus from "../helpers/useSensorsByStatus";
 import CardActions from "@material-ui/core/CardActions";
 import { IDashboardDeviceRouteParams } from "./DashboardDevice";
@@ -171,10 +156,12 @@ const _DashboardDeviceCredential: React.FunctionComponent<IDashboardDeviceCreden
   const intl = useIntl();
   useTitle(intl.formatMessage(messages.title));
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [menuOpen, anchorEl, openMenu, closeMenu, menuDeviceName] = useMenu<string>();
   const [dialogOpen, openDialog, closeDialog, dialogDeviceName] = useModal<string>();
 
   const deviceApi = new DevicesApi(GetDefaultApiConfig());
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const sensors = useSensorByStatus();
   const [key, setKey] = React.useState<string>("");
   const [keyError, setKeyError] = React.useState<string>("");

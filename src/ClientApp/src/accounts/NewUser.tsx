@@ -14,7 +14,7 @@ import Container from '@material-ui/core/Container';
 import { Link as ReachLink, RouteComponentProps } from "@reach/router";
 import UserPasswordForm from "../components/UserPasswordForm";
 import useUserCredentials from "../helpers/useUserCredentials";
-import { SessionsApi, UsersApi, ProblemDetails } from "smeiot-client";
+import { SessionsApi, UsersApi } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
 import { FormattedMessage, defineMessages, useIntl } from "react-intl";
 import { useTitle } from 'react-use';
@@ -104,7 +104,7 @@ const _NewUser: React.FunctionComponent<INewUserProps & WithStyles<typeof styles
     }).finally(() => {
       setLoading(false);
     });
-  }, [uc]);
+  }, [uc, navigate]);
 
   return <Container component="main" maxWidth="xs">
     <CssBaseline />

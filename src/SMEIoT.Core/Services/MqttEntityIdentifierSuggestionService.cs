@@ -33,7 +33,9 @@ namespace SMEIoT.Core.Services
       var stringBuilder = new StringBuilder();
       while (numWords-- > 0)
       {
+#pragma warning disable SCS0005 // Weak random generator: name doesn't need to be secure
         var id = _rand.Next(_identifierCandidates.Count);
+#pragma warning restore SCS0005 // Weak random generator
         stringBuilder.Append(_identifierCandidates[id]);
         if (numWords > 0)
         {
@@ -72,7 +74,9 @@ namespace SMEIoT.Core.Services
       {
         return null;
       }
+#pragma warning disable SCS0005 // Weak random generator: name doesn't need to be secure
       var idx = _rand.Next(candidates.Count);
+#pragma warning restore SCS0005 // Weak random generator
       return candidates[idx];
     }
   }

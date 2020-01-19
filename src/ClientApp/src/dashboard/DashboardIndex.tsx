@@ -10,7 +10,7 @@ import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import DashboardFrame from "./DashboardFrame";
 import clsx from 'clsx';
-import { Link as ReachLink, Redirect, RouteComponentProps } from '@reach/router';
+import { Link as ReachLink, RouteComponentProps } from '@reach/router';
 import UserAvatarMenu from '../components/UserAvatarMenu';
 import { useAppCookie } from '../helpers/useCookie';
 import BasicBrokerCard from './BasicBrokerCard';

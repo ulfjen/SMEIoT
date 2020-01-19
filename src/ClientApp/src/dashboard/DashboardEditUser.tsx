@@ -6,10 +6,9 @@ import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import DashboardFrame from "./DashboardFrame";
 import Typography from "@material-ui/core/Typography";
-import Skeleton from "@material-ui/lab/Skeleton";
 import {GetDefaultApiConfig, UserAvatar} from "../index";
 import Card from "@material-ui/core/Card";
-import { AdminUserApiModel, AdminUsersApi, UsersApi} from "smeiot-client";
+import { AdminUserApiModel, AdminUsersApi } from "smeiot-client";
 import moment from "moment";
 import Avatar from "@material-ui/core/Avatar";
 import CardHeader from "@material-ui/core/CardHeader";
@@ -79,12 +78,12 @@ const _DashboardEditUser: React.FunctionComponent<IDashboardEditUserProps> = ({ 
     }
   }
 
-  const requestUser = async () => {
+  const requestUser = React.useCallback(async () => {
     if (userName === undefined || userName === null) { return; }
     saveUser(await new AdminUsersApi(GetDefaultApiConfig()).apiAdminUsersUserNameGet({
       userName
     }));
-  };
+  }, [userName]);
 
   const handleRoleChange = async (event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
     let userName = user.userName || "";
@@ -118,7 +117,7 @@ const _DashboardEditUser: React.FunctionComponent<IDashboardEditUserProps> = ({ 
     } else {
       requestUser();
     }
-  }, []);
+  }, [requestUser]);
   return <DashboardFrame title={`Edit ${userName}`}
     drawer direction="ltr" toolbarRight={
     <IconButton

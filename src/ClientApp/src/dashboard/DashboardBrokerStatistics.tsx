@@ -9,19 +9,12 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import IconButton from '@material-ui/core/IconButton';
 import Paper from '@material-ui/core/Paper';
-import CloseIcon from "@material-ui/icons/Close";
-import Frame from "./DashboardFrame";
-import { useTitle } from 'react-use';
-import BasicBrokerCard from "./BasicBrokerCard";
 import useInterval from "../helpers/useInterval";
 import { BrokerApi } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
 import { defineMessages, useIntl } from "react-intl";
 import {
-  Link as ReachLink,
-  LinkProps as ReachLinkProps,
   RouteComponentProps
 } from "@reach/router";
 import DashboardBrokerFrame from "./DashboardBrokerFrame";
@@ -72,8 +65,7 @@ const _DashboardBrokerStatistics: React.FunctionComponent<IDashboardBrokerStatis
     setStatistics(details.statistics || {});
   }
 
-  useInterval(updateBroker, 10000);
-  React.useEffect(() => { updateBroker() }, []);
+  useInterval(updateBroker, 10000, true);
 
   return (
     <DashboardBrokerFrame

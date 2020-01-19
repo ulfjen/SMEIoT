@@ -26,9 +26,6 @@ export interface ISensorCardProps extends WithStyles<typeof styles> {
 }
 
 const _SensorCard: React.FunctionComponent<ISensorCardProps & WithStyles<typeof styles>> = ({ classes, sensor, onMoreClick}) => {
-  const onClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-  };
-
   return <Card className={classes.sensorCard}>
     <CardActionArea>
       <CardMedia

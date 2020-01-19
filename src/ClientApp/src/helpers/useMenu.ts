@@ -8,12 +8,12 @@ export default function useMenu<T>(): [boolean, HTMLElement | null, (el: HTMLEle
   const closeMenu = useCallback(() => {
     closeModal();
     setAnchorEl(null);
-  }, []);
+  }, [closeModal]);
 
   const openMenu = useCallback((el: HTMLElement, value: T) => {
     setAnchorEl(el);
     openModal(value);
-  }, []);
+  }, [openModal]);
 
   return [open, anchorEl, openMenu, closeMenu, value];
 }

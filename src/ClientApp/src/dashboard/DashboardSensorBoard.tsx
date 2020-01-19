@@ -2,24 +2,15 @@ import Grid from "@material-ui/core/Grid";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import * as React from "react";
-import AddIcon from "@material-ui/icons/Add";
-import Typography from "@material-ui/core/Typography";
 import Skeleton from "@material-ui/lab/Skeleton";
 import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
-import clsx from "clsx";
-import { useTitle } from 'react-use';
-import BrokerCard from "./BrokerCard";
 import SensorCard from "../components/SensorCard";
-import BannerNotice from "../components/BannerNotice";
-import moment from "moment";
-import { defineMessages, useIntl, FormattedMessage } from "react-intl";
+import { FormattedMessage } from "react-intl";
 import {
-  Link as ReachLink,
-  LinkProps as ReachLinkProps,
-  RouteComponentProps
+  Link as ReachLink
 } from "@reach/router";
 import { SensorDetailsApiModel, SensorsApi } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
@@ -67,29 +58,15 @@ const styles = ({
   });
 
 export interface IDashboardSensorBoard
-  extends RouteComponentProps,
-    WithStyles<typeof styles> {
+  extends WithStyles<typeof styles> {
 }
-
-const messages = defineMessages({
-  title: {
-    id: "dashboard.sensors.index.title",
-    description: "Used as title in the sensors index page on the dashboard",
-    defaultMessage: "Sensors"
-  },
-  fabTooltip: {
-    id: "dashboard.sensors.index.action.tooltip",
-    description: "The tooltip title and aria label for the action button",
-    defaultMessage: "Add"
-  }
-});
 
 const _DashboardSensorBoard: React.FunctionComponent<IDashboardSensorBoard> = ({
   classes,
 }) => {
-  const intl = useIntl();
 
   const [loading, setLoading] = React.useState<boolean>(true);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [loadingError, setLoadingError] = React.useState<boolean>(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const handleMoreClicked = (event: React.MouseEvent<HTMLButtonElement>) => {

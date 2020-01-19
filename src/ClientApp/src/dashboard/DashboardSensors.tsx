@@ -1,6 +1,5 @@
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
-import Paper from "@material-ui/core/Paper";
 import Tooltip from "@material-ui/core/Tooltip";
 import Fab from "@material-ui/core/Fab";
 import * as React from "react";
@@ -10,9 +9,8 @@ import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import DashboardFrame from "./DashboardFrame";
-import clsx from "clsx";
 import DashboardSensorBoard from "./DashboardSensorBoard";
-import { defineMessages, useIntl, FormattedMessage } from "react-intl";
+import { defineMessages, useIntl } from "react-intl";
 import { Link, RouteComponentProps } from "@reach/router";
 import { useTitle } from 'react-use';
 import UserAvatarMenu from '../components/UserAvatarMenu';

@@ -6,7 +6,6 @@ import withStyles from "@material-ui/core/styles/withStyles";
 import DashboardFrame from "./DashboardFrame";
 import Container from '@material-ui/core/Container';
 import List from "@material-ui/core/List";
-import UserListItem from "./UserListItem";
 import Typography from "@material-ui/core/Typography";
 import Chip from "@material-ui/core/Chip";
 import Menu from "@material-ui/core/Menu";
@@ -14,7 +13,6 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Skeleton from "@material-ui/lab/Skeleton";
 import { GetDefaultApiConfig } from "../index";
 import { AdminUserApiModel, AdminUsersApi, AdminUserApiModelList } from "smeiot-client";
-import Card from "@material-ui/core/Card";
 import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
@@ -27,20 +25,18 @@ import { Link, RouteComponentProps } from '@reach/router';
 import UserAvatarMenu from '../components/UserAvatarMenu';
 import { useAppCookie } from '../helpers/useCookie';
 import { defineMessages, useIntl } from 'react-intl';
-import { useTitle, useAsync } from 'react-use';
-import { FixedSizeList, areEqual, ListChildComponentProps } from 'react-window';
-import Grid from '@material-ui/core/Grid';
+import { useTitle } from 'react-use';
+import { FixedSizeList } from 'react-window';
 import InfiniteLoader from 'react-window-infinite-loader';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItem from '@material-ui/core/ListItem';
-import Box from "@material-ui/core/Box";
-import useMenu from '../helpers/useMenu';
 import Avatar from '@material-ui/core/Avatar';
 import { UserAvatar } from "..";
 import IconButton from '@material-ui/core/IconButton';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import useModal from "../helpers/useModal";
+import useMenu from "../helpers/useMenu";
 
 const styles = ({ palette, spacing, transitions, zIndex, mixins, breakpoints }: Theme) => createStyles({
   container: {
@@ -101,15 +97,9 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({ classe
   useTitle(intl.formatMessage(messages.title));
 
   const [users, setUsers] = React.useState<Array<AdminUserApiModel>>([]);
-  const [focusedUserName, setFocusedUserName] = React.useState<null | string>(null);
   const [hasNextPage, setHasNextPage] = React.useState<boolean>(true);
   const [menuOpen, menuAnchorEl, openMenu, closeMenu, menuUserName] = useMenu<string>();
   const [dialogOpen, openDialog, closeDialog, dialogUserName] = useModal<string>();
-
-  const handleEdit = React.useCallback(e => {
-    e.stopPropagation();
-    window.location.href = `/dashboard/users/${focusedUserName}`;
-  }, []);
 
   const handleDelete = React.useCallback(e => {
     e.stopPropagation();
@@ -159,14 +149,14 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({ classe
   const measureRef = React.createRef<HTMLDivElement>();
   const [width, setWidth] = React.useState(-1);
   const [height, setHeight] = React.useState(initialHeight);
-  const measureAvailbleViewport = () => {
+  const measureAvailbleViewport = React.useCallback(() => {
     if (measureRef.current && containerRef.current) {
       const docHeight = containerRef.current.getBoundingClientRect().height;
       const measureRect = measureRef.current.getBoundingClientRect();
       setHeight(Math.min(userCount * ITEM_SIZE, docHeight - measureRect.top - FRAME_PADDING));
       setWidth(measureRect.width);
     }
-  }
+  }, [measureRef, containerRef, setHeight, setWidth, userCount]);
   React.useEffect(() => measureAvailbleViewport(), [measureAvailbleViewport]);
 
   const userItemRenderer = React.useCallback(({ index, style }: {
@@ -193,7 +183,7 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({ classe
           <MoreVertIcon />
         </IconButton>
       </ListItem>;
-  }, [users, openMenu]);
+  }, [users, openMenu, intl]);
 
   return <DashboardFrame
     title={intl.formatMessage(messages.title)}

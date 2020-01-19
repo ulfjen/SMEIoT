@@ -1,22 +1,12 @@
 import * as React from "react";
-import clsx from "clsx";
 import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
-import { useTitle, useAsync } from 'react-use';
 import {
-  defineMessages,
-  useIntl,
   FormattedMessage
 } from "react-intl";
-import {
-  SensorsApi,
-  DevicesApi,
-  DeviceDetailsApiModel
-} from "smeiot-client";
-import { GetDefaultApiConfig } from "../index";
-import { Link as ReachLink, NavigateFn } from "@reach/router";
+import { NavigateFn } from "@reach/router";
 import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
@@ -43,14 +33,9 @@ export interface IDashboardDeviceDialogProps extends WithStyles<typeof styles> {
   navigate?: NavigateFn;
 }
 
-const messages = defineMessages({
-});
-
 const _DashboardDeviceDialog: React.FunctionComponent<IDashboardDeviceDialogProps> = ({
   classes, open, closeDialog, deviceName, navigate
 }) => {
-  const intl = useIntl();
-
   const [removing, setRemoving] = React.useState<boolean>(false);
 
   const handleCancelClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -58,11 +43,10 @@ const _DashboardDeviceDialog: React.FunctionComponent<IDashboardDeviceDialogProp
     closeDialog();
   }
 
-  const api = new DevicesApi(GetDefaultApiConfig());
-
   const handleRemoveClick = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
     closeDialog();
+    // TODO: request
     setRemoving(true);
   }
 

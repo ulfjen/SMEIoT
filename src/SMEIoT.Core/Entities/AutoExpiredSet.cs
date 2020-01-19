@@ -4,7 +4,7 @@ using NodaTime;
 
 namespace SMEIoT.Core.Entities
 {
-  public class AutoExpiredSet<T>
+  public class AutoExpiredSet<T> where T : notnull
   {
     private readonly ConcurrentDictionary<T, Instant> _set = new ConcurrentDictionary<T, Instant>();
 
