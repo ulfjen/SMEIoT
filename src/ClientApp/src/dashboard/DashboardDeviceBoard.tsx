@@ -55,7 +55,7 @@ const styles = ({
   },
   list: {},
   card: {
-    maxWidth: 345
+    maxWidth: 345,
   },
   media: {
     height: 0,
@@ -87,7 +87,7 @@ const messages = defineMessages({
     timed: {
       id: "dashboard.devices.index.card.connected.timed",
       description: "The text for device instaruction",
-      defaultMessage: "Running normally. Last message {ago}"
+      defaultMessage: "Running normally. Last message {ago}."
     },
     notYet: {
       id: "dashboard.devices.index.card.connected.not_yet",
@@ -96,7 +96,7 @@ const messages = defineMessages({
     }
   },
   notConnected: {
-    id: "dashboard.devices.index.card.connected.timed",
+    id: "dashboard.devices.index.card.not_connected",
     description: "The text for device instaruction",
     defaultMessage: "The device is disconnected."
   }

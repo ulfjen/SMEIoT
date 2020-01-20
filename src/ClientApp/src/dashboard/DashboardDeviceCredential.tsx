@@ -295,7 +295,7 @@ const _DashboardDeviceCredential: React.FunctionComponent<IDashboardDeviceCreden
                     <FormattedMessage
                       id="dashboard.device.edit_credentials.instructions"
                       description="The instruction for device's credentials."
-                      defaultMessage="You can reconfigure device's credentials. Existing connections are not connected."
+                      defaultMessage="You can reconfigure device's credentials. Existing connections will still works until they reconnect to us."
                     />
                   </Typography>
                   <SuggestTextField

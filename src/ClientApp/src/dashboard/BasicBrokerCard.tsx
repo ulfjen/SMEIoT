@@ -66,7 +66,9 @@ const _BasicBrokerCard: React.FunctionComponent<IBasicBrokerCard> = ({ classes, 
     lastUpdatedAt: null,
     min1: null,
     min5: null,
-    min15: null
+    min15: null,
+    host: "",
+    port: -1
   });
   const [loading, setLoading] = React.useState<boolean>(false);
 
