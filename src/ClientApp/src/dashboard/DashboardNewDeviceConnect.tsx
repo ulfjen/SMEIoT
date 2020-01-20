@@ -131,7 +131,7 @@ const _DashboardNewDeviceConnect: React.FunctionComponent<IDashboardNewDeviceCon
             <div className={classes.actions}>
               <Button
                 component={ReachLink}
-                to={`../finialize_sensors?name=${device.name}`}
+                to={`../configure_sensors?name=${device.name}`}
                 variant="contained"
                 color="primary"
                 disabled={!connected}

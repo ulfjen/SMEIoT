@@ -38,6 +38,7 @@ export interface IDashboardDeviceDialogProps extends WithStyles<typeof styles> {
   open: boolean;
   closeDialog: () => void
   deviceName?: string;
+  navigateUrl: string;
   navigate?: NavigateFn;
 }
 
@@ -51,7 +52,7 @@ const messages = defineMessages({
 
 
 const _DashboardDeviceDialog: React.FunctionComponent<IDashboardDeviceDialogProps> = ({
-  classes, open, closeDialog, deviceName, navigate
+  classes, open, closeDialog, deviceName, navigate, navigateUrl
 }) => {
   const intl = useIntl();
   const [removing, setRemoving] = React.useState<boolean>(false);
@@ -73,7 +74,7 @@ const _DashboardDeviceDialog: React.FunctionComponent<IDashboardDeviceDialogProp
     await api.apiDevicesNameDelete({
       name: deviceName
     }).then((res) => {
-      navigate && navigate("..");
+      navigate && navigate(navigateUrl);
     }).catch(async response => {
       const pd: ProblemDetails = await response.json();
       setSnackbarOpen(true);

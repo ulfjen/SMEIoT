@@ -334,6 +334,7 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
           deviceName={dialogDeviceName}
           closeDialog={closeDialog}
           navigate={navigate}
+          navigateUrl={".."}
         />
         <DashboardSensorDialog
           open={sensorRemovalOpen}

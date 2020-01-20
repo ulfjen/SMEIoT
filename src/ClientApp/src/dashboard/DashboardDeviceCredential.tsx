@@ -251,6 +251,7 @@ const _DashboardDeviceCredential: React.FunctionComponent<IDashboardDeviceCreden
           deviceName={dialogDeviceName}
           closeDialog={closeDialog}
           navigate={navigate}
+          navigateUrl={"../.."}
         />
         <Grid container spacing={3}>
           <Grid item xs={12}>

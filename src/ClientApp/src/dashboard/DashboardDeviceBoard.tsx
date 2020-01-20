@@ -236,7 +236,8 @@ const _DashboardDeviceBoard: React.FunctionComponent<IDashboardDeviceBoard> = ({
         open={dialogOpen}
         deviceName={dialogDeviceName}
         closeDialog={closeDialog}
-        navigate={navigate}
+        navigate={undefined}
+        navigateUrl={"."}
       />
     </React.Fragment>
   );

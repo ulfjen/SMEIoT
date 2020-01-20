@@ -31,6 +31,7 @@ void copy_topic_buffer(char* buffer, int len_buffer, const char* sensor_name)
 {
 	strncat(buffer, "iot/", len_buffer);
 	strncat(buffer, device_name, len_buffer);
+	strncat(buffer, "/", len_buffer);
 	strncat(buffer, sensor_name, len_buffer);
 }
 
