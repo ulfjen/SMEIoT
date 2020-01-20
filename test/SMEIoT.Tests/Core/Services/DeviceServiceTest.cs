@@ -517,6 +517,20 @@ namespace SMEIoT.Tests.Core.Services
     }
 
     [Fact]
+    public async Task CreateSensorByDeviceAndNameAsync_ThrowsWhenSensorExists()
+    {
+      var device = await SeedOneDeviceAsync();
+      await _service.CreateSensorByDeviceAndNameAsync(device, "sensor-1");
+
+      Task Act() => _service.CreateSensorByDeviceAndNameAsync(device, "sensor-1");
+
+      var exce = await Record.ExceptionAsync(Act);
+      Assert.NotNull(exce);
+      var exist = Assert.IsType<EntityExistException>(exce);
+      Assert.Equal("sensorName", exist.ParamName);
+    }
+
+    [Fact]
     public async Task CreateSensorByDeviceAndNameAsync_ThrowsWhenSensorDoesNotSendMessages()
     {
       var device = await SeedOneDeviceAsync();

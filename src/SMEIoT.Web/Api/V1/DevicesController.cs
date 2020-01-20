@@ -78,9 +78,10 @@ namespace SMEIoT.Web.Api.V1
       {
         sensors.Add(new BasicSensorApiModel(sensor));
       }
+      var registered = sensors.Select(s => s.SensorName);
 
       var sensorNamesFromMqtt = await _mqttService.ListSensorNamesByDeviceNameAsync(device.Name);
-      sensors.AddRange(sensorNamesFromMqtt.Select(n => new BasicSensorApiModel(n)));
+      sensors.AddRange(sensorNamesFromMqtt.Except(registered).Select(n => new BasicSensorApiModel(n)));
 
       var res = new DeviceDetailsApiModel(device, sensors);
       return Ok(res);

@@ -140,7 +140,8 @@ namespace SMEIoT.Infrastructure.Data
         .HasForeignKey(s => s.DeviceId);
 
       modelBuilder.Entity<Sensor>()
-        .HasIndex(s => new { s.NormalizedName, s.DeviceId });
+        .HasIndex(s => new { s.NormalizedName, s.DeviceId })
+        .IsUnique();
 
       modelBuilder.Entity<SensorValue>()
         .HasOne(s => s.Sensor)

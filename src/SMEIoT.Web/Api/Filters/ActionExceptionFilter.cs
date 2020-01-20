@@ -39,6 +39,10 @@ namespace SMEIoT.Web.Api.Filters
           errors.AddModelError(exception.ParamName, exception.Message);
           context.Result = new BadRequestObjectResult(_pdFactory.CreateValidationProblemDetails(context.HttpContext, errors, StatusCodes.Status400BadRequest));
           break;
+        case EntityExistException exception:
+          errors.AddModelError(exception.ParamName, exception.Message);
+          context.Result = new UnprocessableEntityObjectResult(_pdFactory.CreateValidationProblemDetails(context.HttpContext, errors, StatusCodes.Status422UnprocessableEntity)) {StatusCode = StatusCodes.Status422UnprocessableEntity};
+          break;
         case InvalidUserInputException exception:
           context.Result = new UnprocessableEntityObjectResult(_pdFactory.CreateProblemDetails(context.HttpContext, StatusCodes.Status422UnprocessableEntity, null, null, exception.Message));
           break;
@@ -48,7 +52,10 @@ namespace SMEIoT.Web.Api.Filters
         case InternalException exception:
           goto default;
         default:
-          var message = _env.IsProduction() ? "" : context.Exception.Message;
+          var message = "";
+          if (!_env.IsProduction()) {
+            message += $"{context.Exception.Message}: {context.Exception.InnerException?.Message}";
+          }
           context.Result = new ObjectResult(_pdFactory.CreateProblemDetails(context.HttpContext, StatusCodes.Status500InternalServerError, null, null, $"Unhandled exception. {message}")) { StatusCode = StatusCodes.Status500InternalServerError };
           break;
       }

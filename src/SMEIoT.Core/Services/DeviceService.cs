@@ -134,6 +134,8 @@ namespace SMEIoT.Core.Services
       if (!legalNames.Contains(sensorName)) {
         throw new EntityNotFoundException($"We can't find messages from sensor {device.Name}/{sensorName}.", nameof(sensorName));
       }
+      var found = await _dbContext.Sensors.Where(s => s.NormalizedName == Sensor.NormalizeName(sensorName) && s.DeviceId == device.Id).CountAsync();
+      if (found > 0) { throw new EntityExistException($"The sensor {sensorName} was created. You can't create a new one.", nameof(sensorName)); }
       _dbContext.Sensors.Add(new Sensor { Name = sensorName, NormalizedName = Sensor.NormalizeName(sensorName), DeviceId = device.Id });
       await _dbContext.SaveChangesAsync();
     }
