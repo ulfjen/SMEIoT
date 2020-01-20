@@ -1361,15 +1361,6 @@
         },
         "additionalProperties": false
       },
-      "SensorStatus": {
-        "enum": [
-          0,
-          1,
-          2
-        ],
-        "type": "integer",
-        "format": "int32"
-      },
       "BasicSensorApiModel": {
         "required": [
           "sensorName",
@@ -1381,7 +1372,12 @@
             "type": "string"
           },
           "status": {
-            "$ref": "#/components/schemas/SensorStatus"
+            "enum": [
+              "NotRegistered",
+              "NotConnected",
+              "Connected"
+            ],
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -1568,7 +1564,12 @@
             "type": "string"
           },
           "status": {
-            "$ref": "#/components/schemas/SensorStatus"
+            "enum": [
+              "NotRegistered",
+              "NotConnected",
+              "Connected"
+            ],
+            "type": "string"
           }
         },
         "additionalProperties": false

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
@@ -18,6 +19,7 @@ using Microsoft.AspNetCore.Routing.Constraints;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi.Any;
 using Microsoft.Extensions.Logging;
 using Hangfire;
 using NodaTime;
@@ -31,6 +33,7 @@ using SMEIoT.Web.Api.Filters;
 using SMEIoT.Web.Hubs;
 using SMEIoT.Web.Api.Config;
 using SMEIoT.Web.Services;
+using SMEIoT.Web.ApiModels;
 using SMEIoT.Web.Middlewares;
 using System.Net.Mime;
 
@@ -133,6 +136,7 @@ namespace SMEIoT.Web
         {
           c.OperationFilter<ApiVersionOperationFilter>();
           c.SchemaFilter<RequiredSchemaFilter>();
+          c.MapType<SensorStatus>(() => new OpenApiSchema { Type = "string", Enum = new List<IOpenApiAny>(Enum.GetNames(typeof(SensorStatus)).Select(n => new OpenApiString(n))) });
           c.SwaggerDoc("v1", new OpenApiInfo { Title = "SMEIoT API", Version = "v1" });
         });
       }

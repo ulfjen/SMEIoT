@@ -138,7 +138,7 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({ classe
       }
       window.location.href = path;
     }
-  }, [filters]);
+  }, [filters, pathFilters, active, location.pathname]);
 
   const loadMoreUsers = React.useCallback((startIndex: number, stopIndex: number) => {
     const req: AdminUsersApiApiAdminUsersGetRequest = {
@@ -161,7 +161,7 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({ classe
       }
       return result;
     });
-  }, [filters, closeMenu, users]);
+  }, [closeMenu, users, active]);
 
   // for loading indicator
   const userCount = hasNextPage ? users.length + 1 : users.length;

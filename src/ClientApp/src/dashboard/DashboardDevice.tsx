@@ -20,8 +20,7 @@ import {
   BasicSensorApiModel,
   DevicesApi,
   DeviceDetailsApiModel,
-  SensorStatus,
-  ProblemDetails,
+  BasicSensorApiModelStatusEnum
 } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
 import TwoLayerLabelAction from "../components/TwoLayerLabelAction";
@@ -294,9 +293,9 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
     const res = await deviceApi.apiDevicesNameGet({
       name: deviceName
     }).then(res => {
-      sensors.setNotRegistered(res.sensors.filter(s => s.status === "NotRegistered")); // not registered
-      sensors.setNotConnected(res.sensors.filter(s => s.status === "NotConnected")); // not connected
-      sensors.setRunning(res.sensors.filter(s => s.status === "Connected")); // connected
+      sensors.setNotRegistered(res.sensors.filter(s => s.status === BasicSensorApiModelStatusEnum.NotRegistered)); 
+      sensors.setNotConnected(res.sensors.filter(s => s.status === BasicSensorApiModelStatusEnum.NotConnected));
+      sensors.setRunning(res.sensors.filter(s => s.status === BasicSensorApiModelStatusEnum.Connected));
       return res;
     });
 

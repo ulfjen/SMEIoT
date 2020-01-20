@@ -18,10 +18,6 @@ import {
     NumberTimeSeriesApiModelFromJSON,
     NumberTimeSeriesApiModelFromJSONTyped,
     NumberTimeSeriesApiModelToJSON,
-    SensorStatus,
-    SensorStatusFromJSON,
-    SensorStatusFromJSONTyped,
-    SensorStatusToJSON,
 } from './';
 
 /**
@@ -56,10 +52,10 @@ export interface SensorDetailsApiModel {
     sensorName: string;
     /**
      * 
-     * @type {SensorStatus}
+     * @type {string}
      * @memberof SensorDetailsApiModel
      */
-    status: SensorStatus;
+    status: SensorDetailsApiModelStatusEnum;
 }
 
 export function SensorDetailsApiModelFromJSON(json: any): SensorDetailsApiModel {
@@ -76,7 +72,7 @@ export function SensorDetailsApiModelFromJSONTyped(json: any, ignoreDiscriminato
         'data': ((json['data'] as Array<any>).map(NumberTimeSeriesApiModelFromJSON)),
         'startedAt': json['startedAt'],
         'sensorName': json['sensorName'],
-        'status': SensorStatusFromJSON(json['status']),
+        'status': json['status'],
     };
 }
 
@@ -93,8 +89,18 @@ export function SensorDetailsApiModelToJSON(value?: SensorDetailsApiModel | null
         'data': ((value.data as Array<any>).map(NumberTimeSeriesApiModelToJSON)),
         'startedAt': value.startedAt,
         'sensorName': value.sensorName,
-        'status': SensorStatusToJSON(value.status),
+        'status': value.status,
     };
+}
+
+/**
+* @export
+* @enum {string}
+*/
+export enum SensorDetailsApiModelStatusEnum {
+    NotRegistered = 'NotRegistered',
+    NotConnected = 'NotConnected',
+    Connected = 'Connected'
 }
 
 

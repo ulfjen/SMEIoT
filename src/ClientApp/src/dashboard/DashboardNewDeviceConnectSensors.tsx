@@ -11,7 +11,7 @@ import { Link, RouteComponentProps } from "@reach/router";
 import { useTitle, useAsync } from 'react-use';
 import {
   DevicesApi,
-  SensorStatus,
+  BasicSensorApiModelStatusEnum
 } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
 import DashboardNewDeviceFrame from "./DashboardNewDeviceFrame";
@@ -71,9 +71,9 @@ const _DashboardNewDeviceConnectSensors: React.FunctionComponent<IDashboardNewDe
     return await api.apiDevicesNameGet({
       name
     }).then(res => {
-      sensors.setNotRegistered(res.sensors.filter(s => s.status === SensorStatus.NUMBER_0)); // not registered
-      sensors.setNotConnected(res.sensors.filter(s => s.status === SensorStatus.NUMBER_1)); // not connected
-      sensors.setRunning(res.sensors.filter(s => s.status === SensorStatus.NUMBER_2)); // connected
+      sensors.setNotRegistered(res.sensors.filter(s => s.status === BasicSensorApiModelStatusEnum.NotRegistered)); 
+      sensors.setNotConnected(res.sensors.filter(s => s.status === BasicSensorApiModelStatusEnum.NotConnected));
+      sensors.setRunning(res.sensors.filter(s => s.status === BasicSensorApiModelStatusEnum.Connected));
       return res;
     });
   }, [name]);

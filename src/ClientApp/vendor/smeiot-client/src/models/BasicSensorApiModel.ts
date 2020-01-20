@@ -13,13 +13,6 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import {
-    SensorStatus,
-    SensorStatusFromJSON,
-    SensorStatusFromJSONTyped,
-    SensorStatusToJSON,
-} from './';
-
 /**
  * 
  * @export
@@ -34,10 +27,10 @@ export interface BasicSensorApiModel {
     sensorName: string;
     /**
      * 
-     * @type {SensorStatus}
+     * @type {string}
      * @memberof BasicSensorApiModel
      */
-    status: SensorStatus;
+    status: BasicSensorApiModelStatusEnum;
 }
 
 export function BasicSensorApiModelFromJSON(json: any): BasicSensorApiModel {
@@ -51,7 +44,7 @@ export function BasicSensorApiModelFromJSONTyped(json: any, ignoreDiscriminator:
     return {
         
         'sensorName': json['sensorName'],
-        'status': SensorStatusFromJSON(json['status']),
+        'status': json['status'],
     };
 }
 
@@ -65,8 +58,18 @@ export function BasicSensorApiModelToJSON(value?: BasicSensorApiModel | null): a
     return {
         
         'sensorName': value.sensorName,
-        'status': SensorStatusToJSON(value.status),
+        'status': value.status,
     };
+}
+
+/**
+* @export
+* @enum {string}
+*/
+export enum BasicSensorApiModelStatusEnum {
+    NotRegistered = 'NotRegistered',
+    NotConnected = 'NotConnected',
+    Connected = 'Connected'
 }
 
 

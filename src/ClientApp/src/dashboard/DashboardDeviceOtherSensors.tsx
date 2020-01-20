@@ -110,7 +110,7 @@ const _DashboardDeviceOtherSensors: React.FunctionComponent<IDashboardDeviceOthe
       loadingUpdate[sensorName] = false;
       setLoading({...loading, ...loadingUpdate});
     });
-  }, [deviceName, sensors, intl]);
+  }, [deviceName, sensors, loading, tooltipOpen, intl]);
 
   const closeSnackbar = (e: React.SyntheticEvent<Element, Event> | null) => {
     if (e) { e.preventDefault() }
