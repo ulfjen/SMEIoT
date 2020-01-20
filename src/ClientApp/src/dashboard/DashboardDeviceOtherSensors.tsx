@@ -66,15 +66,21 @@ const _DashboardDeviceOtherSensors: React.FunctionComponent<IDashboardDeviceOthe
 }) => {
   const intl = useIntl();
 
-  const [loading, setLoading] = React.useState<boolean>(false);
-  const [tooltipOpen, setTooltipOpen] = React.useState<boolean>(false);
+  // TODO: write with dispatch
+  const [loading, setLoading] = React.useState<Record<string, boolean>>({});
+  const [tooltipOpen, setTooltipOpen] = React.useState<Record<string, boolean>>({});
 
   const [snackbarOpen, setSnackbarOpen] = React.useState<boolean>(false);
   const [snackbarMessage, setSnackbarMessage] = React.useState<string>("");
   
   const handleSensorRegistrationOnClick = React.useCallback(async (sensorName: string) => {
-    setLoading(true);
-    setTooltipOpen(false);
+    const loadingUpdate: Record<string, boolean> = {};
+    loadingUpdate[sensorName] = true;
+    const tooltipUpdate: Record<string, boolean> = {};
+    tooltipUpdate[sensorName] = false;
+    setLoading({...loading, ...loadingUpdate});
+    setTooltipOpen({...tooltipOpen, ...tooltipUpdate});
+
     const api = new SensorsApi(GetDefaultApiConfig());
     await api.apiSensorsPost({
       sensorLocatorBindingModel: {
@@ -100,7 +106,9 @@ const _DashboardDeviceOtherSensors: React.FunctionComponent<IDashboardDeviceOthe
       }
       setSnackbarMessage(msg);
     }).finally(() => {
-      setLoading(false);
+      const loadingUpdate: Record<string, boolean> = {};
+      loadingUpdate[sensorName] = false;
+      setLoading({...loading, ...loadingUpdate});
     });
   }, [deviceName, sensors, intl]);
 
@@ -120,13 +128,21 @@ const _DashboardDeviceOtherSensors: React.FunctionComponent<IDashboardDeviceOthe
             <Tooltip
               title={intl.formatMessage(messages.sensor.connect)}
               aria-label={intl.formatMessage(messages.sensor.connect)}
-              open={tooltipOpen}
-              onOpen={() => setTooltipOpen(true)}
-              onClose={() => setTooltipOpen(false)}
+              open={tooltipOpen[sensor.sensorName]}
+              onOpen={() => {
+                const tooltipUpdate: Record<string, boolean> = {};
+                tooltipUpdate[sensor.sensorName] = true;
+                setTooltipOpen({...tooltipOpen, ...tooltipUpdate});
+              }}
+              onClose={() => {
+                const tooltipUpdate: Record<string, boolean> = {};
+                tooltipUpdate[sensor.sensorName] = false;
+                setTooltipOpen({...tooltipOpen, ...tooltipUpdate});
+              }}
             >
               <ProgressIconButton
                 ariaLabel={intl.formatMessage(messages.sensor.buttonLabel)}
-                loading={loading}
+                loading={loading[sensor.sensorName]}
                 onClick={() => handleSensorRegistrationOnClick(sensor.sensorName)}>
                 <AddIcon />
               </ProgressIconButton>

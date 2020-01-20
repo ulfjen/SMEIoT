@@ -24,19 +24,13 @@ export interface SensorAssignmentApiModel {
      * @type {string}
      * @memberof SensorAssignmentApiModel
      */
-    name: string;
+    sensorName: string;
     /**
      * 
      * @type {string}
      * @memberof SensorAssignmentApiModel
      */
     userName: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof SensorAssignmentApiModel
-     */
-    assignmentCount: number;
 }
 
 export function SensorAssignmentApiModelFromJSON(json: any): SensorAssignmentApiModel {
@@ -49,9 +43,8 @@ export function SensorAssignmentApiModelFromJSONTyped(json: any, ignoreDiscrimin
     }
     return {
         
-        'name': json['name'],
+        'sensorName': json['sensorName'],
         'userName': json['userName'],
-        'assignmentCount': json['assignmentCount'],
     };
 }
 
@@ -64,9 +57,8 @@ export function SensorAssignmentApiModelToJSON(value?: SensorAssignmentApiModel 
     }
     return {
         
-        'name': value.name,
+        'sensorName': value.sensorName,
         'userName': value.userName,
-        'assignmentCount': value.assignmentCount,
     };
 }
 

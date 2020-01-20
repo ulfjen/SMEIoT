@@ -49,6 +49,18 @@ export interface BasicBrokerApiModel {
      * @memberof BasicBrokerApiModel
      */
     min15: number | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof BasicBrokerApiModel
+     */
+    host: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof BasicBrokerApiModel
+     */
+    port: number;
 }
 
 export function BasicBrokerApiModelFromJSON(json: any): BasicBrokerApiModel {
@@ -66,6 +78,8 @@ export function BasicBrokerApiModelFromJSONTyped(json: any, ignoreDiscriminator:
         'min1': json['min1'],
         'min5': json['min5'],
         'min15': json['min15'],
+        'host': json['host'],
+        'port': json['port'],
     };
 }
 
@@ -83,6 +97,8 @@ export function BasicBrokerApiModelToJSON(value?: BasicBrokerApiModel | null): a
         'min1': value.min1,
         'min5': value.min5,
         'min15': value.min15,
+        'host': value.host,
+        'port': value.port,
     };
 }
 

@@ -273,9 +273,9 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
     const res = await deviceApi.apiDevicesNameGet({
       name: deviceName
     }).then(res => {
-      sensors.setNotRegistered(res.sensors.filter(s => s.status === SensorStatus.NUMBER_0)); // not registered
-      sensors.setNotConnected(res.sensors.filter(s => s.status === SensorStatus.NUMBER_1)); // not connected
-      sensors.setRunning(res.sensors.filter(s => s.status === SensorStatus.NUMBER_2)); // connected
+      sensors.setNotRegistered(res.sensors.filter(s => s.status === "NotRegistered")); // not registered
+      sensors.setNotConnected(res.sensors.filter(s => s.status === "NotConnected")); // not connected
+      sensors.setRunning(res.sensors.filter(s => s.status === "Connected")); // connected
       return res;
     });
 

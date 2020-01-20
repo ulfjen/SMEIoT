@@ -370,6 +370,36 @@
             }
           }
         }
+      },
+      "delete": {
+        "tags": [
+          "Devices"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/devices/{name}/basic": {
@@ -556,6 +586,46 @@
         }
       }
     },
+    "/api/devices/{deviceName}/{sensorName}": {
+      "delete": {
+        "tags": [
+          "Devices"
+        ],
+        "parameters": [
+          {
+            "name": "deviceName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sensorName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/sensors/{name}/users": {
       "post": {
         "tags": [
@@ -634,7 +704,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserSensorIAsyncEnumerable"
+                  "$ref": "#/components/schemas/UserIAsyncEnumerable"
                 }
               }
             }
@@ -1146,10 +1216,12 @@
       },
       "BasicBrokerApiModel": {
         "required": [
+          "host",
           "lastUpdatedAt",
           "min1",
           "min15",
           "min5",
+          "port",
           "running"
         ],
         "type": "object",
@@ -1175,6 +1247,13 @@
             "type": "number",
             "format": "double",
             "nullable": true
+          },
+          "host": {
+            "type": "string"
+          },
+          "port": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -1202,9 +1281,13 @@
         "type": "object",
         "properties": {
           "name": {
+            "maxLength": 1000,
+            "minLength": 3,
             "type": "string"
           },
           "key": {
+            "maxLength": 128,
+            "minLength": 64,
             "type": "string"
           }
         },
@@ -1424,26 +1507,21 @@
       },
       "SensorAssignmentApiModel": {
         "required": [
-          "assignmentCount",
-          "name",
+          "sensorName",
           "userName"
         ],
         "type": "object",
         "properties": {
-          "name": {
+          "sensorName": {
             "type": "string"
           },
           "userName": {
             "type": "string"
-          },
-          "assignmentCount": {
-            "type": "integer",
-            "format": "int32"
           }
         },
         "additionalProperties": false
       },
-      "UserSensorIAsyncEnumerable": {
+      "UserIAsyncEnumerable": {
         "type": "object",
         "additionalProperties": false
       },

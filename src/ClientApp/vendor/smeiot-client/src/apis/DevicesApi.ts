@@ -45,12 +45,21 @@ export interface DevicesApiApiDevicesBootstrapPostRequest {
     deviceBootstrapConfigBindingModel: DeviceBootstrapConfigBindingModel;
 }
 
+export interface DevicesApiApiDevicesDeviceNameSensorNameDeleteRequest {
+    deviceName: string;
+    sensorName: string;
+}
+
 export interface DevicesApiApiDevicesGetRequest {
     offset?: number;
     limit?: number;
 }
 
 export interface DevicesApiApiDevicesNameBasicGetRequest {
+    name: string;
+}
+
+export interface DevicesApiApiDevicesNameDeleteRequest {
     name: string;
 }
 
@@ -177,6 +186,37 @@ export class DevicesApi extends runtime.BaseAPI {
 
     /**
      */
+    async apiDevicesDeviceNameSensorNameDeleteRaw(requestParameters: DevicesApiApiDevicesDeviceNameSensorNameDeleteRequest): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.deviceName === null || requestParameters.deviceName === undefined) {
+            throw new runtime.RequiredError('deviceName','Required parameter requestParameters.deviceName was null or undefined when calling apiDevicesDeviceNameSensorNameDelete.');
+        }
+
+        if (requestParameters.sensorName === null || requestParameters.sensorName === undefined) {
+            throw new runtime.RequiredError('sensorName','Required parameter requestParameters.sensorName was null or undefined when calling apiDevicesDeviceNameSensorNameDelete.');
+        }
+
+        const queryParameters: runtime.HTTPQuery = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/devices/{deviceName}/{sensorName}`.replace(`{${"deviceName"}}`, encodeURIComponent(String(requestParameters.deviceName))).replace(`{${"sensorName"}}`, encodeURIComponent(String(requestParameters.sensorName))),
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async apiDevicesDeviceNameSensorNameDelete(requestParameters: DevicesApiApiDevicesDeviceNameSensorNameDeleteRequest): Promise<void> {
+        await this.apiDevicesDeviceNameSensorNameDeleteRaw(requestParameters);
+    }
+
+    /**
+     */
     async apiDevicesGetRaw(requestParameters: DevicesApiApiDevicesGetRequest): Promise<runtime.ApiResponse<BasicDeviceApiModelList>> {
         const queryParameters: runtime.HTTPQuery = {};
 
@@ -233,6 +273,33 @@ export class DevicesApi extends runtime.BaseAPI {
     async apiDevicesNameBasicGet(requestParameters: DevicesApiApiDevicesNameBasicGetRequest): Promise<BasicDeviceApiModel> {
         const response = await this.apiDevicesNameBasicGetRaw(requestParameters);
         return await response.value();
+    }
+
+    /**
+     */
+    async apiDevicesNameDeleteRaw(requestParameters: DevicesApiApiDevicesNameDeleteRequest): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.name === null || requestParameters.name === undefined) {
+            throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling apiDevicesNameDelete.');
+        }
+
+        const queryParameters: runtime.HTTPQuery = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/devices/{name}`.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters.name))),
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async apiDevicesNameDelete(requestParameters: DevicesApiApiDevicesNameDeleteRequest): Promise<void> {
+        await this.apiDevicesNameDeleteRaw(requestParameters);
     }
 
     /**
