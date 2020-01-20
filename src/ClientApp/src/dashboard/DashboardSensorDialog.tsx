@@ -34,11 +34,13 @@ const styles = ({ typography, palette, spacing, zIndex }: Theme) => createStyles
   },
 });
 
-export interface IDashboardDeviceDialogProps extends WithStyles<typeof styles> {
+export interface IDashboardSensorDialogProps extends WithStyles<typeof styles> {
   open: boolean;
   closeDialog: () => void
   deviceName?: string;
+  sensorName?: string;
   navigate?: NavigateFn;
+  refreshAfterDone?: boolean;
 }
 
 const messages = defineMessages({
@@ -49,9 +51,8 @@ const messages = defineMessages({
   }
 });
 
-
-const _DashboardDeviceDialog: React.FunctionComponent<IDashboardDeviceDialogProps> = ({
-  classes, open, closeDialog, deviceName, navigate
+const _DashboardSensorDialog: React.FunctionComponent<IDashboardSensorDialogProps> = ({
+  classes, open, closeDialog, deviceName, navigate, sensorName, refreshAfterDone
 }) => {
   const intl = useIntl();
   const [removing, setRemoving] = React.useState<boolean>(false);
@@ -67,13 +68,20 @@ const _DashboardDeviceDialog: React.FunctionComponent<IDashboardDeviceDialogProp
   const handleRemoveClick = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
     closeDialog();
-    if (!deviceName) { return; }
+    if (!deviceName || !sensorName) { return; }
     const api = new DevicesApi(GetDefaultApiConfig());
     setRemoving(true);
-    await api.apiDevicesNameDelete({
-      name: deviceName
+    await api.apiDevicesDeviceNameSensorNameDelete({
+      deviceName,
+      sensorName
     }).then((res) => {
-      navigate && navigate("..");
+      if (refreshAfterDone) {
+        window.location.reload();
+      } else {
+        navigate && navigate("..");
+      }
+
+      return res;
     }).catch(async response => {
       const pd: ProblemDetails = await response.json();
       setSnackbarOpen(true);
@@ -102,34 +110,34 @@ const _DashboardDeviceDialog: React.FunctionComponent<IDashboardDeviceDialogProp
     >
       <DialogTitle>
         <FormattedMessage
-          id="dashboard.devices.edit.dialog.title"
-          description="The instruction for removing device's dialog"
-          defaultMessage="Remove device {name}?"
+          id="dashboard.devices.edit.removal_dialog.title"
+          description="The instruction for removing sensors's dialog"
+          defaultMessage="Remove sensor {name}?"
           values={{
-            name: deviceName
+            name: sensorName
           }}
         />
       </DialogTitle>
       <DialogContent>
         <DialogContentText>
           <FormattedMessage
-            id="dashboard.devices.edit.dialog.content"
+            id="dashboard.devices.edit.removal_dialog.content"
             description="The instruction for removing device's dialog"
-            defaultMessage="After removing device, we will no longer track devices and its sensor from MQTT."
+            defaultMessage="After removing sensor, all existing data are cleard and we will no longer track values from MQTT."
           />
         </DialogContentText>
       </DialogContent>
       <DialogActions>
         <Button onClick={handleCancelClick} autoFocus>
           <FormattedMessage
-            id="dashboard.devices.edit.dialog.remove.actions.cancel"
+            id="dashboard.devices.edit.removal_dialog.actions.cancel"
             description="The label at the removing device's dialog button"
             defaultMessage="Cancel"
           />
         </Button>
         <Button onClick={handleRemoveClick}>
           <FormattedMessage
-            id="dashboard.devices.edit.dialog.remove.actions.remove"
+            id="dashboard.devices.edit.removal_dialog.actions.remove"
             description="The label at the removing device's dialog button"
             defaultMessage="Remove"
           />
@@ -147,6 +155,6 @@ const _DashboardDeviceDialog: React.FunctionComponent<IDashboardDeviceDialogProp
   </React.Fragment>
 };
 
-const DashboardDeviceDialog = withStyles(styles)(_DashboardDeviceDialog);
+const DashboardSensorDialog = withStyles(styles)(_DashboardSensorDialog);
 
-export default DashboardDeviceDialog;
+export default DashboardSensorDialog;
