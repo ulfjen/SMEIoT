@@ -14,6 +14,7 @@ import DashboardNewDeviceConnect from "./dashboard/DashboardNewDeviceConnect";
 import DashboardNewDeviceConnectSensors from "./dashboard/DashboardNewDeviceConnectSensors";
 import DashboardDeviceCredential from "./dashboard/DashboardDeviceCredential";
 import DashboardBrokerStatistics from "./dashboard/DashboardBrokerStatistics";
+import DashboardSensorAssignment from "./dashboard/DashboardSensorAssignment";
 import { useAppCookie } from "./helpers/useCookie";
 
 export interface IDashboardApp extends RouteComponentProps {
@@ -40,6 +41,7 @@ const DashboardApp: React.FunctionComponent<IDashboardApp> = ({ location }) => {
         <DashboardNewDeviceConnectSensors path="devices/configure_sensors" />
         <DashboardDevice path="devices/:deviceName" />
         <DashboardDeviceCredential path="devices/:deviceName/credentials" />
+        <DashboardSensorAssignment path="devices/:deviceName/:sensorName" />
         <DashboardSensors path="sensors" />
         <DashboardNewSensor path="sensors/new" />
         <DashboardSensorDetails path="sensors/:deviceName/:sensorName" />

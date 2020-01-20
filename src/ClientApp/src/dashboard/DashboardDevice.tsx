@@ -21,6 +21,7 @@ import {
   DevicesApi,
   DeviceDetailsApiModel,
   SensorStatus,
+  ProblemDetails,
 } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
 import TwoLayerLabelAction from "../components/TwoLayerLabelAction";
@@ -53,6 +54,7 @@ import DashboardDeviceDialog from "./DashboardDeviceDialog";
 import DashboardDeviceOtherSensors from "./DashboardDeviceOtherSensors";
 import useSensorByStatus from "../helpers/useSensorsByStatus";
 import CardActions from "@material-ui/core/CardActions";
+import DashboardSensorDialog from "./DashboardSensorDialog";
 
 const styles = ({ typography, palette, spacing, zIndex }: Theme) => createStyles({
   container: {
@@ -115,6 +117,13 @@ const styles = ({ typography, palette, spacing, zIndex }: Theme) => createStyles
   },
   list: {
     marginTop: 20
+  },
+  removeAction: {
+    color: palette.error.main
+  },
+  backdrop: {
+    zIndex: zIndex.drawer + 1,
+    color: '#fff',
   },
 });
 
@@ -196,6 +205,11 @@ const messages = defineMessages({
       description: "Instruction link on sensor panel",
       defaultMessage: "See graph"
     }
+  },
+  defaultError: {
+    id: "dashboard.devices.edit.dialog",
+    description: "Message on snackbar",
+    defaultMessage: "Something went wrong."
   }
 });
 
@@ -212,6 +226,14 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
 
   const [menuOpen, anchorEl, openMenu, closeMenu, menuDeviceName] = useMenu<string>();
   const [dialogOpen, openDialog, closeDialog, dialogDeviceName] = useModal<string>();
+  const sensors = useSensorByStatus();
+
+  const [sensorRemovalOpen, openSensorRemovalDialog, closeSensorRemovalDialog, sensorNameForRemoval] = useModal<string>();
+
+  const onRemoveSensor = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, sensorName: string) => {
+    e.preventDefault();
+    openSensorRemovalDialog(sensorName);
+  };
 
   const renderPanels = (sensors: Array<BasicSensorApiModel>) => {
     return sensors.length === 0 ? <CardContent>
@@ -240,22 +262,22 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
           <Typography variant="caption">
             {intl.formatMessage(messages.instructions.sensor)}
             <br />
-            <a href="#secondary-heading-and-columns" className={classes.link}>
+            <ReachLink to={`../../sensors/${deviceName}/${sensor.sensorName}`} className={classes.link}>
               {intl.formatMessage(messages.instructions.sensorLink)}
-            </a>
+            </ReachLink>
           </Typography>
         </div>
       </ExpansionPanelDetails>
       <Divider />
       <ExpansionPanelActions>
-        <Button size="small" className={classes.warning}>
+        <Button size="small" className={classes.warning} onClick={(e) => onRemoveSensor(e, sensor.sensorName)}>
           <FormattedMessage
             id="dashboard.devices.edit.sensor.actions.remove"
             description="Action for sensor"
             defaultMessage="Remove"
           /> 
         </Button>
-        <Button size="small" variant="contained" color="primary">
+        <Button size="small" variant="contained" color="primary" onClick={() => navigate && navigate(`${sensor.sensorName}`)}>
           <FormattedMessage
             id="dashboard.devices.edit.sensor.actions.assign"
             description="Action for sensor"
@@ -267,7 +289,6 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
   }
 
   const deviceApi = new DevicesApi(GetDefaultApiConfig());
-  const sensors = useSensorByStatus();
 
   const state: AsyncState<DeviceDetailsApiModel> = useAsync(async () => {
     const res = await deviceApi.apiDevicesNameGet({
@@ -280,7 +301,7 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
     });
 
     return res;
-  })
+  });
 
   return <DashboardFrame
     title={intl.formatMessage(messages.title)}
@@ -313,6 +334,14 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
           open={dialogOpen}
           deviceName={dialogDeviceName}
           closeDialog={closeDialog}
+          navigate={navigate}
+        />
+        <DashboardSensorDialog
+          open={sensorRemovalOpen}
+          deviceName={deviceName}
+          sensorName={sensorNameForRemoval}
+          closeDialog={closeSensorRemovalDialog}
+          refreshAfterDone
           navigate={navigate}
         />
         <Grid container spacing={3}>
