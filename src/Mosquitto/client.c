@@ -90,7 +90,11 @@ int mosq_connect(char* host, int port, int keepalive)
             return rc;
         }
         // else the system reports error, perhaps the socket is not up yet. we can retry.
-        printf("connection faild, we will try again later.\n");
+        #ifdef ENABLE_DEBUG_MACRO
+        printf("client failed to connect with the broker %d. errno: %d with %s:%d = %d\n", rc, errno, host, port, keepalive);
+        #else
+        printf("Our mosquitto client failed to connect with the broker, we will try again later.");
+        #endif 
         sleep((10 - remaining_retries) * 2); // wait for a few second to try connect again
     }
     return rc; // failed rc

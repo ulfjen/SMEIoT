@@ -5,11 +5,11 @@ using SMEIoT.Core.Interfaces;
 
 namespace SMEIoT.Infrastructure.Data
 {
-  public class OneLineFileAccessor : IOneLineFileAccessor
+  public class SystemOneLineFileAccessor : ISystemSystemOneLineFileAccessor
   {
     private readonly IFileProvider _fileProvider;
 
-    public OneLineFileAccessor(IFileProvider fileProvider)
+    public SystemOneLineFileAccessor(IFileProvider fileProvider)
     {
       _fileProvider = fileProvider;
     }

@@ -16,7 +16,7 @@ namespace SMEIoT.Core.Services
 
     public string GetHost()
     {
-      var host = _config.GetConnectionString("MqttHost");
+      var host = _config.GetSection("SMEIoT")?.GetValue<string>("MqttHost");
       if (string.IsNullOrEmpty(host))
       {
         throw new InvalidOperationException($"MqttHost is not set to a correct value. Got {host}.");
@@ -27,11 +27,12 @@ namespace SMEIoT.Core.Services
     public int GetPort()
     {
       int port;
-      var portStr = _config.GetConnectionString("MqttPort");
-      if (!int.TryParse(portStr, out port)) {
+      var portStr = _config.GetSection("SMEIoT")?.GetValue<string>("MqttPort");
+      if (int.TryParse(portStr, out port)) {
+        return port;
+      } else {
         throw new InvalidOperationException($"MqttPort is not set to a correct value. Got {portStr} but expect a number");
       }
-      return port;
     }
   }
 }

@@ -61,7 +61,7 @@ namespace SMEIoT.Infrastructure
       }
     }
 
-    public static void AddInfrastructureServices(this IServiceCollection services, IHostEnvironment env)
+    public static void AddInfrastructureServices(this IServiceCollection services, IHostEnvironment env, IConfiguration configuration)
     {
       services.AddSingleton<IClock>(SystemClock.Instance);
       if (env.IsProduction() || env.IsStaging())
@@ -77,12 +77,14 @@ namespace SMEIoT.Infrastructure
       services.AddTransient<IMosquittoBrokerMessageService, MosquittoBrokerMessageService>();
       services.AddTransient<IMqttClientConfigService, MqttClientConfigService>();
       services.AddSingleton<IMqttMessageDispatchService, MqttMessageDispatchService>();
-      services.AddSingleton<IMqttMessageIngestionService, MqttMessageIngestionService>();
-      services.AddSingleton<IFileProvider>(provider => {
-        return env.ContentRootFileProvider;
+      services.AddScoped<IMqttMessageIngestionService, MqttMessageIngestionService>();
+      services.AddTransient<IIdentifierDictionaryFileAccessor, IdentifierDictionaryFileAccessor>(provider => {
+        return new IdentifierDictionaryFileAccessor(env.ContentRootFileProvider);
       });
-      services.AddTransient<IIdentifierDictionaryFileAccessor, IdentifierDictionaryFileAccessor>();
-      services.AddTransient<IOneLineFileAccessor, OneLineFileAccessor>();
+      services.AddTransient<ISystemSystemOneLineFileAccessor, SystemOneLineFileAccessor>(provider => {
+        var fileProvider = new PhysicalFileProvider(configuration.GetSection("SMEIoT")?.GetValue<string>("SystemFilesRoot"));
+        return new SystemOneLineFileAccessor(fileProvider);
+      });
     }
   }
 }

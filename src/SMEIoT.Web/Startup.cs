@@ -52,7 +52,7 @@ namespace SMEIoT.Web
     {
       services.AddDbContext(Configuration);
 
-      services.AddInfrastructureServices(_env);
+      services.AddInfrastructureServices(_env, Configuration);
       services.ConfigureHangfire(Configuration);
       services.AddHangfire(globalConfig => { });
 

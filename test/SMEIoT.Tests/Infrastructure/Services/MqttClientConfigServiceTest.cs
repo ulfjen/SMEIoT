@@ -20,10 +20,16 @@ namespace SMEIoT.Tests.Core.Services
     public MqttClientConfigServiceTest()
     {
       _sectionMock = new Mock<IConfigurationSection>();
-      _sectionMock.Setup(s => s["MqttHost"]).Returns("127.0.0.1");
-      _sectionMock.Setup(s => s["MqttPort"]).Returns("1235");
+      var hostMock = new Mock<IConfigurationSection>();
+      hostMock.Setup(s => s.Value).Returns("127.0.0.1");
+      var portMock = new Mock<IConfigurationSection>();
+      portMock.Setup(s => s.Value).Returns("1235");
+      _sectionMock.Setup(s => s.GetSection("MqttHost")).Returns(hostMock.Object);
+      _sectionMock.Setup(s => s.GetSection("MqttPort")).Returns(portMock.Object);
       _emptyMock = new Mock<IConfigurationSection>();
-      _emptyMock.Setup(s => s[It.IsAny<string>()]).Returns("");
+      var emptyVal = new Mock<IConfigurationSection>();
+      emptyVal.Setup(s => s.Value).Returns("");
+      _emptyMock.Setup(s => s.GetSection(It.IsAny<string>())).Returns(emptyVal.Object);
     }
 
     [Fact]
@@ -31,7 +37,7 @@ namespace SMEIoT.Tests.Core.Services
     {
       // arrange
       var mock = new Mock<IConfiguration>();
-      mock.Setup(x => x.GetSection("ConnectionStrings")).Returns(_sectionMock.Object);
+      mock.Setup(x => x.GetSection("SMEIoT")).Returns(_sectionMock.Object);
       var service = new MqttClientConfigService(mock.Object);
 
       // act
@@ -45,7 +51,7 @@ namespace SMEIoT.Tests.Core.Services
     public void Host_ThrowsIfValueNotSet()
     {
       var mock = new Mock<IConfiguration>();
-      mock.Setup(x => x.GetSection("ConnectionStrings")).Returns(_emptyMock.Object);
+      mock.Setup(x => x.GetSection("SMEIoT")).Returns(_emptyMock.Object);
       var service = new MqttClientConfigService(mock.Object);
 
       Action act = () => service.GetHost();
@@ -59,7 +65,7 @@ namespace SMEIoT.Tests.Core.Services
     public void Port_Returns()
     {
       var mock = new Mock<IConfiguration>();
-      mock.Setup(x => x.GetSection("ConnectionStrings")).Returns(_sectionMock.Object);
+      mock.Setup(x => x.GetSection("SMEIoT")).Returns(_sectionMock.Object);
       var service = new MqttClientConfigService(mock.Object);
 
       var res = service.GetPort();
@@ -71,7 +77,7 @@ namespace SMEIoT.Tests.Core.Services
     public void Port_ThrowsIfValueNotSet()
     {
       var mock = new Mock<IConfiguration>();
-      mock.Setup(x => x.GetSection("ConnectionStrings")).Returns(_emptyMock.Object);
+      mock.Setup(x => x.GetSection("SMEIoT")).Returns(_emptyMock.Object);
       var service = new MqttClientConfigService(mock.Object);
 
       Action act = () => service.GetPort();

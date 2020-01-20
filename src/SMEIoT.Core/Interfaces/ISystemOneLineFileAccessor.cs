@@ -1,6 +1,6 @@
 namespace SMEIoT.Core.Interfaces
 {
-  public interface IOneLineFileAccessor
+  public interface ISystemSystemOneLineFileAccessor
   {
     string? GetLine(string path);
   }

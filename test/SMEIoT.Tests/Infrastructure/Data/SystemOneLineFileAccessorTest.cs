@@ -6,14 +6,14 @@ using Xunit;
 
 namespace SMEIoT.Tests.Infrastructure.Data
 {
-  public class OneLineFileAccessorTest
+  public class SystemOneLineFileAccessorTest
   {
-    private readonly OneLineFileAccessor _accessor;
+    private readonly SystemOneLineFileAccessor _accessor;
     
-    public OneLineFileAccessorTest()
+    public SystemOneLineFileAccessorTest()
     {
       var dir = Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..");
-      _accessor = new OneLineFileAccessor(new PhysicalFileProvider(dir));
+      _accessor = new SystemOneLineFileAccessor(new PhysicalFileProvider(dir));
     }
 
     [Fact]

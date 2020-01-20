@@ -22,7 +22,7 @@ const char* ssid     = "<ssid>";     // your network SSID (name of wifi network)
 const char* password = "<password>"; // your network password
 
 const IPAddress server = IPAddress(0,0,0,-1);  // Server IP address
-const int    port = 8884; // server's port (8883 for MQTT), I run 8884 for MQTT-TLS-PSK
+const int    port = 4588; // server's port. We run 4588 for MQTT-TLS-PSK
 
 const char*  pskIdent = "<psk>"; // PSK identity (sometimes called key hint)
 const char*  psKey = "<key>"; // PSK Key (must be hex string without 0x)

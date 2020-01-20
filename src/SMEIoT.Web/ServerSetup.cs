@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.FileProviders;
 using SMEIoT.Infrastructure.Mosquitto;
 using System.IO;
 using System;
@@ -12,16 +13,19 @@ namespace SMEIoT.Web
   {
     public static void ConfigureKestrel(WebHostBuilderContext context, KestrelServerOptions options)
     {
-      var unixSocket = context.Configuration.GetSection("SMEIoT")?.GetValue<string>("MosquittoLocalAuthenticationSocket");
-      if (unixSocket == null) {
+      var rootPath = context.Configuration.GetSection("SMEIoT")?.GetValue<string>("SystemFilesRoot");
+      if (rootPath == null) {
         return;
       }
+      var provider = new PhysicalFileProvider(rootPath);
 
-      if (File.Exists(unixSocket))
+      var unixSocketFileInfo = provider.GetFileInfo("smeiot.auth.broker");
+
+      if (unixSocketFileInfo.Exists)
       {
-        File.Delete(unixSocket);
+        File.Delete(unixSocketFileInfo.PhysicalPath);
       }
-      options.ListenUnixSocket(unixSocket, builder =>
+      options.ListenUnixSocket(unixSocketFileInfo.PhysicalPath, builder =>
       {
         builder.Protocols = HttpProtocols.None;
         builder.UseConnectionHandler<MosquittoBrokerAuthHandler>();
