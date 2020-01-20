@@ -15,8 +15,6 @@ import {
   FormattedMessage
 } from "react-intl";
 import {
-  DevicesApi,
-  DeviceDetailsApiModel,
   SensorDetailsApiModel,
   SensorsApi,
 } from "smeiot-client";
@@ -30,7 +28,6 @@ import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import Link from '@material-ui/core/Link';
 import NavigateNextIcon from "@material-ui/icons/NavigateNext";
 import { AsyncState } from "react-use/lib/useAsync";
-import StatusBadge from "../components/StatusBadge";
 import ExpandedCardHeader from "../components/ExpandedCardHeader";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
@@ -38,11 +35,7 @@ import useMenu from "../helpers/useMenu";
 import useModal from "../helpers/useModal";
 import DashboardSensorMenu from "./DashboardSensorMenu";
 import DashboardSensorDialog from "./DashboardSensorDialog";
-import useSensorByStatus from "../helpers/useSensorsByStatus";
 import CardActions from "@material-ui/core/CardActions";
-import { IDashboardDeviceRouteParams } from "./DashboardDevice";
-import SuggestTextField from "../components/SuggestTextField";
-import ProgressButton from "../components/ProgressButton";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import TwoLayerLabelAction from "../components/TwoLayerLabelAction";
 

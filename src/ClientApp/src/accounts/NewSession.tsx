@@ -131,7 +131,7 @@ const _NewSession: React.FunctionComponent<INewSessionProps & WithStyles<typeof 
                 <FormattedMessage
                   id="sessions.new.signup_action"
                   description="Action label for redirecting to sign up page"
-                  defaultMessage="Don't have an account? Sign Up"
+                  defaultMessage="Don't have an account? Sign up"
                 />
               </Link>
             </Grid>
