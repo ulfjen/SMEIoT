@@ -7,11 +7,12 @@ import Link from "@material-ui/core/Link";
 import Card from "@material-ui/core/Card";
 import CardActionArea from "@material-ui/core/CardActionArea";
 import { Link as ReachLink } from "@reach/router";
+import { darken, fade } from "@material-ui/core/styles/colorManipulator";
 
-const styles = ({ spacing }: Theme) =>
+const styles = ({ palette, spacing }: Theme) =>
   createStyles({
     root: {
-      backgroundColor: "#eeeeee",
+      backgroundColor: palette.type === 'light' ? darken(palette.background.paper, 0.1) : fade(palette.background.paper, 0.1)
     },
     action: {
       padding: spacing(2)

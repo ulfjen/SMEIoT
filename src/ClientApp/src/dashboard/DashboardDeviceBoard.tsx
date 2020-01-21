@@ -28,6 +28,7 @@ import useMenu from "../helpers/useMenu";
 import useModal from "../helpers/useModal";
 import DashboardDeviceMenu from "./DashboardDeviceMenu";
 import DashboardDeviceDialog from "./DashboardDeviceDialog";
+import { darken, fade } from "@material-ui/core/styles/colorManipulator";
 
 const styles = ({
   palette,
@@ -74,7 +75,7 @@ const styles = ({
   avatar: {
   },
   notConnected: {
-    backgroundColor: "#eeeeee", // needs to dim other component
+    backgroundColor: palette.type === 'light' ? darken(palette.background.paper, 0.1) : fade(palette.background.paper, 0.1)
   }
 });
 

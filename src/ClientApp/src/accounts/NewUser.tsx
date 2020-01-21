@@ -126,7 +126,7 @@ const _NewUser: React.FunctionComponent<INewUserProps & WithStyles<typeof styles
             type="submit"
             fullWidth
             variant="contained"
-            color="primary"
+            color="secondary"
             className={classes.submit}
           >
             <FormattedMessage
