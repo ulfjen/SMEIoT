@@ -1235,12 +1235,13 @@
       },
       "BasicBrokerApiModel": {
         "required": [
-          "host",
           "lastUpdatedAt",
           "min1",
           "min15",
           "min5",
-          "port",
+          "mqttHost",
+          "mqttPort",
+          "mqttTopicPrefix",
           "running"
         ],
         "type": "object",
@@ -1267,12 +1268,18 @@
             "format": "double",
             "nullable": true
           },
-          "host": {
-            "type": "string"
+          "mqttHost": {
+            "type": "string",
+            "readOnly": true
           },
-          "port": {
+          "mqttPort": {
             "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "readOnly": true
+          },
+          "mqttTopicPrefix": {
+            "type": "string",
+            "readOnly": true
           }
         },
         "additionalProperties": false
@@ -1408,7 +1415,6 @@
           },
           "mqttHost": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "mqttPort": {
@@ -1418,7 +1424,6 @@
           },
           "mqttTopicPrefix": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           }
         },
@@ -1516,7 +1521,6 @@
           },
           "mqttHost": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           },
           "mqttPort": {
@@ -1526,7 +1530,6 @@
           },
           "mqttTopicPrefix": {
             "type": "string",
-            "nullable": true,
             "readOnly": true
           }
         },

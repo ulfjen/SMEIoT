@@ -61,15 +61,7 @@ const messages = defineMessages({
 const _BasicBrokerCard: React.FunctionComponent<IBasicBrokerCard> = ({ classes, avatar }) => {
   const intl = useIntl();
 
-  const [broker, setBroker] = React.useState<BasicBrokerApiModel>({
-    running: false,
-    lastUpdatedAt: null,
-    min1: null,
-    min5: null,
-    min15: null,
-    host: "",
-    port: -1
-  });
+  const [broker, setBroker] = React.useState<BasicBrokerApiModel>();
   const [loading, setLoading] = React.useState<boolean>(false);
 
   const api = new BrokerApi(GetDefaultApiConfig());
@@ -89,10 +81,10 @@ const _BasicBrokerCard: React.FunctionComponent<IBasicBrokerCard> = ({ classes, 
       <ExpandedCardHeader
         title={loading ? <Skeleton variant="rect" width={100} height={25} /> : intl.formatMessage(messages.title)}
         status={<StatusBadge
-          severity={broker.running ? "success" : "error"}
+          severity={broker && broker.running ? "success" : "error"}
           badge={loading && <Skeleton variant="circle" width={14} height={14} />}
         >
-          {loading ? <Skeleton variant="rect" width={60} height={14} /> : intl.formatMessage(broker.running ? messages.running : messages.stopped)}
+          {loading ? <Skeleton variant="rect" width={60} height={14} /> : broker && intl.formatMessage(broker.running ? messages.running : messages.stopped)}
         </StatusBadge>}
         avatar={avatar && (loading ? <Skeleton variant="circle" width={40} height={40} /> : <Broker className={classes.media} />)}
       />
@@ -102,7 +94,7 @@ const _BasicBrokerCard: React.FunctionComponent<IBasicBrokerCard> = ({ classes, 
         </div>
         {loading ? <Skeleton variant="text" /> :
           <Typography color="textSecondary">
-            {broker.running ? <FormattedMessage
+            {broker && broker.running ? <FormattedMessage
               id="dashboard.components.basic_broker_card.instruct_running"
               description="Running instruction on the broker card when the broker runs normally."
               defaultMessage="The broker is operating."

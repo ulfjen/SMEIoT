@@ -5,13 +5,13 @@ import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Typography from "@material-ui/core/Typography";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, defineMessages, useIntl } from "react-intl";
 
 const styles = ({ palette, spacing }: Theme) =>
   createStyles({
     root: {
       display: "flex",
-      width: 200,
+      width: 350,
       color: palette.text.secondary
     },
     text: {
@@ -20,13 +20,23 @@ const styles = ({ palette, spacing }: Theme) =>
   });
 
 export interface ILoadFactors extends WithStyles<typeof styles> {
-  min1?: number;
-  min5?: number;
-  min15?: number;
+  min1?: number | null;
+  min5?: number | null;
+  min15?: number | null;
   className?: string;
 }
 
+const messages = defineMessages({
+  kb: {
+    id: "components.load_factors.kb",
+    descrption: "kb/s",
+    defaultMessage: "{num} KB/s"
+  }
+});
+
 const _LoadFactors: React.FunctionComponent<ILoadFactors> = ({ classes, className, min1, min5, min15 }) => {
+  const intl = useIntl();
+  
   return (
     <div className={clsx(classes.root, className)}>
       <Typography component="span" className={classes.text}>
@@ -38,15 +48,15 @@ const _LoadFactors: React.FunctionComponent<ILoadFactors> = ({ classes, classNam
       </Typography>
 
       <Typography component="span" className={classes.text}>
-        {min1}
+        {min1 && intl.formatMessage(messages.kb, { num: (min1 / 1024.0).toFixed(2) })}
       </Typography>
 
       <Typography component="span" className={classes.text}>
-        {min5}
+        {min5 && intl.formatMessage(messages.kb, { num: (min5 / 1024.0).toFixed(2) })}
       </Typography>
 
       <Typography component="span" className={classes.text}>
-        {min15}
+        {min15 && intl.formatMessage(messages.kb, { num: (min15 / 1024.0).toFixed(2) })}
       </Typography>
     </div>
   );

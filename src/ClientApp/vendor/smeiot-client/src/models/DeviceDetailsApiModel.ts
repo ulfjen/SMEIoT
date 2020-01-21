@@ -89,7 +89,7 @@ export interface DeviceDetailsApiModel {
      * @type {string}
      * @memberof DeviceDetailsApiModel
      */
-    readonly mqttHost: string | null;
+    readonly mqttHost: string;
     /**
      * 
      * @type {number}
@@ -101,7 +101,7 @@ export interface DeviceDetailsApiModel {
      * @type {string}
      * @memberof DeviceDetailsApiModel
      */
-    readonly mqttTopicPrefix: string | null;
+    readonly mqttTopicPrefix: string;
 }
 
 export function DeviceDetailsApiModelFromJSON(json: any): DeviceDetailsApiModel {

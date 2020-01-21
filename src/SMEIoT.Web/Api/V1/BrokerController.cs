@@ -17,13 +17,16 @@ namespace SMEIoT.Web.Api.V1
   {
     private readonly ILogger _logger;
     private readonly IMosquittoBrokerService _service;
+    private readonly IMqttClientConfigService _configService;
 
     public BrokerController(
       ILogger<BrokerController> logger,
-      IMosquittoBrokerService service)
+      IMosquittoBrokerService service,
+      IMqttClientConfigService configService)
     {
       _logger = logger;
       _service = service;
+      _configService = configService;
     }
 
     [HttpGet("basic")]
@@ -33,8 +36,8 @@ namespace SMEIoT.Web.Api.V1
     public async Task<ActionResult<BasicBrokerApiModel>> ShowBasic()
     {
       var load = await _service.GetBrokerLoadAsync();
-      var clientInfo = await _service.GetClientConnectionInfoAsync();
-      var res = new BasicBrokerApiModel(_service.BrokerRunning, _service.BrokerLastMessageAt, load, clientInfo);
+      var info = await _configService.SuggestConfigAsync();
+      var res = new BasicBrokerApiModel(_service.BrokerRunning, _service.BrokerLastMessageAt, load, info);
       return Ok(res);
     }
 

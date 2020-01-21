@@ -85,7 +85,6 @@ const _DashboardSensorDetails: React.FunctionComponent<IDashboardSensorDetails> 
         deviceName, sensorName
       });
       if (res !== null) {
-        console.log(res);
         setValues(res.data || []);
       }
       // setLoading(false);
@@ -93,7 +92,6 @@ const _DashboardSensorDetails: React.FunctionComponent<IDashboardSensorDetails> 
   }, [deviceName, sensorName]);
 
   const data = values.map(v => {
-    console.log(new Date(Date.parse(v.createdAt||"")).getTime());
     return {x: new Date(Date.parse(v.createdAt||"")).getTime(), y: v.value}
   });
   const appCookie = useAppCookie();

@@ -1,7 +1,6 @@
 import * as React from "react";
 import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
-import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
@@ -12,7 +11,7 @@ import { defineMessages, useIntl, FormattedMessage } from "react-intl";
 import DashboardBrokerFrame from "./DashboardBrokerFrame";
 import { Typography } from "@material-ui/core";
 
-const styles = ({ }: Theme) => createStyles({
+const styles = () => createStyles({
   container: {
   },
   fixedHeight: {
@@ -62,7 +61,6 @@ const _DashboardMqttLogs: React.FunctionComponent<IDashboardMqttLogsProps> = ({ 
         if (filter && filter.length > 0) {
           if (!req.topic.startsWith(filter)) { return; }
         }
-        console.log(hasData);
         setHasData(true);
         const log = `[${req.receivedAt}] ${req.topic}: ${req.payload}`;
         newLogs.push(log);
@@ -79,7 +77,7 @@ const _DashboardMqttLogs: React.FunctionComponent<IDashboardMqttLogsProps> = ({ 
     }
 
     createHubConnection();
-  }, [logs]);
+  }, [logs, filter]);
   
   const initialHeight = length * ITEM_SIZE;
   const containerRef = React.createRef<HTMLElement>();

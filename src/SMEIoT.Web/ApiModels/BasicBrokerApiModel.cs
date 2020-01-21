@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using NodaTime;
+using SMEIoT.Core.Entities;
 using Newtonsoft.Json;
 
 namespace SMEIoT.Web.ApiModels
@@ -18,18 +19,23 @@ namespace SMEIoT.Web.ApiModels
     public double? Min15 { get; set; }
     
     [JsonProperty(Required = Required.DisallowNull)]
-    public string Host { get; set; }
+    public string MqttHost { get; }
+    
+    public int MqttPort { get; }
+    
+    [JsonProperty(Required = Required.DisallowNull)]
+    public string MqttTopicPrefix { get; }
 
-    public int Port { get; set; }
-
-    public BasicBrokerApiModel(bool running, Instant? lastUpdatedAt, Tuple<double?, double?, double?> loads, (string, int) clientInfo)
+    public BasicBrokerApiModel(bool running, Instant? lastUpdatedAt, Tuple<double?, double?, double?> loads, MqttBrokerConnectionInformation info)
     {
       Running = running;
       LastUpdatedAt = lastUpdatedAt;
       Min1 = loads.Item1;
       Min5 = loads.Item2;
       Min15 = loads.Item3;
-      (Host, Port) = clientInfo;
+      MqttHost = info.Host;
+      MqttPort = info.Port;
+      MqttTopicPrefix = info.TopicPrefix;
     }
   }
 }

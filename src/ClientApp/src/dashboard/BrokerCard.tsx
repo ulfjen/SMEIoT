@@ -17,9 +17,11 @@ import {
 import ExpandedCardHeader from "../components/ExpandedCardHeader";
 import StatusBadge from "../components/StatusBadge";
 import useInterval from "../helpers/useInterval";
-import { BrokerApi } from "smeiot-client";
+import { BrokerApi, BasicBrokerApiModel } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
 import { ReactComponent as Broker } from "../images/broker.svg";
+import { Typography } from "@material-ui/core";
+import LoadFactors from "../components/LoadFactors";
 
 const styles = ({ spacing, transitions }: Theme) => createStyles({
   expand: {
@@ -94,9 +96,7 @@ const _BrokerCard: React.FunctionComponent<IBrokerCard> = ({ classes }) => {
   const intl = useIntl();
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [running, setRunning] = React.useState<boolean>(false);
-  const [statistics, setStatistics] = React.useState<BasicBrokerStatistics>({
-  });
+  const [broker, setBroker] = React.useState<BasicBrokerApiModel>();
 
   const handleClose = () => {
     setAnchorEl(null);
@@ -108,10 +108,7 @@ const _BrokerCard: React.FunctionComponent<IBrokerCard> = ({ classes }) => {
     setLoading(true);
     let details = await api.apiBrokerBasicGet();
     if (details === null) { return; }
-    setRunning(details.running || false);
-    setStatistics({
-      receivedMessages: ""
-    });
+    setBroker(details);
     setLoading(false);
   }
 
@@ -132,10 +129,10 @@ const _BrokerCard: React.FunctionComponent<IBrokerCard> = ({ classes }) => {
         // }
         title={loading ? <Skeleton variant="rect" width={100} height={25} /> : intl.formatMessage(messages.title)}
         status={<StatusBadge
-          severity={running ? "success" : "error"}
+          severity={broker && broker.running ? "success" : "error"}
           badge={loading && <Skeleton variant="circle" height={14} width={14} />}
         >
-          {loading ? <Skeleton variant="rect" width={60} height={14} /> : intl.formatMessage(running ? messages.running : messages.stopped)}
+          {loading ? <Skeleton variant="rect" width={60} height={14} /> : broker && intl.formatMessage(broker.running ? messages.running : messages.stopped)}
         </StatusBadge>}
         avatar={loading ? <Skeleton variant="circle" height={40} width={40} /> : <Broker className={classes.media} />}
       />
@@ -144,7 +141,21 @@ const _BrokerCard: React.FunctionComponent<IBrokerCard> = ({ classes }) => {
           <div>
             <Skeleton variant="text" /><Skeleton variant="text" /><Skeleton variant="text" />
           </div>
-          : <p>Received Messages {statistics.receivedMessages}</p>
+          : <div>
+            {broker && <LoadFactors min1={broker.min1} min5={broker.min5} min15={broker.min15} />}
+            <Typography component="p" color="textSecondary">
+              {broker && <FormattedMessage
+                id="dashboard.broker.prompt"
+                description="The prompt on the broker block."
+                defaultMessage="Current monitoring {prefix}# at {host}:{port}"
+                values={{
+                  prefix: broker.mqttTopicPrefix,
+                  host: broker.mqttHost,
+                  port: broker.mqttPort
+                }}
+              />}
+            </Typography>
+          </div>
         }
       </CardContent>
       <CardActions disableSpacing>
@@ -153,11 +164,11 @@ const _BrokerCard: React.FunctionComponent<IBrokerCard> = ({ classes }) => {
             <Button
               size="small"
               component={ReachLink}
-              to="/dashboard/broker/statistics"
+              to="../broker/statistics"
             >
               {intl.formatMessage(messages.statistics)}
             </Button>
-            <Button size="small" component={ReachLink} to="/dashboard/broker/logs?filter=$SYS/broker">
+            <Button size="small" component={ReachLink} to="../broker/logs?filter=$SYS/broker">
               {intl.formatMessage(messages.logs)}
             </Button>
           </React.Fragment>

@@ -46,7 +46,6 @@ const _UserListItem: React.FunctionComponent<IUserListItemProps & WithStyles<typ
   
   const onClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     setFocusedUserName(userName);
-    console.log(event.currentTarget); 
     setAnchorEl(event.currentTarget);
   };
   

@@ -40,11 +40,8 @@ namespace SMEIoT.Tests.Core.Services
       mock.SetupGet(a => a.BrokerPid).Returns(10000);
       var mockPlugin = new Mock<IMosquittoBrokerPluginPidService>();
       mockPlugin.SetupGet(a => a.BrokerPidFromAuthPlugin).Returns(10000);
-      var configMock = new Mock<IMqttClientConfigService>();
-      configMock.Setup(c => c.GetHost()).Returns("127.0.0.1");
-      configMock.Setup(c => c.GetPort()).Returns(12345);
 
-      _brokerService = new MosquittoBrokerService(_clock, new NullLogger<MosquittoBrokerService>(), mock.Object, mockPlugin.Object, configMock.Object);
+      _brokerService = new MosquittoBrokerService(_clock, new NullLogger<MosquittoBrokerService>(), mock.Object, mockPlugin.Object);
 
       _mqttIdentifierService = new MqttIdentifierService(_clock);
       _deviceService = new DeviceService(_dbContext, _mqttIdentifierService);

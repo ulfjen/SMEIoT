@@ -25,10 +25,12 @@ namespace SMEIoT.Web.ApiModels
 
     public Instant? LastMessageAt { get; }
 
+    [JsonProperty(Required = Required.DisallowNull)]
     public string MqttHost { get; }
     
     public int MqttPort { get; }
     
+    [JsonProperty(Required = Required.DisallowNull)]
     public string MqttTopicPrefix { get; }
 
     public BasicDeviceApiModel(Device device, MqttBrokerConnectionInformation info)

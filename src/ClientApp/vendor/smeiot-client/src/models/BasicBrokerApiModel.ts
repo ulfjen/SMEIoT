@@ -54,13 +54,19 @@ export interface BasicBrokerApiModel {
      * @type {string}
      * @memberof BasicBrokerApiModel
      */
-    host: string;
+    readonly mqttHost: string;
     /**
      * 
      * @type {number}
      * @memberof BasicBrokerApiModel
      */
-    port: number;
+    readonly mqttPort: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof BasicBrokerApiModel
+     */
+    readonly mqttTopicPrefix: string;
 }
 
 export function BasicBrokerApiModelFromJSON(json: any): BasicBrokerApiModel {
@@ -78,8 +84,9 @@ export function BasicBrokerApiModelFromJSONTyped(json: any, ignoreDiscriminator:
         'min1': json['min1'],
         'min5': json['min5'],
         'min15': json['min15'],
-        'host': json['host'],
-        'port': json['port'],
+        'mqttHost': json['mqttHost'],
+        'mqttPort': json['mqttPort'],
+        'mqttTopicPrefix': json['mqttTopicPrefix'],
     };
 }
 
@@ -97,8 +104,6 @@ export function BasicBrokerApiModelToJSON(value?: BasicBrokerApiModel | null): a
         'min1': value.min1,
         'min5': value.min5,
         'min15': value.min15,
-        'host': value.host,
-        'port': value.port,
     };
 }
 
