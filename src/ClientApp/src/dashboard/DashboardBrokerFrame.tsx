@@ -39,11 +39,11 @@ const messages = defineMessages({
   }
 });
 
-const _DashboardBrokerFrame: React.FunctionComponent<IDashboardBrokerFrameProps> = ({
+const _DashboardBrokerFrame = React.forwardRef<HTMLElement, IDashboardBrokerFrameProps>(({
   classes,
   title,
   children
-}) => {
+}, ref) => {
   const intl = useIntl();
   useTitle(title);
 
@@ -51,6 +51,7 @@ const _DashboardBrokerFrame: React.FunctionComponent<IDashboardBrokerFrameProps>
     <DashboardFrame
       title={title}
       drawer
+      ref={ref}
       direction="ltr"
       toolbarRight={
         <IconButton
@@ -93,7 +94,7 @@ const _DashboardBrokerFrame: React.FunctionComponent<IDashboardBrokerFrameProps>
       }
     />
   );
-};
+});
 
 const DashboardBrokerFrame = withStyles(styles)(_DashboardBrokerFrame);
 

@@ -157,7 +157,7 @@ const _BrokerCard: React.FunctionComponent<IBrokerCard> = ({ classes }) => {
             >
               {intl.formatMessage(messages.statistics)}
             </Button>
-            <Button size="small" component={ReachLink} to="/dashboard/broker/logs">
+            <Button size="small" component={ReachLink} to="/dashboard/broker/logs?filter=$SYS/broker">
               {intl.formatMessage(messages.logs)}
             </Button>
           </React.Fragment>

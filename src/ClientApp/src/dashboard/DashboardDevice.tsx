@@ -392,7 +392,7 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
               </Typography>}
               </CardContent>
               {!state.loading && state.value && <CardActions>
-                <Button size="small" color="primary" component={ReachLink} to={`/dashboard/broker/logs?device_name=${state.value.name}`}>
+                <Button size="small" color="primary" component={ReachLink} to={`/dashboard/broker/logs?filter=iot/${state.value.name}`}>
                   <FormattedMessage
                     id="dashboard.device.edit.actions.logs"
                     description="The action for device cards."

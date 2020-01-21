@@ -158,7 +158,7 @@ const _DashboardDeviceBoard: React.FunctionComponent<IDashboardDeviceBoard> = ({
               defaultMessage="Sensors"
             />
           </Button>
-          <Button size="small" component={ReachLink} to={`/dashboard/broker/logs?device_name=${device.name}`}>
+          <Button size="small" component={ReachLink} to={`/dashboard/broker/logs?filter=iot/${device.name}`}>
             <FormattedMessage
               id="dashboard.device.actions.logs"
               description="The action for device cards."

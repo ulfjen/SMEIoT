@@ -17,9 +17,10 @@ namespace SMEIoT.Web.Services
 
     public async Task RelayAsync(MqttMessage message)
     {
-      await _hubContext.Clients.All.SendAsync("ReceiveMessage", new
-      {
-        Message = $"[{message.ReceivedAt.ToString()}] {message.Topic}: {message.Payload}"
+      await _hubContext.Clients.All.SendAsync("ReceiveMessage", new {
+        Payload = message.Payload,
+        Topic = message.Topic,
+        ReceivedAt = message.ReceivedAt.ToString()
       });
     }
   }

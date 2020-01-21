@@ -13,17 +13,5 @@ namespace SMEIoT.Web.Hubs
     {
       _service = service;
     }
-    /// <summary>
-    /// template function. Not actually used. See MqttMessageHubDeliveryService for dispatching.
-    /// </summary>
-    /// <param name="messages"></param>
-    /// <returns></returns>
-    public async Task SendLogs(string log)
-    {
-      await Clients.All.SendAsync("ReceiveMessage", new
-      {
-        Message = log
-      });
-    }
   }
 }

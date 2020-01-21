@@ -233,7 +233,13 @@ const _DashboardUsers: React.FunctionComponent<IDashboardUsersProps> = ({ classe
     content={
       <Container maxWidth="lg" className={classes.container}>
         <Paper className={classes.filterBar}>
-          <Typography>Show:</Typography>
+          <Typography>
+            <FormattedMessage
+              id="dashboard.users.index.list.filter.prompt"
+              description="The text on prompt users"
+              defaultMessage="Show:"
+            />
+          </Typography>
           {renderFilters()}
         </Paper>
         <Paper ref={measureRef}>
