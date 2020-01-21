@@ -190,8 +190,8 @@ const _DashboardDeviceBoard: React.FunctionComponent<IDashboardDeviceBoard> = ({
 
   const unconnectedDeviceNames = devices
     .filter((d: BasicDeviceApiModel) => !d.connected)
-    .map(d => d.name);
-
+    .map(d => d.name)
+    .slice(0, 3);
 
   const state = useAsync(async () => {
     return new DevicesApi(GetDefaultApiConfig()).apiDevicesGet({
