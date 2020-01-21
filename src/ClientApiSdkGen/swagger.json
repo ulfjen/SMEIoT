@@ -227,6 +227,25 @@
         }
       }
     },
+    "/api/dashboard": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemHighlightsApiModel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/devices/bootstrap": {
       "post": {
         "tags": [
@@ -1269,6 +1288,44 @@
             "additionalProperties": {
               "type": "string"
             }
+          }
+        },
+        "additionalProperties": false
+      },
+      "SystemHighlightsApiModel": {
+        "required": [
+          "adminCount",
+          "connectedDeviceCount",
+          "connectedSensorCount",
+          "deviceCount",
+          "sensorCount",
+          "userCount"
+        ],
+        "type": "object",
+        "properties": {
+          "userCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "adminCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "connectedSensorCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sensorCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "connectedDeviceCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "deviceCount": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false

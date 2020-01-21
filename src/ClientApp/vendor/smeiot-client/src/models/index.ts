@@ -22,6 +22,7 @@ export * from './SensorCandidatesApiModel';
 export * from './SensorDetailsApiModel';
 export * from './SensorDetailsApiModelList';
 export * from './SensorLocatorBindingModel';
+export * from './SystemHighlightsApiModel';
 export * from './UserCredentialsUpdateApiModel';
 export * from './UserRolesBindingModel';
 export * from './ValidatedUserCredentialsBindingModel';
