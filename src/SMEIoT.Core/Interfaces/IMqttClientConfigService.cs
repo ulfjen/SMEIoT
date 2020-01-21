@@ -1,4 +1,6 @@
 using System;
+using System.Threading.Tasks;
+using SMEIoT.Core.Entities;
 
 namespace SMEIoT.Core.Interfaces
 {
@@ -6,5 +8,6 @@ namespace SMEIoT.Core.Interfaces
   {
     string GetHost();
     int GetPort();
+    Task<MqttBrokerConnectionInformation> SuggestConfigAsync();
   }
 }

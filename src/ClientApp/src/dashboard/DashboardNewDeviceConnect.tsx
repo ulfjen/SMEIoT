@@ -82,7 +82,7 @@ const _DashboardNewDeviceConnect: React.FunctionComponent<IDashboardNewDeviceCon
   useInterval(async () => {
     if (!state.loading && state.error === undefined) {
 
-      const res = await api.apiDevicesNameGet({
+      const res = await api.apiDevicesNameBasicGet({
         name
       });
       setConnected(res.connected || false);
@@ -119,12 +119,16 @@ const _DashboardNewDeviceConnect: React.FunctionComponent<IDashboardNewDeviceCon
                 description="Notice related when we wait for new connection"
                 defaultMessage="Now you can copy the key to your device and start to connect with the broker.
                   Once we receive a new message from the broker, we will prompt you to continue.
-                  Your device's name is {name}.
-                  Your device's key is shown below.
-                  {code}"
+                  Your device's name is {name} (PSK identity).
+                  Your device's key (PSK key) is shown below.
+                  {code}
+                  Please send messages via MQTT to {topic} at {host}:{port}."
                 values={{
                   name: <LineCode>{device.name}</LineCode>,
-                  code: <BlockCode>{device.preSharedKey}</BlockCode>
+                  code: <BlockCode>{device.preSharedKey}</BlockCode>,
+                  topic: <LineCode>{`${device.mqttTopicPrefix}${device.name}/<any_sensor_name>`}</LineCode>,
+                  host: <LineCode>{device.mqttHost}</LineCode>,
+                  port: <LineCode>{device.mqttPort}</LineCode>
                 }}
               />
             }

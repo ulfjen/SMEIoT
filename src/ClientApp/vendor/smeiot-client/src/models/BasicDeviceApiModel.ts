@@ -74,6 +74,24 @@ export interface BasicDeviceApiModel {
      * @memberof BasicDeviceApiModel
      */
     readonly lastMessageAt: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof BasicDeviceApiModel
+     */
+    readonly mqttHost: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof BasicDeviceApiModel
+     */
+    readonly mqttPort: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof BasicDeviceApiModel
+     */
+    readonly mqttTopicPrefix: string | null;
 }
 
 export function BasicDeviceApiModelFromJSON(json: any): BasicDeviceApiModel {
@@ -94,6 +112,9 @@ export function BasicDeviceApiModelFromJSONTyped(json: any, ignoreDiscriminator:
         'connected': json['connected'],
         'connectedAt': json['connectedAt'],
         'lastMessageAt': json['lastMessageAt'],
+        'mqttHost': json['mqttHost'],
+        'mqttPort': json['mqttPort'],
+        'mqttTopicPrefix': json['mqttTopicPrefix'],
     };
 }
 

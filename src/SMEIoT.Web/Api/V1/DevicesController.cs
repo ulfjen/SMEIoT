@@ -22,8 +22,9 @@ namespace SMEIoT.Web.Api.V1
     private readonly ILogger _logger;
     private readonly IDeviceService _service;
     private readonly IMqttEntityIdentifierSuggestionService _identifierSuggestService;
-    private readonly ISecureKeySuggestionService _SecureKeySuggestionService;
+    private readonly ISecureKeySuggestionService _secureKeySuggestionService;
     private readonly IMqttIdentifierService _mqttService;
+    private readonly IMqttClientConfigService _configService;
     private const int DefaultDeviceNameSuggestWordLength = 2;
     private const int DefaultKeyByteLength = 64;
 
@@ -32,13 +33,15 @@ namespace SMEIoT.Web.Api.V1
       IDeviceService service,
       IMqttEntityIdentifierSuggestionService identifierSuggestService,
       IMqttIdentifierService mqttService,
-      ISecureKeySuggestionService SecureKeySuggestionService)
+      ISecureKeySuggestionService SecureKeySuggestionService,
+      IMqttClientConfigService configService)
     {
       _logger = logger;
       _service = service;
       _mqttService = mqttService;
       _identifierSuggestService = identifierSuggestService;
-      _SecureKeySuggestionService = SecureKeySuggestionService;
+      _secureKeySuggestionService = SecureKeySuggestionService;
+      _configService = configService;
     }
 
     [HttpPost("bootstrap")]
@@ -48,7 +51,8 @@ namespace SMEIoT.Web.Api.V1
     {
       var deviceName = await _service.BootstrapDeviceWithPreSharedKeyAsync(view.Name, view.Key);
       var device = await _service.GetDeviceByNameAsync(deviceName);
-      var res = new BasicDeviceApiModel(device);
+      var info = await _configService.SuggestConfigAsync();
+      var res = new BasicDeviceApiModel(device, info);
       return CreatedAtAction(nameof(BootstrapWithPreSharedKey), res);
     }
 
@@ -61,7 +65,8 @@ namespace SMEIoT.Web.Api.V1
       var device = await _service.GetDeviceByNameAsync(name);
       await _service.UpdateDeviceConfigAsync(device, config.Key);
       device = await _service.GetDeviceByNameAsync(name);
-      var res = new BasicDeviceApiModel(device);
+      var info = await _configService.SuggestConfigAsync();
+      var res = new BasicDeviceApiModel(device, info);
       return Ok(res);
     }
 
@@ -83,7 +88,8 @@ namespace SMEIoT.Web.Api.V1
       var sensorNamesFromMqtt = await _mqttService.ListSensorNamesByDeviceNameAsync(device.Name);
       sensors.AddRange(sensorNamesFromMqtt.Except(registered).Select(n => new BasicSensorApiModel(n)));
 
-      var res = new DeviceDetailsApiModel(device, sensors);
+      var info = await _configService.SuggestConfigAsync();
+      var res = new DeviceDetailsApiModel(device, sensors, info);
       return Ok(res);
     }
 
@@ -93,7 +99,8 @@ namespace SMEIoT.Web.Api.V1
     public async Task<ActionResult<BasicDeviceApiModel>> ShowBasic(string name)
     {
       var device = await _service.GetDeviceByNameAsync(name);
-      var res = new BasicDeviceApiModel(device);
+      var info = await _configService.SuggestConfigAsync();
+      var res = new BasicDeviceApiModel(device, info);
       return Ok(res);
     }
 
@@ -113,7 +120,7 @@ namespace SMEIoT.Web.Api.V1
       var device = await _service.GetARandomUnconnectedDeviceAsync();
       return Ok(new DeviceConfigSuggestApiModel(
         await _identifierSuggestService.GenerateRandomIdentifierForDeviceAsync(DefaultDeviceNameSuggestWordLength),
-        await _SecureKeySuggestionService.GenerateSecureKeyWithByteLengthAsync(DefaultKeyByteLength),
+        await _secureKeySuggestionService.GenerateSecureKeyWithByteLengthAsync(DefaultKeyByteLength),
         device?.Name
       ));
     }
@@ -124,7 +131,7 @@ namespace SMEIoT.Web.Api.V1
     {
       return Ok(new DeviceConfigSuggestApiModel(
         null,
-        await _SecureKeySuggestionService.GenerateSecureKeyWithByteLengthAsync(DefaultKeyByteLength)
+        await _secureKeySuggestionService.GenerateSecureKeyWithByteLengthAsync(DefaultKeyByteLength)
       ));
     }
 
@@ -143,9 +150,10 @@ namespace SMEIoT.Web.Api.V1
     public async Task<ActionResult<BasicDeviceApiModelList>> Index([FromQuery] int offset = 0, [FromQuery] int limit = 10)
     {
       var list = new List<BasicDeviceApiModel>();
+      var info = await _configService.SuggestConfigAsync();
       await foreach (var device in _service.ListDevicesAsync(offset, limit))
       {
-        list.Add(new BasicDeviceApiModel(device));
+        list.Add(new BasicDeviceApiModel(device, info));
       }
 
       return Ok(new BasicDeviceApiModelList(list));

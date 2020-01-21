@@ -86,5 +86,19 @@ namespace SMEIoT.Tests.Core.Services
       var exce = Assert.Throws<InvalidOperationException>(act);
       Assert.Contains("MqttPort", exce.Message);
     }
+
+    [Fact]
+    public async Task SuggestConfigAsync_Suggests()
+    {
+      var mock = new Mock<IConfiguration>();
+      mock.Setup(x => x.GetSection("SMEIoT")).Returns(_sectionMock.Object);
+      var service = new MqttClientConfigService(mock.Object);
+
+      var config = await service.SuggestConfigAsync();
+
+      Assert.Equal("127.0.0.1", config.Host);
+      Assert.Equal(1235, config.Port);
+      Assert.Equal("iot/", config.TopicPrefix);
+    } 
   }
 }

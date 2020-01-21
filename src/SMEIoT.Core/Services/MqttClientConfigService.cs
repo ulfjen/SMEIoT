@@ -1,4 +1,6 @@
 using System;
+using System.Threading.Tasks;
+using SMEIoT.Core.Entities;
 using SMEIoT.Core.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
@@ -33,6 +35,16 @@ namespace SMEIoT.Core.Services
       } else {
         throw new InvalidOperationException($"MqttPort is not set to a correct value. Got {portStr} but expect a number");
       }
+    }
+
+    public Task<MqttBrokerConnectionInformation> SuggestConfigAsync()
+    {
+      var res = new MqttBrokerConnectionInformation {
+        Host = GetHost(),
+        Port = GetPort(),
+        TopicPrefix = MqttMessageIngestionService.SensorTopicPrefix
+      };
+      return Task.FromResult(res);
     }
   }
 }

@@ -25,7 +25,13 @@ namespace SMEIoT.Web.ApiModels
 
     public Instant? LastMessageAt { get; }
 
-    public BasicDeviceApiModel(Device device)
+    public string MqttHost { get; }
+    
+    public int MqttPort { get; }
+    
+    public string MqttTopicPrefix { get; }
+
+    public BasicDeviceApiModel(Device device, MqttBrokerConnectionInformation info)
     {
       Name = device.Name;
       CreatedAt = device.CreatedAt;
@@ -35,6 +41,9 @@ namespace SMEIoT.Web.ApiModels
       Connected = device.Connected;
       ConnectedAt = device.ConnectedAt;
       LastMessageAt = device.LastMessageAt;
+      MqttHost = info.Host;
+      MqttPort = info.Port;
+      MqttTopicPrefix = info.TopicPrefix;
     }
   }
 }

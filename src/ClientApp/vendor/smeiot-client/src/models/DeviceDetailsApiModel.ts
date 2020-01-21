@@ -84,6 +84,24 @@ export interface DeviceDetailsApiModel {
      * @memberof DeviceDetailsApiModel
      */
     readonly lastMessageAt: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof DeviceDetailsApiModel
+     */
+    readonly mqttHost: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof DeviceDetailsApiModel
+     */
+    readonly mqttPort: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof DeviceDetailsApiModel
+     */
+    readonly mqttTopicPrefix: string | null;
 }
 
 export function DeviceDetailsApiModelFromJSON(json: any): DeviceDetailsApiModel {
@@ -105,6 +123,9 @@ export function DeviceDetailsApiModelFromJSONTyped(json: any, ignoreDiscriminato
         'connected': json['connected'],
         'connectedAt': json['connectedAt'],
         'lastMessageAt': json['lastMessageAt'],
+        'mqttHost': json['mqttHost'],
+        'mqttPort': json['mqttPort'],
+        'mqttTopicPrefix': json['mqttTopicPrefix'],
     };
 }
 

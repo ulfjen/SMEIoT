@@ -1364,6 +1364,9 @@
           "connectedAt",
           "createdAt",
           "lastMessageAt",
+          "mqttHost",
+          "mqttPort",
+          "mqttTopicPrefix",
           "name",
           "preSharedKey",
           "updatedAt"
@@ -1399,6 +1402,21 @@
             "readOnly": true
           },
           "lastMessageAt": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "mqttHost": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "mqttPort": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "mqttTopicPrefix": {
             "type": "string",
             "nullable": true,
             "readOnly": true
@@ -1446,6 +1464,9 @@
           "connectedAt",
           "createdAt",
           "lastMessageAt",
+          "mqttHost",
+          "mqttPort",
+          "mqttTopicPrefix",
           "name",
           "preSharedKey",
           "sensors",
@@ -1489,6 +1510,21 @@
             "readOnly": true
           },
           "lastMessageAt": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "mqttHost": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "mqttPort": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "mqttTopicPrefix": {
             "type": "string",
             "nullable": true,
             "readOnly": true
