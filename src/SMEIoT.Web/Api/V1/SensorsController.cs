@@ -19,13 +19,17 @@ namespace SMEIoT.Web.Api.V1
     private readonly ILogger _logger;
     private readonly IDeviceService _service;
     private readonly ISensorValueService _valueService;
-    private readonly IMqttIdentifierService _mqttService;
+    private readonly IClock _clock;
 
-    public SensorsController(ILogger<SensorsController> logger, IDeviceService service, IMqttIdentifierService mqttService, ISensorValueService valueService)
+    public SensorsController(
+      ILogger<SensorsController> logger,
+      IDeviceService service,
+      IClock clock,
+      ISensorValueService valueService)
     {
       _logger = logger;
       _service = service;
-      _mqttService = mqttService;
+      _clock = clock;
       _valueService = valueService;
     }
 
@@ -55,15 +59,23 @@ namespace SMEIoT.Web.Api.V1
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Authorize]
-    public async Task<ActionResult<SensorDetailsApiModel>> Show(string deviceName, string sensorName)
+    public async Task<ActionResult<SensorDetailsApiModel>> Show(string deviceName, string sensorName, [FromQuery] Instant? startedAt = null, [FromQuery] Duration? duration = null)
     {
       var device = await _service.GetDeviceByNameAsync(deviceName);
       var sensor = await _service.GetSensorByDeviceAndNameAsync(device, sensorName);   
       var values = new List<(double, Instant)>();
 
-      await foreach (var val in _valueService.GetNumberTimeSeriesBySensorAsync(sensor, SystemClock.Instance.GetCurrentInstant()-Duration.FromSeconds(3600), Duration.FromSeconds(3600)))
+      _logger.LogTrace($"Getting query {startedAt} and {duration}");
+      if (duration == null) {
+        duration = Duration.FromSeconds(3600);
+      }
+      if (startedAt == null) {
+        startedAt = _clock.GetCurrentInstant()-duration;
+      }
+      _logger.LogTrace($"Querying from {startedAt} with {duration}");
+
+      await foreach (var val in _valueService.GetNumberTimeSeriesBySensorAsync(sensor, startedAt.Value, duration.Value))
       {
-        _logger.LogTrace($"add into list {val}");
         values.Add(val);
       }
       var res = new SensorDetailsApiModel(sensor, values);

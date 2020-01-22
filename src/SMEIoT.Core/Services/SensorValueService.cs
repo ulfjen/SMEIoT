@@ -27,6 +27,7 @@ namespace SMEIoT.Core.Services
     {
       var query = from sv in _dbContext.SensorValues
                   where sv.SensorId == sensor.Id && sv.CreatedAt >= startedAt && sv.CreatedAt < startedAt + duration
+                  orderby sv.CreatedAt
                   select sv;
       await foreach (var sv in query.AsAsyncEnumerable()) {
         yield return (sv.Value, sv.CreatedAt);

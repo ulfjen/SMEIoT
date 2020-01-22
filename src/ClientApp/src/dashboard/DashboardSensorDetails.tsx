@@ -56,7 +56,7 @@ const messages = defineMessages({
   title: {
     id: "dashboard.sensors.index.title",
     description: "Used as title in the sensor index page on the dashboard",
-    defaultMessage: "Sensors"
+    defaultMessage: "Sensor {deviceName}/{sensorName}"
   },
   fabTooltip: {
     id: "dashboard.sensors.index.action.tooltip",
@@ -72,7 +72,7 @@ const _DashboardSensorDetails: React.FunctionComponent<IDashboardSensorDetails> 
   navigate
 }) => {
   const intl = useIntl();
-  useTitle(intl.formatMessage(messages.title));
+  useTitle(intl.formatMessage(messages.title, { deviceName, sensorName }));
 
   const [values, setValues] = React.useState<NumberTimeSeriesApiModel[]>([]);
 
@@ -98,7 +98,7 @@ const _DashboardSensorDetails: React.FunctionComponent<IDashboardSensorDetails> 
 
   return (
     <DashboardFrame
-      title="Sensors"
+      title={intl.formatMessage(messages.title, { deviceName, sensorName })}
       drawer
       direction="ltr"
       toolbarRight={<UserAvatarMenu appCookie={appCookie} navigate={navigate}/>}
