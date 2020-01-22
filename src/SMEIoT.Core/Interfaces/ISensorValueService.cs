@@ -9,5 +9,6 @@ namespace SMEIoT.Core.Interfaces
   {
     Task AddSensorValueAsync(Sensor sensor, double value, Instant instant);
     IAsyncEnumerable<(double value, Instant createdAt)> GetNumberTimeSeriesBySensorAsync(Sensor sensor, Instant startedAt, Duration duration);
+    IAsyncEnumerable<(Sensor sensor, double value, Instant createdAt)> GetLastNumberOfValuesBySensorsAsync(IEnumerable<Sensor> sensors, int count);
   }
 }

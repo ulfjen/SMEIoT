@@ -122,7 +122,7 @@ namespace SMEIoT.Core.Services
       {
         throw new InvalidArgumentException("Limit can't be negative.", "limit");       
       }
-      await foreach (var sensor in _dbContext.Sensors.OrderBy(u => u.Id).Skip(offset).Take(limit).AsAsyncEnumerable())
+      await foreach (var sensor in _dbContext.Sensors.Include(s => s.Device).OrderBy(u => u.Id).Skip(offset).Take(limit).AsAsyncEnumerable())
       {
         yield return sensor;
       }

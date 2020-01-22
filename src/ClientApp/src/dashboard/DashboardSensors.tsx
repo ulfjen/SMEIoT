@@ -70,7 +70,7 @@ const _DashboardSensors: React.FunctionComponent<IDashboardSensors> = ({
 
   return (
     <DashboardFrame
-      title="Sensors"
+      title={intl.formatMessage(messages.title)}
       drawer={appCookie.admin}
       direction="ltr"
       toolbarRight={<UserAvatarMenu appCookie={appCookie} navigate={navigate} />}
@@ -80,21 +80,6 @@ const _DashboardSensors: React.FunctionComponent<IDashboardSensors> = ({
           <Grid container spacing={3}>
             <DashboardSensorBoard />
           </Grid>
-          {appCookie.admin ?
-            <Tooltip
-              title={intl.formatMessage(messages.fabTooltip)}
-              aria-label={intl.formatMessage(messages.fabTooltip)}
-            >
-              <Fab
-                color="secondary"
-                className={classes.absolute}
-                to={"/dashboard/sensors/new"}
-                component={Link}
-              >
-                <AddIcon />
-              </Fab>
-            </Tooltip>
-            : null}
         </Container>
       }
     />

@@ -15,6 +15,8 @@ import { SensorsApi, NumberTimeSeriesApiModel } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
 import { useAppCookie } from "../helpers/useCookie";
 import UserAvatarMenu from "../components/UserAvatarMenu";
+import ButtonGroup from "@material-ui/core/ButtonGroup";
+import Button from "@material-ui/core/Button";
 
 const styles = ({
   palette,
@@ -65,12 +67,17 @@ const messages = defineMessages({
   }
 });
 
+
+const FRAME_PADDING = 24;
+
 const _DashboardSensorDetails: React.FunctionComponent<IDashboardSensorDetails> = ({
   classes,
   deviceName,
   sensorName,
   navigate
 }) => {
+  if (!deviceName || !sensorName) { throw new Error("Device name and sensor name must be provided"); }
+  
   const intl = useIntl();
   useTitle(intl.formatMessage(messages.title, { deviceName, sensorName }));
 
@@ -79,10 +86,14 @@ const _DashboardSensorDetails: React.FunctionComponent<IDashboardSensorDetails> 
   React.useEffect(() => {
     (async () => {
       const api = new SensorsApi(GetDefaultApiConfig());
-      if (!deviceName || !sensorName) { return; }
 
+      let now = new Date();
+      let date = now;
+      date.setDate(now.getDate() - 5);
       const res = await api.apiSensorsDeviceNameSensorNameGet({
-        deviceName, sensorName
+        deviceName, sensorName,
+        startedAt: date.toISOString(),
+        duration: "5:00:00:05.123450000"
       });
       if (res !== null) {
         setValues(res.data || []);
@@ -96,19 +107,44 @@ const _DashboardSensorDetails: React.FunctionComponent<IDashboardSensorDetails> 
   });
   const appCookie = useAppCookie();
 
+  const initialHeight = 600;
+  const containerRef = React.createRef<HTMLElement>();
+  const measureRef = React.createRef<HTMLDivElement>();
+  const [width, setWidth] = React.useState(-1);
+  const [height, setHeight] = React.useState(initialHeight);
+  const measureAvailbleViewport = React.useCallback(() => {
+    if (measureRef.current && containerRef.current) {
+      const docHeight = containerRef.current.getBoundingClientRect().height;
+      const measureRect = measureRef.current.getBoundingClientRect();
+      setHeight(Math.min(initialHeight, docHeight - measureRect.top - FRAME_PADDING));
+      setWidth(measureRect.width);
+    }
+  }, [measureRef, containerRef, setHeight, setWidth]);
+  React.useEffect(() => measureAvailbleViewport(), [measureAvailbleViewport]);
+
   return (
     <DashboardFrame
       title={intl.formatMessage(messages.title, { deviceName, sensorName })}
       drawer
       direction="ltr"
       toolbarRight={<UserAvatarMenu appCookie={appCookie} navigate={navigate}/>}
+      ref={containerRef}
       content={
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={3}>
             {/* {value !== undefined && value ? value.map(v => <p>{v.value}</p>) : null} */}
             <Grid item xs={12}>
-              <Paper>
-                <NumberGraph data={data}/>
+              <ButtonGroup variant="contained" color="default">
+                <Button>30D</Button>
+                <Button>1D</Button>
+                <Button>1H</Button>
+                <Button>15M</Button>
+                <Button>1M</Button>
+              </ButtonGroup>
+            </Grid>
+            <Grid item xs={12}>
+              <Paper ref={measureRef}>
+                <NumberGraph width={width} height={height} data={data}/>
               </Paper>
             </Grid>
           </Grid>

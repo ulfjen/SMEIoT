@@ -491,6 +491,21 @@ namespace SMEIoT.Tests.Core.Services
     }
 
     [Fact]
+    public async Task ListSensorsAsync_ReturnsDeviceWithSensor()
+    {
+      await SeedOneSensorAsync();
+      var res = new List<Sensor>();
+
+      await foreach (var d in _service.ListSensorsAsync(0, 10))
+      {
+        res.Add(d);
+      }
+
+      Assert.Single(res);
+      Assert.Equal("device-1", res[0].Device.Name);
+    }
+
+    [Fact]
     public async Task ListSensorsByDeviceAsync_ReturnsSensors()
     {
       await SeedDefaultSensorsAsync();

@@ -6,10 +6,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using NodaTime;
+using NodaTime.Text;
 using SMEIoT.Core.Entities;
 using SMEIoT.Core.Interfaces;
+using SMEIoT.Core.Exceptions;
 using SMEIoT.Web.ApiModels;
 using SMEIoT.Web.BindingModels;
+using System.ComponentModel;
 using System;
 
 namespace SMEIoT.Web.Api.V1
@@ -40,16 +43,23 @@ namespace SMEIoT.Web.Api.V1
     public async Task<ActionResult<SensorDetailsApiModelList>> Index([FromQuery] int offset = 0, [FromQuery] int limit = 10)
     {
       var list = new List<SensorDetailsApiModel>();
+      var sensors = new Dictionary<long, Sensor>();
       await foreach (var sensor in _service.ListSensorsAsync(offset, limit))
       {
-        var vals = new List<(double, Instant)>();
-        // await foreach (var v in _valueService.GetNumberTimeSeriesBySensorAsync(sensor, SystemClock.Instance.GetCurrentInstant()-Duration.FromSeconds(3600), Duration.FromSeconds(3600)))
-        // {
-        //  vals.Add(v);
-        // }
-                Console.WriteLine("--------------------------------------------------");
-        Console.WriteLine(sensor.Name);
-        list.Add(new SensorDetailsApiModel(sensor, vals));
+        sensors[sensor.Id] = sensor;
+      }
+      
+      var valsBySensorId = new Dictionary<long, List<(double, Instant)>>();
+      await foreach (var v in _valueService.GetLastNumberOfValuesBySensorsAsync(sensors.Values, 20))
+      {
+        if (!valsBySensorId.ContainsKey(v.sensor.Id)) {
+          valsBySensorId[v.sensor.Id] = new List<(double, Instant)>();
+        }
+        valsBySensorId[v.sensor.Id].Add((v.value, v.createdAt));
+      }
+      
+      foreach (var (k, v) in valsBySensorId) {
+        list.Add(new SensorDetailsApiModel(sensors[k], v));
       }
 
       return Ok(new SensorDetailsApiModelList(list));
@@ -59,22 +69,42 @@ namespace SMEIoT.Web.Api.V1
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Authorize]
-    public async Task<ActionResult<SensorDetailsApiModel>> Show(string deviceName, string sensorName, [FromQuery] Instant? startedAt = null, [FromQuery] Duration? duration = null)
+    public async Task<ActionResult<SensorDetailsApiModel>> Show(string deviceName, string sensorName, [FromQuery(Name = "started_at")] string? startedAtQuery = null, [FromQuery(Name = "duration")] string? durationQuery = null)
     {
       var device = await _service.GetDeviceByNameAsync(deviceName);
       var sensor = await _service.GetSensorByDeviceAndNameAsync(device, sensorName);   
       var values = new List<(double, Instant)>();
 
-      _logger.LogTrace($"Getting query {startedAt} and {duration}");
-      if (duration == null) {
-        duration = Duration.FromSeconds(3600);
+      _logger.LogTrace($"Getting query {startedAtQuery} and {durationQuery}");
+      var duration = Duration.FromSeconds(3600);
+      if (durationQuery != null) {
+        try {
+          var converted = TypeDescriptor.GetConverter(typeof(Duration)).ConvertFromString(durationQuery);
+          if (converted != null) {
+            duration = (Duration)converted;
+          }
+        } catch (NotSupportedException) {
+          // do nothing
+        } catch (UnparsableValueException exception) {
+          throw new InvalidArgumentException(exception.Message, "duration");
+        }
       }
-      if (startedAt == null) {
-        startedAt = _clock.GetCurrentInstant()-duration;
+      var startedAt = _clock.GetCurrentInstant()-duration;
+      if (startedAtQuery != null) {
+        try {
+          var converted = TypeDescriptor.GetConverter(typeof(Instant)).ConvertFromString(startedAtQuery);
+          if (converted != null) {
+            startedAt = (Instant)converted;
+          }
+        } catch (NotSupportedException) {
+          // do nothing
+        } catch (UnparsableValueException exception) {
+          throw new InvalidArgumentException(exception.Message, "started_at");
+        }
       }
       _logger.LogTrace($"Querying from {startedAt} with {duration}");
 
-      await foreach (var val in _valueService.GetNumberTimeSeriesBySensorAsync(sensor, startedAt.Value, duration.Value))
+      await foreach (var val in _valueService.GetNumberTimeSeriesBySensorAsync(sensor, startedAt, duration))
       {
         values.Add(val);
       }

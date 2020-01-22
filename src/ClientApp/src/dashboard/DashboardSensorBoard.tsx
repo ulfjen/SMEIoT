@@ -14,6 +14,7 @@ import {
 } from "@reach/router";
 import { SensorDetailsApiModel, SensorsApi } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
+import useInterval from "../helpers/useInterval";
 
 const styles = ({
   palette,
@@ -78,21 +79,19 @@ const _DashboardSensorBoard: React.FunctionComponent<IDashboardSensorBoard> = ({
   };
   const [sensors, setSensors] = React.useState<Array<SensorDetailsApiModel>>([]);
 
-  React.useEffect(() => {
-    (async () => {
-      const api = new SensorsApi(GetDefaultApiConfig());
-      var res = await api.apiSensorsGet({
-        offset: 0,
-        limit: 10
-      });
-      if (res !== null && res.sensors) {
-        setSensors(res.sensors);
-      } else {
-        setLoadingError(true);
-      }
-      setLoading(false);
-    })();
-  }, []);
+  useInterval(async () => {
+    const api = new SensorsApi(GetDefaultApiConfig());
+    var res = await api.apiSensorsGet({
+      offset: 0,
+      limit: 10
+    });
+    if (res !== null && res.sensors) {
+      setSensors(res.sensors);
+    } else {
+      setLoadingError(true);
+    }
+    setLoading(false);
+  }, 3000);
 
   const renderSensors = () => {
     return sensors.map((s: SensorDetailsApiModel) => (
