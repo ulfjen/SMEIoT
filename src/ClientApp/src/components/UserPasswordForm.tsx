@@ -23,6 +23,7 @@ const styles = ({spacing}: Theme) => createStyles({
 interface IUserPasswordFormProps extends WithStyles<typeof styles> {
   handleSubmit: (event: React.MouseEvent<HTMLFormElement>) => Promise<void> | undefined;
   required?: boolean;
+  color?: "primary" | "secondary";
   userCredentials: UserCredentials;
 }
 
@@ -39,8 +40,13 @@ const messages = defineMessages({
   }
 });
 
-const _UserPasswordForm: React.FunctionComponent<IUserPasswordFormProps & WithStyles<typeof styles>> = ({classes, children, handleSubmit, userCredentials, required}) => {
+const _UserPasswordForm: React.FunctionComponent<IUserPasswordFormProps & WithStyles<typeof styles>> = ({
+  classes, children, handleSubmit, userCredentials, required, color
+}) => {
   const intl = useIntl();
+  if (color === undefined) {
+    color = "primary";
+  }
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const userNameChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,6 +70,7 @@ const _UserPasswordForm: React.FunctionComponent<IUserPasswordFormProps & WithSt
       fullWidth
       label={intl.formatMessage(messages.username)}
       autoComplete="userName"
+      color={color}
       autoFocus
       onChange={userNameChanged}
       error={userCredentials.userNameError.length > 0}
@@ -74,6 +81,7 @@ const _UserPasswordForm: React.FunctionComponent<IUserPasswordFormProps & WithSt
       margin="normal"
       required={required}
       fullWidth
+      color={color}
       label={intl.formatMessage(messages.password)}
       type={showPassword ? "text" : "password"}
       autoComplete="password"

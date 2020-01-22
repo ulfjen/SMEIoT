@@ -32,7 +32,7 @@ const styles = ({ palette, spacing, zIndex }: Theme) => createStyles({
   },
   avatar: {
     margin: spacing(1),
-    backgroundColor: palette.secondary.main,
+    backgroundColor: palette.primary.main,
   },
   submit: {
     margin: spacing(3, 0, 2),
@@ -110,7 +110,8 @@ const _NewSession: React.FunctionComponent<INewSessionProps & WithStyles<typeof 
         <Typography component="h1" variant="h5">
           {intl.formatMessage(messages.title)}
         </Typography>
-        <UserPasswordForm handleSubmit={handleSubmit}
+        <UserPasswordForm
+          handleSubmit={handleSubmit}
           userCredentials={uc}>
           <Button
             type="submit"

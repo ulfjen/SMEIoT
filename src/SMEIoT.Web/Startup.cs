@@ -210,7 +210,7 @@ namespace SMEIoT.Web
       {
         endpoints.MapControllerRoute("create_login", "/login", new { controller = "Sessions", action = "Create" });
         endpoints.MapControllerRoute("destroy_login", "/logout", new { controller = "Sessions", action = "Destroy" },
-          new { httpMethod = new HttpMethodRouteConstraint(nameof(HttpMethod.Delete)) });
+          new { httpMethod = new HttpMethodRouteConstraint(new []{ nameof(HttpMethod.Delete), nameof(HttpMethod.Get) } ) });
 
         endpoints.MapControllers();
         endpoints.MapHub<MqttHub>("/dashboard/mqtt_hub");

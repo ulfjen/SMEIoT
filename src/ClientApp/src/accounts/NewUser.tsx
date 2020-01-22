@@ -4,7 +4,7 @@ import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import PersonOutlineIcon from '@material-ui/icons/PersonOutline';
 import Typography from '@material-ui/core/Typography';
 import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
@@ -32,10 +32,14 @@ const styles = ({ palette, spacing, zIndex }: Theme) => createStyles({
   },
   avatar: {
     margin: spacing(1),
-    backgroundColor: palette.secondary.main,
+    backgroundColor: palette.success.light,
   },
   submit: {
     margin: spacing(3, 0, 2),
+    backgroundColor: palette.success.light,
+    "&:hover": {
+      backgroundColor: palette.success.main,
+    }
   },
   backdrop: {
     zIndex: zIndex.drawer + 1,
@@ -114,7 +118,7 @@ const _NewUser: React.FunctionComponent<INewUserProps & WithStyles<typeof styles
       </Backdrop>
       <div className={classes.paper}>
         <Avatar className={classes.avatar}>
-          <LockOutlinedIcon />
+          <PersonOutlineIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
           {intl.formatMessage(messages.title)}
@@ -126,7 +130,6 @@ const _NewUser: React.FunctionComponent<INewUserProps & WithStyles<typeof styles
             type="submit"
             fullWidth
             variant="contained"
-            color="secondary"
             className={classes.submit}
           >
             <FormattedMessage

@@ -37,7 +37,7 @@ namespace SMEIoT.Web.Controllers
     }
 
     [HttpDelete("/logout")]
-    [Authorize]
+    [HttpGet("/logout")]
     public IActionResult Destroy(string? returnUrl = null)
     {
       _signInManager.SignOutAsync();
