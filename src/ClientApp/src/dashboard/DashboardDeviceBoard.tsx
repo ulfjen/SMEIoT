@@ -195,7 +195,8 @@ const _DashboardDeviceBoard: React.FunctionComponent<IDashboardDeviceBoard> = ({
 
   const state = useAsync(async () => {
     return new DevicesApi(GetDefaultApiConfig()).apiDevicesGet({
-      // start, limit
+      offset: 0,
+      limit: 1000000000
     }).then((res: BasicDeviceApiModelList) => {
       if (!res.devices) {
         return;

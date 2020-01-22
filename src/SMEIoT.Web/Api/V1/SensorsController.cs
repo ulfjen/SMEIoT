@@ -50,7 +50,7 @@ namespace SMEIoT.Web.Api.V1
       }
       
       var valsBySensorId = new Dictionary<long, List<(double, Instant)>>();
-      await foreach (var v in _valueService.GetLastNumberOfValuesBySensorsAsync(sensors.Values, 20))
+      await foreach (var v in _valueService.GetLastNumberOfValuesBySensorsAsync(sensors.Values, 10))
       {
         if (!valsBySensorId.ContainsKey(v.sensor.Id)) {
           valsBySensorId[v.sensor.Id] = new List<(double, Instant)>();
