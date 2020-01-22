@@ -908,6 +908,20 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "started_at",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "duration",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -1638,6 +1652,7 @@
         "required": [
           "data",
           "deviceName",
+          "duration",
           "sensorName",
           "startedAt",
           "status"
@@ -1654,7 +1669,12 @@
             }
           },
           "startedAt": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
+          },
+          "duration": {
+            "type": "string",
+            "nullable": true
           },
           "sensorName": {
             "type": "string"

@@ -9,6 +9,8 @@ using Microsoft.Extensions.Logging;
 
 namespace SMEIoT.Core.Services
 {
+  /// we are relying on database to store values fast enough
+  /// of course it can be improved by batche. Now we relies on PG's parameters and our runloop interval
   public class MqttMessageIngestionService : IMqttMessageIngestionService
   {
     public const string SensorTopicPrefix = "iot/";
@@ -47,16 +49,17 @@ namespace SMEIoT.Core.Services
         return;
       }
 
-      _logger.LogTrace($"{parsed.Substring(0, splitP)}:{parsed.Substring(splitP+1)}");
 
       string deviceName = String.Empty;
       string sensorName = String.Empty;
 
       try {
         deviceName = parsed.Substring(0, splitP);
+        _logger.LogTrace($"deviceName {deviceName}");
         await _mqttIdentifierService.RegisterDeviceNameAsync(deviceName);
 
         sensorName = parsed.Substring(splitP+1);
+        _logger.LogTrace($"sensorName {sensorName}");
         await _mqttIdentifierService.RegisterSensorNameWithDeviceNameAsync(sensorName, deviceName);
       }
       catch (InvalidArgumentException exception) {
@@ -88,6 +91,7 @@ namespace SMEIoT.Core.Services
         return;
       }
 
+      _logger.LogTrace($"recording {message.Payload}");
       if (Double.TryParse(message.Payload, out var doubleVal)) {
         await _valueService.AddSensorValueAsync(sensor, doubleVal, message.ReceivedAt);
       } else {

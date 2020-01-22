@@ -1,9 +1,6 @@
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
-import Tooltip from "@material-ui/core/Tooltip";
-import Fab from "@material-ui/core/Fab";
 import * as React from "react";
-import AddIcon from "@material-ui/icons/Add";
 import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
@@ -11,7 +8,7 @@ import withStyles from "@material-ui/core/styles/withStyles";
 import DashboardFrame from "./DashboardFrame";
 import DashboardSensorBoard from "./DashboardSensorBoard";
 import { defineMessages, useIntl } from "react-intl";
-import { Link, RouteComponentProps } from "@reach/router";
+import { RouteComponentProps } from "@reach/router";
 import { useTitle } from 'react-use';
 import UserAvatarMenu from '../components/UserAvatarMenu';
 import { useAppCookie } from "../helpers/useCookie";
@@ -70,7 +67,7 @@ const _DashboardSensors: React.FunctionComponent<IDashboardSensors> = ({
 
   return (
     <DashboardFrame
-      title="Sensors"
+      title={intl.formatMessage(messages.title)}
       drawer={appCookie.admin}
       direction="ltr"
       toolbarRight={<UserAvatarMenu appCookie={appCookie} navigate={navigate} />}
@@ -80,21 +77,6 @@ const _DashboardSensors: React.FunctionComponent<IDashboardSensors> = ({
           <Grid container spacing={3}>
             <DashboardSensorBoard />
           </Grid>
-          {appCookie.admin ?
-            <Tooltip
-              title={intl.formatMessage(messages.fabTooltip)}
-              aria-label={intl.formatMessage(messages.fabTooltip)}
-            >
-              <Fab
-                color="secondary"
-                className={classes.absolute}
-                to={"/dashboard/sensors/new"}
-                component={Link}
-              >
-                <AddIcon />
-              </Fab>
-            </Tooltip>
-            : null}
         </Container>
       }
     />

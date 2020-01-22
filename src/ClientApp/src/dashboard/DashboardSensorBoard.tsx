@@ -7,13 +7,22 @@ import { WithStyles } from "@material-ui/styles/withStyles";
 import createStyles from "@material-ui/styles/createStyles";
 import { Theme } from "@material-ui/core/styles/createMuiTheme";
 import withStyles from "@material-ui/core/styles/withStyles";
-import SensorCard from "../components/SensorCard";
 import { FormattedMessage } from "react-intl";
 import {
   Link as ReachLink
 } from "@reach/router";
 import { SensorDetailsApiModel, SensorsApi } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
+import useInterval from "../helpers/useInterval";
+import Card from "@material-ui/core/Card";
+import CardActionArea from "@material-ui/core/CardActionArea";
+import CardMedia from "@material-ui/core/CardMedia";
+import CardContent from "@material-ui/core/CardContent";
+import CardActions from "@material-ui/core/CardActions";
+import Typography from "@material-ui/core/Typography";
+import Button from "@material-ui/core/Button";
+import TwoLayerLabelAction from "../components/TwoLayerLabelAction";
+import NumberGraph from "../components/NumberGraph";
 
 const styles = ({
   palette,
@@ -54,6 +63,9 @@ const styles = ({
       transition: transitions.create("transform", {
         duration: transitions.duration.shortest
       })
+    },
+    sensorCard: {
+  
     }
   });
 
@@ -69,35 +81,70 @@ const _DashboardSensorBoard: React.FunctionComponent<IDashboardSensorBoard> = ({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [loadingError, setLoadingError] = React.useState<boolean>(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const handleMoreClicked = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
 
   const handleClose = () => {
     setAnchorEl(null);
   };
   const [sensors, setSensors] = React.useState<Array<SensorDetailsApiModel>>([]);
 
-  React.useEffect(() => {
-    (async () => {
-      const api = new SensorsApi(GetDefaultApiConfig());
-      var res = await api.apiSensorsGet({
-        offset: 0,
-        limit: 10
-      });
-      if (res !== null && res.sensors) {
-        setSensors(res.sensors);
-      } else {
-        setLoadingError(true);
-      }
-      setLoading(false);
-    })();
-  }, []);
+  useInterval(async () => {
+    const api = new SensorsApi(GetDefaultApiConfig());
+    var res = await api.apiSensorsGet({
+      offset: 0,
+      limit: 1000000000
+    });
+    if (res !== null && res.sensors) {
+      setSensors(res.sensors);
+    } else {
+      setLoadingError(true);
+    }
+    setLoading(false);
+  }, 3000);
+
+  const measureRef = React.createRef<HTMLDivElement>();
+  const [width, setWidth] = React.useState(-1);
+  const measureAvailbleViewport = React.useCallback(() => {
+    if (measureRef.current) {
+      const measureRect = measureRef.current.getBoundingClientRect();
+      setWidth(measureRect.width);
+    }
+  }, [measureRef, setWidth]);
+  React.useEffect(() => measureAvailbleViewport(), [measureAvailbleViewport]);
+
+  const renderSensor = (sensor: SensorDetailsApiModel, idx: number) => {
+    const data = sensor.data.map(v => {
+      return {x: new Date(Date.parse(v.createdAt)).getTime(), y: v.value}
+    });
+    return <Card ref={idx === 0 ? measureRef : undefined} key={idx} className={classes.sensorCard}>
+    <CardActionArea>
+      <CardMedia
+        component="div"
+        title="placeholder"
+      >
+        <NumberGraph width={width} height={200} data={data}/>
+      </CardMedia>
+      <CardContent>
+        <TwoLayerLabelAction first={sensor.deviceName} second={sensor.sensorName} />
+        <Typography variant="body2" color="textSecondary" component="p">
+          secondary placeholder
+        </Typography>
+      </CardContent>
+    </CardActionArea>
+    <CardActions>
+      <Button size="small" color="primary">
+        Assign
+        </Button>
+      <Button size="small" color="primary">
+        Details
+      </Button>
+    </CardActions>
+  </Card>;
+  }
 
   const renderSensors = () => {
-    return sensors.map((s: SensorDetailsApiModel) => (
-      <Grid item xs={4}>
-        <SensorCard sensor={s} key={s.sensorName} onMoreClick={handleMoreClicked} />
+    return sensors.map((s: SensorDetailsApiModel, idx: number) => (
+      <Grid item xs={12} md={6} lg={4}>
+        {renderSensor(s, idx)}
       </Grid>
     ));
   };

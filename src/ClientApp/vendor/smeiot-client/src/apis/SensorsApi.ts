@@ -35,6 +35,8 @@ import {
 export interface SensorsApiApiSensorsDeviceNameSensorNameGetRequest {
     deviceName: string;
     sensorName: string;
+    startedAt?: string;
+    duration?: string;
 }
 
 export interface SensorsApiApiSensorsGetRequest {
@@ -63,6 +65,14 @@ export class SensorsApi extends runtime.BaseAPI {
         }
 
         const queryParameters: runtime.HTTPQuery = {};
+
+        if (requestParameters.startedAt !== undefined) {
+            queryParameters['started_at'] = requestParameters.startedAt;
+        }
+
+        if (requestParameters.duration !== undefined) {
+            queryParameters['duration'] = requestParameters.duration;
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 

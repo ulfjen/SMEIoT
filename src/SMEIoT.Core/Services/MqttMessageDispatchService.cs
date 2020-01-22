@@ -30,7 +30,7 @@ namespace SMEIoT.Core.Services
         await relay.RelayAsync(message);
       } catch (Exception exception) {
         if (logger != null) {
-          logger.LogWarning($"Exception thrown when process mqtt message {message.Topic}. {exception.Message}");
+          logger.LogWarning($"Exception was thrown when processes mqtt message {message.Topic}. {exception.Message}");
         }
 
       }

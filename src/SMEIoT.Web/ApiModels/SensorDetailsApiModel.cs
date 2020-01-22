@@ -13,12 +13,17 @@ namespace SMEIoT.Web.ApiModels
     [JsonProperty(Required = Required.DisallowNull)]
     public IEnumerable<NumberTimeSeriesApiModel> Data { get; set; }
     
-    public Instant StartedAt { get; set; }
+    public Instant? StartedAt { get; set; }
+    public Duration? Duration { get; set; }
 
-    public SensorDetailsApiModel(Sensor sensor, IEnumerable<(double, Instant)> values) : base(sensor)
+    public SensorDetailsApiModel(Sensor sensor, IList<(double, Instant)> values) : base(sensor)
     {
       DeviceName = sensor.Device.Name;
 
+      if (values.Count > 0) {
+        StartedAt = values[0].Item2;
+        Duration = values[values.Count-1].Item2 - StartedAt;
+      }
       var intermediate = new List<NumberTimeSeriesApiModel>();
       foreach (var item in values)
       {

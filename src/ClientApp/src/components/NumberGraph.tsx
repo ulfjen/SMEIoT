@@ -11,7 +11,7 @@ import {
 
 export default function NumberGraph(props: any) {
   return (
-      <XYPlot width={600} height={300} xType="time">
+      <XYPlot width={props.width} height={props.height} xType="time">
         <HorizontalGridLines style={{stroke: '#B7E9ED'}} />
         <VerticalGridLines style={{stroke: '#B7E9ED'}} />
         <XAxis
