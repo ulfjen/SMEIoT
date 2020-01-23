@@ -39,7 +39,7 @@ namespace SMEIoT.Tests.Core.Services
       _dbContext.Dispose();
     }
 
-    private async Task SeedDefaultCaseAsync()
+    private async Task<(Sensor, Sensor)> SeedDefaultCaseAsync()
     {
       var roleManager = IdentityHelpers.BuildRoleManager(ApplicationDbContextHelper.BuildTestDbContext());
       await roleManager.CreateAsync(new IdentityRole<long>("Admin"));
@@ -79,43 +79,16 @@ namespace SMEIoT.Tests.Core.Services
       _dbContext.UserSensors.Add(new UserSensor { UserId = user2.Id, Sensor = sensor1 });
 
       await _dbContext.SaveChangesAsync();
-    }
-
-    [Fact]
-    public async Task AssignSensorToUserAsync_ThrowsErrorsIfNoSensor()
-    {
-      // arrange
-      await SeedDefaultCaseAsync();
-
-      // act
-      Task Act() => _service.AssignSensorToUserAsync("not-exist-sensor", "normal-user-1");
-
-      // assert
-      var exce = await Record.ExceptionAsync(Act);
-      Assert.NotNull(exce);
-      var notFound = Assert.IsType<EntityNotFoundException>(exce);
-      Assert.Equal("sensorName", notFound.ParamName);
-    }
-    
-    [Fact]
-    public async Task AssignSensorToUserAsync_ThrowsErrorsIfNoUser()
-    {
-      await SeedDefaultCaseAsync();
-
-      Task Act() => _service.AssignSensorToUserAsync("sensor-1", "not-existing-user-1");
-
-      var exce = await Record.ExceptionAsync(Act);
-      Assert.NotNull(exce);
-      var notFound = Assert.IsType<EntityNotFoundException>(exce);
-      Assert.Equal("userName", notFound.ParamName);
+      return (sensor1, sensor2);
     }
 
     [Fact]
     public async Task AssignSensorToUserAsync_Assigns()
     {
-      await SeedDefaultCaseAsync();
+      var (sensor1, sensor2) = await SeedDefaultCaseAsync();
+      var user = await _userManager.FindByNameAsync("normal-user-3");
 
-      await _service.AssignSensorToUserAsync("sensor-1", "normal-user-3");
+      await _service.AssignSensorToUserAsync(sensor1, user);
 
       // throws nothing
     }
@@ -123,9 +96,10 @@ namespace SMEIoT.Tests.Core.Services
     [Fact]
     public async Task AssignSensorToUserAsync_ThrowsIfAlreadyAssigned()
     {
-      await SeedDefaultCaseAsync();
+      var (sensor1, sensor2) = await SeedDefaultCaseAsync();
+      var user = await _userManager.FindByNameAsync("normal-user-1");
 
-      Task Act() => _service.AssignSensorToUserAsync("sensor-1", "normal-user-1");
+      Task Act() => _service.AssignSensorToUserAsync(sensor1, user);
 
       var exce = await Record.ExceptionAsync(Act);
       Assert.NotNull(exce);
@@ -133,38 +107,12 @@ namespace SMEIoT.Tests.Core.Services
     }
 
     [Fact]
-    public async Task RevokeSensorFromUserAsync_ThrowsErrorsIfNoSensor()
-    {
-      await SeedDefaultCaseAsync();
-
-      Task Act() => _service.RevokeSensorFromUserAsync("not-exist-sensor", "normal-user-1");
-
-      // assert
-      var exce = await Record.ExceptionAsync(Act);
-      Assert.NotNull(exce);
-      var notFound = Assert.IsType<EntityNotFoundException>(exce);
-      Assert.Equal("sensorName", notFound.ParamName);
-    }
-
-    [Fact]
-    public async Task RevokeSensorFromUserAsync_ThrowsErrorsIfNoUser()
-    {
-      await SeedDefaultCaseAsync();
-
-      Task Act() => _service.RevokeSensorFromUserAsync("sensor-1", "not-existing-user-1");
-
-      var exce = await Record.ExceptionAsync(Act);
-      Assert.NotNull(exce);
-      var notFound = Assert.IsType<EntityNotFoundException>(exce);
-      Assert.Equal("userName", notFound.ParamName);
-    }
-
-    [Fact]
     public async Task RevokeSensorFromUserAsync_ThrowsErrorsIfNoAssignment()
     {
-      await SeedDefaultCaseAsync();
+      var (sensor1, sensor2) = await SeedDefaultCaseAsync();
+      var user = await _userManager.FindByNameAsync("normal-user-3");
 
-      Task Act() => _service.RevokeSensorFromUserAsync("sensor-1", "normal-user-3");
+      Task Act() => _service.RevokeSensorFromUserAsync(sensor1, user);
 
       var exce = await Record.ExceptionAsync(Act);
       Assert.NotNull(exce);
@@ -175,90 +123,51 @@ namespace SMEIoT.Tests.Core.Services
     [Fact]
     public async Task RevokeSensorFromUserAsync_Revokes()
     {
-      await SeedDefaultCaseAsync();
+      var (sensor1, sensor2) = await SeedDefaultCaseAsync();
+      var user = await _userManager.FindByNameAsync("normal-user-1");
 
-      await _service.RevokeSensorFromUserAsync("sensor-1", "normal-user-1");
+      await _service.RevokeSensorFromUserAsync(sensor1, user);
     }
 
     [Fact]
-    public async Task DoesUserAllowToSeeSensorAsync_ThrowsErrorsIfNoSensor()
+    public async Task CanUserSeeSensorAsync_ReturnsFalseIfNoAssignment()
     {
-      await SeedDefaultCaseAsync();
+      var (sensor1, sensor2) = await SeedDefaultCaseAsync();
+      var user = await _userManager.FindByNameAsync("normal-user-3");
 
-      Task Act() => _service.DoesUserAllowToSeeSensorAsync("not-exist-sensor", "normal-user-1");
-
-      // assert
-      var exce = await Record.ExceptionAsync(Act);
-      Assert.NotNull(exce);
-      var notFound = Assert.IsType<EntityNotFoundException>(exce);
-      Assert.Equal("sensorName", notFound.ParamName);
-    }
-
-    [Fact]
-    public async Task DoesUserAllowToSeeSensorAsync_ThrowsErrorsIfNoUser()
-    {
-      await SeedDefaultCaseAsync();
-
-      Task Act() => _service.DoesUserAllowToSeeSensorAsync("sensor-1", "not-existing-user-1");
-
-      var exce = await Record.ExceptionAsync(Act);
-      Assert.NotNull(exce);
-      var notFound = Assert.IsType<EntityNotFoundException>(exce);
-      Assert.Equal("userName", notFound.ParamName);
-    }
-
-    [Fact]
-    public async Task DoesUserAllowToSeeSensorAsync_ReturnsFalseIfNoAssignment()
-    {
-      await SeedDefaultCaseAsync();
-
-      var result = await _service.DoesUserAllowToSeeSensorAsync("sensor-1", "normal-user-3");
+      var result = await _service.CanUserSeeSensorAsync(sensor1, user);
 
       Assert.False(result);
     }
 
     [Fact]
-    public async Task DoesUserAllowToSeeSensorAsync_ReturnsTrue()
+    public async Task CanUserSeeSensorAsync_ReturnsTrue()
     {
-      await SeedDefaultCaseAsync();
+      var (sensor1, sensor2) = await SeedDefaultCaseAsync();
+      var user = await _userManager.FindByNameAsync("normal-user-1");
 
-      var result = await _service.DoesUserAllowToSeeSensorAsync("sensor-1", "normal-user-1");
+      var result = await _service.CanUserSeeSensorAsync(sensor1, user);
 
       Assert.True(result);
     }
 
     [Fact]
-    public async Task DoesUserAllowToSeeSensorAsync_ReturnsTrueForAdmin()
+    public async Task CanUserSeeSensorAsync_ReturnsTrueForAdmin()
     {
-      await SeedDefaultCaseAsync();
+      var (sensor1, sensor2) = await SeedDefaultCaseAsync();
+      var admin = await _userManager.FindByNameAsync("admin-user");
 
-      Assert.True(await _service.DoesUserAllowToSeeSensorAsync("sensor-1", "admin-user"));
-      Assert.True(await _service.DoesUserAllowToSeeSensorAsync("sensor-2", "admin-user"));
+      Assert.True(await _service.CanUserSeeSensorAsync(sensor1, admin));
+      Assert.True(await _service.CanUserSeeSensorAsync(sensor2, admin));
     }
 
     [Fact]
-    public async Task ListAllowedUsersBySensorNameAsync_ThrowsErrorsIfNoSensor()
+    public async Task ListAllowedUsersBySensorAsync_ReturnsUsers()
     {
-      await SeedDefaultCaseAsync();
-
-      Func<Task> act = async () =>
-      {
-        await foreach (var _ in _service.ListAllowedUsersBySensorNameAsync("not-exist-sensor")) { }
-      };
-
-      var exce = await Record.ExceptionAsync(act);
-      Assert.NotNull(exce);
-      var notFound = Assert.IsType<EntityNotFoundException>(exce);
-      Assert.Equal("sensorName", notFound.ParamName);
-    }
-
-    [Fact]
-    public async Task ListAllowedUsersBySensorNameAsync_ReturnsUsers()
-    {
-      await SeedDefaultCaseAsync();
+      var (sensor1, sensor2) = await SeedDefaultCaseAsync();
 
       var users = new List<User>();
-      await foreach (var u in _service.ListAllowedUsersBySensorNameAsync("sensor-1"))
+      await foreach (var u in _service.ListAllowedUsersBySensorAsync(sensor1))
       {
         users.Add(u);
       }
@@ -270,12 +179,12 @@ namespace SMEIoT.Tests.Core.Services
     }
 
     [Fact]
-    public async Task ListAllowedUsersBySensorNameAsync_ReturnsEmptyList()
+    public async Task ListAllowedUsersBySensorAsync_ReturnsEmptyList()
     {
-      await SeedDefaultCaseAsync();
+      var (sensor1, sensor2) = await SeedDefaultCaseAsync();
 
       var users = new List<User>();
-      await foreach (var u in _service.ListAllowedUsersBySensorNameAsync("sensor-1"))
+      await foreach (var u in _service.ListAllowedUsersBySensorAsync(sensor1))
       {
       }
 
@@ -283,28 +192,13 @@ namespace SMEIoT.Tests.Core.Services
     }
 
     [Fact]
-    public async Task ListSensorsByUserNameAsync_ThrowsErrorsIfNoUser()
-    {
-      await SeedDefaultCaseAsync();
-
-      Func<Task> act = async () =>
-      {
-        await foreach (var _ in _service.ListSensorsByUserNameAsync("not-exist-user")) { }
-      };
-
-      var exce = await Record.ExceptionAsync(act);
-      Assert.NotNull(exce);
-      var notFound = Assert.IsType<EntityNotFoundException>(exce);
-      Assert.Equal("userName", notFound.ParamName);
-    }
-
-    [Fact]
     public async Task ListSensorsByUserNameAsync_ReturnsSensors()
     {
       await SeedDefaultCaseAsync();
+      var user = await _userManager.FindByNameAsync("normal-user-1");
 
       var sensors = new List<Sensor>();
-      await foreach (var u in _service.ListSensorsByUserNameAsync("normal-user-1"))
+      await foreach (var u in _service.ListSensorsByUserNameAsync(user))
       {
         sensors.Add(u);
       }
@@ -318,9 +212,10 @@ namespace SMEIoT.Tests.Core.Services
     public async Task ListSensorsByUserNameAsync_ReturnsEmptyList()
     {
       await SeedDefaultCaseAsync();
+      var user = await _userManager.FindByNameAsync("normal-user-3");
 
       var sensors = new List<Sensor>();
-      await foreach (var u in _service.ListSensorsByUserNameAsync("normal-user-3"))
+      await foreach (var u in _service.ListSensorsByUserNameAsync(user))
       {
         sensors.Add(u);
       }
@@ -332,9 +227,10 @@ namespace SMEIoT.Tests.Core.Services
     public async Task ListSensorsByUserNameAsync_ReturnsEverythingForAdmin()
     {
       await SeedDefaultCaseAsync();
+      var admin = await _userManager.FindByNameAsync("admin-user");
 
       var sensors = new List<Sensor>();
-      await foreach (var u in _service.ListSensorsByUserNameAsync("admin-user"))
+      await foreach (var u in _service.ListSensorsByUserNameAsync(admin))
       {
         sensors.Add(u);
       }

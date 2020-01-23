@@ -120,7 +120,8 @@ const _DashboardNewDeviceConnect: React.FunctionComponent<IDashboardNewDeviceCon
                 defaultMessage="Now you can copy the key to your device and start to connect with the broker.
                   Once we receive a new message from the broker, we will prompt you to continue.
                   Your device's name is {name} (PSK identity).
-                  Your device's key (PSK key) is shown below.
+                  Your device's key (PSK key) is shown below. Now the key has {bytes} ({chars} characters).
+                  We know that ESP32 only supports 32 bytes (64 characters) key.
                   {code}
                   Please send messages via MQTT to {topic} at {host}:{port}."
                 values={{
@@ -128,7 +129,9 @@ const _DashboardNewDeviceConnect: React.FunctionComponent<IDashboardNewDeviceCon
                   code: <BlockCode>{device.preSharedKey}</BlockCode>,
                   topic: <LineCode>{`${device.mqttTopicPrefix}${device.name}/<any_sensor_name>`}</LineCode>,
                   host: <LineCode>{device.mqttHost}</LineCode>,
-                  port: <LineCode>{device.mqttPort}</LineCode>
+                  port: <LineCode>{device.mqttPort}</LineCode>,
+                  bytes: <b>{device.preSharedKey.length / 2} bytes</b>, 
+                  chars: device.preSharedKey.length
                 }}
               />
             }

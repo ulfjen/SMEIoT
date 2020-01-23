@@ -89,6 +89,7 @@ const _DashboardSensorBoard: React.FunctionComponent<IDashboardSensorBoard> = ({
 
   useInterval(async () => {
     const api = new SensorsApi(GetDefaultApiConfig());
+    setLoading(true);
     var res = await api.apiSensorsGet({
       offset: 0,
       limit: 1000000000
@@ -99,7 +100,7 @@ const _DashboardSensorBoard: React.FunctionComponent<IDashboardSensorBoard> = ({
       setLoadingError(true);
     }
     setLoading(false);
-  }, 3000);
+  }, 30000);
 
   const measureRef = React.createRef<HTMLDivElement>();
   const [width, setWidth] = React.useState(-1);
@@ -131,11 +132,19 @@ const _DashboardSensorBoard: React.FunctionComponent<IDashboardSensorBoard> = ({
       </CardContent>
     </CardActionArea>
     <CardActions>
-      <Button size="small" color="primary">
-        Assign
-        </Button>
-      <Button size="small" color="primary">
-        Details
+      <Button size="small" color="default" component={ReachLink} to={`../devices/${sensor.deviceName}/${sensor.sensorName}`}>
+        <FormattedMessage
+          id="dashboard.sensors.index.sensor_card.actions.assign"
+          description="Action for sensor card"
+          defaultMessage="Assign"
+        /> 
+      </Button>
+      <Button size="small" color="primary" component={ReachLink} to={`${sensor.deviceName}/${sensor.sensorName}`}>
+        <FormattedMessage
+          id="dashboard.sensors.index.sensor_card.actions.details"
+          description="Action for sensor card"
+          defaultMessage="Details"
+        /> 
       </Button>
     </CardActions>
   </Card>;

@@ -264,11 +264,7 @@ const _DashboardDeviceCredential: React.FunctionComponent<IDashboardDeviceCreden
                 />
               </Link>
               <Link component={ReachLink} color="inherit" to="..">
-                <FormattedMessage
-                  id="dashboard.devices.edit.breadcrumb.edit"
-                  description="The label at the breadcrumb for devices"
-                  defaultMessage="Configuration"
-                />
+                {deviceName}
               </Link>
               <Typography color="textPrimary">
                 <FormattedMessage
@@ -296,7 +292,13 @@ const _DashboardDeviceCredential: React.FunctionComponent<IDashboardDeviceCreden
                     <FormattedMessage
                       id="dashboard.device.edit_credentials.instructions"
                       description="The instruction for device's credentials."
-                      defaultMessage="You can reconfigure device's credentials. Existing connections will still works until they reconnect to us."
+                      defaultMessage="You can reconfigure device's credentials. Existing connections will still works until they reconnect to us.
+                        Now the key has {bytes} ({chars} characters).
+                        We know that ESP32 only supports 32 bytes (64 characters) key."
+                      values={{
+                        bytes: <b>{key.length / 2} bytes</b>, 
+                        chars: key.length
+                      }}
                     />
                   </Typography>
                   <SuggestTextField

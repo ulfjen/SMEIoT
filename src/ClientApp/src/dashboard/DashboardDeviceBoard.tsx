@@ -151,13 +151,13 @@ const _DashboardDeviceBoard: React.FunctionComponent<IDashboardDeviceBoard> = ({
 
         </CardContent>
         {device && <CardActions disableSpacing>
-          <Button size="small" component={ReachLink} to={`/dashboard/sensors?device_name=${device.name}`}>
+          {/* this is confusing with other buttons. remove it for now <Button size="small" component={ReachLink} to={`/dashboard/sensors?device_name=${device.name}`}>
             <FormattedMessage
               id="dashboard.device.actions.see_sensor"
               description="The action to go to see sensors in the device card."
               defaultMessage="Sensors"
             />
-          </Button>
+          </Button> */}
           <Button size="small" component={ReachLink} to={`/dashboard/broker/logs?filter=iot/${device.name}`}>
             <FormattedMessage
               id="dashboard.device.actions.logs"

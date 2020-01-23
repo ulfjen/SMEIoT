@@ -17,6 +17,8 @@ import {
 import {
   SensorDetailsApiModel,
   SensorsApi,
+  SensorAssignmentsApi,
+  AdminUserApiModelList,
 } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
 import DashboardFrame from "./DashboardFrame";
@@ -173,6 +175,11 @@ const _DashboardSensorAssignment: React.FunctionComponent<IDashboardSensorAssign
     return res;
   }));
 
+  const uApi = new SensorAssignmentsApi(GetDefaultApiConfig());
+  const userState: AsyncState<AdminUserApiModelList> = useAsync(async () => await uApi.apiSensorsDeviceNameSensorNameUsersGet({
+    deviceName, sensorName
+  }));
+
   // const [handlingEdit, setHandlingEdit] = React.useState<boolean>(false);
 
   // const handleEdit = async () => {
@@ -238,11 +245,7 @@ const _DashboardSensorAssignment: React.FunctionComponent<IDashboardSensorAssign
                 />
               </Link>
               <Link component={ReachLink} color="inherit" to="..">
-                <FormattedMessage
-                  id="dashboard.devices.edit.breadcrumb.edit"
-                  description="The label at the breadcrumb for devices"
-                  defaultMessage="Configuration"
-                />
+                {deviceName}
               </Link>
               <Typography color="textPrimary">
                 <FormattedMessage

@@ -15,6 +15,9 @@
 
 import * as runtime from '../runtime';
 import {
+    AdminUserApiModelList,
+    AdminUserApiModelListFromJSON,
+    AdminUserApiModelListToJSON,
     AssignUserSensorBindingModel,
     AssignUserSensorBindingModelFromJSON,
     AssignUserSensorBindingModelToJSON,
@@ -26,17 +29,20 @@ import {
     SensorAssignmentApiModelToJSON,
 } from '../models';
 
-export interface SensorAssignmentsApiApiSensorsNameUsersGetRequest {
-    name: string;
+export interface SensorAssignmentsApiApiSensorsDeviceNameSensorNameUsersGetRequest {
+    deviceName: string;
+    sensorName: string;
 }
 
-export interface SensorAssignmentsApiApiSensorsNameUsersPostRequest {
-    name: string;
+export interface SensorAssignmentsApiApiSensorsDeviceNameSensorNameUsersPostRequest {
+    deviceName: string;
+    sensorName: string;
     assignUserSensorBindingModel: AssignUserSensorBindingModel;
 }
 
-export interface SensorAssignmentsApiApiSensorsNameUsersUserNameDeleteRequest {
-    name: string;
+export interface SensorAssignmentsApiApiSensorsDeviceNameSensorNameUsersUserNameDeleteRequest {
+    deviceName: string;
+    sensorName: string;
     userName: string;
 }
 
@@ -47,9 +53,13 @@ export class SensorAssignmentsApi extends runtime.BaseAPI {
 
     /**
      */
-    async apiSensorsNameUsersGetRaw(requestParameters: SensorAssignmentsApiApiSensorsNameUsersGetRequest): Promise<runtime.ApiResponse<object>> {
-        if (requestParameters.name === null || requestParameters.name === undefined) {
-            throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling apiSensorsNameUsersGet.');
+    async apiSensorsDeviceNameSensorNameUsersGetRaw(requestParameters: SensorAssignmentsApiApiSensorsDeviceNameSensorNameUsersGetRequest): Promise<runtime.ApiResponse<AdminUserApiModelList>> {
+        if (requestParameters.deviceName === null || requestParameters.deviceName === undefined) {
+            throw new runtime.RequiredError('deviceName','Required parameter requestParameters.deviceName was null or undefined when calling apiSensorsDeviceNameSensorNameUsersGet.');
+        }
+
+        if (requestParameters.sensorName === null || requestParameters.sensorName === undefined) {
+            throw new runtime.RequiredError('sensorName','Required parameter requestParameters.sensorName was null or undefined when calling apiSensorsDeviceNameSensorNameUsersGet.');
         }
 
         const queryParameters: runtime.HTTPQuery = {};
@@ -57,31 +67,35 @@ export class SensorAssignmentsApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/api/sensors/{name}/users`.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters.name))),
+            path: `/api/sensors/{deviceName}/{sensorName}/users`.replace(`{${"deviceName"}}`, encodeURIComponent(String(requestParameters.deviceName))).replace(`{${"sensorName"}}`, encodeURIComponent(String(requestParameters.sensorName))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
         });
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => AdminUserApiModelListFromJSON(jsonValue));
     }
 
     /**
      */
-    async apiSensorsNameUsersGet(requestParameters: SensorAssignmentsApiApiSensorsNameUsersGetRequest): Promise<object> {
-        const response = await this.apiSensorsNameUsersGetRaw(requestParameters);
+    async apiSensorsDeviceNameSensorNameUsersGet(requestParameters: SensorAssignmentsApiApiSensorsDeviceNameSensorNameUsersGetRequest): Promise<AdminUserApiModelList> {
+        const response = await this.apiSensorsDeviceNameSensorNameUsersGetRaw(requestParameters);
         return await response.value();
     }
 
     /**
      */
-    async apiSensorsNameUsersPostRaw(requestParameters: SensorAssignmentsApiApiSensorsNameUsersPostRequest): Promise<runtime.ApiResponse<SensorAssignmentApiModel>> {
-        if (requestParameters.name === null || requestParameters.name === undefined) {
-            throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling apiSensorsNameUsersPost.');
+    async apiSensorsDeviceNameSensorNameUsersPostRaw(requestParameters: SensorAssignmentsApiApiSensorsDeviceNameSensorNameUsersPostRequest): Promise<runtime.ApiResponse<SensorAssignmentApiModel>> {
+        if (requestParameters.deviceName === null || requestParameters.deviceName === undefined) {
+            throw new runtime.RequiredError('deviceName','Required parameter requestParameters.deviceName was null or undefined when calling apiSensorsDeviceNameSensorNameUsersPost.');
+        }
+
+        if (requestParameters.sensorName === null || requestParameters.sensorName === undefined) {
+            throw new runtime.RequiredError('sensorName','Required parameter requestParameters.sensorName was null or undefined when calling apiSensorsDeviceNameSensorNameUsersPost.');
         }
 
         if (requestParameters.assignUserSensorBindingModel === null || requestParameters.assignUserSensorBindingModel === undefined) {
-            throw new runtime.RequiredError('assignUserSensorBindingModel','Required parameter requestParameters.assignUserSensorBindingModel was null or undefined when calling apiSensorsNameUsersPost.');
+            throw new runtime.RequiredError('assignUserSensorBindingModel','Required parameter requestParameters.assignUserSensorBindingModel was null or undefined when calling apiSensorsDeviceNameSensorNameUsersPost.');
         }
 
         const queryParameters: runtime.HTTPQuery = {};
@@ -91,7 +105,7 @@ export class SensorAssignmentsApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json; v=1.0';
 
         const response = await this.request({
-            path: `/api/sensors/{name}/users`.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters.name))),
+            path: `/api/sensors/{deviceName}/{sensorName}/users`.replace(`{${"deviceName"}}`, encodeURIComponent(String(requestParameters.deviceName))).replace(`{${"sensorName"}}`, encodeURIComponent(String(requestParameters.sensorName))),
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -103,20 +117,24 @@ export class SensorAssignmentsApi extends runtime.BaseAPI {
 
     /**
      */
-    async apiSensorsNameUsersPost(requestParameters: SensorAssignmentsApiApiSensorsNameUsersPostRequest): Promise<SensorAssignmentApiModel> {
-        const response = await this.apiSensorsNameUsersPostRaw(requestParameters);
+    async apiSensorsDeviceNameSensorNameUsersPost(requestParameters: SensorAssignmentsApiApiSensorsDeviceNameSensorNameUsersPostRequest): Promise<SensorAssignmentApiModel> {
+        const response = await this.apiSensorsDeviceNameSensorNameUsersPostRaw(requestParameters);
         return await response.value();
     }
 
     /**
      */
-    async apiSensorsNameUsersUserNameDeleteRaw(requestParameters: SensorAssignmentsApiApiSensorsNameUsersUserNameDeleteRequest): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters.name === null || requestParameters.name === undefined) {
-            throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling apiSensorsNameUsersUserNameDelete.');
+    async apiSensorsDeviceNameSensorNameUsersUserNameDeleteRaw(requestParameters: SensorAssignmentsApiApiSensorsDeviceNameSensorNameUsersUserNameDeleteRequest): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.deviceName === null || requestParameters.deviceName === undefined) {
+            throw new runtime.RequiredError('deviceName','Required parameter requestParameters.deviceName was null or undefined when calling apiSensorsDeviceNameSensorNameUsersUserNameDelete.');
+        }
+
+        if (requestParameters.sensorName === null || requestParameters.sensorName === undefined) {
+            throw new runtime.RequiredError('sensorName','Required parameter requestParameters.sensorName was null or undefined when calling apiSensorsDeviceNameSensorNameUsersUserNameDelete.');
         }
 
         if (requestParameters.userName === null || requestParameters.userName === undefined) {
-            throw new runtime.RequiredError('userName','Required parameter requestParameters.userName was null or undefined when calling apiSensorsNameUsersUserNameDelete.');
+            throw new runtime.RequiredError('userName','Required parameter requestParameters.userName was null or undefined when calling apiSensorsDeviceNameSensorNameUsersUserNameDelete.');
         }
 
         const queryParameters: runtime.HTTPQuery = {};
@@ -124,7 +142,7 @@ export class SensorAssignmentsApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/api/sensors/{name}/users/{userName}`.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters.name))).replace(`{${"userName"}}`, encodeURIComponent(String(requestParameters.userName))),
+            path: `/api/sensors/{deviceName}/{sensorName}/users/{userName}`.replace(`{${"deviceName"}}`, encodeURIComponent(String(requestParameters.deviceName))).replace(`{${"sensorName"}}`, encodeURIComponent(String(requestParameters.sensorName))).replace(`{${"userName"}}`, encodeURIComponent(String(requestParameters.userName))),
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
@@ -135,8 +153,8 @@ export class SensorAssignmentsApi extends runtime.BaseAPI {
 
     /**
      */
-    async apiSensorsNameUsersUserNameDelete(requestParameters: SensorAssignmentsApiApiSensorsNameUsersUserNameDeleteRequest): Promise<void> {
-        await this.apiSensorsNameUsersUserNameDeleteRaw(requestParameters);
+    async apiSensorsDeviceNameSensorNameUsersUserNameDelete(requestParameters: SensorAssignmentsApiApiSensorsDeviceNameSensorNameUsersUserNameDeleteRequest): Promise<void> {
+        await this.apiSensorsDeviceNameSensorNameUsersUserNameDeleteRaw(requestParameters);
     }
 
 }

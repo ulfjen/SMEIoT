@@ -196,10 +196,10 @@ const _DashboardNewDevice: React.FunctionComponent<IDashboardNewDeviceProps> = (
               <FormattedMessage
                 id="dashboard.devices.new.step1.notice"
                 description="Notice related with how we can add a new device"
-                defaultMessage="We create a pre-shared key (PSK) for your new device and install it in our MQTT broker. 
-                  When your device connects with the broker with this key, you can add its sensor values in the dashboard.
-                  Registed and unused keys are shown on the devices page. 
-                  Notice: the MQTT broker will be reloaded to install the key."
+                defaultMessage="We create a pre-shared key (PSK) for your new device and install it in our MQTT broker.
+                  Be aware of your device's supported key length.
+                  When your device connects with the broker with this key, you can add its sensor in the dashboard.
+                  Registered and unused devices are shown on the devices page. "
               />
               <FormControl error={true}>
                 <FormHelperText>{entityError}</FormHelperText>

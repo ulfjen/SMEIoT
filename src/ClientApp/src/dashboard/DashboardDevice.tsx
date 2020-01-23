@@ -55,6 +55,7 @@ import useSensorByStatus from "../helpers/useSensorsByStatus";
 import CardActions from "@material-ui/core/CardActions";
 import DashboardSensorDialog from "./DashboardSensorDialog";
 import NumberGraph from "../components/NumberGraph";
+import LineCode from "../components/LineCode";
 
 const styles = ({ typography, palette, spacing, zIndex }: Theme) => createStyles({
   container: {
@@ -393,7 +394,13 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
                 <FormattedMessage
                   id="dashboard.device.edit.instructions"
                   description="The instruction for device."
-                  defaultMessage="Configured sensors will show here. But if a device is reconfigured or you believe it sends messages while this page doesn't show anything, refresh the page."
+                  defaultMessage="Configured sensors will be shown here. But if a device is reconfigured or you believe it sends messages while this page doesn't show anything, refresh the page.
+                  Any MQTT messages sent to {topic} at {host}:{port} will appear in different sections below."
+                  values={{
+                    topic: state.value && <LineCode>{`${state.value.mqttTopicPrefix}${state.value.name}/<any_sensor_name>`}</LineCode>,
+                    host: state.value && <LineCode>{state.value.mqttHost}</LineCode>,
+                    port: state.value && <LineCode>{state.value.mqttPort}</LineCode>,
+                  }}
                 />
               </Typography>}
               </CardContent>

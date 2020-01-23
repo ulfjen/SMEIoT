@@ -645,14 +645,22 @@
         }
       }
     },
-    "/api/sensors/{name}/users": {
+    "/api/sensors/{deviceName}/{sensorName}/users": {
       "post": {
         "tags": [
           "SensorAssignments"
         ],
         "parameters": [
           {
-            "name": "name",
+            "name": "deviceName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sensorName",
             "in": "path",
             "required": true,
             "schema": {
@@ -709,7 +717,15 @@
         ],
         "parameters": [
           {
-            "name": "name",
+            "name": "deviceName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sensorName",
             "in": "path",
             "required": true,
             "schema": {
@@ -723,7 +739,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserIAsyncEnumerable"
+                  "$ref": "#/components/schemas/AdminUserApiModelList"
                 }
               }
             }
@@ -751,14 +767,22 @@
         }
       }
     },
-    "/api/sensors/{name}/users/{userName}": {
+    "/api/sensors/{deviceName}/{sensorName}/users/{userName}": {
       "delete": {
         "tags": [
           "SensorAssignments"
         ],
         "parameters": [
           {
-            "name": "name",
+            "name": "deviceName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sensorName",
             "in": "path",
             "required": true,
             "schema": {
@@ -1663,10 +1687,6 @@
             "type": "string"
           }
         },
-        "additionalProperties": false
-      },
-      "UserIAsyncEnumerable": {
-        "type": "object",
         "additionalProperties": false
       },
       "SensorDetailsApiModelList": {
