@@ -16,12 +16,6 @@ import {
   useIntl,
   FormattedMessage
 } from "react-intl";
-import {
-  BasicSensorApiModel,
-  DevicesApi,
-  DeviceDetailsApiModel,
-  BasicSensorApiModelStatusEnum
-} from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
 import TwoLayerLabelAction from "../components/TwoLayerLabelAction";
 import DashboardFrame from "./DashboardFrame";
@@ -50,6 +44,8 @@ import useMenu from "../helpers/useMenu";
 import useModal from "../helpers/useModal";
 import CardActions from "@material-ui/core/CardActions";
 import DashboardSensorDialog from "./DashboardSensorDialog";
+import { SettingsApi, SettingApiModel, SettingApiModelList } from "smeiot-client";
+import TextField from "@material-ui/core/TextField";
 
 const styles = ({ typography, palette, spacing, zIndex }: Theme) => createStyles({
   container: {
@@ -132,9 +128,9 @@ export interface IDashboardSettingsProps extends RouteComponentProps<IDashboardS
 
 const messages = defineMessages({
   title: {
-    id: "dashboard.devices.edit.title",
-    description: "Used as title in the edit device page on the dashboard",
-    defaultMessage: "Configure device"
+    id: "dashboard.settings.index.title",
+    description: "Used as title in the settings page on the dashboard",
+    defaultMessage: "Settings"
   },
   nameLabel: {
     id: "dashboard.devices.new.step1.name",
@@ -158,13 +154,65 @@ const messages = defineMessages({
   },
 });
 
+interface SettingValue {
+  value: object;
+  defaultValue: object;
+};
+
 const _DashboardSettings: React.FunctionComponent<IDashboardSettingsProps> = ({
   classes,
   navigate
 }) => {
   const intl = useIntl();
   useTitle(intl.formatMessage(messages.title));
+  const [values, setValues] = React.useState<Record<string, SettingValue>>({});
 
+  const state = useAsync(async () => {
+    const api = new SettingsApi(GetDefaultApiConfig());
+    return api.apiSettingsGet().then(res => {
+      const update: Record<string, SettingValue> = {};
+      res.settings.forEach((s: SettingApiModel) => {
+        update[s.name] = {
+          defaultValue: s.defaultValue,
+          value: s.value
+        };
+      });
+      console.log(update);
+      setValues({ ...values, ...update });
+      return res;
+    });
+  });
+
+  const onSettingValueChanged = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, name: string) => {
+    e.preventDefault();
+    const update: Record<string, SettingValue> = {};
+    update[name] = {
+      defaultValue: values[name].defaultValue,
+      // @ts-ignore
+      value: e.currentTarget.value
+    };
+
+    setValues({ ...values, ...update });
+  };
+
+
+  const renderSettings = () => {
+    return state.value && state.value.settings.map((f, idx) => <TextField
+      key={idx}
+      label={f.name}
+      style={{ margin: 8 }}
+      value={values[f.name] && values[f.name].value}
+      onChange={(e) => onSettingValueChanged(e, f.name)}
+      helperText={f.description}
+      fullWidth
+      margin="normal"
+      InputLabelProps={{
+        shrink: true,
+      }}
+      variant="filled"
+    />)
+  };
+   
   return <DashboardFrame
     title={intl.formatMessage(messages.title)}
     drawer
@@ -185,6 +233,13 @@ const _DashboardSettings: React.FunctionComponent<IDashboardSettingsProps> = ({
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <Card>
+              <CardContent>
+                {state.loading ? <div><Skeleton variant="text"/><Skeleton variant="text"/><Skeleton variant="text"/></div> : 
+                  <div>
+                    {state.value && renderSettings(state.value)}
+                  </div>
+                }
+              </CardContent>
             </Card>
           </Grid>
         </Grid>
