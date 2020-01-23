@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using SMEIoT.Core.Entities;
 using SMEIoT.Core.Interfaces;
-using Microsoft.Extensions.Logging;
+using SMEIoT.Core.Services;
 using Microsoft.Extensions.Configuration;
 
 namespace SMEIoT.Core.Services

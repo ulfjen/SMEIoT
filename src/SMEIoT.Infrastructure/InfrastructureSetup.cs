@@ -75,8 +75,8 @@ namespace SMEIoT.Infrastructure
       services.AddSingleton<IMosquittoBrokerService, MosquittoBrokerService>();
       services.AddSingleton<IMosquittoClientAuthenticationService, MosquittoClientAuthenticationService>();
       services.AddTransient<IMosquittoBrokerMessageService, MosquittoBrokerMessageService>();
-      services.AddTransient<IMqttClientConfigService, MqttClientConfigService>();
       services.AddSingleton<IMqttMessageDispatchService, MqttMessageDispatchService>();
+      services.AddTransient<IMqttClientConfigService, MqttClientConfigService>();
       services.AddScoped<IMqttMessageIngestionService, MqttMessageIngestionService>();
       services.AddTransient<IIdentifierDictionaryFileAccessor, IdentifierDictionaryFileAccessor>(provider => {
         return new IdentifierDictionaryFileAccessor(env.ContentRootFileProvider);
@@ -85,6 +85,7 @@ namespace SMEIoT.Infrastructure
         var fileProvider = new PhysicalFileProvider(configuration.GetSection("SMEIoT")?.GetValue<string>("SystemFilesRoot"));
         return new SystemOneLineFileAccessor(fileProvider);
       });
+      services.AddTransient<IServerNetworkInterfacesIpAccessor, ServerNetworkInterfacesIpAccessor>();
     }
   }
 }
