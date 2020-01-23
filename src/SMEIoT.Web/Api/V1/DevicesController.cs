@@ -25,8 +25,10 @@ namespace SMEIoT.Web.Api.V1
     private readonly ISecureKeySuggestionService _secureKeySuggestionService;
     private readonly IMqttIdentifierService _mqttService;
     private readonly IMqttClientConfigService _configService;
+    private readonly IServerHostAccessor _hostAccessor;
     private const int DefaultDeviceNameSuggestWordLength = 2;
     private const int DefaultKeyByteLength = 64;
+    private const bool ShowRealHostOrIp = true;
 
     public DevicesController(
       ILogger<DevicesController> logger,
@@ -34,7 +36,8 @@ namespace SMEIoT.Web.Api.V1
       IMqttEntityIdentifierSuggestionService identifierSuggestService,
       IMqttIdentifierService mqttService,
       ISecureKeySuggestionService SecureKeySuggestionService,
-      IMqttClientConfigService configService)
+      IMqttClientConfigService configService,
+      IServerHostAccessor hostAccessor)
     {
       _logger = logger;
       _service = service;
@@ -42,6 +45,17 @@ namespace SMEIoT.Web.Api.V1
       _identifierSuggestService = identifierSuggestService;
       _secureKeySuggestionService = SecureKeySuggestionService;
       _configService = configService;
+      _hostAccessor = hostAccessor;
+    }
+
+    private async Task<MqttBrokerConnectionInformation> GetBrokerConnectionInfoAsync()
+    {
+      var info = await _configService.SuggestConfigAsync();
+      var realHost = await _hostAccessor.GetServerHostAsync();
+      if (ShowRealHostOrIp && realHost != null) {
+        info.Host = realHost;
+      }
+      return info;
     }
 
     [HttpPost("bootstrap")]
@@ -51,7 +65,7 @@ namespace SMEIoT.Web.Api.V1
     {
       var deviceName = await _service.BootstrapDeviceWithPreSharedKeyAsync(view.Name, view.Key);
       var device = await _service.GetDeviceByNameAsync(deviceName);
-      var info = await _configService.SuggestConfigAsync();
+      var info = await GetBrokerConnectionInfoAsync();
       var res = new BasicDeviceApiModel(device, info);
       return CreatedAtAction(nameof(BootstrapWithPreSharedKey), res);
     }
@@ -65,7 +79,7 @@ namespace SMEIoT.Web.Api.V1
       var device = await _service.GetDeviceByNameAsync(name);
       await _service.UpdateDeviceConfigAsync(device, config.Key);
       device = await _service.GetDeviceByNameAsync(name);
-      var info = await _configService.SuggestConfigAsync();
+      var info = await GetBrokerConnectionInfoAsync();
       var res = new BasicDeviceApiModel(device, info);
       return Ok(res);
     }
@@ -88,7 +102,7 @@ namespace SMEIoT.Web.Api.V1
       var sensorNamesFromMqtt = await _mqttService.ListSensorNamesByDeviceNameAsync(device.Name);
       sensors.AddRange(sensorNamesFromMqtt.Except(registered).Select(n => new BasicSensorApiModel(n)));
 
-      var info = await _configService.SuggestConfigAsync();
+      var info = await GetBrokerConnectionInfoAsync();
       var res = new DeviceDetailsApiModel(device, sensors, info);
       return Ok(res);
     }
@@ -99,7 +113,7 @@ namespace SMEIoT.Web.Api.V1
     public async Task<ActionResult<BasicDeviceApiModel>> ShowBasic(string name)
     {
       var device = await _service.GetDeviceByNameAsync(name);
-      var info = await _configService.SuggestConfigAsync();
+      var info = await GetBrokerConnectionInfoAsync();
       var res = new BasicDeviceApiModel(device, info);
       return Ok(res);
     }
@@ -150,7 +164,7 @@ namespace SMEIoT.Web.Api.V1
     public async Task<ActionResult<BasicDeviceApiModelList>> Index([FromQuery] int offset = 0, [FromQuery] int limit = 10)
     {
       var list = new List<BasicDeviceApiModel>();
-      var info = await _configService.SuggestConfigAsync();
+      var info = await GetBrokerConnectionInfoAsync();
       await foreach (var device in _service.ListDevicesAsync(offset, limit))
       {
         list.Add(new BasicDeviceApiModel(device, info));

@@ -18,15 +18,29 @@ namespace SMEIoT.Web.Api.V1
     private readonly ILogger _logger;
     private readonly IMosquittoBrokerService _service;
     private readonly IMqttClientConfigService _configService;
+    private readonly IServerHostAccessor _hostAccessor;
+    private const bool ShowRealHostOrIp = true;
 
     public BrokerController(
       ILogger<BrokerController> logger,
       IMosquittoBrokerService service,
-      IMqttClientConfigService configService)
+      IMqttClientConfigService configService,
+      IServerHostAccessor hostAccessor)
     {
       _logger = logger;
       _service = service;
       _configService = configService;
+      _hostAccessor = hostAccessor;
+    }
+
+    private async Task<MqttBrokerConnectionInformation> GetBrokerConnectionInfoAsync()
+    {
+      var info = await _configService.SuggestConfigAsync();
+      var realHost = await _hostAccessor.GetServerHostAsync();
+      if (ShowRealHostOrIp && realHost != null) {
+        info.Host = realHost;
+      }
+      return info;
     }
 
     [HttpGet("basic")]
@@ -36,7 +50,7 @@ namespace SMEIoT.Web.Api.V1
     public async Task<ActionResult<BasicBrokerApiModel>> ShowBasic()
     {
       var load = await _service.GetBrokerLoadAsync();
-      var info = await _configService.SuggestConfigAsync();
+      var info = await GetBrokerConnectionInfoAsync();
       var res = new BasicBrokerApiModel(_service.BrokerRunning, _service.BrokerLastMessageAt, load, info);
       return Ok(res);
     }
