@@ -15,6 +15,7 @@ import DashboardNewDeviceConnectSensors from "./dashboard/DashboardNewDeviceConn
 import DashboardDeviceCredential from "./dashboard/DashboardDeviceCredential";
 import DashboardBrokerStatistics from "./dashboard/DashboardBrokerStatistics";
 import DashboardSensorAssignment from "./dashboard/DashboardSensorAssignment";
+import DashboardSettings from "./dashboard/DashboardSettings";
 import { useAppCookie } from "./helpers/useCookie";
 
 export interface IDashboardApp extends RouteComponentProps {
@@ -48,6 +49,7 @@ const DashboardApp: React.FunctionComponent<IDashboardApp> = ({ location }) => {
         <DashboardMqttLogs path="broker/logs" />
         <DashboardUsers path="users" />
         <DashboardEditUser path="users/:userName" />
+        <DashboardSettings path="settings" />
       </Router>;
 };
 

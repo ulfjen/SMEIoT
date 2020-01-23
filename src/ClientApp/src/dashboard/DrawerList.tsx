@@ -3,6 +3,7 @@ import DashboardIcon from '@material-ui/icons/Dashboard';
 import PeopleIcon from '@material-ui/icons/People';
 import DynamicFeedIcon from '@material-ui/icons/DynamicFeed';
 import DeviceHubIcon from '@material-ui/icons/DeviceHub';
+import SettingsIcon from '@material-ui/icons/Settings';
 import ListItemRoutedLink from "../components/ListItemRoutedLink";
 import List from '@material-ui/core/List';
 import {defineMessages, useIntl} from 'react-intl';
@@ -27,6 +28,11 @@ const messages = defineMessages({
     id: 'dashboard.drawer.users',
     description: 'Used in the left drawer on the dashboard',
     defaultMessage: 'Users',
+  },
+  settings: {
+    id: 'dashboard.drawer.settings',
+    description: 'Used in the left drawer on the dashboard',
+    defaultMessage: 'Settings',
   }
 });
 
@@ -38,6 +44,7 @@ const DrawerList: React.FunctionComponent = () => {
     <ListItemRoutedLink primary={intl.formatMessage(messages.devices)} to="/dashboard/devices" icon={<DeviceHubIcon/>} />
     <ListItemRoutedLink primary={intl.formatMessage(messages.sensors)} to="/dashboard/sensors" icon={<DynamicFeedIcon/>} />
     <ListItemRoutedLink primary={intl.formatMessage(messages.users)} to="/dashboard/users" icon={<PeopleIcon/>} />
+    <ListItemRoutedLink primary={intl.formatMessage(messages.settings)} to="/dashboard/settings" icon={<SettingsIcon/>} />
   </List>
 };
 
