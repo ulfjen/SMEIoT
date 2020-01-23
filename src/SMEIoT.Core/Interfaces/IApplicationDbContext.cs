@@ -7,7 +7,7 @@ using SMEIoT.Core.Entities;
 
 namespace SMEIoT.Core.Interfaces
 {
-  public interface IApplicationDbContext
+  public interface IApplicationDbContext : IDisposable
   {
     DbSet<User> Users { get; set; }
     DbSet<Sensor> Sensors { get; set; }
