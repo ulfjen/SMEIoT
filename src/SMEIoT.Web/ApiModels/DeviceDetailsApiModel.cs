@@ -7,11 +7,11 @@ namespace SMEIoT.Web.ApiModels
   public class DeviceDetailsApiModel : BasicDeviceApiModel
   {
     [JsonProperty(Required = Required.DisallowNull)]
-    public IEnumerable<BasicSensorApiModel> Sensors { get; }
+    public IEnumerable<SensorDetailsApiModel> Sensors { get; }
 
     public DeviceDetailsApiModel(
       Device device,
-      IEnumerable<BasicSensorApiModel> sensors,
+      IEnumerable<SensorDetailsApiModel> sensors,
       MqttBrokerConnectionInformation info)
       : base(device, info)
     {

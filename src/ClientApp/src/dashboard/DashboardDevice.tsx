@@ -17,10 +17,10 @@ import {
   FormattedMessage
 } from "react-intl";
 import {
-  BasicSensorApiModel,
+  SensorDetailsApiModel,
   DevicesApi,
   DeviceDetailsApiModel,
-  BasicSensorApiModelStatusEnum
+  SensorDetailsApiModelStatusEnum
 } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
 import TwoLayerLabelAction from "../components/TwoLayerLabelAction";
@@ -54,6 +54,7 @@ import DashboardDeviceOtherSensors from "./DashboardDeviceOtherSensors";
 import useSensorByStatus from "../helpers/useSensorsByStatus";
 import CardActions from "@material-ui/core/CardActions";
 import DashboardSensorDialog from "./DashboardSensorDialog";
+import NumberGraph from "../components/NumberGraph";
 
 const styles = ({ typography, palette, spacing, zIndex }: Theme) => createStyles({
   container: {
@@ -234,7 +235,7 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
     openSensorRemovalDialog(sensorName);
   };
 
-  const renderPanels = (sensors: Array<BasicSensorApiModel>) => {
+  const renderPanels = (sensors: Array<SensorDetailsApiModel>) => {
     return sensors.length === 0 ? <CardContent>
       <Typography variant="body2" color="textSecondary" component="p">
         <FormattedMessage
@@ -243,48 +244,53 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
           defaultMessage="You haven't added any sensors yet."
         />  
       </Typography>
-    </CardContent> : sensors.map((sensor, index) => <ExpansionPanel className={index === 0 ? clsx(classes.panel, classes.firstPanel) : classes.panel} key={index} square elevation={0} defaultExpanded={index === 0} TransitionProps={{ unmountOnExit: true }}>
-      <ExpansionPanelSummary
-        expandIcon={<ExpandMoreIcon />}
-        className={classes.summary}
-      >
-        <div className={classes.column}>
-          <TwoLayerLabelAction className={classes.heading} greyoutFirst first={state.value ? state.value.name : ""} second={sensor.sensorName} />
-        </div>
-        <div className={classes.column} />
-      </ExpansionPanelSummary>
-      <ExpansionPanelDetails className={classes.details}>
-        <div className={classes.twoColumnSpan}>
-          graph placeholder
-        </div>
-        <div className={clsx(classes.column, classes.helper)}>
-          <Typography variant="caption">
-            {intl.formatMessage(messages.instructions.sensor)}
-            <br />
-            <ReachLink to={`../../sensors/${deviceName}/${sensor.sensorName}`} className={classes.link}>
-              {intl.formatMessage(messages.instructions.sensorLink)}
-            </ReachLink>
-          </Typography>
-        </div>
-      </ExpansionPanelDetails>
-      <Divider />
-      <ExpansionPanelActions>
-        <Button size="small" className={classes.warning} onClick={(e) => onRemoveSensor(e, sensor.sensorName)}>
-          <FormattedMessage
-            id="dashboard.devices.edit.sensor.actions.remove"
-            description="Action for sensor"
-            defaultMessage="Remove"
-          /> 
-        </Button>
-        <Button size="small" variant="contained" color="primary" onClick={() => navigate && navigate(`${sensor.sensorName}`)}>
-          <FormattedMessage
-            id="dashboard.devices.edit.sensor.actions.assign"
-            description="Action for sensor"
-            defaultMessage="Assign"
-          />
-        </Button>
-      </ExpansionPanelActions>
-    </ExpansionPanel>);
+    </CardContent> : sensors.map((sensor, index) => {
+      const data = sensor.data.map(v => {
+        return {x: new Date(Date.parse(v.createdAt)).getTime(), y: v.value}
+      });
+      return <ExpansionPanel className={index === 0 ? clsx(classes.panel, classes.firstPanel) : classes.panel} key={index} square elevation={0} defaultExpanded={index === 0} TransitionProps={{ unmountOnExit: true }}>
+        <ExpansionPanelSummary
+          expandIcon={<ExpandMoreIcon />}
+          className={classes.summary}
+        >
+          <div className={classes.column}>
+            <TwoLayerLabelAction className={classes.heading} greyoutFirst first={state.value ? state.value.name : ""} second={sensor.sensorName} />
+          </div>
+          <div className={classes.column} />
+        </ExpansionPanelSummary>
+        <ExpansionPanelDetails className={classes.details}>
+          <div className={classes.twoColumnSpan}>
+            <NumberGraph width={300} height={150} data={data} />
+          </div>
+          <div className={clsx(classes.column, classes.helper)}>
+            <Typography variant="caption">
+              {intl.formatMessage(messages.instructions.sensor)}
+              <br />
+              <ReachLink to={`../../sensors/${deviceName}/${sensor.sensorName}`} className={classes.link}>
+                {intl.formatMessage(messages.instructions.sensorLink)}
+              </ReachLink>
+            </Typography>
+          </div>
+        </ExpansionPanelDetails>
+        <Divider />
+        <ExpansionPanelActions>
+          <Button size="small" className={classes.warning} onClick={(e) => onRemoveSensor(e, sensor.sensorName)}>
+            <FormattedMessage
+              id="dashboard.devices.edit.sensor.actions.remove"
+              description="Action for sensor"
+              defaultMessage="Remove"
+            /> 
+          </Button>
+          <Button size="small" variant="contained" color="primary" onClick={() => navigate && navigate(`${sensor.sensorName}`)}>
+            <FormattedMessage
+              id="dashboard.devices.edit.sensor.actions.assign"
+              description="Action for sensor"
+              defaultMessage="Assign"
+            />
+          </Button>
+        </ExpansionPanelActions>
+      </ExpansionPanel>
+    });
   }
 
   const deviceApi = new DevicesApi(GetDefaultApiConfig());
@@ -293,9 +299,9 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
     const res = await deviceApi.apiDevicesNameGet({
       name: deviceName
     }).then(res => {
-      sensors.setNotRegistered(res.sensors.filter(s => s.status === BasicSensorApiModelStatusEnum.NotRegistered)); 
-      sensors.setNotConnected(res.sensors.filter(s => s.status === BasicSensorApiModelStatusEnum.NotConnected));
-      sensors.setRunning(res.sensors.filter(s => s.status === BasicSensorApiModelStatusEnum.Connected));
+      sensors.setNotRegistered(res.sensors.filter(s => s.status === SensorDetailsApiModelStatusEnum.NotRegistered)); 
+      sensors.setNotConnected(res.sensors.filter(s => s.status === SensorDetailsApiModelStatusEnum.NotConnected));
+      sensors.setRunning(res.sensors.filter(s => s.status === SensorDetailsApiModelStatusEnum.Connected));
       return res;
     });
 

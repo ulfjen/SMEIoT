@@ -15,9 +15,6 @@
 
 import * as runtime from '../runtime';
 import {
-    BasicSensorApiModel,
-    BasicSensorApiModelFromJSON,
-    BasicSensorApiModelToJSON,
     ProblemDetails,
     ProblemDetailsFromJSON,
     ProblemDetailsToJSON,
@@ -127,7 +124,7 @@ export class SensorsApi extends runtime.BaseAPI {
 
     /**
      */
-    async apiSensorsPostRaw(requestParameters: SensorsApiApiSensorsPostRequest): Promise<runtime.ApiResponse<BasicSensorApiModel>> {
+    async apiSensorsPostRaw(requestParameters: SensorsApiApiSensorsPostRequest): Promise<runtime.ApiResponse<SensorDetailsApiModel>> {
         if (requestParameters.sensorLocatorBindingModel === null || requestParameters.sensorLocatorBindingModel === undefined) {
             throw new runtime.RequiredError('sensorLocatorBindingModel','Required parameter requestParameters.sensorLocatorBindingModel was null or undefined when calling apiSensorsPost.');
         }
@@ -146,12 +143,12 @@ export class SensorsApi extends runtime.BaseAPI {
             body: SensorLocatorBindingModelToJSON(requestParameters.sensorLocatorBindingModel),
         });
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => BasicSensorApiModelFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => SensorDetailsApiModelFromJSON(jsonValue));
     }
 
     /**
      */
-    async apiSensorsPost(requestParameters: SensorsApiApiSensorsPostRequest): Promise<BasicSensorApiModel> {
+    async apiSensorsPost(requestParameters: SensorsApiApiSensorsPostRequest): Promise<SensorDetailsApiModel> {
         const response = await this.apiSensorsPostRaw(requestParameters);
         return await response.value();
     }

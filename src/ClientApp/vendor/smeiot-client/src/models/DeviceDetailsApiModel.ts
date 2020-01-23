@@ -14,14 +14,14 @@
 
 import { exists, mapValues } from '../runtime';
 import {
-    BasicSensorApiModel,
-    BasicSensorApiModelFromJSON,
-    BasicSensorApiModelFromJSONTyped,
-    BasicSensorApiModelToJSON,
     DeviceAuthenticationType,
     DeviceAuthenticationTypeFromJSON,
     DeviceAuthenticationTypeFromJSONTyped,
     DeviceAuthenticationTypeToJSON,
+    SensorDetailsApiModel,
+    SensorDetailsApiModelFromJSON,
+    SensorDetailsApiModelFromJSONTyped,
+    SensorDetailsApiModelToJSON,
 } from './';
 
 /**
@@ -32,10 +32,10 @@ import {
 export interface DeviceDetailsApiModel {
     /**
      * 
-     * @type {Array<BasicSensorApiModel>}
+     * @type {Array<SensorDetailsApiModel>}
      * @memberof DeviceDetailsApiModel
      */
-    readonly sensors: Array<BasicSensorApiModel>;
+    readonly sensors: Array<SensorDetailsApiModel>;
     /**
      * 
      * @type {string}
@@ -114,7 +114,7 @@ export function DeviceDetailsApiModelFromJSONTyped(json: any, ignoreDiscriminato
     }
     return {
         
-        'sensors': ((json['sensors'] as Array<any>).map(BasicSensorApiModelFromJSON)),
+        'sensors': ((json['sensors'] as Array<any>).map(SensorDetailsApiModelFromJSON)),
         'name': json['name'],
         'createdAt': json['createdAt'],
         'updatedAt': json['updatedAt'],

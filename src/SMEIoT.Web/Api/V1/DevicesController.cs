@@ -26,6 +26,8 @@ namespace SMEIoT.Web.Api.V1
     private readonly IMqttIdentifierService _mqttService;
     private readonly IMqttClientConfigService _configService;
     private readonly IServerHostAccessor _hostAccessor;
+    private readonly ISensorValueService _valueService;
+
     private const int DefaultDeviceNameSuggestWordLength = 2;
     private const int DefaultKeyByteLength = 64;
     private const bool ShowRealHostOrIp = true;
@@ -37,7 +39,8 @@ namespace SMEIoT.Web.Api.V1
       IMqttIdentifierService mqttService,
       ISecureKeySuggestionService SecureKeySuggestionService,
       IMqttClientConfigService configService,
-      IServerHostAccessor hostAccessor)
+      IServerHostAccessor hostAccessor,
+      ISensorValueService valueService)
     {
       _logger = logger;
       _service = service;
@@ -46,6 +49,7 @@ namespace SMEIoT.Web.Api.V1
       _secureKeySuggestionService = SecureKeySuggestionService;
       _configService = configService;
       _hostAccessor = hostAccessor;
+      _valueService = valueService;
     }
 
     private async Task<MqttBrokerConnectionInformation> GetBrokerConnectionInfoAsync()
@@ -92,18 +96,27 @@ namespace SMEIoT.Web.Api.V1
     {
       var device = await _service.GetDeviceByNameAsync(name);
 
-      var sensors = new List<BasicSensorApiModel>();
+      var sensors = new List<Sensor>();
+      var valsBySensorId = new Dictionary<long, List<(double, Instant)>>();
       await foreach (var sensor in _service.ListSensorsByDeviceAsync(device))
       {
-        sensors.Add(new BasicSensorApiModel(sensor));
+        sensors.Add(sensor);
+        valsBySensorId[sensor.Id] = new List<(double, Instant)>();
       }
-      var registered = sensors.Select(s => s.SensorName);
+      await foreach (var v in _valueService.GetLastNumberOfValuesBySensorsAsync(sensors, 10))
+      {
+        valsBySensorId[v.sensor.Id].Add((v.value, v.createdAt));
+      }
+      
+      var sensorList = new List<SensorDetailsApiModel>();
+      sensorList.AddRange(sensors.Select(s => new SensorDetailsApiModel(s, valsBySensorId[s.Id])));
 
       var sensorNamesFromMqtt = await _mqttService.ListSensorNamesByDeviceNameAsync(device.Name);
-      sensors.AddRange(sensorNamesFromMqtt.Except(registered).Select(n => new BasicSensorApiModel(n)));
+      var registeredSensorNames = sensors.Select(s => s.Name);
+      sensorList.AddRange(sensorNamesFromMqtt.Except(registeredSensorNames).Select(n => new SensorDetailsApiModel(n, device.Name)));
 
       var info = await GetBrokerConnectionInfoAsync();
-      var res = new DeviceDetailsApiModel(device, sensors, info);
+      var res = new DeviceDetailsApiModel(device, sensorList, info);
       return Ok(res);
     }
 

@@ -1,19 +1,19 @@
-﻿import { BasicSensorApiModel } from "smeiot-client";
+﻿import { SensorDetailsApiModel } from "smeiot-client";
 import React from "react";
 
 export interface SensorListing {
-  running: Array<BasicSensorApiModel>;
-  setRunning: React.Dispatch<React.SetStateAction<BasicSensorApiModel[]>>;
-  notRegistered: Array<BasicSensorApiModel>;
-  setNotRegistered: React.Dispatch<React.SetStateAction<BasicSensorApiModel[]>>;
-  notConnected: Array<BasicSensorApiModel>;
-  setNotConnected: React.Dispatch<React.SetStateAction<BasicSensorApiModel[]>>;
+  running: Array<SensorDetailsApiModel>;
+  setRunning: React.Dispatch<React.SetStateAction<SensorDetailsApiModel[]>>;
+  notRegistered: Array<SensorDetailsApiModel>;
+  setNotRegistered: React.Dispatch<React.SetStateAction<SensorDetailsApiModel[]>>;
+  notConnected: Array<SensorDetailsApiModel>;
+  setNotConnected: React.Dispatch<React.SetStateAction<SensorDetailsApiModel[]>>;
 }
 
 function useSensorByStatus(): SensorListing {
-  const [sensors, setSensors] = React.useState<Array<BasicSensorApiModel>>([]);
-  const [notRegisteredSensors, setNotRegisteredSensors] = React.useState<Array<BasicSensorApiModel>>([]);
-  const [notConnectedSensors, setNotConnectedSensors] = React.useState<Array<BasicSensorApiModel>>([]);
+  const [sensors, setSensors] = React.useState<Array<SensorDetailsApiModel>>([]);
+  const [notRegisteredSensors, setNotRegisteredSensors] = React.useState<Array<SensorDetailsApiModel>>([]);
+  const [notConnectedSensors, setNotConnectedSensors] = React.useState<Array<SensorDetailsApiModel>>([]);
   
   return {
     running: sensors, 

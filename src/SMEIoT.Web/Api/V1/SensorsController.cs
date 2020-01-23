@@ -117,12 +117,12 @@ namespace SMEIoT.Web.Api.V1
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<BasicSensorApiModel>> Create([BindRequired] SensorLocatorBindingModel view)
+    public async Task<ActionResult<SensorDetailsApiModel>> Create([BindRequired] SensorLocatorBindingModel view)
     {
       var device = await _service.GetDeviceByNameAsync(view.DeviceName);
       await _service.CreateSensorByDeviceAndNameAsync(device, view.Name);
       var sensor = await _service.GetSensorByDeviceAndNameAsync(device, view.Name);
-      var res = new BasicSensorApiModel(sensor);
+      var res = new SensorDetailsApiModel(sensor);
       return CreatedAtAction(nameof(Create), res);
     }
   }

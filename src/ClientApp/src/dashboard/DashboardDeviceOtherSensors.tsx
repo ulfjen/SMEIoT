@@ -9,7 +9,7 @@ import {
 } from "react-intl";
 import {
   SensorsApi,
-  BasicSensorApiModel
+  SensorDetailsApiModel
 } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
 import Tooltip from "@material-ui/core/Tooltip";
@@ -32,7 +32,7 @@ const styles = ({ spacing }: Theme) => createStyles({
 
 export interface IDashboardDeviceOtherSensorsProps extends WithStyles<typeof styles> {
   deviceName: string;
-  sensorsToRender: Array<BasicSensorApiModel>;
+  sensorsToRender: Array<SensorDetailsApiModel>;
   sensors: SensorListing;
   disableAction?: boolean;
 }

@@ -4,7 +4,6 @@ export * from './AssignUserSensorBindingModel';
 export * from './BasicBrokerApiModel';
 export * from './BasicDeviceApiModel';
 export * from './BasicDeviceApiModelList';
-export * from './BasicSensorApiModel';
 export * from './BasicUserApiModel';
 export * from './BrokerStatisticsApiModel';
 export * from './ConfirmedUserCredentialsUpdateBindingModel';

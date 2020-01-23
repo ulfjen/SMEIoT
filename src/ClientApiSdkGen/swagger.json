@@ -869,7 +869,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BasicSensorApiModel"
+                  "$ref": "#/components/schemas/SensorDetailsApiModel"
                 }
               }
             }
@@ -1455,13 +1455,37 @@
         },
         "additionalProperties": false
       },
-      "BasicSensorApiModel": {
+      "NumberTimeSeriesApiModel": {
         "required": [
+          "createdAt",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "number",
+            "format": "double"
+          },
+          "createdAt": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SensorDetailsApiModel": {
+        "required": [
+          "data",
+          "deviceName",
+          "duration",
           "sensorName",
+          "startedAt",
           "status"
         ],
         "type": "object",
         "properties": {
+          "deviceName": {
+            "type": "string"
+          },
           "sensorName": {
             "type": "string"
           },
@@ -1472,6 +1496,20 @@
               "Connected"
             ],
             "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NumberTimeSeriesApiModel"
+            }
+          },
+          "startedAt": {
+            "type": "string",
+            "nullable": true
+          },
+          "duration": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -1496,7 +1534,7 @@
           "sensors": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/BasicSensorApiModel"
+              "$ref": "#/components/schemas/SensorDetailsApiModel"
             },
             "readOnly": true
           },
@@ -1629,65 +1667,6 @@
       },
       "UserIAsyncEnumerable": {
         "type": "object",
-        "additionalProperties": false
-      },
-      "NumberTimeSeriesApiModel": {
-        "required": [
-          "createdAt",
-          "value"
-        ],
-        "type": "object",
-        "properties": {
-          "value": {
-            "type": "number",
-            "format": "double"
-          },
-          "createdAt": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "SensorDetailsApiModel": {
-        "required": [
-          "data",
-          "deviceName",
-          "duration",
-          "sensorName",
-          "startedAt",
-          "status"
-        ],
-        "type": "object",
-        "properties": {
-          "deviceName": {
-            "type": "string"
-          },
-          "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/NumberTimeSeriesApiModel"
-            }
-          },
-          "startedAt": {
-            "type": "string",
-            "nullable": true
-          },
-          "duration": {
-            "type": "string",
-            "nullable": true
-          },
-          "sensorName": {
-            "type": "string"
-          },
-          "status": {
-            "enum": [
-              "NotRegistered",
-              "NotConnected",
-              "Connected"
-            ],
-            "type": "string"
-          }
-        },
         "additionalProperties": false
       },
       "SensorDetailsApiModelList": {
