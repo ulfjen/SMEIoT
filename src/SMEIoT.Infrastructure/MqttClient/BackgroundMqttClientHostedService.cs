@@ -94,12 +94,10 @@ namespace SMEIoT.Infrastructure.MqttClient
       try
       {
         if (_reconnect) {
-          var ret = _client.Reconnect();
-          _logger.LogInformation($"MQTT client failed, trying to reconnect. got status: {ret}");
+          _client.Connect();
+          _logger.LogInformation($"MQTT client failed, trying to reconnect.");
   
-          if (ret == 0) {
-            _reconnect = false;
-          }
+          _reconnect = false;
         } else {
           var ret = _client.RunLoop();
           _logger.LogTrace($"runloop returned: {ret}");

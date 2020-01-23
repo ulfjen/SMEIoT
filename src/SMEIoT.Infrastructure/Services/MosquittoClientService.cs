@@ -43,13 +43,13 @@ namespace SMEIoT.Infrastructure.Services
       MaxPackets = 1; // document says it's unused and should be set to 1 for future compatibility
       SleepOnReconnect = 10;
       MessageCallback = handler.HandleMessage;
+
+      // the service is registered as transient, but double invoke this can cause trouble.
+      MosquittoWrapper.mosq_init();   
     }
 
     public async Task Connect()
     {
-      // the service is registered as transient, but double invoke this can cause trouble.
-      MosquittoWrapper.mosq_init();   
-
       var psk = await _authService.GetClientPskAsync();
       var identity = await _authService.GetClientNameAsync();
       var res = MosquittoWrapper.mosq_set_tls_psk(psk, identity, Ciphers);
