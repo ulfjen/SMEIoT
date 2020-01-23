@@ -658,6 +658,40 @@ namespace SMEIoT.Tests.Core.Services
 
 
     [Fact]
+    public async Task UpdateDeviceTimestampsAndStatusAsync_RespectsGracePeriodWithNoUpdate()
+    {
+      var device = await SeedOneDeviceAsync();
+      var future1 = _initial + Duration.FromSeconds(1);
+      await _service.UpdateDeviceTimestampsAndStatusAsync(device, _initial);
+      device.Connected = false;
+      _dbContext.Devices.Update(device);
+      await _dbContext.SaveChangesAsync();
+
+      await _service.UpdateDeviceTimestampsAndStatusAsync(device, future1);
+
+      Assert.True(device.Connected);
+      Assert.Equal(_initial, device.ConnectedAt);
+      Assert.Equal(_initial, device.LastMessageAt);
+    }
+
+    [Fact]
+    public async Task UpdateDeviceTimestampsAndStatusAsync_RespectsGracePeriodWithUpdate()
+    {
+      var device = await SeedOneDeviceAsync();
+      var future = _initial + Duration.FromSeconds(DeviceService.LastMessageAtTimestampUpdateGracePeriod);
+      await _service.UpdateDeviceTimestampsAndStatusAsync(device, _initial);
+      device.Connected = false;
+      _dbContext.Devices.Update(device);
+      await _dbContext.SaveChangesAsync();
+
+      await _service.UpdateDeviceTimestampsAndStatusAsync(device, future);
+
+      Assert.True(device.Connected);
+      Assert.Equal(_initial, device.ConnectedAt);
+      Assert.Equal(future, device.LastMessageAt);
+    }
+
+    [Fact]
     public async Task UpdateSensorAndDeviceTimestampsAndStatusAsync_UpdatesEverythingWithFirstMessage()
     {
       var (device, sensor) = await SeedOneSensorAsync();
@@ -677,6 +711,48 @@ namespace SMEIoT.Tests.Core.Services
     {
       var (device, sensor) = await SeedOneSensorAsync();
       var future = _initial + Duration.FromDays(1);
+      await _service.UpdateSensorAndDeviceTimestampsAndStatusAsync(sensor, _initial);
+      sensor.Connected = false;
+      sensor.Device.Connected = false;
+      _dbContext.Sensors.Update(sensor);
+      await _dbContext.SaveChangesAsync();
+
+      await _service.UpdateSensorAndDeviceTimestampsAndStatusAsync(sensor, future);
+
+      Assert.True(sensor.Connected);
+      Assert.Equal(_initial, sensor.ConnectedAt);
+      Assert.Equal(future, sensor.LastMessageAt);
+      Assert.True(device.Connected);
+      Assert.Equal(_initial, device.ConnectedAt);
+      Assert.Equal(future, device.LastMessageAt);
+    }
+
+    [Fact]
+    public async Task UpdateSensorAndDeviceTimestampsAndStatusAsync_RespectsGracePeriodWithNoUpdate()
+    {
+      var (device, sensor) = await SeedOneSensorAsync();
+      var future1 = _initial + Duration.FromSeconds(1);
+      await _service.UpdateSensorAndDeviceTimestampsAndStatusAsync(sensor, _initial);
+      sensor.Connected = false;
+      sensor.Device.Connected = false;
+      _dbContext.Sensors.Update(sensor);
+      await _dbContext.SaveChangesAsync();
+
+      await _service.UpdateSensorAndDeviceTimestampsAndStatusAsync(sensor, future1);
+
+      Assert.True(sensor.Connected);
+      Assert.Equal(_initial, sensor.ConnectedAt);
+      Assert.Equal(_initial, sensor.LastMessageAt);
+      Assert.True(device.Connected);
+      Assert.Equal(_initial, device.ConnectedAt);
+      Assert.Equal(_initial, device.LastMessageAt);
+    }
+
+    [Fact]
+    public async Task UpdateSensorAndDeviceTimestampsAndStatusAsync_RespectsGracePeriodWithUpdate()
+    {
+      var (device, sensor) = await SeedOneSensorAsync();
+      var future = _initial + Duration.FromSeconds(DeviceService.LastMessageAtTimestampUpdateGracePeriod);
       await _service.UpdateSensorAndDeviceTimestampsAndStatusAsync(sensor, _initial);
       sensor.Connected = false;
       sensor.Device.Connected = false;

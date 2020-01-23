@@ -15,6 +15,7 @@ namespace SMEIoT.Core.Services
     private readonly IApplicationDbContext _dbContext;
     private readonly IMqttIdentifierService _identifierService;
     public static readonly List<string> ForbiddenDeviceNames = new List<string> { "config_suggest", "bootstrap", "wait_connection", "configure_sensors", "new", "broker" }; 
+    public const int LastMessageAtTimestampUpdateGracePeriod = 40;
 
     public DeviceService(IApplicationDbContext dbContext, IMqttIdentifierService identifierService)
     {
@@ -190,33 +191,41 @@ namespace SMEIoT.Core.Services
       await _dbContext.SaveChangesAsync();
     }
 
+    private bool UpdateMqttEntityTimestampsAndStatus(MqttEntityBase entity, Instant receivedAt)
+    {
+      var updated = false;
+      if (entity.Connected != true) {
+        entity.Connected = true;
+        updated = true;
+      }
+      if (entity.ConnectedAt == null) {
+        entity.ConnectedAt = receivedAt;
+        updated = true;
+      }
+
+      if (entity.LastMessageAt == null || entity.LastMessageAt + Duration.FromSeconds(LastMessageAtTimestampUpdateGracePeriod) <= receivedAt) {
+        entity.LastMessageAt = receivedAt;
+        updated = true;
+      }
+      return updated;
+    }
+
     public async Task UpdateDeviceTimestampsAndStatusAsync(Device device, Instant receivedAt)
     {
-      device.Connected = true;
-      if (device.ConnectedAt == null) {
-        device.ConnectedAt = receivedAt;
+      if (UpdateMqttEntityTimestampsAndStatus(device, receivedAt)) {
+        _dbContext.Devices.Update(device);
+        await _dbContext.SaveChangesAsync();
       }
-      device.LastMessageAt = receivedAt;
-      _dbContext.Devices.Update(device);
-      await _dbContext.SaveChangesAsync();
     }
 
     public async Task UpdateSensorAndDeviceTimestampsAndStatusAsync(Sensor sensor, Instant receivedAt)
     {
-      sensor.Connected = true;
-      if (sensor.ConnectedAt == null) {
-        sensor.ConnectedAt = receivedAt;
+      if (UpdateMqttEntityTimestampsAndStatus(sensor, receivedAt)) {
+        UpdateMqttEntityTimestampsAndStatus(sensor.Device, receivedAt);
+        // Device is auto tracked.
+        _dbContext.Sensors.Update(sensor);
+        await _dbContext.SaveChangesAsync();
       }
-      sensor.LastMessageAt = receivedAt;
-
-      sensor.Device.Connected = true;
-      if (sensor.Device.ConnectedAt == null) {
-        sensor.Device.ConnectedAt = receivedAt;
-      }
-      sensor.Device.LastMessageAt = receivedAt;
-
-      _dbContext.Sensors.Update(sensor);
-      await _dbContext.SaveChangesAsync();
     }
   }
 }
