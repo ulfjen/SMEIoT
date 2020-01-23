@@ -37,10 +37,20 @@ namespace SMEIoT.Core.Entities
     [DefaultValue(16)]
     public int MaximumSensorNameLength { get; set; }
 
+    [Display(Description = "The broker is expected to run with SMEIoT server. If that's not the case, toggle the setting to show real host from our MQTT client. With the setting on, we will try to get the binding host or local IP.")]
+    [DefaultValue(true)]
+    public bool ShowingLocalHostAsBrokerHost { get; set; }
+
+    [StringLength(10240, ErrorMessage = "Setting for {0} must be shorter than {1}.")]
+    [Display(Description = "Only watch messages from the broker under this topic branch. It's used for device & sensor discovery.")]
+    [DefaultValue("iot/")]
+    public string MqttSensorTopicPrefix { get; set; } = null!;
+
     public override void ValidateItems()
     {
       ValidateDeviceNameLength();
       ValidateSensorNameLength();
+      ValidateMqttSensorTopicPrefix();
     }
 
     private void ValidateDeviceNameLength()
@@ -54,6 +64,16 @@ namespace SMEIoT.Core.Entities
     {
       if (MaximumSensorNameLength < MinimumSensorNameLength) {
         throw new InvalidArgumentException($"{nameof(MinimumSensorNameLength)} must not be larger than {nameof(MaximumSensorNameLength)}", nameof(Settings));
+      }
+    }
+
+    private void ValidateMqttSensorTopicPrefix()
+    {
+      if (MqttSensorTopicPrefix.Trim().Length != MqttSensorTopicPrefix.Length) {
+        throw new InvalidArgumentException($"{nameof(MqttSensorTopicPrefix)} can't has white space.", nameof(Settings));
+      }
+      if (MqttSensorTopicPrefix.StartsWith("$SYS")) {
+        throw new InvalidArgumentException($"{nameof(MqttSensorTopicPrefix)} can't be with broker messages.", nameof(Settings));
       }
     }
   }
