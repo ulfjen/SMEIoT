@@ -25,11 +25,15 @@ namespace SMEIoT.Web
       {
         File.Delete(unixSocketFileInfo.PhysicalPath);
       }
-      options.ListenUnixSocket(unixSocketFileInfo.PhysicalPath, builder =>
+
+      if (context.Configuration.GetSection("SMEIoT")?.GetValue<bool>("UseMosquittoBackgroundClient") == true)
       {
-        builder.Protocols = HttpProtocols.None;
-        builder.UseConnectionHandler<MosquittoBrokerAuthHandler>();
-      });
+        options.ListenUnixSocket(unixSocketFileInfo.PhysicalPath, builder =>
+        {
+          builder.Protocols = HttpProtocols.None;
+          builder.UseConnectionHandler<MosquittoBrokerAuthHandler>();
+        });
+      }
     }
   }
 }

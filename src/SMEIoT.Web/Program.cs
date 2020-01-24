@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore;
-using SMEIoT.Infrastructure;
-using System.Threading;
 
 namespace SMEIoT.Web
 {
