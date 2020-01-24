@@ -37,11 +37,12 @@ namespace SMEIoT.Infrastructure.MqttClient
       _pluginService = pluginService;
       _env = env;
 
-      var interval = config.GetSection("SMEIoT")?.GetValue<int>("MosquittoBackgroundClientRunloopInteval");
+      // Mosquitto handles around 50 more messages/s, 10 ms default is mostly safe enough
+      var interval = config.GetSection("SMEIoT")?.GetValue<int>("MosquittoBackgroundClientRunloopInterval");
       if (interval.HasValue && interval.Value > 0) {
          _delay = interval.Value;
       } else {
-        throw new InvalidOperationException("SMEIoT__MosquittoBackgroundClientRunloopInteval must be set to a positive millis.");
+        throw new InvalidOperationException("SMEIoT__MosquittoBackgroundClientRunloopInterval must be set to a positive milliseconds.");
       }
     }
 
