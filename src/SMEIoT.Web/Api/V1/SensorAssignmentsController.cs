@@ -20,16 +20,16 @@ namespace SMEIoT.Web.Api.V1
   {
     private readonly ISensorAssignmentService _service;
     private readonly IDeviceService _deviceService;
-    private readonly UserManager<User> _userManager;
+    private readonly IUserManagementService _userService;
 
     public SensorAssignmentsController(
       ISensorAssignmentService service,
       IDeviceService deviceService,
-      UserManager<User> userManager)
+      IUserManagementService userService)
     {
       _service = service;
       _deviceService = deviceService;
-      _userManager = userManager;
+      _userService = userService;
     }
     
     [HttpPost("{deviceName}/{sensorName}/users")]
@@ -41,12 +41,12 @@ namespace SMEIoT.Web.Api.V1
     {
       var device = await _deviceService.GetDeviceByNameAsync(deviceName);
       var sensor = await _deviceService.GetSensorByDeviceAndNameAsync(device, sensorName);
-      var user = await _userManager.FindByNameAsync(binding.UserName);
-      if (user == null) {
-        throw new EntityNotFoundException($"cannot find the user {binding.UserName}.", "userName");
-      }
+      var (user, roles) = await _userService.GetUserAndRoleByNameAsync(binding.UserName);
+
       await _service.AssignSensorToUserAsync(sensor, user);
-      var result = new SensorAssignmentApiModel(sensor.Name, user.UserName);
+
+      var basicUser = new BasicUserApiModel(user, roles);
+      var result = new SensorAssignmentApiModel(sensor.Name, basicUser);
 
       return CreatedAtAction(nameof(Create), result);
     }
@@ -62,9 +62,9 @@ namespace SMEIoT.Web.Api.V1
       var sensor = await _deviceService.GetSensorByDeviceAndNameAsync(device, sensorName);
       
       var list = new List<AdminUserApiModel>();
-      await foreach (var user in _service.ListAllowedUsersBySensorAsync(sensor))
+      await foreach (var (user, roles) in _service.ListAllowedUsersBySensorAsync(sensor))
       {
-        list.Add(new AdminUserApiModel(user, Array.Empty<string>()));
+        list.Add(new AdminUserApiModel(user, roles));
       }
       var res = new AdminUserApiModelList(list, list.Count);
       return Ok(res);
@@ -79,11 +79,10 @@ namespace SMEIoT.Web.Api.V1
     {
       var device = await _deviceService.GetDeviceByNameAsync(deviceName);
       var sensor = await _deviceService.GetSensorByDeviceAndNameAsync(device, sensorName);
-      var user = await _userManager.FindByNameAsync(userName);
-      if (user == null) {
-        throw new EntityNotFoundException($"cannot find the user {userName}.", "userName");
-      }
+      var (user, roles) = await _userService.GetUserAndRoleByNameAsync(userName);
+      
       await _service.RevokeSensorFromUserAsync(sensor, user);
+
       return Ok();
     }
   }

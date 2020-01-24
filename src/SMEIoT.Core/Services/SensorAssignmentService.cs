@@ -42,17 +42,19 @@ namespace SMEIoT.Core.Services
       await _dbContext.SaveChangesAsync();
     }
 
-    public async IAsyncEnumerable<User> ListAllowedUsersBySensorAsync(Sensor sensor)
+    public async IAsyncEnumerable<(User, IList<string>)> ListAllowedUsersBySensorAsync(Sensor sensor)
     {
       var admins = await _userManager.GetUsersInRoleAsync("Admin");
       await foreach (var user in _dbContext.Users.Join(_dbContext.UserSensors, u => u.Id, us => us.UserId, (u, us) => u).Distinct().AsAsyncEnumerable())
       {
         admins.Remove(user);
-        yield return user;
+        var roles = await _userManager.GetRolesAsync(user);
+        yield return (user, roles);
       }
       foreach (var admin in admins)
       {
-        yield return admin;
+        var roles = await _userManager.GetRolesAsync(admin);
+        yield return (admin, roles);
       }
     }
 

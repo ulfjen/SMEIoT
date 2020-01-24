@@ -12,7 +12,7 @@ using System.Linq.Dynamic.Core;
 
 namespace SMEIoT.Core.Services
 {
-  // IdentityResult has an error catelog Identity/Extensions.Core/src/IdentityErrorDescriber.cs
+  // IdentityResult has an error catalog Identity/Extensions.Core/src/IdentityErrorDescriber.cs
   public class UserManagementService : IUserManagementService
   {
     private const string TooCommonPasswordErrorCode = nameof(TooCommonPasswordError);

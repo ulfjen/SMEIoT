@@ -7,14 +7,14 @@ namespace SMEIoT.Web.ApiModels
   {
     [JsonProperty(Required = Required.DisallowNull)]
     public string SensorName { get; set; }
-    
-    [JsonProperty(Required = Required.DisallowNull)]
-    public string UserName { get; set; }
 
-    public SensorAssignmentApiModel(string sensorName, string userName)
+    [JsonProperty(Required = Required.DisallowNull)]
+    public BasicUserApiModel User { get; set; }
+
+    public SensorAssignmentApiModel(string sensorName, BasicUserApiModel user)
     {
       SensorName = sensorName;
-      UserName = userName;
+      User = user;
     }
   }
 }

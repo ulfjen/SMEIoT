@@ -1673,18 +1673,41 @@
         },
         "additionalProperties": false
       },
+      "BasicUserApiModel": {
+        "required": [
+          "createdAt",
+          "roles",
+          "userName"
+        ],
+        "type": "object",
+        "properties": {
+          "userName": {
+            "type": "string"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "createdAt": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "SensorAssignmentApiModel": {
         "required": [
           "sensorName",
-          "userName"
+          "user"
         ],
         "type": "object",
         "properties": {
           "sensorName": {
             "type": "string"
           },
-          "userName": {
-            "type": "string"
+          "user": {
+            "$ref": "#/components/schemas/BasicUserApiModel"
           }
         },
         "additionalProperties": false
@@ -1770,29 +1793,6 @@
             "minLength": 8,
             "type": "string",
             "format": "password"
-          }
-        },
-        "additionalProperties": false
-      },
-      "BasicUserApiModel": {
-        "required": [
-          "createdAt",
-          "roles",
-          "userName"
-        ],
-        "type": "object",
-        "properties": {
-          "userName": {
-            "type": "string"
-          },
-          "roles": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "createdAt": {
-            "type": "string"
           }
         },
         "additionalProperties": false

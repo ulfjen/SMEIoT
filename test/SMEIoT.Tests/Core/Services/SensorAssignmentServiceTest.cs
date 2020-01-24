@@ -166,16 +166,16 @@ namespace SMEIoT.Tests.Core.Services
     {
       var (sensor1, sensor2) = await SeedDefaultCaseAsync();
 
-      var users = new List<User>();
-      await foreach (var u in _service.ListAllowedUsersBySensorAsync(sensor1))
+      var users = new List<(User, IList<string>)>();
+      await foreach (var (u, r) in _service.ListAllowedUsersBySensorAsync(sensor1))
       {
-        users.Add(u);
+        users.Add((u, r));
       }
       
       Assert.Equal(3, users.Count);
-      Assert.Contains(users, x => x.UserName == "normal-user-1");
-      Assert.Contains(users, x => x.UserName == "normal-user-2");
-      Assert.Contains(users, x => x.UserName == "admin-user");
+      Assert.Contains(users, x => x.Item1.UserName == "normal-user-1");
+      Assert.Contains(users, x => x.Item1.UserName == "normal-user-2");
+      Assert.Contains(users, x => x.Item1.UserName == "admin-user" && x.Item2.Contains("Admin"));
     }
 
     [Fact]
@@ -183,7 +183,7 @@ namespace SMEIoT.Tests.Core.Services
     {
       var (sensor1, sensor2) = await SeedDefaultCaseAsync();
 
-      var users = new List<User>();
+      var users = new List<(User, IList<string>)>();
       await foreach (var u in _service.ListAllowedUsersBySensorAsync(sensor1))
       {
       }
