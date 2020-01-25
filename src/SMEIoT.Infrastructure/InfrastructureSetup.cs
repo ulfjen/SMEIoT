@@ -14,9 +14,7 @@ using SMEIoT.Core.Services;
 using SMEIoT.Infrastructure.Services;
 using Npgsql;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Builder;
-using System.Data;
 
 namespace SMEIoT.Infrastructure
 {
@@ -42,7 +40,8 @@ namespace SMEIoT.Infrastructure
         .UseRecommendedSerializerSettings()
         // we want less dependencies.
         // and hangfire PostgreSql can't store Nodatime.
-        .UseLiteDbStorage($"Filename=Hangfire.db; Mode=Shared; Cache Size=5000");
+        // Cache size 5000 * 4KB (page) = 20M memory
+        .UseLiteDbStorage($"Filename=Hangfire.db; Mode=Shared; Cache Size=5000; Flush=true");
     }
 
     public static void UseHangfireActivator(this IApplicationBuilder app, IServiceProvider serviceProvider)

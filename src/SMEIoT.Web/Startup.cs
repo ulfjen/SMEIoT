@@ -34,6 +34,7 @@ using SMEIoT.Web.Services;
 using SMEIoT.Web.ApiModels;
 using SMEIoT.Web.Middlewares;
 using System.Net.Mime;
+using SMEIoT.Web.Hangfire;
 
 namespace SMEIoT.Web
 {
@@ -152,9 +153,6 @@ namespace SMEIoT.Web
       {
         app.UseMiddleware<DevThrottleMiddleware>();
 
-        app.UseHangfireActivator(serviceProvider);
-        app.UseHangfireDashboard();
-
         app.UseDeveloperExceptionPage();
         app.UseDatabaseErrorPage();
         app.UseSwagger(c => {
@@ -187,6 +185,7 @@ namespace SMEIoT.Web
         app.UseHsts();
       }
 
+      app.UseHangfireActivator(serviceProvider);
       app.UseHttpsRedirection();
 
       app.UseStaticFiles(new StaticFileOptions
@@ -203,6 +202,12 @@ namespace SMEIoT.Web
 
       app.UseAuthentication();
       StartupIdentityDataInitializer.SeedRoles(roleManager);
+
+      app.UseHangfireDashboard("/hangfire", new DashboardOptions
+      {
+        Authorization = new[] { new HangfireDashboardAuthorizationFilter() }
+      });
+
       app.UseAuthorization();
 
       app.UseEndpoints(endpoints =>
