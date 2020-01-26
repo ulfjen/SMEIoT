@@ -27,6 +27,7 @@ using SMEIoT.Infrastructure;
 using SMEIoT.Infrastructure.Data;
 using SMEIoT.Core.Interfaces;
 using SMEIoT.Core.Services;
+using SMEIoT.Core.Jobs;
 using SMEIoT.Web.Api.Filters;
 using SMEIoT.Web.Hubs;
 using SMEIoT.Web.Api.Config;
@@ -73,6 +74,7 @@ namespace SMEIoT.Web
       services.AddScoped<IMqttEntityIdentifierSuggestionService, MqttEntityIdentifierSuggestionService>();
       services.AddTransient<ISecureKeySuggestionService, SecureKeySuggestionService>();
       services.AddTransient<IServerHostAccessor, ServerHostAccessor>();
+      services.AddScoped<IToggleMqttEntityStatusJob, ToggleMqttEntityStatusJob>();
 
       services.ConfigureMqttClient(Configuration);
 

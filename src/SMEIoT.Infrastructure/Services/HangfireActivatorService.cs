@@ -17,11 +17,5 @@ namespace SMEIoT.Infrastructure.Services
     {
       return new HangfireJobActivatorScopeService(_serviceScopeFactory.CreateScope());
     }
-
-
-    // public override object ActivateJob(Type type)
-    // {
-    //   return _serviceProvider.GetService(type);
-    // }
   }
 }
