@@ -6,7 +6,7 @@ namespace SMEIoT.Core.Interfaces
 {
   public interface IUserProfileService
   {
-    [ThrottleFitler(120, "{0}")]
+    [ThrottleFilter(120, "{0}")]
     Task UpdateUserLastSeenAsync(long userId, DateTime seenAt);
   }
 }

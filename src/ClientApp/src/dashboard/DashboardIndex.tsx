@@ -153,6 +153,14 @@ const _DashboardIndex: React.FunctionComponent<IDashboardIndexProps> = ({ classe
                     defaultMessage="View users"
                   /> 
                 </Link>
+                <br/>
+                <Link to="/hangfire" component={ReachLink}>
+                  <FormattedMessage
+                    id="dashboard.index.hangfire.link"
+                    description="The link on dashboard users card"
+                    defaultMessage="View background tasks"
+                  /> 
+                </Link>
               </div>}
             </Paper>
           </Grid>

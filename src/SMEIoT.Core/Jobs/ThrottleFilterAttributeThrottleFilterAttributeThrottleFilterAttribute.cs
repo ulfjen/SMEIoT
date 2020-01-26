@@ -7,29 +7,31 @@ using Hangfire.Common;
 using Hangfire.Server;
 using Hangfire.States;
 using Hangfire.Storage;
+using Hangfire.Logging;
 
 namespace SMEIoT.Core.Jobs
 {
-  public sealed class ThrottleFitlerAttribute : JobFilterAttribute,
+  public sealed class ThrottleFilterAttribute : JobFilterAttribute,
      IClientFilter, IServerFilter, IElectStateFilter
   {
-    private static readonly TimeSpan s_lockTimeout = TimeSpan.FromSeconds(5);
+    private static readonly TimeSpan s_lockTimeout = TimeSpan.FromSeconds(15);
     private const string TimestampKey = "Timestamp";
     private const string FingerprintPrefix = "_p:";
     private const string LockKeyPrefix = "_l:";
     private const int MaxHangfireKeyLength = 91; // Hangfire resource (key) limit length is 100. Lock has a prefix with `Hangfire:` 
+    private static readonly ILog Logger = LogProvider.GetCurrentClassLogger();
 
     private readonly TimeSpan _seconds;
 
     private readonly string? _fingerPrintFormat;
 
     /// <summary>
-    /// Debounce the background task, preventing it from being called until the end
+    /// Throttle the background task, preventing it from being called until the end
     /// of the lockout period.
     /// </summary>
     /// <param name="seconds">The length of the lockout period in seconds.</param>
     /// <param name="resourceFormat">format to generate a postfix for certian jobs</param>
-    public ThrottleFitlerAttribute(int seconds, string? resourceFormat = null)
+    public ThrottleFilterAttribute(int seconds, string? resourceFormat = null)
     {
       _seconds = TimeSpan.FromSeconds(seconds);
       _fingerPrintFormat = resourceFormat;
@@ -37,8 +39,6 @@ namespace SMEIoT.Core.Jobs
 
     public void OnCreating(CreatingContext context)
     {
-      // If the job is created in anything other than an Enqueued state, check the
-      // debounce lock state. This allows short scheduled versions to pass through.
       if (!(context.InitialState is EnqueuedState))
       {
         return;
@@ -46,12 +46,15 @@ namespace SMEIoT.Core.Jobs
 
       try
       {
-        using (context.Connection.AcquireDistributedLock(GetFingerprintWithPrefix(context.Job, LockKeyPrefix), s_lockTimeout))
+        var key = GetFingerprintWithPrefix(context.Job, LockKeyPrefix);
+        Logger.TraceFormat("Acquring a lock for {key}", key);
+        using (context.Connection.AcquireDistributedLock(key, s_lockTimeout))
         {
           var timestamp = GetTimestamp(context.Connection, context.Job);
 
           if (TimestampInWindow(timestamp, _seconds))
           {
+            Logger.TraceFormat("cancel the job.");
             context.Canceled = true;
           }
           else
@@ -59,9 +62,9 @@ namespace SMEIoT.Core.Jobs
             // Set the timestamp - this will add the lock key, or update
             // and extend the lock.
             context.Connection.SetRangeInHash(GetFingerprintWithPrefix(context.Job, FingerprintPrefix), new Dictionary<string, string>
-          {
-            { TimestampKey, DateTimeOffset.UtcNow.ToString("o") }
-          });
+            {
+              { TimestampKey, DateTimeOffset.UtcNow.ToString("o") }
+            });
           }
         }
       }
@@ -85,6 +88,7 @@ namespace SMEIoT.Core.Jobs
     public void OnStateElection(ElectStateContext context)
     {
       var timestamp = GetTimestamp(context.Connection, context.BackgroundJob.Job);
+      Logger.TraceFormat("timestamp {0} for the job {1}.", timestamp, context.BackgroundJob.Job.Type.FullName);
 
       if (context.CandidateState is DeletedState)
       {
@@ -97,7 +101,7 @@ namespace SMEIoT.Core.Jobs
 
 
     /// <summary>
-    /// Fetch the debounce starting timestamp.
+    /// Fetch the throttle starting timestamp.
     /// </summary>
     /// <param name="connection"></param>
     /// <param name="job"></param>
