@@ -1,7 +1,7 @@
 pid_file /var/SMEIoT/run/smeiot.mosquitto.pid
 
 persistence true
-persistence_location /var/lib/mosquitto/
+persistence_location /var/SMEIoT/run
 
 log_dest stdout
 #file /var/log/mosquitto/mosquitto.log
@@ -14,6 +14,6 @@ listener 4588
 #tls_version tlsv1.2
 psk_hint "vinnovabroker"
 use_identity_as_username true
-auth_plugin /var/SMEIoT/libmosqauth.so
+auth_plugin /var/SMEIoT/current/libmosqauth.so
 allow_anonymous false
 sys_interval 30

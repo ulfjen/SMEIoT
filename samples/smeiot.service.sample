@@ -9,10 +9,10 @@ StartLimitIntervalSec=0
 
 [Service]
 Type=exec
-WorkingDirectory=/var/SMEIoT
+WorkingDirectory=/var/SMEIoT/current
 EnvironmentFile=/var/SMEIoT/server_env
 AmbientCapabilities=CAP_NET_BIND_SERVICE
-ExecStart=/var/SMEIoT/SMEIoT.Web
+ExecStart=/var/SMEIoT/current/SMEIoT.Web
 User=smeiot
 Group=smeiot
 ProtectSystem=full

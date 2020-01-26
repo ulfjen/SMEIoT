@@ -26,6 +26,6 @@ if (CMAKE_BUILD_TYPE MATCHES Debug)
           )
 elseif(CMAKE_BUILD_TYPE MATCHES Release)
   install(TARGETS mosq
-          LIBRARY DESTINATION /var/SMEIoT
+          LIBRARY DESTINATION ${INSTALL_PATH}
           )
 endif ()

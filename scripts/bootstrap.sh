@@ -21,6 +21,7 @@ CLIENT_CONFIG=Release
 WEB_ROOT=$REPO_ROOT/src/SMEIoT.Web
 JS_ROOT=$REPO_ROOT/src/ClientApp
 BUILD_DIR=$WEB_ROOT/bin/$SERVER_CONFIG/netcoreapp3.1/$ARCH/publish
+DATE=$(date -u +"%Y%m%d%H%M%S")
 
 function create_user {
   # disable ssh login
@@ -57,7 +58,7 @@ function build_mosquitto {
 # We have custom plugins that needed to be configured, but after mosquitto is built and installed
 function build_mosquitto_plugins {
   cd /tmp && sudo tar xf smeiot-mosquitto-plugins.tar.gz -C $TMP_BOOTSTRAP_DIR
-  sudo mkdir -p $TMP_BOOTSTRAP_DIR/out && cd $TMP_BOOTSTRAP_DIR/out && sudo cmake .. -DCMAKE_BUILD_TYPE=Release && sudo make -j$(nproc) && sudo make install
+  sudo mkdir -p $TMP_BOOTSTRAP_DIR/out && cd $TMP_BOOTSTRAP_DIR/out && sudo cmake .. -DCMAKE_BUILD_TYPE=Release -DINSTALL_PATH=$SMEIOT_ROOT/$DATE && sudo make -j$(nproc) && sudo make install
 }
 
 # we rely on Self-contained deployment that contains .NET itself with us
@@ -81,7 +82,7 @@ function build_smeiot {
   cd $WEB_ROOT && rm -rf $BUILD_DIR && dotnet publish -c $SERVER_CONFIG -r $ARCH --self-contained true
   cp $WEB_ROOT/*.txt $BUILD_DIR
   cd $JS_ROOT && npm run build && cp -r build/* $BUILD_DIR/wwwroot
-  cd $WEB_ROOT && \
+  cd $WEB_ROOT/../SMEIoT.Infrastructure && \
       echo "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";" > $BUILD_DIR/00-db-extension.sql.part && \
       dotnet ef migrations script -o $BUILD_DIR/01-migrations.sql.part && sed -i '1s/^\xEF\xBB\xBF//' $BUILD_DIR/01-migrations.sql.part && \
       cat $BUILD_DIR/*.sql.part > $BUILD_DIR/db_migrate.sql && \
@@ -143,8 +144,8 @@ function setup_server_config_and_db {
 }
 
 function setup_smeiot_with_tar {
-  sudo rm -rf $SMEIOT_ROOT && sudo mkdir -p $SMEIOT_ROOT
-  sudo tar xf /tmp/smeiot.tar.gz -C $SMEIOT_ROOT
+  sudo mkdir -p $SMEIOT_ROOT && sudo mkdir -p $SMEIOT_ROOT/$DATE
+  sudo tar xf /tmp/smeiot.tar.gz -C $SMEIOT_ROOT/$DATE
   sudo mkdir -p $SMEIOT_ROOT/run
   sudo chown -R smeiot:smeiot $SMEIOT_ROOT
 }
@@ -175,6 +176,11 @@ function configure_system {
   sudo systemctl enable mosquitto
 }
 
+function link_build_to_current {
+  sudo rm -f $SMEIOT_ROOT/current
+  sudo ln -s $SMEIOT_ROOT/$DATE $SMEIOT_ROOT/current
+}
+
 function build_smeiot_with_remote_tars {
   sudo mkdir -p $TMP_BOOTSTRAP_DIR
   create_user
@@ -183,8 +189,16 @@ function build_smeiot_with_remote_tars {
   setup_smeiot_with_tar
   build_mosquitto_plugins
   setup_server_config_and_db
+  link_build_to_current
   configure_system
-  sudo rm -rf $TMP_BOOTSTRAP_DIR && sudo rm -rf /tmp/smeiot*.tar.gz && echo "SMEIoT is up." && cd $SMEIOT_ROOT
+  sudo chown -R smeiot:smeiot $SMEIOT_ROOT && sudo rm -rf $TMP_BOOTSTRAP_DIR && sudo rm -rf /tmp/smeiot*.tar.gz && echo "SMEIoT is up." && cd $SMEIOT_ROOT
+}
+
+function upgrade_smeiot {
+  setup_smeiot_with_tar
+  build_mosquitto_plugins
+  link_build_to_current
+  sudo chown -R smeiot:smeiot $SMEIOT_ROOT && sudo rm -rf $TMP_BOOTSTRAP_DIR && sudo rm -rf /tmp/smeiot*.tar.gz && sudo systemctl restart smeiot && echo "SMEIoT is upgraded." && cd $SMEIOT_ROOT
 }
 
 function install_dotnet_ef {
