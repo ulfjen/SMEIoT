@@ -157,7 +157,7 @@ const _DashboardIndex: React.FunctionComponent<IDashboardIndexProps> = ({ classe
                   /> 
                 </Link>
                 <br/>
-                <Link to="/hangfire" component={ReachLink}>
+                <Link href="/hangfire">
                   <FormattedMessage
                     id="dashboard.index.hangfire.link"
                     description="The link on dashboard users card"
