@@ -20,6 +20,7 @@ namespace SMEIoT.Tests.Core.Services
   {
     private readonly ApplicationDbContext _dbContext;
     private Instant _initial;
+    private IClock _clock;
     private readonly MosquittoBrokerMessageService _service;
     private readonly DeviceService _deviceService;
     private readonly MosquittoClientAuthenticationService _clientAuthService;
@@ -27,11 +28,12 @@ namespace SMEIoT.Tests.Core.Services
     public MosquittoBrokerMessageServiceTest()
     {
       _initial = SystemClock.Instance.GetCurrentInstant();
-      _dbContext = ApplicationDbContextHelper.BuildTestDbContext(_initial);
+      _clock = new FakeClock(_initial);
+      _dbContext = ApplicationDbContextHelper.BuildTestDbContext(_clock);
       var keyService = new SecureKeySuggestionService();
       _clientAuthService = new MosquittoClientAuthenticationService(keyService);
       var mockPlugin = new Mock<MosquittoBrokerPluginPidService>();
-      var identifierSerivce = new MqttIdentifierService(new FakeClock(_initial));
+      var identifierSerivce = new MqttIdentifierService(_clock);
       _deviceService = new DeviceService(_dbContext, identifierSerivce);
       _service = new MosquittoBrokerMessageService(_clientAuthService, mockPlugin.Object, _deviceService);
     }

@@ -11,11 +11,11 @@ namespace SMEIoT.Tests.Shared
 {
   public static class ApplicationDbContextHelper
   {
-    public static ApplicationDbContext BuildTestDbContext(Instant? initial = null)
+    public static ApplicationDbContext BuildTestDbContext(IClock? clock = null)
     {
-      if (initial == null)
+      if (clock == null)
       {
-        initial = SystemClock.Instance.GetCurrentInstant();
+        clock = new FakeClock(SystemClock.Instance.GetCurrentInstant());
       }
       
       var dir = Path.Combine(Directory.GetCurrentDirectory(), "..",　"..", "..");
@@ -32,7 +32,7 @@ namespace SMEIoT.Tests.Shared
         .EnableSensitiveDataLogging()
         .Options;
 
-      var context = new ApplicationDbContext(dbContextOptions, new FakeClock(initial.Value));
+      var context = new ApplicationDbContext(dbContextOptions, clock);
 
       return context;
     }

@@ -239,6 +239,8 @@ namespace SMEIoT.Web
           spa.UseProxyToSpaDevelopmentServer("http://localhost:3000");
         }
       });
+
+      RecurringJob.AddOrUpdate<IToggleMqttEntityStatusJob>(x => x.ScanAndToggleMqttEntityConnectedStatus(), "*/2 * * * *");
     }
   }
 }
