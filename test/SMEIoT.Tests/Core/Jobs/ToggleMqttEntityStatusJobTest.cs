@@ -103,7 +103,7 @@ namespace SMEIoT.Tests.Core.Jobs
       var sensors = await SeedEntitiesAsync(2);
       var sensor = sensors[0];
       sensor.Connected = true;
-      sensor.Device.LastMessageAt = sensor.LastMessageAt;
+      sensor.Device.LastMessageAt = sensor.LastMessageAt = _initial;
       sensor.Device.Connected = true;
       _dbContext.Sensors.Update(sensor);
       await _dbContext.SaveChangesAsync();
