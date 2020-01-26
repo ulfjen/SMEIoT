@@ -143,6 +143,15 @@ namespace SMEIoT.Web
       }
       services.AddSignalR();
       services.AddSingleton<IMqttMessageRelayService, MqttMessageRelayService>();
+
+      services.AddMiniProfiler(options =>
+      {
+        options.RouteBasePath = "/profiler";
+        options.ShouldProfile = request => request.Path.StartsWithSegments("/api");
+        options.ResultsAuthorize = request => request.HttpContext.User.IsInRole("Admin");
+        options.ResultsListAuthorize = request => request.HttpContext.User.IsInRole("Admin");
+      }).AddEntityFramework();
+
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -209,6 +218,7 @@ namespace SMEIoT.Web
       });
 
       app.UseAuthorization();
+      app.UseMiniProfiler();
 
       app.UseEndpoints(endpoints =>
       {
