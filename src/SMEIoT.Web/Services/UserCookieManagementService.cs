@@ -1,17 +1,13 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using SMEIoT.Core.Entities;
-using SMEIoT.Core.Exceptions;
 using SMEIoT.Core.Interfaces;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authentication;
 
 namespace SMEIoT.Web.Services
 {
@@ -27,6 +23,7 @@ namespace SMEIoT.Web.Services
     }
   }
 
+  // TODO: Makes more sense if name is ApplicationCookieSchemaEvents
   public static class UserCookieManagementService
   {
     public static string UserCookieKey = "currentUser";
@@ -80,6 +77,12 @@ namespace SMEIoT.Web.Services
           UserCookieKey,
           context.CookieOptions);
       return Task.CompletedTask;
+    }
+
+    public static async Task OnRedirectToLogin(RedirectContext<CookieAuthenticationOptions> context)
+    {
+      await context.HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
+      context.Response.Redirect(context.RedirectUri);
     }
   }
 }

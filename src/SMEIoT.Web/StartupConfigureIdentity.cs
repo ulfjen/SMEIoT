@@ -92,6 +92,7 @@ namespace SMEIoT.Web
         o.Events = new CookieAuthenticationEvents
         {
           OnValidatePrincipal = SecurityStampValidatorHelper.ValidatePrincipalAsync,
+          OnRedirectToLogin = UserCookieManagementService.OnRedirectToLogin,
           OnSignedIn = UserCookieManagementService.UserSignedInAsync,
           OnSigningOut = UserCookieManagementService.UserSigningOutAsync,
           OnRedirectToAccessDenied = ForbidEventHandler.OnRedirectToAccessDenied
