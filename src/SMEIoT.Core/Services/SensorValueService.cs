@@ -37,6 +37,32 @@ namespace SMEIoT.Core.Services
       }
     }
 
+    public async IAsyncEnumerable<(double value, Instant createdAt)> GetLastSecondsOfValuesBySensorAsync(Sensor sensor, int seconds)
+    {
+      if (seconds < 0) {
+        throw new InvalidArgumentException("Seconds must not be negative.", nameof(seconds));
+      }
+      var query = from sv in _dbContext.SensorValues
+                  where sv.SensorId == sensor.Id
+                  orderby sv.CreatedAt descending
+                  select sv;
+      var v = await query.FirstOrDefaultAsync();
+      if (v == null) {
+        yield break;
+      }
+      var lastMessageTime = v.CreatedAt;
+      var duration = Duration.FromSeconds(seconds);
+
+      query = from sv in _dbContext.SensorValues
+              where sv.SensorId == sensor.Id && sv.CreatedAt >= lastMessageTime - duration
+              orderby sv.CreatedAt
+              select sv;
+      await foreach (var sv in query.AsNoTracking().AsAsyncEnumerable()) {
+        yield return (sv.Value, sv.CreatedAt);
+      }
+    }
+
+
     public async IAsyncEnumerable<(Sensor sensor, double value, Instant createdAt)> GetLastNumberOfValuesBySensorsAsync(IEnumerable<Sensor> sensors, int count)
     {
       if (count < 0) {

@@ -136,6 +136,25 @@ namespace SMEIoT.Web.Api.V1
       return Ok(res);
     }
 
+    [HttpGet("{deviceName}/{sensorName}/last")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize]
+    public async Task<ActionResult<SensorDetailsApiModel>> ShowLast(string deviceName, string sensorName, [FromQuery] int seconds = 120)
+    {
+      var device = await _service.GetDeviceByNameAsync(deviceName);
+      var sensor = await _service.GetSensorByDeviceAndNameAsync(device, sensorName);   
+      var values = new List<(double, Instant)>();
+
+      await foreach (var val in _valueService.GetLastSecondsOfValuesBySensorAsync(sensor, seconds))
+      {
+        values.Add(val);
+      }
+      var res = new SensorDetailsApiModel(sensor, values);
+
+      return Ok(res);
+    }
+
     [HttpPost("")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]

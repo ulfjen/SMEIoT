@@ -275,5 +275,37 @@ namespace SMEIoT.Tests.Core
         }
       }
     }
+
+    [Fact]
+    public async Task GetLastSecondsOfValuesBySensorAsync_ReturnsValuesWithSeconds()
+    {
+      await SeedDefaultSensorsAsync();
+      var items = new List<(double value, Instant createdAt)>();
+      var sensor = await _dbContext.Sensors.Where(s => s.Name == "sensor-1-1").FirstOrDefaultAsync();
+
+      await foreach (var i in _service.GetLastSecondsOfValuesBySensorAsync(sensor, 2)) {
+        items.Add(i);
+      }
+
+      Assert.Equal(3, items.Count);
+    }
+
+    [Fact]
+    public async Task GetLastSecondsOfValuesBySensorAsync_ThrowsIfSecondsIsNegative()
+    {
+      await SeedDefaultSensorsAsync();
+      var sensor = await _dbContext.Sensors.Where(s => s.Name == "sensor-1-1").FirstOrDefaultAsync();
+
+      Func<Task> act = async () => { 
+        await foreach (var i in _service.GetLastSecondsOfValuesBySensorAsync(sensor, -1)) {
+        }
+      };
+
+      var exce = await Record.ExceptionAsync(act);
+      Assert.NotNull(exce);
+      var details = Assert.IsType<InvalidArgumentException>(exce);
+      Assert.Equal("seconds", details.ParamName);
+      Assert.Contains("negative", details.Message);
+    }
   }
 }

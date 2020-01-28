@@ -5,12 +5,15 @@ import {
   YAxis,
   HorizontalGridLines,
   VerticalGridLines,
-  LineSeries
+  LineSeries,
+  Highlight,
+  Crosshair
 } from 'react-vis';
 import { Theme } from '@material-ui/core/styles/createMuiTheme';
 import useTheme from '@material-ui/styles/useTheme';
 import { darken } from '@material-ui/core/styles/colorManipulator';
 import { defineMessages, useIntl } from 'react-intl';
+import IDimension from '../models/IDimension';
 
 const messages = defineMessages({
   xais: {
@@ -25,17 +28,30 @@ const messages = defineMessages({
   }
 })
 
-const _NumberGraph = (props: any) => {
+const _InteractiveNumberGraph = (props: any) => {
   const intl = useIntl();
-  const {palette} = useTheme<Theme>();
+  const { dimension, setDimension, width, height, data } = props;
+  const { palette } = useTheme<Theme>();
   const gridLineColor = palette.text.hint;
   const axisStyle = {
     line: {stroke: darken(palette.text.hint, 0.2)},
     ticks: {stroke: palette.text.hint},
     text: {stroke: 'none', fill: palette.text.hint, fontWeight: 600}
   };
+
+  const [crosshairValues, setCrosshairValues] = React.useState<Array<any>>([]);
+  const onNearestX = (value:any, {index}:any) => {
+    setCrosshairValues([value]);
+  }
+
   return (
-      <XYPlot width={props.width} height={props.height} xType="time">
+      <XYPlot
+        width={width}
+        height={height}
+        xType="time"
+        xDomain={dimension && [dimension.left, dimension.right]}
+        yDomain={dimension && [dimension.bottom, dimension.top]}
+      >
         <HorizontalGridLines style={{stroke: gridLineColor}} />
         <VerticalGridLines style={{stroke: gridLineColor}} />
         <XAxis
@@ -44,15 +60,28 @@ const _NumberGraph = (props: any) => {
         />
         <YAxis title={intl.formatMessage(messages.yais)} style={axisStyle}/>
         <LineSeries
-          data={props.data}
+          data={data}
           color={palette.info.light}
           style={{
             strokeLinejoin: 'round',
             strokeWidth: 4
           }}
+          onNearestX={onNearestX}
         />
+        <Highlight
+          onBrushEnd={(area: IDimension) => setDimension(area)}
+          onDrag={(area: IDimension) => {
+            setDimension({
+              bottom: dimension ? dimension.bottom : 0,
+              top: dimension ? dimension.top : 0,
+              left: area.left,
+              right: area.right
+            });
+          }}
+        />
+        <Crosshair values={crosshairValues} />
       </XYPlot>
   );
 };
 
-export default (_NumberGraph);
+export default (_InteractiveNumberGraph);
