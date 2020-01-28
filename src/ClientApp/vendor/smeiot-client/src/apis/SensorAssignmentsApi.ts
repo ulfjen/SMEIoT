@@ -32,6 +32,8 @@ import {
 export interface SensorAssignmentsApiApiSensorsDeviceNameSensorNameUsersGetRequest {
     deviceName: string;
     sensorName: string;
+    offset?: number;
+    limit?: number;
 }
 
 export interface SensorAssignmentsApiApiSensorsDeviceNameSensorNameUsersPostRequest {
@@ -63,6 +65,14 @@ export class SensorAssignmentsApi extends runtime.BaseAPI {
         }
 
         const queryParameters: runtime.HTTPQuery = {};
+
+        if (requestParameters.offset !== undefined) {
+            queryParameters['offset'] = requestParameters.offset;
+        }
+
+        if (requestParameters.limit !== undefined) {
+            queryParameters['limit'] = requestParameters.limit;
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 

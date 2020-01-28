@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -576,6 +577,40 @@ namespace SMEIoT.Tests.Core.Services
       var res = await _service.NumberOfUsersAsync(new[] {"roles3"});
 
       Assert.Equal(10, res);
+    }
+
+    [Fact]
+    public async Task SearchUserWithQueryAsync_ReturnsListOfUsers()
+    {
+      await SeedDefaultRolesAsync();
+      await SeedDefaultUsersAsync();
+
+      var res = new List<(User, IList<string>)>();
+      await foreach (var p in _service.SearchUserWithQueryAsync("normal-user-1", 3))
+      {
+        res.Add(p);
+      }
+
+      Assert.Equal(3, res.Count);
+      Assert.True(res.All(p => p.Item1.UserName.StartsWith("normal-user-1")));
+    }
+
+    [Fact]
+    public async Task SearchUserWithQueryAsync_ThrowsWithNegativeLimit()
+    {
+      await SeedDefaultRolesAsync();
+      await SeedDefaultUsersAsync();
+
+      Func<Task> act = async () => { 
+        await foreach (var s in _service.SearchUserWithQueryAsync("normal-user-1", -3)) {
+        }
+      };
+
+      var exce = await Record.ExceptionAsync(act);
+      Assert.NotNull(exce);
+      var details = Assert.IsType<InvalidArgumentException>(exce);
+      Assert.Equal("limit", details.ParamName);
+      Assert.Contains("negative", details.Message);
     }
   }
 }

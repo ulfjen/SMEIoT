@@ -104,6 +104,7 @@ namespace SMEIoT.Tests.Core.Services
       var exce = await Record.ExceptionAsync(Act);
       Assert.NotNull(exce);
       var details = Assert.IsType<InvalidOperationException>(exce);
+      Assert.Contains("already assigned", details.Message);
     }
 
     [Fact]
@@ -167,7 +168,7 @@ namespace SMEIoT.Tests.Core.Services
       var (sensor1, sensor2) = await SeedDefaultCaseAsync();
 
       var users = new List<(User, IList<string>)>();
-      await foreach (var (u, r) in _service.ListAllowedUsersBySensorAsync(sensor1))
+      await foreach (var (u, r) in _service.ListAllowedUsersBySensorAsync(sensor1, 0, 10))
       {
         users.Add((u, r));
       }
@@ -179,26 +180,109 @@ namespace SMEIoT.Tests.Core.Services
     }
 
     [Fact]
-    public async Task ListAllowedUsersBySensorAsync_ReturnsEmptyList()
+    public async Task ListAllowedUsersBySensorAsync_ReturnsEmpty()
     {
-      var (sensor1, sensor2) = await SeedDefaultCaseAsync();
+      var deviceName = "device";
+      var device = new Device {
+        Name = deviceName,
+        NormalizedName = deviceName.ToUpperInvariant(),
+        AuthenticationType = DeviceAuthenticationType.PreSharedKey,
+        PreSharedKey = "key"
+      };
+      _dbContext.Devices.Add(device);
 
-      var users = new List<(User, IList<string>)>();
-      await foreach (var u in _service.ListAllowedUsersBySensorAsync(sensor1))
-      {
+      var name1 = "sensor-1";
+      var sensor = new Sensor { Name = name1, NormalizedName = name1.ToUpperInvariant(), Device = device };
+      _dbContext.Sensors.Add(sensor);
+      await _dbContext.SaveChangesAsync();
+
+      var users = new List<User>();
+      await foreach (var (u, r) in _service.ListAllowedUsersBySensorAsync(sensor, 0, 10)) {
+        users.Add(u);
       }
 
       Assert.Empty(users);
     }
 
     [Fact]
-    public async Task ListSensorsByUserNameAsync_ReturnsSensors()
+    public async Task ListAllowedUsersBySensorAsync_ThrowsIfOffsetIsNegative()
+    {
+      var (sensor1, sensor2) = await SeedDefaultCaseAsync();
+
+      var exce = await Record.ExceptionAsync(async () => {
+        await foreach (var u in _service.ListAllowedUsersBySensorAsync(sensor1, -1, 10)) {
+        }
+      });
+      Assert.NotNull(exce);
+      var details = Assert.IsType<InvalidArgumentException>(exce);
+      Assert.Equal("offset", details.ParamName);
+      Assert.Contains("negative", details.Message);
+    }
+
+    [Fact]
+    public async Task ListAllowedUsersBySensorAsync_WorksForZeroOffsetAndLimits()
+    {
+      var (sensor1, sensor2) = await SeedDefaultCaseAsync();
+
+      var users = new List<User>();
+      await foreach (var (u, r) in _service.ListAllowedUsersBySensorAsync(sensor1, 0, 0))
+      {
+        users.Add(u);
+      }
+
+      Assert.Empty(users);
+    }
+
+    [Fact]
+    public async Task ListAllowedUsersBySensorAsync_ThrowsIfLimitIsNegative()
+    {
+      var (sensor1, sensor2) = await SeedDefaultCaseAsync();
+
+      Func<Task> act = async () => { 
+        await foreach (var s in _service.ListAllowedUsersBySensorAsync(sensor1, 0, -1)) {
+        }
+      };
+
+      var exce = await Record.ExceptionAsync(act);
+      Assert.NotNull(exce);
+      var details = Assert.IsType<InvalidArgumentException>(exce);
+      Assert.Equal("limit", details.ParamName);
+      Assert.Contains("negative", details.Message);
+    }
+
+    [Fact]
+    public async Task ListAllowedUsersBySensorAsync_LimitsResultSize()
+    {
+      var (sensor1, sensor2) = await SeedDefaultCaseAsync();
+
+      var users = new List<User>();
+      await foreach (var (u, r) in _service.ListAllowedUsersBySensorAsync(sensor1, 0, 1))
+      {
+        users.Add(u);
+      }
+
+      Assert.Single(users);
+      Assert.Contains(users, u => u.UserName == "normal-user-1" || u.UserName == "admin-user");
+    }
+
+    [Fact]
+    public async Task NumberOfAllowedUsersBySensorAsync_ReturnsSizeOfResult()
+    {
+      var (sensor1, sensor2) = await SeedDefaultCaseAsync();
+
+      var userCount = await _service.NumberOfAllowedUsersBySensorAsync(sensor1);
+
+      Assert.Equal(2 + 1, userCount);
+    }
+
+    [Fact]
+    public async Task ListSensorsByUserAsync_ReturnsSensors()
     {
       await SeedDefaultCaseAsync();
       var user = await _userManager.FindByNameAsync("normal-user-1");
 
       var sensors = new List<Sensor>();
-      await foreach (var u in _service.ListSensorsByUserNameAsync(user))
+      await foreach (var u in _service.ListSensorsByUserAsync(user, 0, 10))
       {
         sensors.Add(u);
       }
@@ -209,13 +293,13 @@ namespace SMEIoT.Tests.Core.Services
     }
 
     [Fact]
-    public async Task ListSensorsByUserNameAsync_ReturnsEmptyList()
+    public async Task ListSensorsByUserAsync_ReturnsEmptyList()
     {
       await SeedDefaultCaseAsync();
       var user = await _userManager.FindByNameAsync("normal-user-3");
 
       var sensors = new List<Sensor>();
-      await foreach (var u in _service.ListSensorsByUserNameAsync(user))
+      await foreach (var u in _service.ListSensorsByUserAsync(user, 0, 10))
       {
         sensors.Add(u);
       }
@@ -224,18 +308,97 @@ namespace SMEIoT.Tests.Core.Services
     }
 
     [Fact]
-    public async Task ListSensorsByUserNameAsync_ReturnsEverythingForAdmin()
+    public async Task ListSensorsByUserAsync_ReturnsEverythingForAdmin()
     {
       await SeedDefaultCaseAsync();
       var admin = await _userManager.FindByNameAsync("admin-user");
 
       var sensors = new List<Sensor>();
-      await foreach (var u in _service.ListSensorsByUserNameAsync(admin))
+      await foreach (var u in _service.ListSensorsByUserAsync(admin, 0, 10))
       {
         sensors.Add(u);
       }
 
       Assert.Equal(_dbContext.Sensors.Count(), sensors.Count());
     }
+
+    [Fact]
+    public async Task ListSensorsByUserAsync_ThrowsIfOffsetIsNegative()
+    {
+      await SeedDefaultCaseAsync();
+      var user = await _userManager.FindByNameAsync("normal-user-1");
+
+      Func<Task> act = async () => { 
+        await foreach (var s in _service.ListSensorsByUserAsync(user, -1, 10)) {
+        }
+      };
+
+      var exce = await Record.ExceptionAsync(act);
+      Assert.NotNull(exce);
+      var details = Assert.IsType<InvalidArgumentException>(exce);
+      Assert.Equal("offset", details.ParamName);
+      Assert.Contains("negative", details.Message);
+    }
+
+    [Fact]
+    public async Task ListSensorsByUserAsync_WorksForZeroOffsetAndLimits()
+    {
+      await SeedDefaultCaseAsync();
+      var user = await _userManager.FindByNameAsync("normal-user-3");
+
+      var sensors = new List<Sensor>();
+      await foreach (var u in _service.ListSensorsByUserAsync(user, 0, 0))
+      {
+        sensors.Add(u);
+      }
+
+      Assert.Empty(sensors);
+    }
+
+    [Fact]
+    public async Task ListSensorsByUserAsync_ThrowsIfLimitIsNegative()
+    {
+      await SeedDefaultCaseAsync();
+      var user = await _userManager.FindByNameAsync("normal-user-1");
+
+      Func<Task> act = async () => { 
+        await foreach (var s in _service.ListSensorsByUserAsync(user, 0, -10)) {
+        }
+      };
+
+      var exce = await Record.ExceptionAsync(act);
+      Assert.NotNull(exce);
+      var details = Assert.IsType<InvalidArgumentException>(exce);
+      Assert.Equal("limit", details.ParamName);
+      Assert.Contains("negative", details.Message);
+    }
+
+    [Fact]
+    public async Task ListSensorsByUserAsync_LimitsResultSize()
+    {
+      await SeedDefaultCaseAsync();
+      var user = await _userManager.FindByNameAsync("normal-user-1");
+
+      var sensors = new List<Sensor>();
+      await foreach (var s in _service.ListSensorsByUserAsync(user, 0, 1))
+      {
+        sensors.Add(s);
+      }
+
+      Assert.Single(sensors);
+      Assert.Equal("sensor-1", sensors[0].Name);
+    }
+
+    [Fact]
+    public async Task NumberOfSensorsByUserAsync_ReturnsSizeOfResult()
+    {
+      await SeedDefaultCaseAsync();
+      var user = await _userManager.FindByNameAsync("normal-user-1");
+
+      var cnt = await _service.NumberOfSensorsByUserAsync(user);
+
+      Assert.Equal(2, cnt);
+    }
+
   }
 }

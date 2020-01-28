@@ -1,3 +1,5 @@
+using System;
+using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -45,6 +47,21 @@ namespace SMEIoT.Web.Api.V1
     {
       var model = await GetAdminUserResultAsync(userName);
       return Ok(model);
+    }
+
+    [HttpGet("search")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<AdminUserApiModelList>> Search([Required] string query, [FromQuery] int limit = 3)
+    {
+      var list = new List<AdminUserApiModel>();
+
+      await foreach (var (user, userRoles) in _userService.SearchUserWithQueryAsync(query, limit))
+      {
+        list.Add(new AdminUserApiModel(user, userRoles));
+      }
+
+      return Ok(new AdminUserApiModelList(list, Math.Min(limit, list.Count)));
     }
 
     [HttpPut("{userName}/roles")]

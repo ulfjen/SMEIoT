@@ -38,6 +38,11 @@ export interface AdminUsersApiApiAdminUsersGetRequest {
     roles?: Array<string>;
 }
 
+export interface AdminUsersApiApiAdminUsersSearchGetRequest {
+    query: string;
+    limit?: number;
+}
+
 export interface AdminUsersApiApiAdminUsersUserNameGetRequest {
     userName: string;
 }
@@ -85,6 +90,42 @@ export class AdminUsersApi extends runtime.BaseAPI {
      */
     async apiAdminUsersGet(requestParameters: AdminUsersApiApiAdminUsersGetRequest): Promise<AdminUserApiModelList> {
         const response = await this.apiAdminUsersGetRaw(requestParameters);
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiAdminUsersSearchGetRaw(requestParameters: AdminUsersApiApiAdminUsersSearchGetRequest): Promise<runtime.ApiResponse<AdminUserApiModelList>> {
+        if (requestParameters.query === null || requestParameters.query === undefined) {
+            throw new runtime.RequiredError('query','Required parameter requestParameters.query was null or undefined when calling apiAdminUsersSearchGet.');
+        }
+
+        const queryParameters: runtime.HTTPQuery = {};
+
+        if (requestParameters.query !== undefined) {
+            queryParameters['query'] = requestParameters.query;
+        }
+
+        if (requestParameters.limit !== undefined) {
+            queryParameters['limit'] = requestParameters.limit;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/admin/users/search`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        });
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => AdminUserApiModelListFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiAdminUsersSearchGet(requestParameters: AdminUsersApiApiAdminUsersSearchGetRequest): Promise<AdminUserApiModelList> {
+        const response = await this.apiAdminUsersSearchGetRaw(requestParameters);
         return await response.value();
     }
 

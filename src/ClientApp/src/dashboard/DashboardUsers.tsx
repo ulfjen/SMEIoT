@@ -12,7 +12,7 @@ import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import Skeleton from "@material-ui/lab/Skeleton";
 import { GetDefaultApiConfig } from "../index";
-import { AdminUserApiModel, AdminUsersApi, AdminUserApiModelList, AdminUsersApiApiAdminUsersGetRequest, ProblemDetails } from "smeiot-client";
+import { AdminUserApiModel, AdminUsersApi, AdminUserApiModelList, AdminUsersApiApiAdminUsersGetRequest } from "smeiot-client";
 import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";

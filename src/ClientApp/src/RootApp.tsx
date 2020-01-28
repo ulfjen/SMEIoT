@@ -1,4 +1,3 @@
-import "./styles/site.scss";
 import * as React from "react";
 import { Router, RouteComponentProps, Redirect } from "@reach/router";
 import NewSession from "./accounts/NewSession";

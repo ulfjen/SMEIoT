@@ -6,7 +6,6 @@ import DashboardDevices from "./dashboard/DashboardDevices";
 import DashboardEditUser from "./dashboard/DashboardEditUser";
 import DashboardIndex from "./dashboard/DashboardIndex";
 import DashboardMqttLogs from "./dashboard/DashboardMqttLogs";
-import DashboardNewSensor from "./dashboard/DashboardNewSensor";
 import DashboardNewDevice from "./dashboard/DashboardNewDevice";
 import DashboardDevice from "./dashboard/DashboardDevice";
 import DashboardSensorDetails from "./dashboard/DashboardSensorDetails";
@@ -43,7 +42,6 @@ const DashboardApp: React.FunctionComponent<IDashboardApp> = ({ location }) => {
         <DashboardDeviceCredential path="devices/:deviceName/credentials" />
         <DashboardSensorAssignment path="devices/:deviceName/:sensorName" />
         <DashboardSensors path="sensors" />
-        <DashboardNewSensor path="sensors/new" />
         <DashboardSensorDetails path="sensors/:deviceName/:sensorName" />
         <DashboardMqttLogs path="broker/logs" />
         <DashboardUsers path="users" />

@@ -1,6 +1,5 @@
 import 'react-app-polyfill/stable';
-import '@fortawesome/fontawesome-free/css/all.css';
-import './styles/site.scss';
+import "./styles/site.scss";
 import { Configuration } from "smeiot-client";
 import * as React from "react";
 import * as ReactDOM from "react-dom";

@@ -45,8 +45,8 @@ namespace SMEIoT.Web.Api.V1
 
       await _service.AssignSensorToUserAsync(sensor, user);
 
-      var basicUser = new BasicUserApiModel(user, roles);
-      var result = new SensorAssignmentApiModel(sensor.Name, basicUser);
+      var userApiModel = new AdminUserApiModel(user, roles);
+      var result = new SensorAssignmentApiModel(sensor.Name, userApiModel);
 
       return CreatedAtAction(nameof(Create), result);
     }
@@ -56,17 +56,18 @@ namespace SMEIoT.Web.Api.V1
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<AdminUserApiModelList>> Index(string deviceName, string sensorName)
+    public async Task<ActionResult<AdminUserApiModelList>> Index(string deviceName, string sensorName, [FromQuery] int offset = 0, [FromQuery] int limit = 10)
     {
       var device = await _deviceService.GetDeviceByNameAsync(deviceName);
       var sensor = await _deviceService.GetSensorByDeviceAndNameAsync(device, sensorName);
       
       var list = new List<AdminUserApiModel>();
-      await foreach (var (user, roles) in _service.ListAllowedUsersBySensorAsync(sensor))
+      await foreach (var (user, roles) in _service.ListAllowedUsersBySensorAsync(sensor, offset, limit))
       {
         list.Add(new AdminUserApiModel(user, roles));
       }
-      var res = new AdminUserApiModelList(list, list.Count);
+      var cnt = await _service.NumberOfAllowedUsersBySensorAsync(sensor);
+      var res = new AdminUserApiModelList(list, cnt);
       return Ok(res);
     }
 

@@ -216,18 +216,20 @@ const _EditUser: React.FunctionComponent<IEditUserProps> = ({ classes, navigate 
               </Typography>}
           </div>
 
-          <PasswordField
-            label={intl.formatMessage(messages.password)}
-            setPassword={uc.setPassword}
-            errors={uc.passwordError}
-            setErrors={uc.setPasswordError} />
-          <PasswordField
-            label={intl.formatMessage(messages.newPassword)}
-            setPassword={setNewPassword}
-            errors={newPasswordError}
-            setErrors={setNewPasswordError} />
+          {!state.loading && <React.Fragment>
+            <PasswordField
+              label={intl.formatMessage(messages.password)}
+              setPassword={uc.setPassword}
+              errors={uc.passwordError}
+              setErrors={uc.setPasswordError} />
+            <PasswordField
+              label={intl.formatMessage(messages.newPassword)}
+              setPassword={setNewPassword}
+              errors={newPasswordError}
+              setErrors={setNewPasswordError} />
+          </React.Fragment>}
         </CardContent>
-        <CardActions>
+        {!state.loading && <CardActions>
           <Button onClick={() => { navigate && navigate("/dashboard") }}>
             <FormattedMessage
               id="users.edit.action.back"
@@ -242,7 +244,7 @@ const _EditUser: React.FunctionComponent<IEditUserProps> = ({ classes, navigate 
               defaultMessage="Edit"
             />
           </Button>
-        </CardActions>
+        </CardActions>}
       </Card>
       <Snackbar
         className={classes.snackbar}

@@ -111,6 +111,54 @@
         }
       }
     },
+    "/api/admin/users/search": {
+      "get": {
+        "tags": [
+          "AdminUsers"
+        ],
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 3
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminUserApiModelList"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/users/{userName}/roles": {
       "put": {
         "tags": [
@@ -730,6 +778,24 @@
             "required": true,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
             }
           }
         ],
@@ -1673,29 +1739,6 @@
         },
         "additionalProperties": false
       },
-      "BasicUserApiModel": {
-        "required": [
-          "createdAt",
-          "roles",
-          "userName"
-        ],
-        "type": "object",
-        "properties": {
-          "userName": {
-            "type": "string"
-          },
-          "roles": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "createdAt": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
       "SensorAssignmentApiModel": {
         "required": [
           "sensorName",
@@ -1707,7 +1750,7 @@
             "type": "string"
           },
           "user": {
-            "$ref": "#/components/schemas/BasicUserApiModel"
+            "$ref": "#/components/schemas/AdminUserApiModel"
           }
         },
         "additionalProperties": false
@@ -1793,6 +1836,29 @@
             "minLength": 8,
             "type": "string",
             "format": "password"
+          }
+        },
+        "additionalProperties": false
+      },
+      "BasicUserApiModel": {
+        "required": [
+          "createdAt",
+          "roles",
+          "userName"
+        ],
+        "type": "object",
+        "properties": {
+          "userName": {
+            "type": "string"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "createdAt": {
+            "type": "string"
           }
         },
         "additionalProperties": false

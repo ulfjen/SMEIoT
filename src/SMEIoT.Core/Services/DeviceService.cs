@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using SMEIoT.Core.Entities;
 using SMEIoT.Core.Exceptions;
 using SMEIoT.Core.Interfaces;
+using SMEIoT.Core.Helpers;
 using NodaTime;
 
 namespace SMEIoT.Core.Services
@@ -91,14 +92,7 @@ namespace SMEIoT.Core.Services
 
     public async IAsyncEnumerable<Device> ListDevicesAsync(int offset, int limit)
     {
-      if (offset < 0)
-      {
-        throw new InvalidArgumentException("Offset can't be negative.", "offset");
-      }
-      if (limit < 0)
-      {
-        throw new InvalidArgumentException("Limit can't be negative.", "limit"); 
-      }
+      RangeQueryValidations.ValidateRangeQueryParameters(offset, limit);
       await foreach (var device in _dbContext.Devices.OrderBy(u => u.Id).Skip(offset).Take(limit).AsAsyncEnumerable())
       {
         yield return device;
@@ -115,14 +109,8 @@ namespace SMEIoT.Core.Services
 
     public async IAsyncEnumerable<Sensor> ListSensorsAsync(int offset, int limit)
     {
-      if (offset < 0)
-      {
-        throw new InvalidArgumentException("Offset can't be negative.", "offset");
-      }
-      if (limit < 0)
-      {
-        throw new InvalidArgumentException("Limit can't be negative.", "limit");       
-      }
+      RangeQueryValidations.ValidateRangeQueryParameters(offset, limit);
+
       await foreach (var sensor in _dbContext.Sensors.Include(s => s.Device).OrderBy(u => u.Id).Skip(offset).Take(limit).AsAsyncEnumerable())
       {
         yield return sensor;

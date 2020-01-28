@@ -1,4 +1,3 @@
-import "./styles/site.scss";
 import * as React from "react";
 import { Router } from "@reach/router";
 import { IntlProvider } from "react-intl";

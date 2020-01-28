@@ -29,14 +29,12 @@ import useModal from "../helpers/useModal";
 import DashboardDeviceMenu from "./DashboardDeviceMenu";
 import DashboardDeviceDialog from "./DashboardDeviceDialog";
 import { darken, fade } from "@material-ui/core/styles/colorManipulator";
+import Grow from "@material-ui/core/Grow";
 
 const styles = ({
   palette,
   spacing,
-  transitions,
-  zIndex,
-  mixins,
-  breakpoints
+  transitions
 }: Theme) => createStyles({
   container: {
   },
@@ -76,6 +74,10 @@ const styles = ({
   },
   notConnected: {
     backgroundColor: palette.type === 'light' ? darken(palette.background.paper, 0.1) : fade(palette.background.paper, 0.1)
+  },
+  banner: {
+    transition: "1s",
+    transform: ""
   }
 });
 
@@ -210,20 +212,22 @@ const _DashboardDeviceBoard: React.FunctionComponent<IDashboardDeviceBoard> = ({
   return (
     <React.Fragment>
       {unconnectedDeviceNames.length > 0 && (
-        <Grid item xs={12}>
-          <BannerNotice to={`/dashboard/devices/wait_connection?name=${unconnectedDeviceNames[0]}`}>
-            <Typography component="p">
-              <FormattedMessage
-                id="dashboard.devices.index.unconnected_notice"
-                description="Notice related with continuing connecting devices"
-                defaultMessage="Notice: your devices {names} are not connected. Continue to connect instead of creating a new one?"
-                values={{
-                  names: unconnectedDeviceNames.join(", ")
-                }}
-              />
-            </Typography>
-          </BannerNotice>
-        </Grid>
+        <Grow in {...{ timeout: 1000 }}>
+          <Grid item xs={12}>
+            <BannerNotice to={`wait_connection?name=${unconnectedDeviceNames[0]}`}>
+              <Typography component="p">
+                <FormattedMessage
+                  id="dashboard.devices.index.unconnected_notice"
+                  description="Notice related with continuing connecting devices"
+                  defaultMessage="Notice: your devices {names} are not connected. Continue to connect instead of creating a new one?"
+                  values={{
+                    names: unconnectedDeviceNames.join(", ")
+                  }}
+                />
+              </Typography>
+            </BannerNotice>
+          </Grid>
+        </Grow>
       )}
       {state.loading ? renderDevice(undefined, "") : renderDevices()}
       <DashboardDeviceMenu

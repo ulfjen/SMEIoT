@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using SMEIoT.Core.Entities;
 using SMEIoT.Core.Exceptions;
 using SMEIoT.Core.Interfaces;
+using SMEIoT.Core.Helpers;
 using System.Linq.Dynamic.Core;
 using NodaTime;
 
@@ -47,7 +48,7 @@ namespace SMEIoT.Core.Services
       var user = await _userManager.FindByNameAsync(userName);
       if (user == null)
       {
-        throw new EntityNotFoundException($"cannot find the user {userName}.", "userName");
+        throw new EntityNotFoundException($"cannot find the user {userName}.", nameof(userName));
       }
 
       var roles = await _userManager.GetRolesAsync(user);
@@ -72,11 +73,11 @@ namespace SMEIoT.Core.Services
           }
           else if (!HandleNewPasswordIdentityError(err, passwordErrors))
           {
-              throw new InvalidUserInputException(err.Description);
+            throw new InvalidUserInputException(err.Description);
           }
         }
         if (passwordErrors.Count > 0) {
-          throw new InvalidArgumentException(string.Join('\n', passwordErrors), "password");
+          throw new InvalidArgumentException(string.Join('\n', passwordErrors), nameof(password));
         }
       }
 
@@ -240,14 +241,7 @@ namespace SMEIoT.Core.Services
     /// otherwise we return the users have designated roles
     public async IAsyncEnumerable<(User, IList<string>)> ListBasicUserResultAsync(int offset, int limit, IEnumerable<string?>? roles = null)
     {
-      if (offset < 0)
-      {
-        throw new InvalidArgumentException("Offset can't be negative", "offset");
-      }
-      if (limit < 0)
-      {
-        throw new InvalidArgumentException("limit can't be negative", "limit"); 
-      }
+      RangeQueryValidations.ValidateRangeQueryParameters(offset, limit);
       var sanitized = SanitizedRoles(roles);
       var roleIds = await GetRoleIdsFromNamesAsync(sanitized); 
       
@@ -304,6 +298,18 @@ namespace SMEIoT.Core.Services
       var adminRoleName = normalizer.NormalizeName("Admin");
       
       return Task.FromResult(roles.Any(r => normalizer.NormalizeName(r) == adminRoleName));
+    }
+
+    public async IAsyncEnumerable<(User, IList<string>)> SearchUserWithQueryAsync(string query, int limit)
+    {
+      RangeQueryValidations.ValidateRangeQueryParameters(0, limit);
+
+      await foreach (var user in 
+        _dbContext.Users.Where(u => EF.Functions.Like(u.UserName, $"{query}%")).Take(limit).AsAsyncEnumerable())
+      {
+        var roles = await _userManager.GetRolesAsync(user);
+        yield return (user, roles);
+      }
     }
   }
 

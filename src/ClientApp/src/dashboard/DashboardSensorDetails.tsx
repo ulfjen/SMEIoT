@@ -125,7 +125,7 @@ const _DashboardSensorDetails: React.FunctionComponent<IDashboardSensorDetails> 
   return (
     <DashboardFrame
       title={intl.formatMessage(messages.title, { deviceName, sensorName })}
-      drawer
+      drawer={appCookie.admin}
       direction="ltr"
       toolbarRight={<UserAvatarMenu appCookie={appCookie} navigate={navigate}/>}
       ref={containerRef}

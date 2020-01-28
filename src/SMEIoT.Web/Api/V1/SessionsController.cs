@@ -26,7 +26,7 @@ namespace SMEIoT.Web.Api.V1
     }
 
     [AllowAnonymous]
-//    [ValidateAntiForgeryToken]
+    [IgnoreAntiforgeryToken]
     [HttpPost("")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
