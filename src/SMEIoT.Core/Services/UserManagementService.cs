@@ -9,6 +9,7 @@ using SMEIoT.Core.Entities;
 using SMEIoT.Core.Exceptions;
 using SMEIoT.Core.Interfaces;
 using System.Linq.Dynamic.Core;
+using NodaTime;
 
 namespace SMEIoT.Core.Services
 {
@@ -26,16 +27,19 @@ namespace SMEIoT.Core.Services
     private readonly RoleManager<IdentityRole<long>> _roleManager;
     private readonly ILogger _logger;
     private readonly IApplicationDbContext _dbContext;
+    private readonly IClock _clock;
 
     public UserManagementService(IApplicationDbContext dbContext,
       UserManager<User> userManager,
       RoleManager<IdentityRole<long>> roleManager,
-      ILogger<UserManagementService> logger)
+      ILogger<UserManagementService> logger,
+      IClock clock)
     {
       _dbContext = dbContext;
       _userManager = userManager;
       _roleManager = roleManager;
       _logger = logger;
+      _clock = clock;
     }
 
     public async Task<(User, IList<string>)> GetUserAndRoleByNameAsync(string userName)
@@ -52,9 +56,11 @@ namespace SMEIoT.Core.Services
 
     public async Task CreateUserWithPasswordAsync(string userName, string password)
     {
-      var result =
-        await _userManager.CreateAsync(new User {UserName = userName, SecurityStamp = Guid.NewGuid().ToString()},
-          password);
+      var result = await _userManager.CreateAsync(new User {
+        UserName = userName,
+        SecurityStamp = Guid.NewGuid().ToString(),
+        LastSeenAt = _clock.GetCurrentInstant()
+      }, password);
       if (!result.Succeeded)
       {
         var passwordErrors = new List<string>();

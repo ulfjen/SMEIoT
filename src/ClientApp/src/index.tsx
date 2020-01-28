@@ -14,14 +14,11 @@ export function GetDefaultApiConfig() {
     credentials: "same-origin",
     middleware: [{
       post: (ctx) => new Promise(resolve => {
-        const status = ctx.response.status;
-        if (status >= 300 && status < 400) {
-          const location = ctx.response.headers.get("Location");
-          if (location) {
-            window.location.replace(location);
-          }
+        if (ctx.response.redirected) {
+          window.location.href = ctx.response.url;
+        } else {
+          resolve(ctx.response);
         }
-        resolve(ctx.response);
       })
     }]
   });

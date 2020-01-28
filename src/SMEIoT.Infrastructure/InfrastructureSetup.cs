@@ -14,7 +14,6 @@ using SMEIoT.Core.Services;
 using SMEIoT.Infrastructure.Services;
 using Npgsql;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.AspNetCore.Builder;
 
 namespace SMEIoT.Infrastructure
 {
@@ -32,9 +31,9 @@ namespace SMEIoT.Infrastructure
       });
     }
 
-    public static void ConfigureHangfire(this IServiceCollection services, IConfiguration configuration)
+    public static void ConfigureHangfire(IGlobalConfiguration configuration)
     {
-      Hangfire.GlobalConfiguration.Configuration
+      configuration
         .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
         .UseSimpleAssemblyNameTypeSerializer()
         .UseRecommendedSerializerSettings()
@@ -42,12 +41,6 @@ namespace SMEIoT.Infrastructure
         // and hangfire PostgreSql can't store Nodatime.
         // Cache size 5000 * 4KB (page) = 20M memory
         .UseLiteDbStorage($"Filename=Hangfire.db; Mode=Shared; Cache Size=5000; Flush=true");
-    }
-
-    public static void UseHangfireActivator(this IApplicationBuilder app, IServiceProvider serviceProvider)
-    {
-      Hangfire.GlobalConfiguration.Configuration
-        .UseActivator(new HangfireActivatorService(serviceProvider.GetService<IServiceScopeFactory>()));
     }
 
     public static void ConfigureMqttClient(this IServiceCollection services, IConfiguration configuration)

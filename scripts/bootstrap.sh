@@ -181,6 +181,14 @@ function link_build_to_current {
   sudo ln -s $SMEIOT_ROOT/$DATE $SMEIOT_ROOT/current
 }
 
+function fix_permission {
+  sudo chown -R smeiot:smeiot $SMEIOT_ROOT && sudo chmod +x $SMEIOT_ROOT/current/SMEIoT.Web
+}
+
+function cleanup_tmp_build {
+  sudo rm -rf $TMP_BOOTSTRAP_DIR && sudo rm -rf /tmp/smeiot*.tar.gz
+}
+
 function build_smeiot_with_remote_tars {
   sudo mkdir -p $TMP_BOOTSTRAP_DIR
   create_user
@@ -191,14 +199,18 @@ function build_smeiot_with_remote_tars {
   setup_server_config_and_db
   link_build_to_current
   configure_system
-  sudo chown -R smeiot:smeiot $SMEIOT_ROOT && sudo rm -rf $TMP_BOOTSTRAP_DIR && sudo rm -rf /tmp/smeiot*.tar.gz && echo "SMEIoT is up." && cd $SMEIOT_ROOT
+  fix_permission
+  cleanup_tmp_build
+  echo "SMEIoT is up." && cd $SMEIOT_ROOT
 }
 
 function upgrade_smeiot {
   setup_smeiot_with_tar
   build_mosquitto_plugins
   link_build_to_current
-  sudo chown -R smeiot:smeiot $SMEIOT_ROOT && sudo rm -rf $TMP_BOOTSTRAP_DIR && sudo rm -rf /tmp/smeiot*.tar.gz && sudo systemctl restart smeiot && echo "SMEIoT is upgraded." && cd $SMEIOT_ROOT
+  fix_permission
+  cleanup_tmp_build
+  sudo systemctl restart smeiot && echo "SMEIoT is upgraded." && cd $SMEIOT_ROOT
 }
 
 function install_dotnet_ef {

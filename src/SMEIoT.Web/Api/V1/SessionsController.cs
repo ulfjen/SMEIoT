@@ -19,9 +19,9 @@ namespace SMEIoT.Web.Api.V1
 
     public SessionsController(
       SignInManager<User> signInManager,
-      ILoggerFactory loggerFactory)
+      ILogger<SessionsController> logger)
     {
-      _logger = loggerFactory.CreateLogger<SessionsController>();
+      _logger = logger;
       _signInManager = signInManager;
     }
 

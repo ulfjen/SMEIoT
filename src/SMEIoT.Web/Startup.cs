@@ -56,8 +56,7 @@ namespace SMEIoT.Web
       services.AddDbContext(Configuration);
 
       services.AddInfrastructureServices(_env, Configuration);
-      services.ConfigureHangfire(Configuration);
-      services.AddHangfire(globalConfig => { });
+      services.AddHangfire(InfrastructureSetup.ConfigureHangfire);
 
       services.AddHangfireServer(options =>
       {
@@ -67,14 +66,15 @@ namespace SMEIoT.Web
       services.AddTransient<ProblemDetailsFactory, SMEIoTProblemDetailsFactory>();
       services.AddScoped<ISensorAssignmentService, SensorAssignmentService>();
       services.AddScoped<IUserManagementService, UserManagementService>();
-      services.AddScoped<IUserProfileService, UserProfileService>();
       services.AddScoped<IDeviceService, DeviceService>();
       services.AddScoped<IDashboardService, DashboardService>();
       services.AddScoped<ISensorValueService, SensorValueService>();
       services.AddScoped<IMqttEntityIdentifierSuggestionService, MqttEntityIdentifierSuggestionService>();
       services.AddTransient<ISecureKeySuggestionService, SecureKeySuggestionService>();
       services.AddTransient<IServerHostAccessor, ServerHostAccessor>();
+
       services.AddScoped<IToggleMqttEntityStatusJob, ToggleMqttEntityStatusJob>();
+      services.AddScoped<IUpdateUserLastSeenAtTimestampJob, UpdateUserLastSeenAtTimestampJob>();
 
       services.ConfigureMqttClient(Configuration);
 
@@ -196,7 +196,6 @@ namespace SMEIoT.Web
         app.UseHsts();
       }
 
-      app.UseHangfireActivator(serviceProvider);
       app.UseHttpsRedirection();
 
       app.UseStaticFiles(new StaticFileOptions

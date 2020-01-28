@@ -80,12 +80,6 @@ namespace SMEIoT.Core.Jobs
 
     public void OnPerforming(PerformingContext context)
     {
-      var timestamp = GetTimestamp(context.Connection, context.BackgroundJob.Job);
-      Logger.TraceFormat("timestamp {0} for the job {1}.", timestamp, context.BackgroundJob.Job.Type.FullName);
-      if (TimestampInWindow(timestamp, _seconds))
-      {
-        context.Canceled = true;
-      }
     } 
 
     public void OnPerformed(PerformedContext context)

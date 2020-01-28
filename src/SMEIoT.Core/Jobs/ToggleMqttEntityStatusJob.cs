@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using SMEIoT.Core.Interfaces;
-using SMEIoT.Core.Entities;
 using NodaTime;
 using Microsoft.EntityFrameworkCore;
 

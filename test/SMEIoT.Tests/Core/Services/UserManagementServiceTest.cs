@@ -9,9 +9,10 @@ using SMEIoT.Core.Services;
 using SMEIoT.Infrastructure.Data;
 using SMEIoT.Tests.Shared;
 using SMEIoT.Web.Services;
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
+using NodaTime;
+using NodaTime.Testing;
 
 namespace SMEIoT.Tests.Core.Services
 {
@@ -24,13 +25,15 @@ namespace SMEIoT.Tests.Core.Services
     private readonly UserManager _userManager;
     private readonly RoleManager<IdentityRole<long>> _roleManager;
     private UserManagementService _service;
+    private IClock _clock;
 
     public UserManagementServiceTest()
     {
-      _dbContext = ApplicationDbContextHelper.BuildTestDbContext();
-      _userManager = IdentityHelpers.BuildUserManager(ApplicationDbContextHelper.BuildTestDbContext());
-      _roleManager = IdentityHelpers.BuildRoleManager(ApplicationDbContextHelper.BuildTestDbContext());
-      _service = new UserManagementService(_dbContext, _userManager, _roleManager, new NullLogger<UserManagementService>());
+      _clock = new FakeClock(SystemClock.Instance.GetCurrentInstant());
+      _dbContext = ApplicationDbContextHelper.BuildTestDbContext(_clock);
+      _userManager = IdentityHelpers.BuildUserManager(ApplicationDbContextHelper.BuildTestDbContext(_clock));
+      _roleManager = IdentityHelpers.BuildRoleManager(ApplicationDbContextHelper.BuildTestDbContext(_clock));
+      _service = new UserManagementService(_dbContext, _userManager, _roleManager, new NullLogger<UserManagementService>(), _clock);
     }
 
 #pragma warning disable CA1063 // Implement IDisposable Correctly
@@ -174,6 +177,17 @@ namespace SMEIoT.Tests.Core.Services
       var exce = Assert.IsType<InvalidArgumentException>(res);
       Assert.Equal("password", exce.ParamName);
       Assert.Contains("common", exce.Message);
+    }
+
+    [Fact]
+    public async Task CreateUserWithPasswordAsync_AssignsLastSeenAt()
+    {
+      const string userName1 = "normal-userName-1";
+
+      await _service.CreateUserWithPasswordAsync(userName1, "a-normal-pass123456789");
+
+      var user = await _userManager.FindByNameAsync(userName1);
+      Assert.Equal(_clock.GetCurrentInstant(), user.LastSeenAt);
     }
 
     [Fact]
