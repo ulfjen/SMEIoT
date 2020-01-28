@@ -36,6 +36,7 @@ using SMEIoT.Web.ApiModels;
 using SMEIoT.Web.Middlewares;
 using System.Net.Mime;
 using SMEIoT.Web.Hangfire;
+using AspNetCoreRateLimit;
 
 namespace SMEIoT.Web
 {
@@ -54,6 +55,10 @@ namespace SMEIoT.Web
     public virtual void ConfigureServices(IServiceCollection services)
     {
       services.AddDbContext(Configuration);
+      services.AddOptions();
+      services.AddMemoryCache();
+      services.Configure<IpRateLimitOptions>(Configuration.GetSection("IpRateLimiting"));
+      services.Configure<IpRateLimitPolicies>(Configuration.GetSection("IpRateLimitPolicies"));
 
       services.AddInfrastructureServices(_env, Configuration);
       services.AddHangfire(InfrastructureSetup.ConfigureHangfire);
@@ -62,6 +67,11 @@ namespace SMEIoT.Web
       {
         options.Queues = new[] { "critical", "default" };
       });
+
+      services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+      services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+      services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+      services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 
       services.AddTransient<ProblemDetailsFactory, SMEIoTProblemDetailsFactory>();
       services.AddScoped<ISensorAssignmentService, SensorAssignmentService>();
@@ -209,6 +219,7 @@ namespace SMEIoT.Web
       });
 
       app.UseRouting();
+      app.UseIpRateLimiting();
 
       app.UseAuthentication();
       StartupIdentityDataInitializer.SeedRoles(roleManager);
