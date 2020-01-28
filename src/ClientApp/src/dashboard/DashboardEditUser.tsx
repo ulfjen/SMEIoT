@@ -18,6 +18,8 @@ import CloseIcon from '@material-ui/icons/Close';
 import { Link, RouteComponentProps } from '@reach/router';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
+import { useIntl, defineMessages } from 'react-intl';
+import { useTitle } from 'react-use';
 
 const styles = ({palette, spacing, transitions, zIndex, mixins, breakpoints}: Theme) => createStyles({
   container: {
@@ -59,8 +61,18 @@ export interface IDashboardEditUserProps extends RouteComponentProps<IDashboardE
   
 }
 
+const messages = defineMessages({
+  title: {
+    id: "dashboard.users.title",
+    description: "Edit user title",
+    defaultMessage: "Edit user"
+  }
+});
 
 const _DashboardEditUser: React.FunctionComponent<IDashboardEditUserProps> = ({ classes, userName }) => {
+  const intl = useIntl();
+  useTitle(intl.formatMessage(messages.title));
+
   const [user, setUser] = React.useState<AdminUserApiModel>({
     createdAt: moment.utc().toISOString(),
     id: 0,

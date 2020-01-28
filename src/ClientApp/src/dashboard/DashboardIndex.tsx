@@ -19,6 +19,7 @@ import useInterval from '../helpers/useInterval';
 import { DashboardApi, SystemHighlightsApiModel } from 'smeiot-client';
 import { GetDefaultApiConfig } from '..';
 import Skeleton from '@material-ui/lab/Skeleton';
+import { useTitle } from 'react-use';
 
 const styles = ({ palette, spacing }: Theme) => createStyles({
   container: {
@@ -50,6 +51,8 @@ const messages = defineMessages({
 
 const _DashboardIndex: React.FunctionComponent<IDashboardIndexProps> = ({ classes, navigate }) => {
   const intl = useIntl();
+  useTitle(intl.formatMessage(messages.title));
+
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
   const appCookie = useAppCookie();
