@@ -17,7 +17,7 @@ import {
 import ExpandedCardHeader from "../components/ExpandedCardHeader";
 import StatusBadge from "../components/StatusBadge";
 import useInterval from "../helpers/useInterval";
-import { BrokerApi, BasicBrokerApiModel } from "smeiot-client";
+import { BrokerApi, BasicBrokerApiModel, ProblemDetails } from "smeiot-client";
 import { GetDefaultApiConfig } from "../index";
 import { ReactComponent as Broker } from "../images/broker.svg";
 import { Typography } from "@material-ui/core";
@@ -102,15 +102,26 @@ const _BrokerCard: React.FunctionComponent<IBrokerCard> = ({ classes }) => {
     setAnchorEl(null);
   };
   const [loading, setLoading] = React.useState<boolean>(false);
+  const [error, setError] = React.useState<string>("");
 
   const api = new BrokerApi(GetDefaultApiConfig());
   const updateBroker = async () => {
     setLoading(true);
-    let details = await api.apiBrokerBasicGet();
-    if (details === null) { return; }
-    setBroker(details);
-    setLoading(false);
-  }
+    setError("");
+    await api.apiBrokerBasicGet().then(res => {
+      if (res !== null) {
+        setBroker(res);
+      }
+      return res;
+    })
+    .catch(async res => {
+      const pd: ProblemDetails = await res.json();
+      setError(pd.title + "\n" + pd.detail);
+    })
+    .finally(() => {
+      setLoading(false);
+    });
+  };
 
   useInterval(updateBroker, 10000);
 
@@ -141,7 +152,7 @@ const _BrokerCard: React.FunctionComponent<IBrokerCard> = ({ classes }) => {
           <div>
             <Skeleton variant="text" /><Skeleton variant="text" /><Skeleton variant="text" />
           </div>
-          : <div>
+          : error.length > 0 ? <div>{error}</div> : <div>
             {broker && <LoadFactors min1={broker.min1} min5={broker.min5} min15={broker.min15} />}
             <Typography component="p" color="textSecondary">
               {broker && <FormattedMessage
