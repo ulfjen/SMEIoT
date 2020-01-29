@@ -22,7 +22,9 @@ const styles = ({ spacing, transitions, zIndex, mixins, breakpoints }: Theme) =>
   root: {
     display: 'flex',
   },
-  toolbar: mixins.toolbar,
+  toolbar: {
+    ...mixins.toolbar
+  },
   toolbarIcon: {
     display: 'flex',
     alignItems: 'center',
@@ -55,7 +57,9 @@ const styles = ({ spacing, transitions, zIndex, mixins, breakpoints }: Theme) =>
   drawerPaper: {
     width: drawerWidth,
   },
-  appBarSpacer: mixins.toolbar,
+  appBarSpacer: {
+    ...mixins.toolbar,
+  },
   content: {
     flexGrow: 1,
     height: '100vh',
