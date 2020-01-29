@@ -4,7 +4,7 @@ using SMEIoT.Core.Services;
 using Xunit;
 using System.Threading.Tasks;
 
-namespace SMEIoT.Tests.Core.Services
+namespace SMEIoT.Tests.Core
 {
   public class SecureKeySuggestionServiceTest
   {

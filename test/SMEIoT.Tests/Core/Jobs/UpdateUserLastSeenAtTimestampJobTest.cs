@@ -10,7 +10,7 @@ using SMEIoT.Infrastructure.Data;
 using SMEIoT.Tests.Shared;
 using Xunit;
 
-namespace SMEIoT.Tests.Core.Jobs
+namespace SMEIoT.Tests.Core
 {
   [Collection("Database collection")]
   public

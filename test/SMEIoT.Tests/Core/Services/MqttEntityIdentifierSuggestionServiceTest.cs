@@ -13,7 +13,7 @@ using SMEIoT.Infrastructure.Data;
 using SMEIoT.Tests.Shared;
 using Xunit;
 
-namespace SMEIoT.Tests.Core.Services
+namespace SMEIoT.Tests.Core
 {
 #pragma warning disable CA1063 // Implement IDisposable Correctly
   public class MqttEntityIdentifierSuggestionServiceTest : IDisposable

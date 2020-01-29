@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using SMEIoT.Core.Services;
 using Xunit;
 
-namespace SMEIoT.Tests.Core.Services
+namespace SMEIoT.Tests.Core
 {
   public class MosquittoClientAuthenticationServiceTest
   {

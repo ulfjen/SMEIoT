@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using SMEIoT.Infrastructure.Services;
 
-namespace SMEIoT.Tests.Core.Services
+namespace SMEIoT.Tests.Core
 {
   [Collection("Database collection")]
 #pragma warning disable CA1063 // Implement IDisposable Correctly

@@ -12,7 +12,7 @@ using SMEIoT.Tests.Shared;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace SMEIoT.Tests.Core.Jobs
+namespace SMEIoT.Tests.Core
 {
   [Collection("Database collection")]
 #pragma warning disable CA1063 // Implement IDisposable Correctly

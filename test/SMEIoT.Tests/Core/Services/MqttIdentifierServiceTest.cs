@@ -11,7 +11,7 @@ using SMEIoT.Core.Services;
 using SMEIoT.Tests.Shared;
 using Xunit;
 
-namespace SMEIoT.Tests.Core.Services
+namespace SMEIoT.Tests.Core
 {
   [Collection("Database collection")]
   public class MqttIdentifierServiceTest

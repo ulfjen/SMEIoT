@@ -9,7 +9,7 @@ using System.Linq;
 using Moq;
 using SMEIoT.Core.Interfaces;
 
-namespace SMEIoT.Tests.Core.Services
+namespace SMEIoT.Tests.Core
 {
   public class MosquittoBrokerServiceTest
   {

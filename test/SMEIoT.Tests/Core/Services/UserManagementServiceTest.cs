@@ -15,7 +15,7 @@ using Xunit;
 using NodaTime;
 using NodaTime.Testing;
 
-namespace SMEIoT.Tests.Core.Services
+namespace SMEIoT.Tests.Core
 {
   [Collection("Database collection")]
 #pragma warning disable CA1063 // Implement IDisposable Correctly

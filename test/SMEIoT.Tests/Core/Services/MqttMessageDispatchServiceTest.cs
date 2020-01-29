@@ -15,7 +15,7 @@ using Moq;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace SMEIoT.Tests.Core.Services
+namespace SMEIoT.Tests.Core
 {
   public class MqttMessageDispatchServiceTest
   {
