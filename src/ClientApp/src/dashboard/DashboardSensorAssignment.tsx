@@ -232,7 +232,7 @@ const _DashboardSensorAssignment: React.FunctionComponent<IDashboardSensorAssign
     throw new Error("No sensor is assigned to the route.");
   }
   const intl = useIntl();
-  const title = intl.formatMessage(messages.title, { name: sensorName });
+  const title = intl.formatMessage(messages.title, { name: `${deviceName}/${sensorName}` });
   useTitle(title);
 
   const aApi = new SensorAssignmentsApi(GetDefaultApiConfig());

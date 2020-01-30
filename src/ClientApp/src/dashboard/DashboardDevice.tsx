@@ -56,6 +56,7 @@ import CardActions from "@material-ui/core/CardActions";
 import DashboardSensorDialog from "./DashboardSensorDialog";
 import NumberGraph from "../components/NumberGraph";
 import LineCode from "../components/LineCode";
+import placeholder from "../images/placeholder300.jpg";
 
 const styles = ({ typography, palette, spacing, zIndex }: Theme) => createStyles({
   container: {
@@ -126,6 +127,9 @@ const styles = ({ typography, palette, spacing, zIndex }: Theme) => createStyles
     zIndex: zIndex.drawer + 1,
     color: '#fff',
   },
+  media: {
+    height: 150,
+  }
 });
 
 export interface IDashboardDeviceRouteParams {
@@ -211,6 +215,11 @@ const messages = defineMessages({
     id: "dashboard.devices.edit.dialog",
     description: "Message on snackbar",
     defaultMessage: "Something went wrong."
+  },
+  nothing: {
+    id: "dashboard.devices.edit.sensor.graph.nothing",
+      description: "graph placeholder text on sensor panel",
+      defaultMessage: "Nothing available yet"
   }
 });
 
@@ -261,7 +270,7 @@ const _DashboardDevice: React.FunctionComponent<IDashboardDeviceProps> = ({
         </ExpansionPanelSummary>
         <ExpansionPanelDetails className={classes.details}>
           <div className={classes.twoColumnSpan}>
-            <NumberGraph width={300} height={150} data={data} />
+            {data.length === 0 ? <img alt={intl.formatMessage(messages.nothing)} src={placeholder} className={classes.media} /> : <NumberGraph width={300} height={150} data={data} />}
           </div>
           <div className={clsx(classes.column, classes.helper)}>
             <Typography variant="caption">

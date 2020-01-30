@@ -1,0 +1,1 @@
+images/placeholder*.jpg is free. Photo by AbsolutVision on Unsplash.

@@ -29,6 +29,8 @@ import {
   Link as ReachLink
 } from "@reach/router";
 import Skeleton from "@material-ui/lab/Skeleton";
+import ErrorBoundary from "../components/ErrorBoundary";
+import placeholder from "../images/placeholder400.jpg";
 
 const styles = ({
   palette,
@@ -56,7 +58,10 @@ const styles = ({
       right: spacing(3)
     },
     sensorCard: {
-  
+
+    },
+    media: {
+      height: 200,
     }
   });
 
@@ -144,20 +149,24 @@ const _DashboardSensors: React.FunctionComponent<IDashboardSensors> = ({
 
   const renderSensor = (sensor: SensorDetailsApiModel, idx: number) => {
     const data = sensor.data.map(v => {
-      return {x: new Date(Date.parse(v.createdAt)).getTime(), y: v.value}
+      return { x: new Date(Date.parse(v.createdAt)).getTime(), y: v.value }
     });
     return <Card ref={idx === 0 ? measureRef : undefined} key={idx} className={classes.sensorCard}>
       <CardActionArea onClick={() => redirectToSensor(sensor.deviceName, sensor.sensorName)}>
-        <CardMedia
-          component="div"
+        {data.length === 0 ? <CardMedia
+          component="img"
           title="placeholder"
+          image={placeholder}
+          height={200}
+        /> : <CardMedia
+          component="div"
         >
-          <NumberGraph width={width} height={200} data={data}/>
-        </CardMedia>
+          <NumberGraph width={width} height={200} data={data} />
+        </CardMedia>}
         <CardContent>
           <TwoLayerLabelAction first={sensor.deviceName} second={sensor.sensorName} />
           <Typography variant="body2" color="textSecondary" component="p">
-            {sensor.data.length > 0 ? intl.formatMessage(messages.lastMessage, { last: moment(sensor.data[sensor.data.length-1].createdAt).fromNow() }) : intl.formatMessage(messages.noMessage)}
+            {sensor.data.length > 0 ? intl.formatMessage(messages.lastMessage, { last: moment(sensor.data[sensor.data.length - 1].createdAt).fromNow() }) : intl.formatMessage(messages.noMessage)}
           </Typography>
         </CardContent>
       </CardActionArea>
@@ -167,14 +176,14 @@ const _DashboardSensors: React.FunctionComponent<IDashboardSensors> = ({
             id="dashboard.sensors.index.sensor_card.actions.assign"
             description="Action for sensor card"
             defaultMessage="Assign"
-          /> 
+          />
         </Button>}
         <Button size="small" color="primary" component={ReachLink} to={`${sensor.deviceName}/${sensor.sensorName}`}>
           <FormattedMessage
             id="dashboard.sensors.index.sensor_card.actions.details"
             description="Action for sensor card"
             defaultMessage="Details"
-          /> 
+          />
         </Button>
       </CardActions>
     </Card>;
@@ -196,7 +205,7 @@ const _DashboardSensors: React.FunctionComponent<IDashboardSensors> = ({
     }
     window.location.href = path;
   };
-  
+
   return (
     <DashboardFrame
       title={intl.formatMessage(messages.title)}
@@ -207,23 +216,26 @@ const _DashboardSensors: React.FunctionComponent<IDashboardSensors> = ({
       content={
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={3}>
-            {loading ? <Grid item xs={12} md={6} lg={4}>
-              <Card className={classes.sensorCard}>
-                <Skeleton variant="rect" height={200} />
-                <CardContent>
-                  <Skeleton variant="text" />
-                  <Skeleton variant="text" />
-                </CardContent>
-              </Card>
-            </Grid>: renderSensors()}
-            {!loading && <Grid item xs={12}>
-              <Pagination
-                limit={10}
-                offset={(page-1)*10}
-                total={total}
-                onClick={(e, offset, page) => handleOffest(e, offset, page)}
-              />
-            </Grid>}
+            <ErrorBoundary>
+
+              {loading ? <Grid item xs={12} md={6} lg={4}>
+                <Card className={classes.sensorCard}>
+                  <Skeleton variant="rect" height={200} />
+                  <CardContent>
+                    <Skeleton variant="text" />
+                    <Skeleton variant="text" />
+                  </CardContent>
+                </Card>
+              </Grid> : renderSensors()}
+              {!loading && <Grid item xs={12}>
+                <Pagination
+                  limit={10}
+                  offset={(page - 1) * 10}
+                  total={total}
+                  onClick={(e, offset, page) => handleOffest(e, offset, page)}
+                />
+              </Grid>}
+            </ErrorBoundary>
           </Grid>
         </Container>
       }
