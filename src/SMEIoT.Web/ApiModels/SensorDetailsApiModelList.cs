@@ -8,9 +8,12 @@ namespace SMEIoT.Web.ApiModels
     [JsonProperty(Required = Required.DisallowNull)]
     public IEnumerable<SensorDetailsApiModel> Sensors { get; set; }
 
-    public SensorDetailsApiModelList(IEnumerable<SensorDetailsApiModel> sensors)
+    public int Total { get; set; }
+
+    public SensorDetailsApiModelList(IEnumerable<SensorDetailsApiModel> sensors, int total)
     {
       Sensors = sensors;
+      Total = total;
     }
   }
 }

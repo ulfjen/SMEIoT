@@ -14,6 +14,7 @@ using SMEIoT.Web.ApiModels;
 using SMEIoT.Web.BindingModels;
 using System.ComponentModel;
 using System;
+using Microsoft.AspNetCore.Identity;
 
 namespace SMEIoT.Web.Api.V1
 {
@@ -22,18 +23,24 @@ namespace SMEIoT.Web.Api.V1
     private readonly ILogger _logger;
     private readonly IDeviceService _service;
     private readonly ISensorValueService _valueService;
+    private readonly ISensorAssignmentService _assignmentService;
+    private readonly UserManager<User> _userManager;
     private readonly IClock _clock;
 
     public SensorsController(
       ILogger<SensorsController> logger,
       IDeviceService service,
       IClock clock,
-      ISensorValueService valueService)
+      ISensorValueService valueService,
+      ISensorAssignmentService assignmentService,
+      UserManager<User> userManager)
     {
       _logger = logger;
       _service = service;
       _clock = clock;
       _valueService = valueService;
+      _assignmentService = assignmentService;
+      _userManager = userManager;
     }
 
     [HttpGet("")]
@@ -44,25 +51,41 @@ namespace SMEIoT.Web.Api.V1
     {
       var list = new List<SensorDetailsApiModel>();
       var sensors = new Dictionary<long, Sensor>();
-      await foreach (var sensor in _service.ListSensorsAsync(offset, limit))
+      var user = await _userManager.GetUserAsync(HttpContext.User);
+      var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+      var total = 0;
+      if (isAdmin)
       {
-        sensors[sensor.Id] = sensor;
-      }
-      
-      var valsBySensorId = new Dictionary<long, List<(double, Instant)>>();
-      await foreach (var v in _valueService.GetLastNumberOfValuesBySensorsAsync(sensors.Values, 10))
-      {
-        if (!valsBySensorId.ContainsKey(v.sensor.Id)) {
-          valsBySensorId[v.sensor.Id] = new List<(double, Instant)>();
+        await foreach (var sensor in _service.ListSensorsAsync(offset, limit))
+        {
+          sensors[sensor.Id] = sensor;
         }
-        valsBySensorId[v.sensor.Id].Add((v.value, v.createdAt));
+        total = await _service.NumberOfSensorsAsync();
+      }
+      else
+      {
+        await foreach (var sensor in _assignmentService.ListSensorsByUserAsync(user, offset, limit))
+        {
+          sensors[sensor.Id] = sensor;
+        }
+        total = await _assignmentService.NumberOfSensorsByUserAsync(user);
+      }
+
+      var valsBySensorId = new Dictionary<long, List<(double, Instant)>>();
+      foreach (var id in sensors.Keys)
+      {
+        valsBySensorId[id] = new List<(double, Instant)>();
+      }
+      await foreach (var (sensor, value, createdAt) in _valueService.GetLastNumberOfValuesBySensorsAsync(sensors.Values, 10))
+      {
+        valsBySensorId[sensor.Id].Add((value, createdAt));
       }
       
       foreach (var (k, v) in valsBySensorId) {
         list.Add(new SensorDetailsApiModel(sensors[k], v));
       }
 
-      return Ok(new SensorDetailsApiModelList(list));
+      return Ok(new SensorDetailsApiModelList(list, total));
     }
 
     [HttpGet("{deviceName}/{sensorName}")]

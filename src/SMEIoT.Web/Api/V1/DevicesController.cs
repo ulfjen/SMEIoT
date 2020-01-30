@@ -103,9 +103,9 @@ namespace SMEIoT.Web.Api.V1
         sensors.Add(sensor);
         valsBySensorId[sensor.Id] = new List<(double, Instant)>();
       }
-      await foreach (var v in _valueService.GetLastNumberOfValuesBySensorsAsync(sensors, 10))
+      await foreach (var (sensor, value, createdAt) in _valueService.GetLastNumberOfValuesBySensorsAsync(sensors, 10))
       {
-        valsBySensorId[v.sensor.Id].Add((v.value, v.createdAt));
+        valsBySensorId[sensor.Id].Add((value, createdAt));
       }
       
       var sensorList = new List<SensorDetailsApiModel>();

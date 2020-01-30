@@ -117,6 +117,11 @@ namespace SMEIoT.Core.Services
       }
     }
 
+    public async Task<int> NumberOfSensorsAsync()
+    {
+      return await _dbContext.Sensors.CountAsync();
+    }
+
     public async Task CreateSensorByDeviceAndNameAsync(Device device, string sensorName)
     {
       var legalNames = await _identifierService.ListSensorNamesByDeviceNameAsync(device.Name);

@@ -1757,7 +1757,8 @@
       },
       "SensorDetailsApiModelList": {
         "required": [
-          "sensors"
+          "sensors",
+          "total"
         ],
         "type": "object",
         "properties": {
@@ -1766,6 +1767,10 @@
             "items": {
               "$ref": "#/components/schemas/SensorDetailsApiModel"
             }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false

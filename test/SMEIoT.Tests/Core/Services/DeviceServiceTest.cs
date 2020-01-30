@@ -420,6 +420,17 @@ namespace SMEIoT.Tests.Core
     }
 
     [Fact]
+    public async Task NumberOfSensorsAsync_ReturnsNumber()
+    {
+      await SeedDefaultSensorsAsync();
+
+      var cnt = await _service.NumberOfSensorsAsync();
+
+      Assert.Equal(15, cnt);
+    }
+
+
+    [Fact]
     public async Task ListSensorsAsync_ThrowsNegativeOffset()
     {
       await SeedDefaultSensorsAsync();
