@@ -36,7 +36,7 @@ const styles = ({ spacing, transitions }: Theme) => createStyles({
     filter: "brightness(0) invert(1)"
   },
   buttonLoading: {
-    "& > div": {
+    "& > span": {
       marginLeft: spacing(1),
       display: "inline-block"
     }
