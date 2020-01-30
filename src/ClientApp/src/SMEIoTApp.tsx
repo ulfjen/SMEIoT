@@ -31,6 +31,7 @@ const SMEIoTApp: React.FunctionComponent = () => {
     script.async = true;
     // a hack so that we get 404 instead of 500
     // this does not get to a security problem anyhow but it's better with a 4xx.
+    // fix will be published after 4.1.0
     script.dataset.ids = "00000000-0000-0000-0000-000000000000";
     script.dataset.version = "4.1.0+202001271656";
     script.dataset.path = "/profiler/";

@@ -74,7 +74,7 @@ const _DashboardDeviceDialog: React.FunctionComponent<IDashboardDeviceDialogProp
     await api.apiDevicesNameDelete({
       name: deviceName
     }).then((res) => {
-      navigate && navigate(navigateUrl);
+      window.location.href = navigateUrl;
     }).catch(async response => {
       const pd: ProblemDetails = await response.json();
       setSnackbarOpen(true);
