@@ -121,6 +121,7 @@ namespace SMEIoT.Tests.Core
       foreach (var s in sensors) {
         s.Device.Connected = s.Connected = true;
         s.Device.LastMessageAt = s.LastMessageAt = _initial;
+        _dbContext.Sensors.Update(s);
       }
       await _dbContext.SaveChangesAsync();
       _clock.AdvanceMinutes(TimeOverWindow);
