@@ -13,9 +13,8 @@ using Xunit;
 namespace SMEIoT.Tests.Core
 {
   [Collection("Database collection")]
-  public
 #pragma warning disable CA1063 // Implement IDisposable Correctly
-  class UpdateUserLastSeenAtTimestampJobTest : IDisposable
+  public class UpdateUserLastSeenAtTimestampJobTest : IDisposable
 #pragma warning restore CA1063 // Implement IDisposable Correctly
   {
     private readonly ApplicationDbContext _dbContext;
