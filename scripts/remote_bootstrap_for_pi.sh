@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # The script runs on a workstation and then one can connect via ssh to a Pi and set it up
+# Dependencies like dotnet, dotnet-ef, node, npm, tsc (typescript) must be installed 
 
 set -ex
 
