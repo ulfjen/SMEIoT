@@ -295,50 +295,46 @@ const _DashboardSensorAssignment: React.FunctionComponent<IDashboardSensorAssign
     });
   }, [userList, aApi, deviceName, sensorName, users]);
 
-  const [debouncedQ, setDebouncedQ] = React.useState<string>('');
   useDebounce(
     () => {
-      setDebouncedQ(q);
+      // setDebouncedQ(q);
+      console.log("debounced hook", q, typeof(q));
+      if (q.length === 0) {
+        setUserList([]);
+        setSuggestText("");
+        return;
+      }
+      (async () => {
+        const api = new AdminUsersApi(GetDefaultApiConfig());
+        setSuggesting(true);
+        setUserList([]);
+        setSuggestText("");
+
+        await api.apiAdminUsersSearchGet({
+          query: q,
+          limit: 3
+        }).then(res => {
+          let hasSuggest = false;
+          if (res.total !== 0) {
+            const userIds = users.map(u => u.id);
+            const suggestedIds = (userList || []).map(u => u.user.id);
+            const suggestList = (userList || []).concat(res.users.map(u => { return {user: u, adding: false} })).filter(u => userIds.indexOf(u.user.id) === -1).filter(u => suggestedIds.indexOf(u.user.id) === -1);
+            if (suggestList.length !== 0) {
+              setUserList(suggestList);
+              hasSuggest = true;
+            }
+          }
+          if (!hasSuggest) {
+            setSuggestText(intl.formatMessage(messages.notFound));
+          }
+          setSuggesting(false);
+          return res;
+        });
+      })();
     },
-    300,
+    400,
     [q]
   );
-
-  React.useEffect(() => {
-    if (debouncedQ.length === 0) {
-      setUserList([]);
-      setSuggestText("");
-      return;
-    }
-    if (suggesting) { return; }
-    (async () => {
-      const api = new AdminUsersApi(GetDefaultApiConfig());
-      setSuggesting(true);
-      setUserList([]);
-      setSuggestText("");
-
-      await api.apiAdminUsersSearchGet({
-        query: debouncedQ,
-        limit: 3
-      }).then(res => {
-        let hasSuggest = false;
-        if (res.total !== 0) {
-          const userIds = users.map(u => u.id);
-          const suggestList = (userList || []).concat(res.users.map(u => { return {user: u, adding: false} })).filter(u => userIds.indexOf(u.user.id) === -1);
-          console.log(users, userIds, suggestList);
-          if (suggestList.length !== 0) {
-            setUserList(suggestList);
-            hasSuggest = true;
-          }
-        }
-        if (!hasSuggest) {
-          setSuggestText(intl.formatMessage(messages.notFound));
-        }
-        setSuggesting(false);
-        return res;
-      });
-    })();
-  }, [debouncedQ, users, intl, suggesting, userList]);
 
   const suggestUsers = (userList: Array<SuggestUserState>) => {
     return userList.map((u, idx) => <ListItem className={classes.suggestItem} key={idx}>
@@ -366,6 +362,9 @@ const _DashboardSensorAssignment: React.FunctionComponent<IDashboardSensorAssign
       deviceName, sensorName, userName
     }).then(res => {
       setUsers(users.filter(u => u.userName !== userName));
+      const update: Record<string, boolean> = {};
+      update[userName] = false;
+      setDeleting({ ...deleting, ...update });
     }).catch(async res => {
       const update: Record<string, boolean> = {};
       update[userName] = false;
