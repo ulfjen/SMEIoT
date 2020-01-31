@@ -120,6 +120,7 @@ namespace SMEIoT.Core.Services
           us => us.SensorId,
           (s, us) => s
         )
+        .Include(s => s.Device)
         .Distinct()
         .OrderBy(s => s.Id)
         .AsQueryable();
