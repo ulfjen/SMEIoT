@@ -95,7 +95,7 @@ namespace SMEIoT.Core.Services
 
       if (await _userManager.IsInRoleAsync(user, "Admin"))
       {
-        await foreach (var s in _dbContext.Sensors.Skip(offset).Take(limit).AsAsyncEnumerable())
+        await foreach (var s in _dbContext.Sensors.Include(s => s.Device).Skip(offset).Take(limit).AsAsyncEnumerable())
         {
           yield return s;
         }
