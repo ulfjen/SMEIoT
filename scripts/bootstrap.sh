@@ -81,7 +81,7 @@ function build_smeiot {
 
   cd $WEB_ROOT && rm -rf $BUILD_DIR && dotnet publish -c $SERVER_CONFIG -r $ARCH --self-contained true
   cp $WEB_ROOT/*.txt $BUILD_DIR
-  cd $JS_ROOT && npm install && npm run build && cp -r build/* $BUILD_DIR/wwwroot
+  cd $JS_ROOT/vendor/smeiot-client && npm run build && cd ../.. && npm run install && npm run build && cp -r build/* $BUILD_DIR/wwwroot
   cd $WEB_ROOT/../SMEIoT.Infrastructure && \
       echo "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";" > $BUILD_DIR/00-db-extension.sql.part && \
       dotnet ef migrations script -o $BUILD_DIR/01-migrations.sql.part && sed -i '1s/^\xEF\xBB\xBF//' $BUILD_DIR/01-migrations.sql.part && \
